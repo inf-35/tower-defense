@@ -1,0 +1,11 @@
+extends Data
+class_name TowerData
+
+@export var id: String = "default_tower"
+
+#meta-properties
+@export var cost: int = 20
+#...upgrades
+
+#attack
+@export var attack: AttackData

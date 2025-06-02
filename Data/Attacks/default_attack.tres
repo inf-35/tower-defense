@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://da0bsnptbva8s"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Data/attack_data.gd" id="1_noc6i"]
+
+[resource]
+script = ExtResource("1_noc6i")
+range = 20.0
+cooldown = 1.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

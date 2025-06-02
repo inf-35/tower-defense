@@ -1,0 +1,60 @@
+[gd_scene load_steps=11 format=3 uid="uid://b5w56jjx8pany"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_gynqw"]
+[ext_resource type="Resource" uid="uid://boo2jmxoqfgiv" path="res://Data/Towers/slow_tower.tres" id="2_gynqw"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_wm63n"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_w5asf"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_epj6i"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_ffjpd"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_88o0m"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_s3ih8"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/effects_component.gd" id="9_q1te1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
+radius = 600.0
+
+[node name="SlowTower" type="Node2D" node_paths=PackedStringArray("range_component", "attack_component", "graphics", "effects_component", "health_component", "movement_component")]
+z_index = 1
+script = ExtResource("1_gynqw")
+tower_data = ExtResource("2_gynqw")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+graphics = NodePath("Graphics")
+effects_component = NodePath("EffectsComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_wm63n")
+movement_data = ExtResource("4_w5asf")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_epj6i")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="." node_paths=PackedStringArray("area")]
+script = ExtResource("6_ffjpd")
+area = NodePath("../Range")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("7_88o0m")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 1, 1)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("8_s3ih8")
+
+[node name="Range" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Range"]
+shape = SubResource("CircleShape2D_lmklq")
+
+[node name="EffectsComponent" type="Node" parent="."]
+script = ExtResource("9_q1te1")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

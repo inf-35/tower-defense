@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://c3ku1oq2vb0nq"]
+
+[ext_resource type="Resource" uid="uid://drwm72s2i5kat" path="res://Data/Attacks/no_attack.tres" id="1_fnove"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="2_27gte"]
+
+[resource]
+script = ExtResource("2_27gte")
+id = "player_core"
+cost = 2147483648
+attack = ExtResource("1_fnove")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

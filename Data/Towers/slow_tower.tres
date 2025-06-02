@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://boo2jmxoqfgiv"]
+
+[ext_resource type="Resource" uid="uid://d1kim3xupxe54" path="res://Data/Attacks/slow_attack.tres" id="1_mb7nl"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="2_81w3o"]
+
+[resource]
+script = ExtResource("2_81w3o")
+id = "slow_tower"
+cost = null
+attack = ExtResource("1_mb7nl")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

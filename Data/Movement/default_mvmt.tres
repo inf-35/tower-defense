@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MovementData" load_steps=2 format=3 uid="uid://cluoqipn8n73o"]
+
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Data/movement_data.gd" id="1_4amoh"]
+
+[resource]
+script = ExtResource("1_4amoh")
+mobile = true
+max_speed = 50.0
+acceleration = 10000.0
+turn_speed = 720.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"

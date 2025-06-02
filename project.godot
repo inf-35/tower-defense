@@ -1,0 +1,29 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="tower_defense"
+run/main_scene="uid://dj5u4rlrnurt7"
+config/features=PackedStringArray("4.4", "Mobile")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Navigation="*res://Singletons/navigation.gd"
+Player="*res://Singletons/player.gd"
+References="*res://Singletons/references.gd"
+ClickHandler="*res://Singletons/click_handler.gd"
+TowerPattern="*res://Singletons/tower_pattern.gd"
+Waves="*res://Singletons/waves.gd"
+
+[rendering]
+
+renderer/rendering_method="mobile"
