@@ -33,7 +33,7 @@ func _ready():
 	_precompute_patterns()
 
 func _on_tower_changed(change_position: Vector2i):
-	var changed_type: Towers.Type = References.island.tower_grid[change_position]
+	var changed_type: Towers.Type = References.island.tower_grid[change_position].type
 	
 	for rule_key: String in PATTERN_RULES: 
 		var rule: Dictionary = PATTERN_RULES[rule_key]
@@ -46,7 +46,7 @@ func _on_tower_changed(change_position: Vector2i):
 			var pivot = change_position - off
 			# test the pattern at that pivot
 			if matches_pattern_at(pivot, rule.offsets, changed_type, true):
-				var tower_type: Towers.Type = tower_grid[pivot]
+				var tower_type: Towers.Type = tower_grid[pivot].type
 				pattern_detected = true
 
 		#if pattern_detected:
@@ -61,7 +61,7 @@ func matches_pattern_at(cell: Vector2i, pattern: Array[Vector2i], type_id: Tower
 		var ok = true
 		for off in variant:
 			var pos = cell + off
-			if not tower_grid.has(pos) or tower_grid[pos] != type_id:
+			if not tower_grid.has(pos) or (not is_instance_valid(tower_grid[pos])) or tower_grid[pos].type != type_id:
 				ok = false
 				break
 		if ok:

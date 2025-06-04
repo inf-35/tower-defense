@@ -1,7 +1,7 @@
 extends Data
 class_name TowerData
 
-@export var id: String = "default_tower"
+@export var id: Towers.Type
 
 #meta-properties
 @export var cost: int = 20

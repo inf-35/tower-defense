@@ -23,6 +23,8 @@ References="*res://Singletons/references.gd"
 ClickHandler="*res://Singletons/click_handler.gd"
 TowerPattern="*res://Singletons/tower_pattern.gd"
 Waves="*res://Singletons/waves.gd"
+Terrain="*res://Singletons/terrain.gd"
+TerrainGen="*res://Singletons/terrain_generator.gd"
 
 [rendering]
 

@@ -3,7 +3,7 @@ class_name MovementComponent
 
 signal movement_to_cell(origin: Vector2i, destination: Vector2i)
 
-var _effects_component: EffectsComponent
+var _modifiers_component: ModifiersComponent
 
 @export var movement_data: MovementData = preload("res://Data/Movement/default_mvmt.tres")
 var graphics: Node2D
@@ -14,7 +14,8 @@ var position: Vector2:
 	set(new_position):
 		position = new_position
 		cell_position = Island.position_to_cell(position)
-		unit.position = position
+		if is_instance_valid(unit):
+			unit.position = position
 
 var direction: Vector2
 var cell_position: Vector2i:
@@ -32,10 +33,10 @@ var target_direction: Vector2:
 
 var velocity: Vector2
 
-func inject_components(n_graphics: Node2D, effects_component = null):
-	if effects_component != null:
-		_effects_component = effects_component
-		_effects_component.register_data(movement_data)
+func inject_components(n_graphics: Node2D, modifiers_component = null):
+	if modifiers_component != null:
+		_modifiers_component = modifiers_component
+		_modifiers_component.register_data(movement_data)
 	graphics = n_graphics
 
 func _compute_stats():
@@ -60,9 +61,9 @@ func _physics_process(delta: float) -> void:
 	if not movement_data.mobile:
 		return
 		
-	var max_speed: float = get_stat(_effects_component, movement_data, Attributes.id.MAX_SPEED)
-	var acceleration: float = get_stat(_effects_component, movement_data, Attributes.id.ACCELERATION)
-	var turn_speed: float = get_stat(_effects_component, movement_data, Attributes.id.TURN_SPEED)
+	var max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
+	var acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
+	var turn_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.TURN_SPEED)
 
 	if target_position:
 		if (target_position - position).length_squared() > _ERROR_SQUARED:

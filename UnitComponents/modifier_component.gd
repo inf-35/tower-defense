@@ -1,5 +1,5 @@
 extends UnitComponent
-class_name EffectsComponent
+class_name ModifiersComponent
 
 #base stats
 var base_stats: Dictionary[Attributes.id, float] = {}
@@ -17,6 +17,10 @@ func add_modifier(mod: Modifier) -> void:
 		get_tree().create_timer(mod.cooldown).timeout.connect(func():
 			remove_modifier(mod)
 		)
+
+#change modifier
+func change_modifier(mod: Modifier) -> void:
+	_effective_cache.erase(mod.attribute)
 
 # remove a buff/debuff
 func remove_modifier(mod: Modifier) -> void:

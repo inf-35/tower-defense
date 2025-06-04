@@ -1,24 +1,34 @@
-[gd_scene load_steps=9 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene load_steps=12 format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_sl14g"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_42xql"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Data/effect_prototype.gd" id="2_61ft8"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_l1gn2"]
+[ext_resource type="Script" uid="uid://cw1ec6piesg7q" path="res://Data/Effects/reflect_damage.gd" id="3_od54l"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_61ft8"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="5_od54l"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="6_8fmk0"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/effects_component.gd" id="7_42xql"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifier_component.gd" id="7_42xql"]
+
+[sub_resource type="Resource" id="Resource_8fmk0"]
+script = ExtResource("3_od54l")
+params = {
+"reflection": 0.001
+}
+effect_type = 0
+metadata/_custom_type_script = "uid://cw1ec6piesg7q"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]
 radius = 60.0
 
-[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("graphics", "effects_component", "health_component", "movement_component", "navigation_component")]
+[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("graphics", "health_component", "movement_component", "navigation_component")]
 script = ExtResource("1_sl14g")
 hostile = true
 graphics = NodePath("Graphics")
-effects_component = NodePath("EffectsComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 navigation_component = NodePath("NavigationComponent")
+intrinsic_effects = Array[ExtResource("2_61ft8")]([SubResource("Resource_8fmk0")])
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
@@ -45,6 +55,6 @@ script = ExtResource("6_8fmk0")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_7w2p3")
 
-[node name="EffectsComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("7_42xql")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

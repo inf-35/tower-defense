@@ -6,7 +6,7 @@ signal health_changed(new_health: float)
 
 @export var health_data: HealthData = preload("res://Data/Health/default_health.tres")
 
-var _effects_component: EffectsComponent
+var _modifiers_component: ModifiersComponent
 
 var health: float = health_data.max_health:
 	set(new_health):
@@ -23,10 +23,10 @@ var health: float = health_data.max_health:
 		if health < 0.01:
 			died.emit()
 
-func inject_components(effects_component: EffectsComponent):
-	if effects_component != null:
-		_effects_component = effects_component
-		_effects_component.register_data(health_data)
+func inject_components(modifiers_component: ModifiersComponent):
+	if modifiers_component != null:
+		_modifiers_component = modifiers_component
+		_modifiers_component.register_data(health_data)
 
 func _ready():
 	_STAGGER_CYCLE = 5
@@ -38,7 +38,7 @@ func _process(delta : float) -> void:
 	#if _stagger % _STAGGER_CYCLE != 1:
 		#return
 		
-	var regeneration: float = get_stat(_effects_component, health_data, Attributes.id.REGENERATION)
+	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
 		
 	health += regeneration * delta
 	_accumulated_delta = 0.0

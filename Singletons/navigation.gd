@@ -23,7 +23,7 @@ var path_cache: Dictionary[Vector2i, Array] = {}
 var _cached_goal: Vector2i = Vector2i.ZERO
 var _field_built: bool = false
 
-# Threading members
+# Threading members -> the rationale behind side-threading here is to not cause stutters when rebuilding the field
 var _build_thread: Thread
 var _thread_running: bool = false
 

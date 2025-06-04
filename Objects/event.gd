@@ -5,10 +5,9 @@ enum EventType {
 	PRE_HIT_DEALT,
 	HIT_DEALT,
 	PRE_HIT,
-	HIT
+	HIT,
+	WAVE_STARTED,
 }
 
 var event_type: EventType
-var source: Node #who is agent
-var target: Node #who is affected
-var data: Dictionary #mutable payload
+var data: EventData #mutable payload

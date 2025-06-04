@@ -8,21 +8,18 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_272l3"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_r5nu7"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_qgmek"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/effects_component.gd" id="9_l85yc"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifier_component.gd" id="9_l85yc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
 
-[node name="Palisade" type="Node2D" node_paths=PackedStringArray("range_component", "attack_component", "graphics", "effects_component", "health_component", "movement_component")]
+[node name="Palisade" type="Node2D" node_paths=PackedStringArray("range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_fmnx7")
+type = 3
 tower_data = ExtResource("2_fmnx7")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
-graphics = NodePath("Graphics")
-effects_component = NodePath("EffectsComponent")
-health_component = NodePath("HealthComponent")
-movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]
@@ -55,6 +52,6 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Range"]
 shape = SubResource("CircleShape2D_lmklq")
 
-[node name="EffectsComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("9_l85yc")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

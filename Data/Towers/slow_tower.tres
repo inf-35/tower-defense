@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_81w3o")
-id = "slow_tower"
+id = 0
 cost = null
 attack = ExtResource("1_mb7nl")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

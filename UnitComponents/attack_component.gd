@@ -3,17 +3,17 @@ class_name AttackComponent
 #polymorphic, stateless class that takes in AttackData and executes attacks
 var attack_data: AttackData #"meta" attack resource - determines range, cooldown, etc.
 
-var _effects_component: EffectsComponent
+var _modifiers_component: ModifiersComponent
 
-func inject_components(effects_component: EffectsComponent):
-	_effects_component = effects_component
-	_effects_component.register_data(attack_data)
+func inject_components(modifiers_component: ModifiersComponent):
+	_modifiers_component = modifiers_component
+	_modifiers_component.register_data(attack_data)
 
 func attack(target: Unit):
 	if attack_data == null:
 		return
 	
-	var radius: float = get_stat(_effects_component, attack_data, Attributes.id.RADIUS) #attack AoE
+	var radius: float = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS) #attack AoE
 	
 	if radius <= 0.01: #pointlike attack
 		deal_attack(target)
@@ -26,20 +26,26 @@ func attack(target: Unit):
 	unit.draw_color = Color.CYAN
 
 func deal_attack(target: Unit):
-	var damage: float = get_stat(_effects_component, attack_data, Attributes.id.DAMAGE)
-	
-	target.health_component.health -= damage
-	
-	if attack_data.modifier_data != null:
-		target.effects_component.add_modifier(
-			Modifier.new(
-				attack_data.modifier_data.attribute,
-				attack_data.modifier_data.multiplicative,
-				attack_data.modifier_data.additive,
-				attack_data.modifier_data.override,
-				unit.unit_id
-			)
-		)
+	var damage: float = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
+
+	var hit_data := HitData.new()
+	hit_data.source = unit
+	hit_data.target = target
+	hit_data.damage = damage
+	unit.deal_hit(
+		hit_data
+	)
+	#
+	#if attack_data.modifier_data != null:
+		#target.modifiers_component.add_modifier(
+			#Modifier.new(
+				#attack_data.modifier_data.attribute,
+				#attack_data.modifier_data.multiplicative,
+				#attack_data.modifier_data.additive,
+				#attack_data.modifier_data.override,
+				#unit.unit_id
+			#)
+		#)
 
 func get_enemies_in_radius(center: Vector2, radius: float, max_results := 100) -> Array[Unit]:
 	var space := unit.get_world_2d().direct_space_state

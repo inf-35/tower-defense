@@ -5,5 +5,7 @@
 [resource]
 script = ExtResource("1_le62f")
 range = 20.0
-cooldown = 0.2
+cooldown = 0.01
+radius = 3.0
+damage = 0.1
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

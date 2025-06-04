@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_vdgqt")
-id = "default_tower"
+id = 0
 cost = 20
 attack = ExtResource("1_qlt3h")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

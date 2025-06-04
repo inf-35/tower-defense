@@ -14,5 +14,5 @@ func initiate():
 func _ready():
 	_stagger += randi_range(0, _STAGGER_CYCLE)
 	
-func get_stat(effects_component: EffectsComponent, data: Data, attribute: Attributes.id) -> Variant:
-	return data.get(Data.get_stringname(attribute)) if (effects_component == null or effects_component.pull_stat(attribute) == null) else effects_component.pull_stat(attribute) 
+func get_stat(modifiers_component: ModifiersComponent, data: Data, attribute: Attributes.id) -> Variant:
+	return data.get(Data.get_stringname(attribute)) if (modifiers_component == null or modifiers_component.pull_stat(attribute) == null) else modifiers_component.pull_stat(attribute) 

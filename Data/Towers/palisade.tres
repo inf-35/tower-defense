@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_pue8w")
-id = "palisade"
+id = 0
 cost = null
 attack = ExtResource("1_f8db1")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

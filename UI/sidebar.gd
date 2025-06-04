@@ -15,8 +15,8 @@ func _populate_buttons() -> void:
 
 	for type_id: Towers.Type in Towers.Type.values():
 		var btn := Button.new()
-		btn.text = str(type_id).pad_zeros(2) + ": " + Towers.get_tower_scene(type_id).resource_name
-		btn.name = "Btn_%s" % Towers.get_tower_scene(type_id).resource_name
+		btn.text = str(type_id).pad_zeros(2) + ": " + str(type_id)
+		btn.name = "Btn_%s" % str(type_id)
 		btn.pressed.connect(_on_button_pressed.bind(type_id))
 		_vbox.add_child(btn)
 

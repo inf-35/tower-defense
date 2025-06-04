@@ -1,6 +1,7 @@
 extends Unit
 class_name Tower
 
+@export var type: Towers.Type
 @export var tower_data: TowerData
 
 @export var range_component: RangeComponent
@@ -10,14 +11,17 @@ var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
 		tower_position = new_pos
 		movement_component.position = Island.cell_to_position(tower_position)
-		print(movement_component.position," ", tower_position)
 	
 var _cooldown: float = 0.0
 
 func _ready():
+	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
+
+	
 	attack_component.attack_data = tower_data.attack
+	attack_component.inject_components(modifiers_component)
 
 func _process(delta: float):
 	if tower_data == null or range_component == null or attack_component == null:

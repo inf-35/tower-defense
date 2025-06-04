@@ -29,7 +29,8 @@ func _ready():
 	for i in 100:
 		blueprints.append_array([
 			Blueprint.new(Towers.Type.PALISADE),
-			Blueprint.new(Towers.Type.SLOW_TOWER)
+			Blueprint.new(Towers.Type.SLOW_TOWER),
+			Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER)
 		])
 		
 	ClickHandler.click_on_island.connect(func(world_position: Vector2, tower_type: Towers.Type):
@@ -39,7 +40,11 @@ func _ready():
 			
 		consume_blueprint(tower_type)
 		var cell: Vector2i = Island.position_to_cell(world_position)
-		if Towers.tower_stats[tower_type].construct > Terrain.is_constructable(References.island.terrain_grid[cell]):
+		if Towers.tower_stats[tower_type].construct > References.island.terrain_level_grid[cell]:
 			return
 		References.island.construct_tower(cell, tower_type)
 	)
+
+func choose_terrain_expansion():
+	pass
+	#... (expand terrain function is References.island.expand_by_block(n)

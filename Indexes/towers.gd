@@ -14,7 +14,8 @@ enum Type {
 	PLAYER_CORE,
 	DPS_TOWER,
 	SLOW_TOWER,
-	PALISADE
+	PALISADE,
+	BLUEPRINT_HARVESTER,
 }
 
 static var tower_stats : Dictionary[Type, TowerStat] = {
@@ -23,28 +24,22 @@ static var tower_stats : Dictionary[Type, TowerStat] = {
 		20,
 	),
 	Type.DPS_TOWER: TowerStat.new(
-		preload("res://Units/Towers/player_core.tscn"),
-		3,
+		preload("res://Units/Towers/basic_tower.tscn"),
+		2,
 	),
 	Type.SLOW_TOWER: TowerStat.new(
-		preload("res://Units/Towers/player_core.tscn"),
+		preload("res://Units/Towers/slow_tower.tscn"),
 		2,
 	),
 	Type.PALISADE: TowerStat.new(
-		preload("res://Units/Towers/player_core.tscn"),
+		preload("res://Units/Towers/palisade.tscn"),
 		1,
 	),
+	Type.BLUEPRINT_HARVESTER: TowerStat.new(
+		preload("res://Units/Towers/blueprint_harvester.tscn"),
+		2,
+	)
 }
 
 static func get_tower_scene(tower: Type) -> PackedScene:
-	match tower:
-		Type.PLAYER_CORE:
-			return preload("res://Units/Towers/player_core.tscn")
-		Type.DPS_TOWER:
-			return preload("res://Units/Towers/basic_tower.tscn")
-		Type.SLOW_TOWER:
-			return preload("res://Units/Towers/slow_tower.tscn")
-		Type.PALISADE:
-			return preload("res://Units/Towers/palisade.tscn")
-		_:
-			return
+	return tower_stats[tower].tower_scene

@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_27gte")
-id = "player_core"
+id = 0
 cost = 2147483648
 attack = ExtResource("1_fnove")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

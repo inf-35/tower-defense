@@ -5,9 +5,10 @@ signal wave_started(wave_number: int)
 var wave: int = 0 #current wave number
 
 func start_wave(wave: int):
-	References.island.expand_by_block(8)
 	References.island.spawn_enemies(wave)
+	References.island.expand_by_block(8)
 	wave_started.emit(wave)
+
 	
 func _ready():
 	var timer := Timer.new()
