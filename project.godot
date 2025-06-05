@@ -25,6 +25,7 @@ TowerPattern="*res://Singletons/tower_pattern.gd"
 Waves="*res://Singletons/waves.gd"
 Terrain="*res://Singletons/terrain.gd"
 TerrainGen="*res://Singletons/terrain_generator.gd"
+Expansions="*res://Singletons/expansion_manager.gd"
 
 [rendering]
 

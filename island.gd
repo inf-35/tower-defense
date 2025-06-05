@@ -3,6 +3,7 @@ class_name Island
 
 signal terrain_changed
 signal tower_changed(tower_position: Vector2i)
+signal expansion_applied
 
 var terrain_level_grid: Dictionary[Vector2i, Terrain.Level] = {}
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {} # Store for Terrain.Base
@@ -12,11 +13,13 @@ var tower_grid: Dictionary[Vector2i, Tower] = {}
 var shore_boundary_tiles: Array[Vector2i] = []
 var active_boundary_tiles: Array[Vector2i] = [ Vector2i.ZERO ]
 
+var is_choosing_expansion: bool = false
+var current_expansion_options: Array[ExpansionChoice] = []
+
+
 const CELL_SIZE: int = 10
 const GRID_SIZE: int = 50
 const HALF: int = GRID_SIZE * 0.5
-const SHALLOWS_RADIUS_SQUARED: float = (HALF * 0.0) ** 2
-const ISLAND_RADIUS_SQUARED: float = (HALF * 0.2) ** 2
 
 const DIRS: Array[Vector2i] = [
 	Vector2i( 1,  0),
@@ -72,8 +75,8 @@ func generate_terrain():
 			terrain_level_grid[Vector2i(x, y)] = Terrain.Level.SEA
 			occupied_grid[Vector2i(x, y)] = false
 
-	expand_by_block(40)
-	expand_by_block(4)
+	expand_by_block(TerrainGen.generate_block(40))
+	expand_by_block(TerrainGen.generate_block(2))
 	
 	_update_terrain()
 
@@ -111,29 +114,78 @@ func _get_terrain_boundary(_terrain_grid: Dictionary[Vector2i, Terrain.Level] = 
 				break
 
 	return boundary_tiles
-
-# ... (rest of your Island class code below, including _draw, get_adjacent_towers etc.)
-func expand_by_block(block_size: int) -> void:
-	var block: Dictionary[Vector2i, Terrain.Base] = TerrainGen.generate_block(block_size)
+#expansion mechanism
+func expand_by_block(block: Dictionary[Vector2i, Terrain.Base]) -> void:
 	for cell: Vector2i in block:
 		terrain_base_grid[cell] = block[cell]
 		terrain_level_grid[cell] = Terrain.Level.EARTH
+		occupied_grid[cell] = false
 		Navigation.grid[cell] = true
 
 	active_boundary_tiles = _get_terrain_boundary(terrain_level_grid, block.keys(), Terrain.Level.EARTH, Terrain.Level.SEA)
 	_update_terrain()
 	
 var preview_grid: Dictionary[Vector2i, Terrain.Base] = {} #for preview terrain
+var preview_tint_grid: Dictionary[Vector2i, Color] = {} #preview tints
+
+#expansion
+func present_expansion_choices(options: Array[ExpansionChoice]): #entry point to expansion, called by Expansions
+	is_choosing_expansion = true
+	current_expansion_options = options
+	
+	preview_grid.clear() #clear preview
+	for option: ExpansionChoice in options:
+		if option and option.block_data: # Check if option and its block_data are valid
+			var rand_color: Color = Color(randf(), randf(), randf(), 0.5)
+			for world_cell: Vector2i in option.block_data:
+				# Store the Terrain.Base type for preview drawing
+				preview_grid[world_cell] = option.block_data[world_cell]
+				preview_tint_grid[world_cell] = rand_color
+	queue_redraw()
+
+func select_expansion(choice_id: int):
+	if not is_choosing_expansion:
+		push_warning("Island: Tried to select expansion when not in choice mode.")
+		# emit expansion_applied to potentially unstuck ExpansionManager
+		expansion_applied.emit()
+		return
+
+	var chosen_option: ExpansionChoice = null
+	for option: ExpansionChoice in current_expansion_options: #retrieve corresponding option
+		if option and option.id == choice_id:
+			chosen_option = option
+			break
+	
+	if chosen_option and chosen_option.block_data and not chosen_option.block_data.is_empty():
+		apply_expansion_option(chosen_option) # This will handle state clearing and signal
+	else:
+		push_error("Island: Selected expansion choice_id '" + str(choice_id) + "' not found or has no data.")
+	# Clear preview state and emit signal to allow game to continue
+	preview_grid.clear()
+	is_choosing_expansion = false
+	current_expansion_options.clear()
+	queue_redraw()
+	expansion_applied.emit() # Allow game to resume
+
+func apply_expansion_option(option: ExpansionChoice):
+	expand_by_block(option.block_data)
+	
+	if is_choosing_expansion: # Clear preview state if we were in choice mode
+		preview_grid.clear()
+		is_choosing_expansion = false
+		current_expansion_options.clear()
+	
+	expansion_applied.emit() # Signal that the process is complete.
 
 func _draw():
 	for cell_pos: Vector2i in terrain_base_grid.keys():
 		var rect_position: Vector2 = cell_pos * CELL_SIZE
 		var rect = Rect2(rect_position, Vector2(CELL_SIZE, CELL_SIZE))
 		var color: Color = Terrain.get_color(terrain_level_grid[cell_pos], terrain_base_grid[cell_pos])
-		if preview_grid.has(cell_pos):
-			color = Terrain.get_color(Terrain.Level.EARTH, preview_grid[cell_pos])
 		if active_boundary_tiles.has(cell_pos):
-			color = Terrain.get_color(Terrain.Level.SHORE,terrain_base_grid[cell_pos])
+			color = Terrain.get_color(Terrain.Level.SHORE, terrain_base_grid[cell_pos])
+		if preview_grid.has(cell_pos):
+			color = Terrain.get_color(Terrain.Level.EARTH, preview_grid[cell_pos]).blend(preview_tint_grid[cell_pos])
 		draw_rect(rect, color)
 
 # "Public" helper functions

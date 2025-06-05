@@ -17,7 +17,7 @@ func generate_block(block_size: int) -> Dictionary[Vector2i, Terrain.Base]:
 	
 	var to_visit_evaluation: Dictionary[Vector2i, float] = {start: start.length_squared() + 0.0}
 	var visited: Dictionary[Vector2i, bool] = {}
-	var block_candidate_coords: Array[Vector2i] = []
+	var block_candidate_coords: Array[Vector2i] = []	
 
 	while not to_visit.is_empty() and block_candidate_coords.size() < block_size:
 		# Select the cell from to_visit with the lowest evaluation score.
@@ -40,7 +40,7 @@ func generate_block(block_size: int) -> Dictionary[Vector2i, Terrain.Base]:
 				continue
 			# if this neighbor hasn't had an evaluation score calculated yet, calculate it and add it to the to_visit list.
 			if not to_visit_evaluation.has(nbr):
-				to_visit_evaluation[nbr] = nbr.length_squared() + (nbr - cell).length_squared() * 5.0 + randf() * 5.0
+				to_visit_evaluation[nbr] = nbr.length_squared() * 0.0 + (nbr - start).length_squared() * 2.0 + randf() 
 				to_visit.append(nbr) # Add to the list of cells to potentially visit
 		# mark the current cell as visited and remove it from the to_visit list.
 		visited[cell] = true
