@@ -16,17 +16,18 @@ const WALL_3_PATTERN: Array[Vector2i] = [
 
 const PATTERN_RULES := {
 	# e.g. an L-shape of Fire towers unlocks “Burn Chain”
-	burn_chain = { type = Towers.Type.DPS_TOWER,
+	burn_chain = { type = Towers.Type.TURRET,
 	  offsets = L_PATTERN,
 	  },
 	# e.g. three Ice towers in a line unlock “Glacial Wall”
-	glacial_wall = { type = Towers.Type.SLOW_TOWER,
+	glacial_wall = { type = Towers.Type.FROST_TOWER,
 	  offsets = WALL_3_PATTERN,
 	 },
 	# …add as many as you like…
 }
 
 var _pattern_offsets := {}
+
 
 func _ready():
 	References.island.tower_changed.connect(_on_tower_changed)

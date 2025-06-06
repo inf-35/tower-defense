@@ -1,6 +1,8 @@
 extends UnitComponent
 class_name ModifiersComponent
 
+signal stat_changed(attribute: Attributes.id)
+
 #base stats
 var base_stats: Dictionary[Attributes.id, float] = {}
 # internal storage of modifiers
@@ -12,6 +14,7 @@ var _effective_cache: Dictionary[Attributes.id, float] = {}
 func add_modifier(mod: Modifier) -> void:
 	_modifiers.append(mod)
 	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
 	
 	if mod.cooldown >= 0.0:
 		get_tree().create_timer(mod.cooldown).timeout.connect(func():
@@ -21,17 +24,20 @@ func add_modifier(mod: Modifier) -> void:
 #change modifier
 func change_modifier(mod: Modifier) -> void:
 	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
 
 # remove a buff/debuff
 func remove_modifier(mod: Modifier) -> void:
 	_modifiers.erase(mod)
 	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
 	
 func register_stat(attr: Attributes.id, value: float) -> void: #registers a stat
 	if value == null:
 		return
 	base_stats[attr] = value #overwrites if neccessary
 	_effective_cache.erase(attr)  # ensure clean first read
+	stat_changed.emit(attr)
 		
 func register_data(data: Data) -> void: #registers any arbitrary data resource; polymorphic
 	for attr: Attributes.id in Attributes.id.values():
@@ -44,6 +50,9 @@ func register_data(data: Data) -> void: #registers any arbitrary data resource; 
 	data.value_changed.connect(func(attribute: Attributes.id): #re-register base stat if changed
 		register_stat(attribute, data.resolve(attribute))
 	)
+
+func has_stat(attr: Attributes.id) -> bool:
+	return base_stats.has(attr)
 
 func pull_stat(attr: Attributes.id) -> Variant:
 	if _effective_cache.has(attr):

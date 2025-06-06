@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_7vd3x"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_5map6"]
 [ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="9_qvkhl"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifier_component.gd" id="10_6akvo"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_6akvo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0

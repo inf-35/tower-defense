@@ -17,4 +17,6 @@ enum id { #trackable value
 
 enum Status { #diegetic statuses
 	FROST,
+	BURN,
+	POISON,
 }

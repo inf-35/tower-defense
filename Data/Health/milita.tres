@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_nuaja")
-max_health = 10.0
+max_health = 2.0
 regeneration = 0.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c184bi7kvtd4o"]
+[gd_scene load_steps=12 format=3 uid="uid://c184bi7kvtd4o"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_fmnx7"]
 [ext_resource type="Resource" uid="uid://dmhe72ed8tejy" path="res://Data/Towers/palisade.tres" id="2_fmnx7"]
@@ -6,9 +6,10 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_n2qx0"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_ahe76"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_272l3"]
+[ext_resource type="Resource" uid="uid://2vwfs1vot17t" path="res://Data/Health/tower_default.tres" id="6_a8fxa"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_r5nu7"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_qgmek"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifier_component.gd" id="9_l85yc"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_l85yc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
@@ -29,6 +30,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("5_ahe76")
+health_data = ExtResource("6_a8fxa")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="RangeComponent" type="Node" parent="." node_paths=PackedStringArray("area")]

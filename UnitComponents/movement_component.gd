@@ -14,8 +14,7 @@ var position: Vector2:
 	set(new_position):
 		position = new_position
 		cell_position = Island.position_to_cell(position)
-		if is_instance_valid(unit):
-			unit.position = position
+		unit.position = position
 
 var direction: Vector2
 var cell_position: Vector2i:
@@ -34,14 +33,14 @@ var target_direction: Vector2:
 var velocity: Vector2
 
 func inject_components(n_graphics: Node2D, modifiers_component = null):
-	if modifiers_component != null:
-		_modifiers_component = modifiers_component
-		_modifiers_component.register_data(movement_data)
 	graphics = n_graphics
+	if modifiers_component == null:
+		return
 
-func _compute_stats():
-	pass
-
+	_modifiers_component = modifiers_component
+	_modifiers_component.register_data(movement_data)
+	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
+	
 func _ready():
 	_STAGGER_CYCLE = 3
 	_stagger = randi_range(0, _STAGGER_CYCLE)
@@ -54,16 +53,15 @@ func _physics_process(delta: float) -> void:
 		#
 	#if _stagger % _STAGGER_CYCLE != 1:
 		#return
-		#
+	
+	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
+	var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
+		
 	if movement_data == null:
 		return  # no data → do nothing
 
 	if not movement_data.mobile:
 		return
-		
-	var max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
-	var acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
-	var turn_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.TURN_SPEED)
 
 	if target_position:
 		if (target_position - position).length_squared() > _ERROR_SQUARED:
@@ -72,15 +70,15 @@ func _physics_process(delta: float) -> void:
 			target_direction = Vector2.ZERO
 
 	# accelerate/decelerate to match max_speed
-	var target_speed = max_speed
+	var target_speed = local_max_speed
 	if target_direction.length_squared() < 0.0001: #Vector2.ZERO
 		target_speed = 0.0
 
 	velocity = velocity.move_toward(
 		target_direction * target_speed,
-		acceleration * delta,
+		local_acceleration * delta,
 	)
 
 	position += velocity * delta
 	
-	_accumulated_delta = 0.0 #reset accumulated delta
+	#_accumulated_delta = 0.0 #reset accumulated delta

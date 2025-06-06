@@ -39,16 +39,6 @@ func _ready():
 	construct_tower(Vector2i.ZERO, Towers.Type.PLAYER_CORE)
 	queue_redraw()
 
-func spawn_enemies(wave: int):
-	if active_boundary_tiles.is_empty():
-		push_warning("No boundary available for spawning!")
-		return
-
-	for i in 5:
-		var unit : Unit = preload("res://Units/Enemies/basic_unit.tscn").instantiate()
-		add_child(unit)
-		unit.movement_component.position = cell_to_position(active_boundary_tiles.pick_random())
-
 func construct_tower(cell: Vector2i, tower_type: Towers.Type):
 	var tower: Tower = Towers.get_tower_scene(tower_type).instantiate()
 	occupied_grid[cell] = true
@@ -75,8 +65,8 @@ func generate_terrain():
 			terrain_level_grid[Vector2i(x, y)] = Terrain.Level.SEA
 			occupied_grid[Vector2i(x, y)] = false
 
-	expand_by_block(TerrainGen.generate_block(40))
-	expand_by_block(TerrainGen.generate_block(2))
+	expand_by_block(TerrainGen.generate_block(80))
+	expand_by_block(TerrainGen.generate_block(6))
 	
 	_update_terrain()
 
@@ -129,7 +119,7 @@ var preview_grid: Dictionary[Vector2i, Terrain.Base] = {} #for preview terrain
 var preview_tint_grid: Dictionary[Vector2i, Color] = {} #preview tints
 
 #expansion
-func present_expansion_choices(options: Array[ExpansionChoice]): #entry point to expansion, called by Expansions
+func present_expansion_choices(options: Array[ExpansionChoice]): #entry point to expansion, called by Phases
 	is_choosing_expansion = true
 	current_expansion_options = options
 	
@@ -174,8 +164,6 @@ func apply_expansion_option(option: ExpansionChoice):
 		preview_grid.clear()
 		is_choosing_expansion = false
 		current_expansion_options.clear()
-	
-	expansion_applied.emit() # Signal that the process is complete.
 
 func _draw():
 	for cell_pos: Vector2i in terrain_base_grid.keys():

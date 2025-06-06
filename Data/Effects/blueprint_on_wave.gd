@@ -2,7 +2,7 @@ extends EffectPrototype
 class_name WaveBlueprintEffect
 
 @export var params: Dictionary = {
-	"blueprint_type": Towers.Type.DPS_TOWER,
+	"blueprint_pool": [Towers.Type.TURRET],
 }
 
 func _handle_event(instance: EffectInstance, event: GameEvent):
@@ -13,7 +13,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent):
 		print("wrong terrain type.")
 		return
 	
-	assert(instance.params.has("blueprint_type"))
+	assert(instance.params.has("blueprint_pool"))
 
-	Player.blueprints.append(Blueprint.new(params.blueprint_type))
+	Player.blueprints.append(Blueprint.new(instance.params.blueprint_pool.pick_random()))
 	print("new blueprint!")

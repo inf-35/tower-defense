@@ -15,5 +15,5 @@ func _ready():
 			
 
 		Player.health -= area.unit.health_component.health
-		area.unit.queue_free()
+		area.unit.died.emit()
 	)

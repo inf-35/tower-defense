@@ -4,7 +4,7 @@ class_name HealthComponent
 signal died()
 signal health_changed(new_health: float)
 
-@export var health_data: HealthData = preload("res://Data/Health/default_health.tres")
+@export var health_data: HealthData = preload("res://Data/Health/tower_default.tres")
 
 var _modifiers_component: ModifiersComponent
 
@@ -27,6 +27,7 @@ func inject_components(modifiers_component: ModifiersComponent):
 	if modifiers_component != null:
 		_modifiers_component = modifiers_component
 		_modifiers_component.register_data(health_data)
+		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION])
 
 func _ready():
 	_STAGGER_CYCLE = 5

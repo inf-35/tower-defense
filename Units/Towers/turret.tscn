@@ -1,23 +1,22 @@
 [gd_scene load_steps=11 format=3 uid="uid://cjv7g5iwxihva"]
 
-[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_e8qal"]
-[ext_resource type="Resource" uid="uid://b5cj8127nqgvq" path="res://Data/Towers/default_tower.tres" id="2_5sd34"]
-[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_veo76"]
-[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_5schx"]
-[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sbfeb"]
-[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_owon1"]
-[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_yulc5"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_jrc3v"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifier_component.gd" id="9_5sd34"]
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
+[ext_resource type="Resource" uid="uid://b5cj8127nqgvq" path="res://Data/Towers/default_tower.tres" id="2_rghec"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_soln4"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_joj2e"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_liko0"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_ug8w7"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_lkyt2"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_2r1vv"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_hp3w6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
 
 [node name="BasicTower" type="Node2D" node_paths=PackedStringArray("range_component", "attack_component", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
-script = ExtResource("1_e8qal")
-type = 1
-tower_data = ExtResource("2_5sd34")
+script = ExtResource("1_lj076")
+tower_data = ExtResource("2_rghec")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 graphics = NodePath("Graphics")
@@ -27,27 +26,27 @@ movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("3_veo76")
-movement_data = ExtResource("4_5schx")
+script = ExtResource("3_soln4")
+movement_data = ExtResource("4_joj2e")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("5_sbfeb")
+script = ExtResource("5_liko0")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="RangeComponent" type="Node" parent="." node_paths=PackedStringArray("area")]
-script = ExtResource("6_owon1")
+script = ExtResource("6_ug8w7")
 area = NodePath("../Range")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="AttackComponent" type="Node" parent="."]
-script = ExtResource("7_yulc5")
+script = ExtResource("7_lkyt2")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 modulate = Color(1, 0, 0, 1)
 scale = Vector2(0.1, 0.1)
-texture = ExtResource("8_jrc3v")
+texture = ExtResource("8_2r1vv")
 
 [node name="Range" type="Area2D" parent="."]
 scale = Vector2(0.1, 0.1)
@@ -57,5 +56,5 @@ collision_layer = 0
 shape = SubResource("CircleShape2D_lmklq")
 
 [node name="ModifiersComponent" type="Node" parent="."]
-script = ExtResource("9_5sd34")
+script = ExtResource("9_hp3w6")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

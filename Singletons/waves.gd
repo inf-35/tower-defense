@@ -1,60 +1,50 @@
-#extends Node #Waves
-#
-#signal wave_started(wave_number: int)
-#signal offer_expansion_choices()
-#
-#var wave: int = 0 #current wave number
-#var wave_timer : Timer
-#
-#const EXPANSION_BLOCK_SIZE: int = 8
-#const WAVES_PER_EXPANSION: int = 5
-#const WAVE_INTERVAL_SECONDS: float = 2.0
-#
-#func start_wave(wave: int):
-	#References.island.spawn_enemies(wave)
-	#wave_started.emit(wave)
-#
-	#
-#func _ready():
-	#wave_timer = Timer.new()
-	#wave_timer.one_shot = true
-	#add_child(wave_timer)
-	#wave_timer.wait_time = WAVE_INTERVAL_SECONDS
-	#wave_timer.timeout.connect(_on_wave_timer_timeout)
-	#
-	#Expansions
-	#
-#func _on_wave_timer_timeout():
-	#pass
-
 # Waves.gd
 extends Node
 
 signal wave_started(wave_number: int)
-# New signal to ExpansionManager:
+signal wave_ended()
+# Signals to Phases:
 signal offer_expansion_choices(choices: Array[ExpansionChoice])
+signal request_building_phase_start()
 
 var wave: int = 0
-var wave_timer: Timer
+
+#per-wave numbers
+var alive_enemies: int = 0:
+	set(value):
+		alive_enemies = value
+		if alive_enemies <= 0 and wave > 0:
+			wave_ended.emit()
 
 # Assumed expansion block size, can be configured elsewhere
 const EXPANSION_BLOCK_SIZE = 12
 const WAVES_PER_EXPANSION_CHOICE = 5
-const WAVE_INTERVAL_SECONDS = 0.5
+const CONCURRENT_ENEMY_SPAWNS: int = 10
 const EXPANSION_CHOICES: int = 3
 
-func _ready():
-	wave_timer = Timer.new()
-	wave_timer.one_shot = false # Timer will be manually restarted after each wave/expansion phase
-	add_child(wave_timer)
-	wave_timer.wait_time = WAVE_INTERVAL_SECONDS
-	wave_timer.timeout.connect(start_next_wave_or_expansion_phase)
-	
-	# Connect to ExpansionManager to know when the expansion phase is over
-	if not Expansions.is_connected("expansion_phase_ended", resume_wave_cycle):
-		Expansions.expansion_phase_ended.connect(resume_wave_cycle)
+const DELAY_AFTER_BUILDING_PHASE: float = 0.5
 
-	start_next_wave_or_expansion_phase.call_deferred() # Start the process once scene is ready
+func _ready():
+	wave_ended.connect(func():
+		print("Waves: wave_ended received for wave ", wave, ". Requesting building phase start.")
+		request_building_phase_start.emit() # Tell Phases to start the building phase
+	)
+	wave_started.connect(func(wave: int):
+		spawn_enemies(wave)
+	)
+	# Connect to Phases to know when the expansion phase is over
+	Phases.expansion_phase_ended.connect(resume_wave_cycle)
+	Phases.building_phase_ended.connect(func():
+		print("Waves: Phases.building_phase_ended received. Preparing next game phase after delay.")
+		await get_tree().create_timer(DELAY_AFTER_BUILDING_PHASE).timeout
+		start_next_wave_or_expansion_phase()
+	)
+
+	initial_game_start.call_deferred() # Start the process once scene is ready
+
+func initial_game_start():
+	print("Waves: Initial game start. Requesting first building phase before wave 1.")
+	request_building_phase_start.emit()
 
 func start_next_wave_or_expansion_phase():
 	wave += 1
@@ -65,14 +55,10 @@ func start_next_wave_or_expansion_phase():
 	else:
 		# Regular wave
 		assert(is_instance_valid(References.island))
-		References.island.spawn_enemies(wave)
 		wave_started.emit(wave)
-		wave_timer.start() # Start timer for the next event
 
 func initiate_expansion_choice_sequence():
 	print("Waves: Initiating expansion choice for upcoming wave period (current wave: " + str(wave) + ")")
-	wave_timer.stop() # Pause waves until choice is made
-
 	var options: Array[ExpansionChoice] = []
 
 	for i in EXPANSION_CHOICES: # Generate 3 options
@@ -95,15 +81,35 @@ func initiate_expansion_choice_sequence():
 func resume_wave_cycle():
 	print("Waves: Resuming wave cycle. Current wave: " + str(wave))
 	# After expansion, the current 'wave' number's enemies can spawn.
-	References.island.spawn_enemies(wave) # Spawn enemies for the wave that just had an expansion
-		
 	wave_started.emit(wave)
-	wave_timer.start() # Start timer for the next event (wave or another expansion choice)
 
-# Note: The old start_wave(wave_num) is effectively replaced by the logic within 
-# start_next_wave_or_expansion_phase() and resume_wave_cycle() for spawning enemies.
-# The original start_wave was:
-# func start_wave(wave: int):
-#	References.island.spawn_enemies(wave)
-#	References.island.expand_by_block(8) # This line is removed
-#	wave_started.emit(wave)
+func spawn_enemies(wave: int):
+	var unit_sc : PackedScene = preload("res://Units/Enemies/basic_unit.tscn")
+	
+	var island: Island = References.island
+	if island.active_boundary_tiles.is_empty():
+		push_warning("No boundary available for spawning!")
+		return
+	
+	var enemies_this_wave: int = wave * 5
+	var enemy_stagger: float = (2.0 + log(enemies_this_wave) * 0.5) / enemies_this_wave
+	alive_enemies += enemies_this_wave
+	
+	if enemies_this_wave > 500: #mass spawn as fast as is allowed
+		var enemies_spawned: int = 0
+		while enemies_spawned <= enemies_this_wave:
+			var spawn_concurrent: int = min(enemies_this_wave - enemies_spawned, CONCURRENT_ENEMY_SPAWNS)
+			for i: int in spawn_concurrent:
+				var unit: Unit = unit_sc.instantiate()
+				unit.part_of_wave = true
+				island.add_child(unit)
+				unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
+			enemies_spawned += spawn_concurrent
+			await get_tree().create_timer(enemy_stagger * spawn_concurrent).timeout
+	else:
+		for i: int in enemies_this_wave:
+			var unit: Unit = unit_sc.instantiate()
+			unit.part_of_wave = true
+			island.add_child(unit)
+			unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
+			await get_tree().create_timer(enemy_stagger).timeout

@@ -28,8 +28,8 @@ func consume_blueprint(tower_type: Towers.Type) -> bool:
 func _ready():
 	for i in 100:
 		blueprints.append_array([
-			Blueprint.new(Towers.Type.PALISADE),
-			Blueprint.new(Towers.Type.SLOW_TOWER),
+			Blueprint.new(Towers.Type.CANNON),
+			Blueprint.new(Towers.Type.FROST_TOWER),
 			Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER)
 		])
 		

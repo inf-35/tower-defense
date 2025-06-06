@@ -13,8 +13,10 @@ class_name Unit
 var effects: Array[EffectInstance]
 
 signal on_event(event: GameEvent) #polymorphic event bus
+signal died()
 
 var unit_id: int
+var part_of_wave: bool = false
 
 func _create_components():
 	if modifiers_component == null:
@@ -28,7 +30,12 @@ func _create_components():
 func _prepare_components():
 	unit_id = References.assign_unit_id()
 	
-	
+	died.connect(func():
+		if part_of_wave:
+			Waves.alive_enemies -= 1
+		queue_free()
+	)
+
 	if navigation_component != null:
 		navigation_component.inject_components(movement_component)
 	
@@ -39,7 +46,7 @@ func _prepare_components():
 	if health_component != null:
 		health_component.inject_components(modifiers_component)
 		health_component.died.connect(func():
-			queue_free()
+			died.emit()
 		)
 	
 	for child in get_children(true):
@@ -74,7 +81,7 @@ func take_hit(hit: HitData):
 	evt.data = hit
 	
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
-	
+
 	health_component.health -= evt.data.damage
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()

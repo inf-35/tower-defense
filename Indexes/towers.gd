@@ -12,9 +12,9 @@ class TowerStat: #data container for stats
 
 enum Type {
 	PLAYER_CORE,
-	DPS_TOWER,
-	SLOW_TOWER,
-	PALISADE,
+	TURRET,
+	FROST_TOWER,
+	CANNON,
 	BLUEPRINT_HARVESTER,
 }
 
@@ -23,17 +23,17 @@ static var tower_stats : Dictionary[Type, TowerStat] = {
 		preload("res://Units/Towers/player_core.tscn"),
 		20,
 	),
-	Type.DPS_TOWER: TowerStat.new(
-		preload("res://Units/Towers/basic_tower.tscn"),
+	Type.TURRET: TowerStat.new(
+		preload("res://Units/Towers/turret.tscn"),
 		2,
 	),
-	Type.SLOW_TOWER: TowerStat.new(
-		preload("res://Units/Towers/slow_tower.tscn"),
+	Type.FROST_TOWER: TowerStat.new(
+		preload("res://Units/Towers/frost_tower.tscn"),
 		2,
 	),
-	Type.PALISADE: TowerStat.new(
-		preload("res://Units/Towers/palisade.tscn"),
-		1,
+	Type.CANNON: TowerStat.new(
+		preload("res://Units/Towers/cannon.tscn"),
+		2,
 	),
 	Type.BLUEPRINT_HARVESTER: TowerStat.new(
 		preload("res://Units/Towers/blueprint_harvester.tscn"),

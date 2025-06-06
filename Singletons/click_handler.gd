@@ -1,6 +1,6 @@
 extends Node
 
-var tower_type: int = Towers.Type.DPS_TOWER
+var tower_type: Towers.Type
 signal click_on_island(world_position: Vector2, tower_type: Towers.Type)
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -5,10 +5,10 @@ var option_buttons: Array[Button]
 
 func _ready():
 	visible = false
-	Expansions.display_expansion_choices.connect(func(expansion_choices: Array[ExpansionChoice]):
+	Phases.display_expansion_choices.connect(func(expansion_choices: Array[ExpansionChoice]):
 		present_options()
 	)
-	Expansions.expansion_phase_ended.connect(hide_options)
+	Phases.expansion_phase_ended.connect(hide_options)
 	
 func present_options():
 	_populate_buttons()
@@ -31,4 +31,4 @@ func _populate_buttons():
 		option_buttons.append(btn)
 		
 func _on_button_pressed(button: int):
-	Expansions.player_chose_expansion(button)
+	Phases.player_chose_expansion(button)
