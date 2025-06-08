@@ -5,24 +5,24 @@ var option_buttons: Array[Button]
 
 func _ready():
 	visible = false
-	Phases.display_expansion_choices.connect(func(expansion_choices: Array[ExpansionChoice]):
-		present_options()
+	UI.display_expansion_choices.connect(func(expansion_choices: Array[ExpansionChoice]):
+		present_options(expansion_choices)
 	)
-	Phases.expansion_phase_ended.connect(hide_options)
+	UI.hide_expansion_choices.connect(hide_options)
 	
-func present_options():
-	_populate_buttons()
+func present_options(data: Array[ExpansionChoice]):
+	_populate_buttons(data)
 	visible = true
 	
 func hide_options():
 	visible = false
 	
-func _populate_buttons():
+func _populate_buttons(data: Array[ExpansionChoice]):
 	for button: Node in option_buttons:
 		button.queue_free()
 	option_buttons.clear()
 	
-	for i in Waves.EXPANSION_CHOICES:
+	for i: int in len(data):
 		var btn := Button.new()
 		btn.text = str(i)
 		btn.name = "Btn_selection_%s" % str(i)
@@ -30,5 +30,5 @@ func _populate_buttons():
 		_vbox.add_child(btn)
 		option_buttons.append(btn)
 		
-func _on_button_pressed(button: int):
-	Phases.player_chose_expansion(button)
+func _on_button_pressed(button_id: int):
+	UI.expansion_selected.emit(button_id)

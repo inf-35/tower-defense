@@ -136,7 +136,7 @@ func present_expansion_choices(options: Array[ExpansionChoice]): #entry point to
 func select_expansion(choice_id: int):
 	if not is_choosing_expansion:
 		push_warning("Island: Tried to select expansion when not in choice mode.")
-		# emit expansion_applied to potentially unstuck ExpansionManager
+		# emit expansion_applied to potentially unstuck Phases
 		expansion_applied.emit()
 		return
 
@@ -154,9 +154,11 @@ func select_expansion(choice_id: int):
 	preview_grid.clear()
 	is_choosing_expansion = false
 	current_expansion_options.clear()
+	
 	queue_redraw()
+	
 	expansion_applied.emit() # Allow game to resume
-
+	
 func apply_expansion_option(option: ExpansionChoice):
 	expand_by_block(option.block_data)
 	

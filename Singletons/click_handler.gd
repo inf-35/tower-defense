@@ -3,6 +3,9 @@ extends Node
 var tower_type: Towers.Type
 signal click_on_island(world_position: Vector2, tower_type: Towers.Type)
 
+func _ready():
+	UI.tower_selected.connect(func(type_id: Towers.Type): tower_type = type_id)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton

@@ -31,8 +31,6 @@ func _prepare_components():
 	unit_id = References.assign_unit_id()
 	
 	died.connect(func():
-		if part_of_wave:
-			Waves.alive_enemies -= 1
 		queue_free()
 	)
 

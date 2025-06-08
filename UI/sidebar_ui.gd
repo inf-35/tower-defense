@@ -2,8 +2,6 @@
 extends Control
 class_name SidebarUI
 
-signal tower_selected(type_id: int)
-
 @onready var _vbox: VBoxContainer = $Panel/VBoxContainer
 
 func _ready() -> void:
@@ -20,6 +18,5 @@ func _populate_buttons() -> void:
 		btn.pressed.connect(_on_button_pressed.bind(type_id))
 		_vbox.add_child(btn)
 
-func _on_button_pressed(type_id: int) -> void:
-	emit_signal("tower_selected", type_id)
-	ClickHandler.tower_type = type_id
+func _on_button_pressed(type_id: Towers.Type) -> void:
+	UI.tower_selected.emit(type_id)

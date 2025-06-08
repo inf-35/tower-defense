@@ -1,115 +1,136 @@
 # Waves.gd
-extends Node
+extends Node #"Service" type singleton, mainly called by Phases
 
-signal wave_started(wave_number: int)
-signal wave_ended()
-# Signals to Phases:
-signal offer_expansion_choices(choices: Array[ExpansionChoice])
-signal request_building_phase_start()
+signal wave_started(wave_number_int: int) # Emitted when combat spawning begins
+signal wave_ended # Emitted when all enemies of a specific combat session are cleared
 
-var wave: int = 0
-
-#per-wave numbers
+var current_combat_wave_number: int = 0 # Tracks the wave number it's currently managing combat for
 var alive_enemies: int = 0:
 	set(value):
 		alive_enemies = value
-		if alive_enemies <= 0 and wave > 0:
-			wave_ended.emit()
+		# Only emit wave_ended if we are actually in a combat session for a specific wave
+		if alive_enemies <= 0 and current_combat_wave_number > 0:
+			print("Waves: All enemies cleared for combat wave ", current_combat_wave_number, ". Emitting wave_ended.")
+			var ended_wave = current_combat_wave_number # Store before reset
+			current_combat_wave_number = 0 # Reset, ready for next combat call
+			wave_ended.emit() # No payload needed as Phases knows current_wave_number
 
-# Assumed expansion block size, can be configured elsewhere
-const EXPANSION_BLOCK_SIZE = 12
-const WAVES_PER_EXPANSION_CHOICE = 5
-const CONCURRENT_ENEMY_SPAWNS: int = 10
-const EXPANSION_CHOICES: int = 3
+# Constants for spawning
+const CONCURRENT_ENEMY_SPAWNS: int = 10 # From your original
 
-const DELAY_AFTER_BUILDING_PHASE: float = 0.5
-
-func _ready():
-	wave_ended.connect(func():
-		print("Waves: wave_ended received for wave ", wave, ". Requesting building phase start.")
-		request_building_phase_start.emit() # Tell Phases to start the building phase
-	)
-	wave_started.connect(func(wave: int):
-		spawn_enemies(wave)
-	)
-	# Connect to Phases to know when the expansion phase is over
-	Phases.expansion_phase_ended.connect(resume_wave_cycle)
-	Phases.building_phase_ended.connect(func():
-		print("Waves: Phases.building_phase_ended received. Preparing next game phase after delay.")
-		await get_tree().create_timer(DELAY_AFTER_BUILDING_PHASE).timeout
-		start_next_wave_or_expansion_phase()
-	)
-
-	initial_game_start.call_deferred() # Start the process once scene is ready
-
-func initial_game_start():
-	print("Waves: Initial game start. Requesting first building phase before wave 1.")
-	request_building_phase_start.emit()
-
-func start_next_wave_or_expansion_phase():
-	wave += 1
-	print("Waves: Starting phase for wave " + str(wave))
-
-	if wave > 0 and wave % WAVES_PER_EXPANSION_CHOICE == 0:
-		initiate_expansion_choice_sequence() #expansion
-	else:
-		# Regular wave
-		assert(is_instance_valid(References.island))
-		wave_started.emit(wave)
-
-func initiate_expansion_choice_sequence():
-	print("Waves: Initiating expansion choice for upcoming wave period (current wave: " + str(wave) + ")")
-	var options: Array[ExpansionChoice] = []
-
-	for i in EXPANSION_CHOICES: # Generate 3 options
-		var new_block_data: Dictionary = {}
-
-		new_block_data = TerrainGen.generate_block(EXPANSION_BLOCK_SIZE)
-		if new_block_data.is_empty():
-			push_warning("Waves: TerrainGen.generate_block returned empty for option " + str(i))
-			# For now, we'll create an option with empty data; Island.gd should handle it.	
-		var choice = ExpansionChoice.new(i, new_block_data)
-		options.append(choice)
-	
-	if options.is_empty() or options.all(func(opt): return opt.block_data.is_empty()):
-		push_warning("Waves: All generated expansion options are empty. Skipping choice phase.")
-		resume_wave_cycle()
+# New function called by Phases.gd to start a combat wave
+func start_combat_wave(wave_num_to_spawn: int):
+	if current_combat_wave_number > 0:
+		push_warning("Waves: start_combat_wave called for wave " + str(wave_num_to_spawn) + 
+					 " while already managing combat for wave " + str(current_combat_wave_number) + ". Ignoring new call.")
 		return
 
-	offer_expansion_choices.emit(options) # Signal ExpansionManager with the choices
+	if wave_num_to_spawn <= 0:
+		push_error("Waves: start_combat_wave called with invalid wave number: " + str(wave_num_to_spawn))
+		return
 
-func resume_wave_cycle():
-	print("Waves: Resuming wave cycle. Current wave: " + str(wave))
-	# After expansion, the current 'wave' number's enemies can spawn.
-	wave_started.emit(wave)
+	current_combat_wave_number = wave_num_to_spawn
+	print("Waves: Starting combat mechanics for wave " + str(current_combat_wave_number))
+	wave_started.emit(current_combat_wave_number) # Announce spawning has begun
+	_spawn_enemies_for_current_wave() # Internal spawner
 
-func spawn_enemies(wave: int):
+func _spawn_enemies_for_current_wave():
+	# Ensure unit_sc is loaded, ideally as a class member if always the same
 	var unit_sc : PackedScene = preload("res://Units/Enemies/basic_unit.tscn")
-	
+	if not unit_sc:
+		push_error("Waves: Failed to preload enemy scene for wave " + str(current_combat_wave_number))
+		self.alive_enemies = 0 # This will trigger wave_ended immediately
+		return
+
 	var island: Island = References.island
+	if not is_instance_valid(island):
+		self.alive_enemies = 0
+		return
 	if island.active_boundary_tiles.is_empty():
-		push_warning("No boundary available for spawning!")
+		self.alive_enemies = 0
 		return
 	
-	var enemies_this_wave: int = wave * 5
-	var enemy_stagger: float = (2.0 + log(enemies_this_wave) * 0.5) / enemies_this_wave
-	alive_enemies += enemies_this_wave
+	var enemies_to_spawn: int = get_enemies_for_wave(current_combat_wave_number) # Your formula
+	if enemies_to_spawn <= 0:
+		print("Waves: No enemies to spawn for wave " + str(current_combat_wave_number) + " based on formula.")
+		self.alive_enemies = 0
+		return
+
+	self.alive_enemies = enemies_to_spawn 
+	print("Waves: Spawning " + str(enemies_to_spawn) + " enemies for wave " + str(current_combat_wave_number))
+
+	# Your stagger logic
+	var enemy_stagger: float = 0.1 # Default
+	if enemies_to_spawn > 0: # Avoid division by zero if somehow enemies_to_spawn is 0
+		enemy_stagger = (2.0 + log(float(enemies_to_spawn)) * 0.5) / float(enemies_to_spawn)
+		enemy_stagger = max(0.01, enemy_stagger) # Ensure a tiny minimum stagger
 	
-	if enemies_this_wave > 500: #mass spawn as fast as is allowed
-		var enemies_spawned: int = 0
-		while enemies_spawned <= enemies_this_wave:
-			var spawn_concurrent: int = min(enemies_this_wave - enemies_spawned, CONCURRENT_ENEMY_SPAWNS)
-			for i: int in spawn_concurrent:
-				var unit: Unit = unit_sc.instantiate()
-				unit.part_of_wave = true
-				island.add_child(unit)
-				unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
-			enemies_spawned += spawn_concurrent
-			await get_tree().create_timer(enemy_stagger * spawn_concurrent).timeout
-	else:
-		for i: int in enemies_this_wave:
-			var unit: Unit = unit_sc.instantiate()
-			unit.part_of_wave = true
-			island.add_child(unit)
-			unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
-			await get_tree().create_timer(enemy_stagger).timeout
+	if enemies_to_spawn > 500: # Mass spawn logic
+		var enemies_spawned_count: int = 0
+		while enemies_spawned_count < enemies_to_spawn:
+			var num_to_spawn_now: int = min(enemies_to_spawn - enemies_spawned_count, CONCURRENT_ENEMY_SPAWNS)
+			for i: int in num_to_spawn_now:
+				var unit: Node = unit_sc.instantiate()
+				if unit is Unit: # Type check
+					var actual_unit = unit as Unit
+					# actual_unit.part_of_wave = true # If your Unit script uses this
+					if actual_unit.has_signal("died"):
+						actual_unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
+					else:
+						push_warning("Waves: Unit spawned for wave " + str(current_combat_wave_number) + " has no 'died' signal.")
+
+					island.add_child(actual_unit)
+					if island.active_boundary_tiles.is_empty(): # Should not happen if initial check passed
+						actual_unit.queue_free()
+						push_error("Boundary empty mid spawn batch")
+						self.alive_enemies -=1 # Manually adjust if one unit fails here
+						continue
+					actual_unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
+				else:
+					push_error("Waves: Spawned scene is not a Unit for wave " + str(current_combat_wave_number))
+					if is_instance_valid(unit): unit.queue_free()
+					self.alive_enemies -= 1 # Account for failed spawn if possible
+					continue # Skip to next in batch or next batch
+
+			enemies_spawned_count += num_to_spawn_now
+			if enemies_spawned_count < enemies_to_spawn and enemy_stagger * num_to_spawn_now > 0 : # Only await if more to spawn & stagger is positive
+				await get_tree().create_timer(enemy_stagger * num_to_spawn_now).timeout
+	else: # Regular spawn logic
+		for i: int in enemies_to_spawn:
+			if not is_instance_valid(island) or island.active_boundary_tiles.is_empty():
+				push_warning("Waves: Island/boundaries became invalid during regular spawn for wave " + str(current_combat_wave_number))
+				self.alive_enemies = i # Only count those successfully iterated for spawning
+				return
+			
+			var unit: Node = unit_sc.instantiate()
+			if unit is Unit:
+				var actual_unit = unit as Unit
+				# actual_unit.part_of_wave = true
+				if actual_unit.has_signal("died"):
+					actual_unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
+				else:
+					push_warning("Waves: Unit spawned for wave " + str(current_combat_wave_number) + " has no 'died' signal.")
+				
+				island.add_child(actual_unit)
+				if island.active_boundary_tiles.is_empty():
+					actual_unit.queue_free()
+					push_error("Boundary empty mid spawn")
+					self.alive_enemies -=1
+					continue
+				actual_unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
+			else:
+				push_error("Waves: Spawned scene is not a Unit for wave " + str(current_combat_wave_number))
+				if is_instance_valid(unit): unit.queue_free()
+				self.alive_enemies -= 1
+				continue
+
+			if i < enemies_to_spawn - 1 and enemy_stagger > 0: # Don't wait after last enemy & if stagger is positive
+				await get_tree().create_timer(enemy_stagger).timeout
+
+func _on_enemy_died():
+	if self.alive_enemies > 0:
+		self.alive_enemies -= 1 # Setter handles emitting wave_ended
+
+static func get_enemies_for_wave(wave: int) -> int:
+	return wave * 5
+	
