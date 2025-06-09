@@ -40,7 +40,7 @@ func _ready():
 	queue_redraw()
 
 func construct_tower(cell: Vector2i, tower_type: Towers.Type):
-	var tower: Tower = Towers.get_tower_scene(tower_type).instantiate()
+	var tower: Tower = Towers.create_tower(tower_type)
 	occupied_grid[cell] = true
 	_update_navigation(cell) # Update navigation
 	tower_grid[cell] = tower

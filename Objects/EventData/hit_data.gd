@@ -5,4 +5,5 @@ var source: Unit #dealer of hit
 var target: Unit #receiver of hit
 
 var damage: float = 0.0
+var modifiers: Array[Modifier] = []
 #see unit.gd, deal_hit and take_hit

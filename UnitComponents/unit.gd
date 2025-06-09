@@ -16,7 +16,8 @@ signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
 
 var unit_id: int
-var part_of_wave: bool = false
+
+var flux_value: float #how much flux this unit drops when killed
 
 func _create_components():
 	if modifiers_component == null:
@@ -31,6 +32,7 @@ func _prepare_components():
 	unit_id = References.assign_unit_id()
 	
 	died.connect(func():
+		Player.flux += flux_value
 		queue_free()
 	)
 
@@ -79,11 +81,18 @@ func take_hit(hit: HitData):
 	evt.data = hit
 	
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
-
+	
+	var benchmark: float = health_component.health
 	health_component.health -= evt.data.damage
+	var delta_health: float = benchmark - health_component.health #measured damage caused
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
-	hit_report.damage_caused = evt.data.damage #TODO: change this to like actual readings
+	hit_report.damage_caused = delta_health
+	if benchmark >= 0.01 and health_component.health < 0.01:
+		hit_report.death_caused = true
+		
+	for modifier: Modifier in hit.modifiers:
+		modifiers_component.add_modifier(modifier)
 	
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT

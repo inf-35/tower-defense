@@ -10,6 +10,7 @@ var effect_type: Effects.Type #id of this type of effect
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 #negative = permanent
 
+
 var params: Dictionary = {}
 const GLOBAL_RECURSION_LIMIT: int = 0 #limit for effect recursion; see Unit effect parsing
 

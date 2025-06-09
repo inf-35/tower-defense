@@ -15,5 +15,5 @@ func _handle_event(instance: EffectInstance, event: GameEvent):
 	
 	assert(instance.params.has("blueprint_pool"))
 
-	Player.blueprints.append(Blueprint.new(instance.params.blueprint_pool.pick_random()))
+	Player.add_blueprint(Blueprint.new(instance.params.blueprint_pool.pick_random()))
 	print("new blueprint!")

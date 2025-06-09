@@ -126,9 +126,6 @@ func _start_building_phase():
 	_report("Starting Building Phase for wave " + str(current_wave_number))
 	UI.show_building_ui.emit() # UI listens to this
 	UI.building_phase_ended.connect(_on_player_ended_building_phase, CONNECT_ONE_SHOT) #ui hooks to this
-	get_tree().create_timer(0.5).timeout.connect(func():
-		UI.building_phase_ended.emit()
-	)
 
 # Called by your UI when the player clicks the "End Building Phase" button
 func _on_player_ended_building_phase():

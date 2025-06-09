@@ -36,12 +36,6 @@ func start_combat_wave(wave_num_to_spawn: int):
 
 func _spawn_enemies_for_current_wave():
 	# Ensure unit_sc is loaded, ideally as a class member if always the same
-	var unit_sc : PackedScene = preload("res://Units/Enemies/basic_unit.tscn")
-	if not unit_sc:
-		push_error("Waves: Failed to preload enemy scene for wave " + str(current_combat_wave_number))
-		self.alive_enemies = 0 # This will trigger wave_ended immediately
-		return
-
 	var island: Island = References.island
 	if not is_instance_valid(island):
 		self.alive_enemies = 0
@@ -60,7 +54,7 @@ func _spawn_enemies_for_current_wave():
 	print("Waves: Spawning " + str(enemies_to_spawn) + " enemies for wave " + str(current_combat_wave_number))
 
 	# Your stagger logic
-	var enemy_stagger: float = 0.1 # Default
+	var enemy_stagger: float = 0.01 # Default
 	if enemies_to_spawn > 0: # Avoid division by zero if somehow enemies_to_spawn is 0
 		enemy_stagger = (2.0 + log(float(enemies_to_spawn)) * 0.5) / float(enemies_to_spawn)
 		enemy_stagger = max(0.01, enemy_stagger) # Ensure a tiny minimum stagger
@@ -70,27 +64,12 @@ func _spawn_enemies_for_current_wave():
 		while enemies_spawned_count < enemies_to_spawn:
 			var num_to_spawn_now: int = min(enemies_to_spawn - enemies_spawned_count, CONCURRENT_ENEMY_SPAWNS)
 			for i: int in num_to_spawn_now:
-				var unit: Node = unit_sc.instantiate()
-				if unit is Unit: # Type check
-					var actual_unit = unit as Unit
-					# actual_unit.part_of_wave = true # If your Unit script uses this
-					if actual_unit.has_signal("died"):
-						actual_unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
-					else:
-						push_warning("Waves: Unit spawned for wave " + str(current_combat_wave_number) + " has no 'died' signal.")
+				var unit: Unit = Units.create_unit(Units.Type.BASIC_UNIT)
+				unit.flux_value = Units.get_unit_flux(Units.Type.BASIC_UNIT)
+				unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
 
-					island.add_child(actual_unit)
-					if island.active_boundary_tiles.is_empty(): # Should not happen if initial check passed
-						actual_unit.queue_free()
-						push_error("Boundary empty mid spawn batch")
-						self.alive_enemies -=1 # Manually adjust if one unit fails here
-						continue
-					actual_unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
-				else:
-					push_error("Waves: Spawned scene is not a Unit for wave " + str(current_combat_wave_number))
-					if is_instance_valid(unit): unit.queue_free()
-					self.alive_enemies -= 1 # Account for failed spawn if possible
-					continue # Skip to next in batch or next batch
+				island.add_child(unit)
+				unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
 
 			enemies_spawned_count += num_to_spawn_now
 			if enemies_spawned_count < enemies_to_spawn and enemy_stagger * num_to_spawn_now > 0 : # Only await if more to spawn & stagger is positive
@@ -102,30 +81,13 @@ func _spawn_enemies_for_current_wave():
 				self.alive_enemies = i # Only count those successfully iterated for spawning
 				return
 			
-			var unit: Node = unit_sc.instantiate()
-			if unit is Unit:
-				var actual_unit = unit as Unit
-				# actual_unit.part_of_wave = true
-				if actual_unit.has_signal("died"):
-					actual_unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
-				else:
-					push_warning("Waves: Unit spawned for wave " + str(current_combat_wave_number) + " has no 'died' signal.")
-				
-				island.add_child(actual_unit)
-				if island.active_boundary_tiles.is_empty():
-					actual_unit.queue_free()
-					push_error("Boundary empty mid spawn")
-					self.alive_enemies -=1
-					continue
-				actual_unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
-			else:
-				push_error("Waves: Spawned scene is not a Unit for wave " + str(current_combat_wave_number))
-				if is_instance_valid(unit): unit.queue_free()
-				self.alive_enemies -= 1
-				continue
+			var unit: Unit = Units.create_unit(Units.Type.BASIC_UNIT)
+			unit.flux_value = Units.get_unit_flux(Units.Type.BASIC_UNIT)
+			unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
+			island.add_child(unit)
+			unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
 
-			if i < enemies_to_spawn - 1 and enemy_stagger > 0: # Don't wait after last enemy & if stagger is positive
-				await get_tree().create_timer(enemy_stagger).timeout
+			await get_tree().create_timer(enemy_stagger).timeout
 
 func _on_enemy_died():
 	if self.alive_enemies > 0:

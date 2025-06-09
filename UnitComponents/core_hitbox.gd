@@ -14,6 +14,6 @@ func _ready():
 			return
 			
 
-		Player.health -= area.unit.health_component.health
+		Player.flux -= area.unit.health_component.health
 		area.unit.died.emit()
 	)
