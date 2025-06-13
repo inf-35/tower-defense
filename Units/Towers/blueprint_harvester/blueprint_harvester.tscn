@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_p4o20"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_0fd6n"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Data/effect_prototype.gd" id="4_sxhhn"]
-[ext_resource type="Script" uid="uid://bhssb1tl7sd1q" path="res://Data/Effects/blueprint_on_wave.gd" id="5_8sfbc"]
+[ext_resource type="Script" uid="uid://bhssb1tl7sd1q" path="res://Data/Effects/_blueprint_on_wave.gd" id="5_8sfbc"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sxhhn"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_w5o8d"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
@@ -16,7 +16,7 @@ params = {
 }
 metadata/_custom_type_script = "uid://bhssb1tl7sd1q"
 
-[node name="BlueprintHarvester" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component")]
+[node name="BlueprintHarvester" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_ein27")
 type = 4
@@ -24,7 +24,6 @@ graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
-range_component = NodePath("")
 intrinsic_effects = Array[ExtResource("4_sxhhn")]([SubResource("Resource_ein27")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 

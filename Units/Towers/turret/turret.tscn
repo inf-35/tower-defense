@@ -36,7 +36,7 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("7_lkyt2")
-_attack_data = ExtResource("8_rghec")
+attack_data = ExtResource("8_rghec")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]

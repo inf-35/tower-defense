@@ -1,41 +1,41 @@
 [gd_scene load_steps=8 format=3 uid="uid://1mt24rkpxr7f"]
 
-[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ovd7c"]
-[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_6akvo"]
-[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_qblfd"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_5map6"]
-[ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="9_qvkhl"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_6akvo"]
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2li7g"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_vum4a"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="3_yq3fw"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="4_hh2tl"]
+[ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="5_cg3ju"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_ok6e0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
 radius = 6.0
 
 [node name="PlayerCore" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "movement_component")]
 z_index = 1
-script = ExtResource("1_ovd7c")
+script = ExtResource("1_2li7g")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("3_6akvo")
-movement_data = ExtResource("4_qblfd")
+script = ExtResource("2_vum4a")
+movement_data = ExtResource("3_yq3fw")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 0, 1)
 scale = Vector2(0.1, 0.1)
-texture = ExtResource("8_5map6")
+texture = ExtResource("4_hh2tl")
 
 [node name="CoreHitbox" type="Area2D" parent="."]
 collision_layer = 0
-script = ExtResource("9_qvkhl")
+script = ExtResource("5_cg3ju")
 metadata/_custom_type_script = "uid://qpwm2iqakx70"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CoreHitbox"]
 shape = SubResource("CircleShape2D_6akvo")
 
 [node name="ModifiersComponent" type="Node" parent="."]
-script = ExtResource("10_6akvo")
+script = ExtResource("6_ok6e0")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

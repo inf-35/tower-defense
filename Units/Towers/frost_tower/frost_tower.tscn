@@ -56,5 +56,5 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("7_5npwk")
-_attack_data = ExtResource("10_wqvsu")
+attack_data = ExtResource("10_wqvsu")
 metadata/_custom_type_script = "uid://detgar3t50qgi"

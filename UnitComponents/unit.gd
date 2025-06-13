@@ -13,6 +13,7 @@ class_name Unit
 @export var attack_component: AttackComponent
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
+var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
 var effects: Array[EffectInstance]
 
 signal on_event(event: GameEvent) #polymorphic event bus
@@ -67,9 +68,7 @@ func _prepare_components():
 
 func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
-		var effect_instance: EffectInstance = effect_prototype.create_instance()
-		effect_instance.attach_to(self)
-		effects.append(effect_instance)
+		apply_effect(effect_prototype)
 		
 	Waves.wave_started.connect(func(wave: int):
 		var wave_data := WaveData.new()
@@ -81,6 +80,27 @@ func _attach_intrinsic_effects() -> void:
 		
 		on_event.emit(evt)
 	)
+
+func apply_effect(effect_prototype: EffectPrototype) -> void:
+	effect_prototypes.append(effect_prototype)
+	
+	var effect_instance: EffectInstance = effect_prototype.create_instance()
+	effect_instance.attach_to(self)
+	effects.append(effect_instance)
+
+func remove_effect(effect_prototype: EffectPrototype) -> void:
+	var effects_to_remove: Array[EffectInstance] = []
+	
+	for effect_instance: EffectInstance in effects: #remove all child EffectInstances
+		if effect_instance.effect_prototype == effect_prototype:
+			effects_to_remove.append(effect_instance)
+			
+	for effect in effects_to_remove:
+		effect.detach() #trigger effect's detach handler
+		effects.erase(effect)
+		effect.free()
+	
+	effect_prototypes.erase(effect_prototype)
 
 func _ready():
 	_attach_intrinsic_effects()
@@ -144,7 +164,19 @@ func deal_hit(hit: HitData):
 
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
 	return References.island.get_terrain_base(movement_component.cell_position)
+	
+func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be used for ui related purposes
+	if health_component != null:
+		if attr == Attributes.id.MAX_HEALTH:
+			return health_component.get_stat(modifiers_component, health_component.health_data, attr)
 
+	if movement_component != null:
+		if attr == Attributes.id.MAX_SPEED:
+			return movement_component.get_stat(modifiers_component, movement_component.movement_data, attr)
+	
+	if attack_component != null:
+		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
+			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
 			
 var draw_start: Vector2 = position
 var draw_end: Vector2 = Vector2.ZERO

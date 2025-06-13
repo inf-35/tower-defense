@@ -10,6 +10,12 @@ var effect_type: Effects.Type #id of this type of effect
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 #negative = permanent
 
+#var stack: int = 1: #how many "stacks" of the same effect do we have
+	#set(new_stack):
+		#stack = new_stack
+		#if stack <= 0:
+			#free()
+
 
 var params: Dictionary = {}
 const GLOBAL_RECURSION_LIMIT: int = 0 #limit for effect recursion; see Unit effect parsing
@@ -18,6 +24,10 @@ var host: Unit #to which unit does this effect apply onto
 
 func _init():
 	pass
+	
+func detach() -> void:
+	if is_instance_valid(host):
+		effect_prototype.detach_handler.call(self)
 	
 func attach_to(_host: Unit) -> void:
 	if is_instance_valid(host):
@@ -32,4 +42,5 @@ func _handle_event_unfiltered(event: GameEvent) -> void:
 	if not is_instance_valid(host): #reject if host is dead
 		return
 	
+	#for i in stack:
 	effect_prototype.event_handler.call(self, event)

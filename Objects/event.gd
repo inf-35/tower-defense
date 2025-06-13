@@ -7,6 +7,8 @@ enum EventType {
 	PRE_HIT,
 	HIT,
 	WAVE_STARTED,
+	
+	ADJACENCY_UPDATED, #for towers only
 }
 
 var event_type: EventType

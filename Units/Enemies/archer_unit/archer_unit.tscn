@@ -1,0 +1,67 @@
+[gd_scene load_steps=13 format=3 uid="uid://bmjm05pjgv3df"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_afgbb"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_5ykig"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_25jjc"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_rlh67"]
+[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Data/Health/milita.tres" id="5_ha1o6"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="6_yocns"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_c8nbp"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_obpax"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_xmpgh"]
+[ext_resource type="Resource" uid="uid://bkuvyutqxnknt" path="res://Units/Enemies/archer_unit/archer_attack.tres" id="10_x6e3e"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_nfsk5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]
+radius = 60.0
+
+[node name="ArcherUnit" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+script = ExtResource("1_afgbb")
+hostile = true
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_5ykig")
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_25jjc")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_rlh67")
+health_data = ExtResource("5_ha1o6")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+self_modulate = Color(1, 1, 0.00784314, 1)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("6_yocns")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("7_c8nbp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_7w2p3")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("8_obpax")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("9_xmpgh")
+_attack_data = ExtResource("10_x6e3e")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("12_nfsk5")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"

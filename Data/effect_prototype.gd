@@ -29,7 +29,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	pass #override in sub-classes
 	
 func create_instance() -> EffectInstance:
-	assert("params" in self) #ensure that the subclass that class this has the variable params
+	assert("params" in self) #ensure that the subclass has the variable params
+	assert("state" in self) #ensure that the subclass has the variable state
 	
 	var effect_instance := EffectInstance.new()
 	effect_instance.effect_type = effect_type

@@ -12,14 +12,26 @@ class UnitStat: #data container for stats
 		strength_value = _strength_value
 
 enum Type {
-	BASIC_UNIT
+	BASIC,
+	BUFF,
+	ARCHER,
 }
 
 static var unit_stats : Dictionary[Type, UnitStat] = {
-	Type.BASIC_UNIT: UnitStat.new(
-		preload("res://Units/Enemies/basic_unit.tscn"),
-		0.5,
+	Type.BASIC: UnitStat.new(
+		preload("res://Units/Enemies/basic_unit/basic_unit.tscn"),
+		0.2,
 		1.0
+	),
+	Type.BUFF: UnitStat.new(
+		preload("res://Units/Enemies/buff_unit/buff_unit.tscn"),
+		0.4,
+		2.0,
+	),
+	Type.ARCHER: UnitStat.new(
+		preload("res://Units/Enemies/archer_unit/archer_unit.tscn"),
+		0.5,
+		2.0
 	)
 }
 

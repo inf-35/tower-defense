@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CatalystEffect" load_steps=2 format=3 uid="uid://oix80pe5es6j"]
+
+[ext_resource type="Script" uid="uid://dfxogp1ohj6rw" path="res://Data/Effects/_catalyst.gd" id="1_lay7q"]
+
+[resource]
+script = ExtResource("1_lay7q")
+params = {
+"hooks": [Vector2i(0, 1), Vector2i(0, -1)]
+}
+metadata/_custom_type_script = "uid://dfxogp1ohj6rw"

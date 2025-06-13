@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_1q65b")
-range = 70.0
+range = 40.0
 cooldown = 1.0
 radius = 0.0
 damage = 2.0

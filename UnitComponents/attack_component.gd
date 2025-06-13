@@ -1,12 +1,10 @@
 extends UnitComponent
 class_name AttackComponent
 #polymorphic, stateless class that takes in AttackData and executes attacks
-@export var _attack_data: Data
-var attack_data
+@export var attack_data: Data
 var _modifiers_component: ModifiersComponent
 
 func inject_components(modifiers_component: ModifiersComponent):
-	attack_data = _attack_data
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])

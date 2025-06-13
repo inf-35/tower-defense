@@ -44,7 +44,7 @@ func _ready():
 		])
 	add_blueprint(Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER))
 		
-	ClickHandler.click_on_island.connect(func(world_position: Vector2, tower_type: Towers.Type):
+	ClickHandler.click_on_island.connect(func(world_position: Vector2, tower_type: Towers.Type, tower_facing: Tower.Facing):
 		if not has_blueprint(tower_type):
 			print("no blueprint!")
 			return
@@ -61,8 +61,10 @@ func _ready():
 		
 		consume_blueprint(tower_type)
 		Player.flux -= Towers.tower_stats[tower_type].flux_cost
-		References.island.construct_tower(cell, tower_type)
+		References.island.construct_tower(cell, tower_type, tower_facing)
 	)
+	
+	print(Towers.get_tower_stat(Towers.Type.TURRET, Attributes.id.RANGE))
 
 func choose_terrain_expansion():
 	pass

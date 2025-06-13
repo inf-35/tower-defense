@@ -4,6 +4,7 @@ extends Node
 
 @onready var island: Island = root.get_node("Island")
 @onready var camera: Camera2D = island.get_node("Camera2D")
+@onready var tower_preview: TowerPreview = island.get_node("TowerPreview")
 
 var current_unit_id: int = -1
 var current_stat_id: int = -1

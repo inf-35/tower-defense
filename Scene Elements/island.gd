@@ -39,18 +39,35 @@ func _ready():
 	construct_tower(Vector2i.ZERO, Towers.Type.PLAYER_CORE)
 	queue_redraw()
 
-func construct_tower(cell: Vector2i, tower_type: Towers.Type):
+func construct_tower(cell: Vector2i, tower_type: Towers.Type = Towers.Type.VOID, tower_facing: Tower.Facing = Tower.Facing.UP):
+	if tower_type == Towers.Type.VOID:
+		if tower_grid.has(cell) and is_instance_valid(tower_grid[cell]):
+			tower_grid[cell].queue_free()
+		update_adjacencies_around(cell)
+		return
+
 	var tower: Tower = Towers.create_tower(tower_type)
 	occupied_grid[cell] = true
 	_update_navigation(cell) # Update navigation
 	tower_grid[cell] = tower
 
 	tower.type # Necessary: Evil pre-resolution hotfix
+	tower.facing = tower_facing
 	add_child(tower)
 
 	tower.tower_position = cell
 	terrain_changed.emit()
 	tower_changed.emit(cell)
+	update_adjacencies_around(cell)
+	
+func update_adjacencies_around(cell: Vector2i): #allows neighbouring tiles to detect updated adjacencies
+	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
+	if tower_grid.has(cell): #update our own adjacencies
+		tower_grid[cell].adjacency_updated.emit(adjacent_towers)
+	
+	for tower: Tower in adjacent_towers.values(): #conversely we also have to update neighbours
+		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
+		tower.adjacency_updated.emit(local_adjacencies)
 
 func generate_terrain():
 	terrain_base_grid.clear()
@@ -65,7 +82,7 @@ func generate_terrain():
 			terrain_level_grid[Vector2i(x, y)] = Terrain.Level.SEA
 			occupied_grid[Vector2i(x, y)] = false
 
-	expand_by_block(TerrainGen.generate_block(80))
+	expand_by_block(TerrainGen.generate_block(40))
 	expand_by_block(TerrainGen.generate_block(6))
 	
 	_update_terrain()
@@ -179,17 +196,27 @@ func _draw():
 		draw_rect(rect, color)
 
 # "Public" helper functions
-func get_adjacent_towers(cell: Vector2i) -> Array[Tower]:
-	var output: Array[Tower] = []
+func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]: #returns tower with their local direction
+	var output: Dictionary[Vector2i, Tower] = {}
 	for dir: Vector2i in DIRS:
 		if not tower_grid.has(cell + dir):
 			continue
-		output.append(tower_grid[cell + dir])
+		output[dir] = tower_grid[cell + dir]
 
 	return output
+
+func is_occupied(cell: Vector2i) -> bool:
+	if occupied_grid.has(cell):
+		return occupied_grid[cell]
+	else:
+		return false
 
 func get_terrain_base(cell: Vector2i) -> Terrain.Base:
 	return terrain_base_grid[cell]
 
 func get_terrain_level(cell: Vector2i) -> Terrain.Level:
-	return terrain_level_grid[cell]
+	if terrain_level_grid.has(cell):
+		return terrain_level_grid[cell]
+	else:
+		push_warning("couldnt get terrain level reading at, ", str(cell))
+		return Terrain.Level.SEA

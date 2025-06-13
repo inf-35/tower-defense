@@ -5,6 +5,8 @@ class_name ReflectDamageEffect
 	"reflection": 0.001,
 }
 
+var state: Dictionary = {}
+
 func _handle_event(instance: EffectInstance, event : GameEvent):
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return

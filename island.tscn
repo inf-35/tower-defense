@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=4 format=3 uid="uid://dj5u4rlrnurt7"]
 
-[ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://island.gd" id="1_0iamf"]
+[ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="PackedScene" uid="uid://bbh3fi3s5ng5p" path="res://UI/ui.tscn" id="2_hdtfb"]
+[ext_resource type="Script" uid="uid://baq25cbcbk0eh" path="res://Scene Elements/tower_preview.gd" id="3_fgmf3"]
 
 [node name="Island" type="Node2D"]
 script = ExtResource("1_0iamf")
@@ -12,3 +13,6 @@ zoom = Vector2(2, 2)
 [node name="UI" parent="." instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
+
+[node name="TowerPreview" type="Node2D" parent="."]
+script = ExtResource("3_fgmf3")
