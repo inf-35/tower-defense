@@ -10,3 +10,5 @@ script = ExtResource("1_0iamf")
 zoom = Vector2(2, 2)
 
 [node name="UI" parent="." instance=ExtResource("2_hdtfb")]
+
+[node name="Projectiles" type="Node2D" parent="."]

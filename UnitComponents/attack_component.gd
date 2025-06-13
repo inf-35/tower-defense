@@ -1,13 +1,15 @@
 extends UnitComponent
 class_name AttackComponent
 #polymorphic, stateless class that takes in AttackData and executes attacks
-var attack_data: AttackData #"meta" attack resource - determines range, cooldown, etc.
-
+@export var _attack_data: Data
+var attack_data
 var _modifiers_component: ModifiersComponent
 
 func inject_components(modifiers_component: ModifiersComponent):
+	attack_data = _attack_data
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
+	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])
 
 func attack(target: Unit):
 	if attack_data == null:
@@ -27,25 +29,20 @@ func attack(target: Unit):
 
 func deal_attack(target: Unit):
 	var damage: float = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
-
+	
 	var hit_data := HitData.new()
 	hit_data.source = unit
 	hit_data.target = target
 	hit_data.damage = damage
+	hit_data.expected_damage = damage
+	hit_data.modifiers = attack_data.generate_modifiers() #TODO: integrate hit modifiers with the modifiers system
+	
+	for modifier: Modifier in hit_data.modifiers:
+		modifier.source_id = unit.unit_id
+
 	unit.deal_hit(
 		hit_data
 	)
-	#
-	#if attack_data.modifier_data != null:
-		#target.modifiers_component.add_modifier(
-			#Modifier.new(
-				#attack_data.modifier_data.attribute,
-				#attack_data.modifier_data.multiplicative,
-				#attack_data.modifier_data.additive,
-				#attack_data.modifier_data.override,
-				#unit.unit_id
-			#)
-		#)
 
 func get_enemies_in_radius(center: Vector2, radius: float, max_results := 100) -> Array[Unit]:
 	var space := unit.get_world_2d().direct_space_state

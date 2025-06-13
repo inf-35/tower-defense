@@ -12,8 +12,9 @@ var source_id: int #unit id of the source of this modifier
 
 var cooldown: float = -1.0 #negative cooldown -> permanent
 
-func _init(_attribute: Attributes.id, _multiplicative: float = 1.0, _additive: float = 0.0, _override = null, _source_id = 0) -> void:
+func _init(_attribute: Attributes.id, _status: Attributes.Status, _multiplicative: float = 1.0, _additive: float = 0.0, _override = null, _source_id = 0) -> void:
 	attribute = _attribute
+	status = _status
 	additive = _additive
 	multiplicative = _multiplicative
 	override = _override

@@ -6,6 +6,3 @@ class_name TowerData
 #meta-properties
 @export var cost: int = 20
 #...upgrades
-
-#attack
-@export var attack: AttackData

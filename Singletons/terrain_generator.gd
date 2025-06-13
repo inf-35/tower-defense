@@ -47,6 +47,6 @@ func generate_block(block_size: int) -> Dictionary[Vector2i, Terrain.Base]:
 		to_visit.erase(cell)
 	#now, for all the chosen coordinates, determine their Terrain.Base type.
 	for cell_coord: Vector2i in block_candidate_coords:
-		generated_tiles[cell_coord] = Terrain.Base.EARTH if randf() > 0.1 else Terrain.Base.RUINS
+		generated_tiles[cell_coord] = Terrain.Base.EARTH if randf() > 0.08 else Terrain.Base.RUINS
 
 	return generated_tiles

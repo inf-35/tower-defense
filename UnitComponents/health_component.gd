@@ -8,16 +8,14 @@ signal health_changed(new_health: float)
 
 var _modifiers_component: ModifiersComponent
 
-var health: float = health_data.max_health:
+var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH):
 	set(new_health):
-		health = new_health
 		if health_data == null:
 			return
 		
-		new_health = clampf(new_health, 0.0, health_data.max_health)
+		new_health = clampf(new_health, 0.0, get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH))
 		if new_health == health:
 			return
-		
 		health = new_health
 		health_changed.emit(health)
 		if health < 0.01:
@@ -26,12 +24,40 @@ var health: float = health_data.max_health:
 func inject_components(modifiers_component: ModifiersComponent):
 	if modifiers_component != null:
 		_modifiers_component = modifiers_component
+		
+		_modifiers_component.stat_changed.connect(func(attr: Attributes.id):
+			if not attr == Attributes.id.MAX_HEALTH:
+				return
+				
+			health = health #this triggers the health setter function, which clamps to maxhp
+		)
+		
 		_modifiers_component.register_data(health_data)
 		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION])
+	
+	if not unit.get_node_or_null("Hitbox"):
+		var hitbox := Hitbox.new() #generate range area
+		hitbox.name = "Hitbox"
+		hitbox.unit = unit
+		unit.add_child.call_deferred(hitbox)
+		
+		var shape := RectangleShape2D.new()
+		shape.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
+		
+		var collision := CollisionShape2D.new()
+		collision.shape = shape
+		hitbox.add_child.call_deferred(collision)
+		#set detection bitmasks
+		hitbox.collision_layer = 0b0000_0001 if unit.hostile else 0b0000_0010
+		hitbox.collision_mask = 0
+		hitbox.monitoring = false
+		hitbox.monitorable = true
+
 
 func _ready():
 	_STAGGER_CYCLE = 5
 	_stagger = randi_range(0, _STAGGER_CYCLE)
+	
 
 func _process(delta : float) -> void:
 	#_stagger += 1
@@ -40,6 +66,8 @@ func _process(delta : float) -> void:
 		#return
 		
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
-		
+	if regeneration == 0:
+		return
+
 	health += regeneration * delta
 	_accumulated_delta = 0.0

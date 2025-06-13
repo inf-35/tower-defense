@@ -129,8 +129,8 @@ func _on_player_blueprints_updated(current_player_bps: Array[Blueprint]) -> void
 		
 		blueprint_bar.add_child(btn)
 
-func _update_flux(new_flux_value: float): # Renamed parameter for clarity
-	flux_display.text = "Flux: %s" % str(round(new_flux_value)) # Using string formatting
+func _update_flux(new_flux_value: float): 
+	flux_display.text = "Flux: %s" % str(round(new_flux_value * 10) * 0.1) # Using string formatting
 
 func _on_blueprint_button_pressed(type_id: Towers.Type) -> void:
 	# This function is called when a blueprint button is pressed.

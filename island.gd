@@ -45,7 +45,7 @@ func construct_tower(cell: Vector2i, tower_type: Towers.Type):
 	_update_navigation(cell) # Update navigation
 	tower_grid[cell] = tower
 
-	tower.tower_data # Necessary: Evil pre-resolution hotfix
+	tower.type # Necessary: Evil pre-resolution hotfix
 	add_child(tower)
 
 	tower.tower_position = cell

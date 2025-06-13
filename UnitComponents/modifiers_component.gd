@@ -16,6 +16,9 @@ func add_modifier(mod: Modifier) -> void:
 	_effective_cache.erase(mod.attribute)
 	stat_changed.emit(mod.attribute)
 	
+	if mod.source_id == null:
+		push_warning("modifier ", self, " has no source id!")
+
 	if mod.cooldown >= 0.0:
 		get_tree().create_timer(mod.cooldown).timeout.connect(func():
 			remove_modifier(mod)
@@ -58,7 +61,7 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	if _effective_cache.has(attr):
 		return _effective_cache[attr] #return cache
 	
-	if not base_stats.has(attr):
+	if not has_stat(attr):
 		return null #unregistered stat!
 	
 	#compute stat
@@ -67,17 +70,25 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	var product_mult := 1.0 #consolidated multiplication figure
 	var override = null #force-set figure, null if no such modifier exists
 	
-	var status_best: Dictionary[Attributes.Status, Modifier] = {} #status -> modifier
-	
-	for mod: Modifier in _modifiers: #find best modifier in each status
-		if mod.attribute != attr:
+	var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
+	#this prevents endless stacking by a single unit
+	for modifier: Modifier in _modifiers:
+		if modifier.attribute != attr:
 			continue
-
-		var status: Attributes.Status = mod.status
-		if (not status_best.has(status)) or (abs(mod.additive) > abs(status_best[status].additive)) or (abs(1 - mod.multiplicative) > abs(1 - status_best[status].multiplicative)):
-			status_best[status] = mod
+		
+		var source_id: int = modifier.source_id
+		if not best_modifier_by_source_id.has(source_id):
+			best_modifier_by_source_id[source_id] = modifier
+			continue
+		
+		var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
+		if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
+			best_modifier_by_source_id[source_id] = modifier
 	
-	for modifier: Modifier in status_best.values(): #iterate through "strongest" modifiers
+	for modifier: Modifier in best_modifier_by_source_id.values(): #run over strongest attribute per source
+		if modifier.attribute != attr:
+			continue
+	
 		sum_add += modifier.additive
 		product_mult *= modifier.multiplicative
 		if modifier.override != null:

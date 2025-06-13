@@ -17,9 +17,20 @@ enum Type {
 	FROST_TOWER,
 	CANNON,
 	BLUEPRINT_HARVESTER,
+	PALISADE,
 }
 
-static var tower_stats : Dictionary[Type, TowerStat] = {
+enum Element {
+	KINETIC,
+	FROST,
+	FIRE,
+	NATURE,
+	SPARK,
+	ARCANE,
+	NEUTRAL,
+}
+
+static var tower_stats: Dictionary[Type, TowerStat] = {
 	Type.PLAYER_CORE: TowerStat.new(
 		preload("res://Units/Towers/player_core.tscn"),
 		20,
@@ -44,6 +55,11 @@ static var tower_stats : Dictionary[Type, TowerStat] = {
 		preload("res://Units/Towers/blueprint_harvester.tscn"),
 		2,
 		8.0,
+	),
+	Type.PALISADE: TowerStat.new(
+		preload("res://Units/Towers/palisade.tscn"),
+		1,
+		1.5
 	)
 }
 

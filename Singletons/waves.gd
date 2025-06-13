@@ -15,8 +15,12 @@ var alive_enemies: int = 0:
 			current_combat_wave_number = 0 # Reset, ready for next combat call
 			wave_ended.emit() # No payload needed as Phases knows current_wave_number
 
-# Constants for spawning
-const CONCURRENT_ENEMY_SPAWNS: int = 10 # From your original
+# Constants for waves
+const CONCURRENT_ENEMY_SPAWNS: int = 10
+const EXPANSION_BLOCK_SIZE: int = 12
+const WAVES_PER_EXPANSION_CHOICE: int = 3 # e.g., expansion before wave 5, 10, etc.
+const EXPANSION_CHOICES_COUNT: int = 3
+const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5 # Before starting combat
 
 # New function called by Phases.gd to start a combat wave
 func start_combat_wave(wave_num_to_spawn: int):
@@ -56,7 +60,7 @@ func _spawn_enemies_for_current_wave():
 	# Your stagger logic
 	var enemy_stagger: float = 0.01 # Default
 	if enemies_to_spawn > 0: # Avoid division by zero if somehow enemies_to_spawn is 0
-		enemy_stagger = (2.0 + log(float(enemies_to_spawn)) * 0.5) / float(enemies_to_spawn)
+		enemy_stagger = get_wave_length_for_enemies(enemies_to_spawn) / float(enemies_to_spawn)
 		enemy_stagger = max(0.01, enemy_stagger) # Ensure a tiny minimum stagger
 	
 	if enemies_to_spawn > 500: # Mass spawn logic
@@ -94,5 +98,8 @@ func _on_enemy_died():
 		self.alive_enemies -= 1 # Setter handles emitting wave_ended
 
 static func get_enemies_for_wave(wave: int) -> int:
-	return wave * 5
+	return floor(wave*5 + (wave*0.5)**2) # 5x + (x/2)^2
+	
+static func get_wave_length_for_enemies(enemies: int) -> float:
+	return (4.0 + pow(float(enemies), 1.0/3.0)) #4 + cbrt(enemies)
 	

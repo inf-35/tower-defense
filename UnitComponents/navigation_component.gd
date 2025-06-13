@@ -6,7 +6,6 @@ var movement_component: MovementComponent
 func inject_components(movement: MovementComponent):
 	movement_component = movement
 
-
 var goal: Vector2i = Vector2i.ZERO
 var _current_waypoint_index: int:
 	set(ncwi):
@@ -35,7 +34,7 @@ func _ready():
 func update_path():
 	var path_data: Navigation.PathData = Navigation.find_path(movement_component.cell_position)
 	if path_data.status == Navigation.PathData.Status.building_path:
-		Navigation.request_path_promise(Navigation.PathPromise.new(
+		Navigation.request_path_promise(Navigation.PathPromise.new( #request a path for later
 			self,
 			movement_component.cell_position,
 			goal
@@ -44,7 +43,7 @@ func update_path():
 		get_tree().create_timer(0.2).timeout.connect(func():
 			unit.graphics.modulate = Color(1.0, 1.0, 1.0)
 		)
-	else:
+	else: #path built/ no path found
 		_path = path_data.path
 		unit.graphics.modulate = Color(1.0, 0.0, 1.0)
 		get_tree().create_timer(0.2).timeout.connect(func():
@@ -53,7 +52,6 @@ func update_path():
 
 func receive_path_data(path_data: Navigation.PathData): #used by Navigation to fulfill promises
 	if path_data.status == Navigation.PathData.Status.building_path: #keep requesting path until we get back a good reply
-		push_warning(self, " navigation promise bounced!")
 		Navigation.request_path_promise(Navigation.PathPromise.new(
 			self,
 			movement_component.cell_position,

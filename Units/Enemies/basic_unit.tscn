@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene load_steps=15 format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_sl14g"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_42xql"]
@@ -8,11 +8,24 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="5_od54l"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="6_8fmk0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="7_42xql"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_8fmk0"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Data/modifier_data_prototype.gd" id="10_ttlkd"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Data/attack_data.gd" id="11_tujvi"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_ttlkd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]
 radius = 60.0
 
-[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[sub_resource type="Resource" id="Resource_n1ybg"]
+script = ExtResource("11_tujvi")
+range = 100.0
+cooldown = 1.0
+radius = 0.0
+damage = 2.0
+modifiers = Array[ExtResource("10_ttlkd")]([])
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_sl14g")
 hostile = true
 graphics = NodePath("Graphics")
@@ -20,6 +33,8 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
@@ -39,14 +54,23 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("5_od54l")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="."]
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("6_8fmk0")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("CircleShape2D_7w2p3")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("7_42xql")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("9_8fmk0")
+_attack_data = SubResource("Resource_n1ybg")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("12_ttlkd")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"

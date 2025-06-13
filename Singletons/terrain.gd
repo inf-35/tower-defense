@@ -1,7 +1,7 @@
 extends Node #terrain
 #repository of data, purely static
 
-enum Level { 
+enum Level {
 	SEA, #all terrains unbuildable, with little exception
 	SHORE, #buildable only to large structures
 	EARTH #buildable in general

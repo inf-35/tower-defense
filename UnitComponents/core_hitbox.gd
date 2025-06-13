@@ -12,7 +12,6 @@ func _ready():
 		
 		if not area.unit.hostile:
 			return
-			
 
 		Player.flux -= area.unit.health_component.health
 		area.unit.died.emit()

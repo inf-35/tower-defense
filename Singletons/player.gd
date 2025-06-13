@@ -37,12 +37,12 @@ var effect_prototypes: Array[EffectPrototype] = [] #allied units will base their
 #ready
 
 func _ready():
-	for i in 100:
+	for i in 10:
 		blueprints.append_array([
-			Blueprint.new(Towers.Type.CANNON),
-			Blueprint.new(Towers.Type.FROST_TOWER),
-			Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER)
+			Blueprint.new(Towers.Type.TURRET),
+			Blueprint.new(Towers.Type.PALISADE),
 		])
+	add_blueprint(Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER))
 		
 	ClickHandler.click_on_island.connect(func(world_position: Vector2, tower_type: Towers.Type):
 		if not has_blueprint(tower_type):

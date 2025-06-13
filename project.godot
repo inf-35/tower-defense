@@ -27,6 +27,12 @@ Terrain="*res://Singletons/terrain.gd"
 TerrainGen="*res://Singletons/terrain_generator.gd"
 Phases="*res://Singletons/phase_manager.gd"
 UI="*res://UI/ui_bus.gd"
+Targeting="*res://Singletons/targeting_coordinator.gd"
+
+[layer_names]
+
+2d_physics/layer_1="enemies"
+2d_physics/layer_2="allies"
 
 [rendering]
 

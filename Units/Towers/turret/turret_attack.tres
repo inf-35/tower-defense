@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://b026mhuu7c8a1"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Data/modifier_data_prototype.gd" id="1_5qqag"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Data/attack_data.gd" id="2_1q65b"]
+
+[resource]
+script = ExtResource("2_1q65b")
+range = 70.0
+cooldown = 1.0
+radius = 0.0
+damage = 2.0
+modifiers = Array[ExtResource("1_5qqag")]([])
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

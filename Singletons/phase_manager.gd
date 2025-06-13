@@ -7,12 +7,6 @@ var current_wave_number: int = 0 # Phases now owns the wave progression
 enum GamePhase { IDLE, EXPANSION, BUILDING, COMBAT_WAVE, GAME_OVER }
 var current_phase: GamePhase = GamePhase.IDLE
 
-# --- Constants ---
-const EXPANSION_BLOCK_SIZE = 12
-const WAVES_PER_EXPANSION_CHOICE = 2 # e.g., expansion before wave 5, 10, etc.
-const EXPANSION_CHOICES_COUNT: int = 3
-const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5 # Before starting combat
-
 const DEBUG_PRINT_REPORTS: bool = true #debug -> print phase reports?
 
 func _ready():
@@ -61,7 +55,7 @@ func _prepare_for_next_wave_cycle():
 	current_wave_number += 1
 	_report("Preparing for wave cycle " + str(current_wave_number))
 
-	if current_wave_number > 0 and current_wave_number % WAVES_PER_EXPANSION_CHOICE == 0:
+	if current_wave_number > 0 and current_wave_number % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 		_start_expansion_phase() #divert to expansion phase
 	else:
 		_start_building_phase()
@@ -72,8 +66,8 @@ func _start_expansion_phase():
 	_report("Starting Expansion Phase for upcoming wave " + str(current_wave_number))
 	
 	var options: Array[ExpansionChoice] = []
-	for i: int in EXPANSION_CHOICES_COUNT:
-		var new_block_data: Dictionary = TerrainGen.generate_block(EXPANSION_BLOCK_SIZE)
+	for i: int in Waves.EXPANSION_CHOICES_COUNT:
+		var new_block_data: Dictionary = TerrainGen.generate_block(Waves.EXPANSION_BLOCK_SIZE)
 		if new_block_data.is_empty():
 			push_warning("Phases: TerrainGen.generate_block returned empty for expansion option " + str(i) + " for wave " + str(current_wave_number))
 		
@@ -135,7 +129,7 @@ func _on_player_ended_building_phase():
 	_report("Player ended Building Phase for wave " + str(current_wave_number) + ".")
 	UI.hide_building_ui.emit()
 	# Add delay before starting combat
-	await get_tree().create_timer(DELAY_AFTER_BUILDING_PHASE_ENDS).timeout
+	await get_tree().create_timer(Waves.DELAY_AFTER_BUILDING_PHASE_ENDS).timeout
 	_advance_phase() # Moves from BUILDING to COMBAT
 
 # --- Combat Wave Logic ---

@@ -1,11 +1,9 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://dmhe72ed8tejy"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3 uid="uid://dmhe72ed8tejy"]
 
-[ext_resource type="Resource" uid="uid://drwm72s2i5kat" path="res://Data/Attacks/no_attack.tres" id="1_f8db1"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="2_pue8w"]
 
 [resource]
 script = ExtResource("2_pue8w")
 id = 0
 cost = null
-attack = ExtResource("1_f8db1")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
