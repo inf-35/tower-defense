@@ -23,6 +23,7 @@ var tower_position: Vector2i = Vector2i.ZERO:
 		movement_component.position = Island.cell_to_position(tower_position)
 		
 func _ready():
+	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
@@ -35,6 +36,6 @@ func _ready():
 		var event := GameEvent.new()
 		event.event_type = GameEvent.EventType.ADJACENCY_UPDATED
 		event.data = adjacency_data
-		print(adjacency_data.adjacent_towers)
+		
 		on_event.emit(event)
 	)

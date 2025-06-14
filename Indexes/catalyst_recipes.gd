@@ -32,12 +32,16 @@ class CatalystRecipe:
 var catalyst_recipes: Array[CatalystRecipe] = [
 	CatalystRecipe.new(
 		{Towers.Element.KINETIC: 1},
+		{},
+	),
+	CatalystRecipe.new(
+		{Towers.Element.KINETIC: 2},
 		{}
 	)
 ]
 
 static func get_element_count(element_list: Dictionary[Towers.Element, int]) -> int:
-	var counter: int = 0
+	var counter: int = 0 #count the number of components in a element list.
 	for element_stack: int in element_list.values():
 		counter += element_stack
 	return counter
@@ -47,9 +51,15 @@ func get_most_relevant_recipe(element_list: Dictionary[Towers.Element, int]):
 	var record_length: int = 0
 	var element_count: int = get_element_count(element_list)
 	
+	if element_count == 0: #early return for empty lists
+		return
+	
 	for recipe: CatalystRecipe in catalyst_recipes:
 		var recipe_element_count: int = recipe.get_element_count()
 		if element_count < recipe_element_count: #ignore recipes which take more elements than we have
+			continue
+			
+		if recipe_element_count < record_length: #ignore recipes which are less relevant anyways
 			continue
 
 		var sufficient: bool = recipe.check_sufficiency_with(element_list)

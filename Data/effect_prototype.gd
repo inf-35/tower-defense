@@ -7,8 +7,17 @@ var effect_type: Effects.Type #id of this type of effect
 var event_hooks: Array[GameEvent.EventType] #just for information, the event hooks can be found in per-handler behaviour
 var duration: float = -1.0 #negative = permanent
 
-#neat container for arbitrary params
-#@export params: Dictionary = {} (please find in sub-classes)
+#data containers
+#@export abstract var params: Dictionary = {} #used for input params. should be exported to inspector.
+#abstract var state: Dictionary = {} #used for internal state variables. should not be exposed.
+
+enum Schedule { #schedule categories, used to enforce determinstic ordering of effects
+	MULTIPLICATIVE,
+	ADDITIVE,
+	REACTIVE,
+}
+
+@export var schedule: Schedule = Schedule.REACTIVE #NOTE: schedule is a purely effect_prototype-handled variable
 
 #inject handler functions into EffectInstance
 var attach_handler: Callable = _handle_attach
@@ -29,15 +38,17 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	pass #override in sub-classes
 	
 func create_instance() -> EffectInstance:
-	assert("params" in self) #ensure that the subclass has the variable params
-	assert("state" in self) #ensure that the subclass has the variable state
+	assert("params" in self) #ensure that the subclass has parameters
+	assert("state" in self) #ensure that the subclass has state
 	
 	var effect_instance := EffectInstance.new()
 	effect_instance.effect_type = effect_type
 	effect_instance.event_hooks = event_hooks
 	effect_instance.duration = duration
 	effect_instance.effect_prototype = self as EffectPrototype
-	effect_instance.params = self.params
+	
+	effect_instance.params = self.params.duplicate(true)
+	effect_instance.state = self.state.duplicate(true)
 	
 	return effect_instance
 	

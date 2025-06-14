@@ -16,8 +16,9 @@ var duration: float = -1.0 #negative = permanent
 		#if stack <= 0:
 			#free()
 
+var params: Dictionary = {} #for input parameters
+var state: Dictionary = {} #for internal state variables
 
-var params: Dictionary = {}
 const GLOBAL_RECURSION_LIMIT: int = 0 #limit for effect recursion; see Unit effect parsing
 
 var host: Unit #to which unit does this effect apply onto
@@ -35,10 +36,8 @@ func attach_to(_host: Unit) -> void:
 	
 	host = _host
 	effect_prototype.attach_handler.call(self)
-	host.on_event.connect(_handle_event_unfiltered)
 
-
-func _handle_event_unfiltered(event: GameEvent) -> void:
+func handle_event_unfiltered(event: GameEvent) -> void: #called by Unit in setup_event_bus
 	if not is_instance_valid(host): #reject if host is dead
 		return
 	

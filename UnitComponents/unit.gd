@@ -14,7 +14,11 @@ class_name Unit
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
-var effects: Array[EffectInstance]
+var effects: Dictionary[EffectPrototype.Schedule, Array] = {
+	EffectPrototype.Schedule.MULTIPLICATIVE: [],
+	EffectPrototype.Schedule.ADDITIVE: [],
+	EffectPrototype.Schedule.REACTIVE: [],
+} #sorted by Schedule, see EffectPrototype. each array contains EffectInstances
 
 signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
@@ -26,7 +30,7 @@ var flux_value: float #how much flux this unit drops when killed
 #runtime
 var _cooldown: float
 
-func _create_components():
+func _create_components() -> void:
 	if modifiers_component == null:
 		var n_modifiers_component: = ModifiersComponent.new()
 		add_child(n_modifiers_component)
@@ -35,7 +39,7 @@ func _create_components():
 		n_movement_component.movement_data = preload("res://Data/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
 
-func _prepare_components():
+func _prepare_components() -> void:
 	unit_id = References.assign_unit_id()
 	
 	died.connect(func():
@@ -81,17 +85,25 @@ func _attach_intrinsic_effects() -> void:
 		on_event.emit(evt)
 	)
 
+func _setup_event_bus() -> void:
+	on_event.connect(func(event: GameEvent):
+		for schedule_class: EffectPrototype.Schedule in effects:
+			var scheduled_effects: Array = effects[schedule_class]
+			for effect_instance: EffectInstance in scheduled_effects:
+				effect_instance.handle_event_unfiltered(event)
+	)
+
 func apply_effect(effect_prototype: EffectPrototype) -> void:
 	effect_prototypes.append(effect_prototype)
 	
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	effect_instance.attach_to(self)
-	effects.append(effect_instance)
+	effects[effect_prototype.schedule].append(effect_instance)
 
 func remove_effect(effect_prototype: EffectPrototype) -> void:
 	var effects_to_remove: Array[EffectInstance] = []
 	
-	for effect_instance: EffectInstance in effects: #remove all child EffectInstances
+	for effect_instance: EffectInstance in effects[effect_prototype.schedule]: #remove all child EffectInstances
 		if effect_instance.effect_prototype == effect_prototype:
 			effects_to_remove.append(effect_instance)
 			
@@ -103,6 +115,7 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 	effect_prototypes.erase(effect_prototype)
 
 func _ready():
+	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
@@ -133,7 +146,7 @@ func take_hit(hit: HitData):
 	
 	var benchmark: float = health_component.health
 	health_component.health -= evt.data.damage
-	var delta_health: float = benchmark - health_component.health #measured damage caused
+	var delta_health: float = benchmark - health_component.health #measure damage caused
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
 	hit_report.damage_caused = delta_health

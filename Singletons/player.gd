@@ -41,6 +41,8 @@ func _ready():
 		blueprints.append_array([
 			Blueprint.new(Towers.Type.TURRET),
 			Blueprint.new(Towers.Type.PALISADE),
+			Blueprint.new(Towers.Type.CATALYST),
+			Blueprint.new(Towers.Type.FROST_TOWER),
 		])
 	add_blueprint(Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER))
 		

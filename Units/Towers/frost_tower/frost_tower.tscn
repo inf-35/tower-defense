@@ -16,7 +16,7 @@ radius = 600.0
 [node name="FrostTower" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_8tw53")
-type = 2
+type = 3
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

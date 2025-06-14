@@ -14,12 +14,13 @@ script = ExtResource("5_8sfbc")
 params = {
 "blueprint_pool": [1, 2, 3, 4, 5]
 }
+schedule = 0
 metadata/_custom_type_script = "uid://bhssb1tl7sd1q"
 
 [node name="BlueprintHarvester" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_ein27")
-type = 4
+type = 5
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

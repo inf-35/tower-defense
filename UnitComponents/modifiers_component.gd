@@ -70,22 +70,22 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	var product_mult := 1.0 #consolidated multiplication figure
 	var override = null #force-set figure, null if no such modifier exists
 	
-	var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
-	#this prevents endless stacking by a single unit
-	for modifier: Modifier in _modifiers:
-		if modifier.attribute != attr:
-			continue
-		
-		var source_id: int = modifier.source_id
-		if not best_modifier_by_source_id.has(source_id):
-			best_modifier_by_source_id[source_id] = modifier
-			continue
-		
-		var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
-		if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
-			best_modifier_by_source_id[source_id] = modifier
-	
-	for modifier: Modifier in best_modifier_by_source_id.values(): #run over strongest attribute per source
+	#var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
+	##this prevents endless stacking by a single unit
+	#for modifier: Modifier in _modifiers:
+		#if modifier.attribute != attr:
+			#continue
+		#
+		#var source_id: int = modifier.source_id
+		#if not best_modifier_by_source_id.has(source_id):
+			#best_modifier_by_source_id[source_id] = modifier
+			#continue
+		#
+		#var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
+		#if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
+			#best_modifier_by_source_id[source_id] = modifier
+	#TODO: decide whether we want per-unit filtering
+	for modifier: Modifier in _modifiers: #run over strongest attribute per source
 		if modifier.attribute != attr:
 			continue
 	

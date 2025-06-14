@@ -75,13 +75,13 @@ static var tower_stats: Dictionary[Type, TowerStat] = {
 		preload("res://Units/Towers/catalyst/catalyst.tscn"),
 		Element.ARCANE,
 		2,
-		10.0,
+		1.0, #TODO: make sure you change this to 10.0
 	)
 }
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
-func get_tower_stat(tower_type: Type, attr: Attributes.id):
+func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat based off an unmodified prototype
 	if not tower_prototypes.has(tower_type): #if no prototype
 		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
 	
