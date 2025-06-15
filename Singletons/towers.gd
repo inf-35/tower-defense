@@ -21,7 +21,8 @@ enum Type {
 	CANNON,
 	BLUEPRINT_HARVESTER,
 	PALISADE,
-	CATALYST
+	CATALYST,
+	FLAMETHROWER
 }
 
 enum Element {
@@ -75,7 +76,13 @@ static var tower_stats: Dictionary[Type, TowerStat] = {
 		preload("res://Units/Towers/catalyst/catalyst.tscn"),
 		Element.ARCANE,
 		2,
-		1.0, #TODO: make sure you change this to 10.0
+		10.0,
+	),
+	Type.FLAMETHROWER: TowerStat.new(
+		preload("res://Units/Towers/flamethrower/flamethrower.tscn"),
+		Element.FIRE,
+		2,
+		10.0,
 	)
 }
 

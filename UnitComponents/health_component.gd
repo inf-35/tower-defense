@@ -8,12 +8,14 @@ signal health_changed(new_health: float)
 
 var _modifiers_component: ModifiersComponent
 
+var max_health: float #updated by health setter
 var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH):
 	set(new_health):
 		if health_data == null:
 			return
 		
-		new_health = clampf(new_health, 0.0, get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH))
+		max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
+		new_health = clampf(new_health, 0.0, max_health)
 		if new_health == health:
 			return
 		health = new_health
@@ -33,7 +35,7 @@ func inject_components(modifiers_component: ModifiersComponent):
 		)
 		
 		_modifiers_component.register_data(health_data)
-		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION])
+		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION, Attributes.id.REGEN_PERCENT])
 	
 	if not unit.get_node_or_null("Hitbox"):
 		var hitbox := Hitbox.new() #generate range area
@@ -66,8 +68,9 @@ func _process(delta : float) -> void:
 		#return
 		
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
-	if regeneration == 0:
+	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
+	if regeneration == 0 and regen_percent == 0:
 		return
-
-	health += regeneration * delta
+		
+	health += regeneration * delta + regen_percent * max_health * delta
 	_accumulated_delta = 0.0

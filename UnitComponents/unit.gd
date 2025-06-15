@@ -44,6 +44,10 @@ func _prepare_components() -> void:
 	
 	died.connect(func():
 		Player.flux += flux_value
+		
+		for effect_prototype: EffectPrototype in effect_prototypes:
+			remove_effect(effect_prototype)
+	
 		queue_free()
 	)
 
@@ -109,7 +113,7 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 			
 	for effect in effects_to_remove:
 		effect.detach() #trigger effect's detach handler
-		effects.erase(effect)
+		effects[effect_prototype.schedule].erase(effect)
 		effect.free()
 	
 	effect_prototypes.erase(effect_prototype)
@@ -155,6 +159,11 @@ func take_hit(hit: HitData):
 		
 	for modifier: Modifier in hit.modifiers:
 		modifiers_component.add_modifier(modifier)
+
+	for status: Attributes.Status in hit.status_effects:
+		var stack: float = hit.status_effects[status].x
+		var cooldown: float = hit.status_effects[status].y
+		modifiers_component.add_status(status, stack, cooldown)
 	
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT

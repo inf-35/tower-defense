@@ -10,3 +10,7 @@ class_name HealthData
 	set(new_value):
 		regeneration = new_value
 		value_changed.emit(Attributes.id.REGENERATION)
+@export var regen_percent: float = 0.0:
+	set(new_value):
+		regen_percent = new_value
+		value_changed.emit(Attributes.id.REGEN_PERCENT)

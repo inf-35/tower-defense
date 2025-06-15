@@ -1,8 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=10 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
-[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Data/effect_prototype.gd" id="2_6ogs4"]
-[ext_resource type="Script" uid="uid://c3opiy5vich7i" path="res://Data/Effects/_on_attack_debug.gd" id="3_i3qpa"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_soln4"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_joj2e"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_liko0"]
@@ -11,14 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_2r1vv"]
 [ext_resource type="Resource" uid="uid://b026mhuu7c8a1" path="res://Units/Towers/turret/turret_attack.tres" id="8_rghec"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_hp3w6"]
-
-[sub_resource type="Resource" id="Resource_uhk0q"]
-script = ExtResource("3_i3qpa")
-params = {
-"message": "pew pew!"
-}
-schedule = 2
-metadata/_custom_type_script = "uid://c3opiy5vich7i"
 
 [node name="Turret" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
@@ -30,7 +20,6 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
-intrinsic_effects = Array[ExtResource("2_6ogs4")]([SubResource("Resource_uhk0q")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]

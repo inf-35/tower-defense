@@ -8,8 +8,10 @@ class_name CatalystEffect
 var state: Dictionary = {
 	"catalyst_effects": {}, #Tower -> Array[EffectInstance], stores effects caused by this catalyst
 	"current_recipe": null, #current recipe the catalyst is upholding
-	#this allows us to delete effects that are no longer relevant
 }
+
+func _handle_detach(instance: EffectInstance):
+	clear_effects(instance)
 
 func _handle_event(instance: EffectInstance, event : GameEvent):
 	if event.event_type != GameEvent.EventType.ADJACENCY_UPDATED:
@@ -32,8 +34,15 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	var hooked_towers: Array[Tower] = [] #stores towers which are located on "hook" tiles.
 
 	var element_list: Dictionary[Towers.Element, int] = {}
+	#rotate the hooks appropriately
+	var rotation: float = instance.host.facing * PI * 0.5
+	var translated_hooks: Array[Vector2i]
+	for hook: Vector2i in hooks:
+		translated_hooks.append(Vector2i(Vector2(hook).rotated(rotation)))
+
+	#get hooked towers
 	for adjacency: Vector2i in adjacencies:
-		if not hooks.has(adjacency): #filter out adjacencies that are not hooks
+		if not translated_hooks.has(adjacency): #filter out adjacencies that are not hooks
 			continue
 		
 		var tower: Tower = adjacencies[adjacency]
@@ -46,6 +55,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 		else:
 			element_list[element] += 1
 
+	#compare with catalyst recipes
 	var result = CatalystRecipes.get_most_relevant_recipe(element_list)
 	if not result: #we didnt get any valid recipe
 		instance.state.current_recipe = null
@@ -58,9 +68,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	else:
 		instance.state.current_recipe = recipe
 	#clear existing effects
-	for affected_tower: Tower in catalyst_effects:
-		for effect_prototype: EffectPrototype in catalyst_effects[affected_tower]:
-			affected_tower.remove_effect(effect_prototype)
+	clear_effects(instance) 
 	#add new effects
 	for adjacent_tower: Tower in hooked_towers:
 		var adjacent_tower_element: Towers.Element = Towers.get_tower_element(adjacent_tower.type)
@@ -71,8 +79,14 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 		adjacent_tower.apply_effect(effect_to_apply)
 		
 		if not catalyst_effects.has(adjacent_tower): #record this new effect down under the affected tower
-			catalyst_effects[adjacent_tower] = effect_to_apply
+			catalyst_effects[adjacent_tower] = [effect_to_apply]
 		else:
 			catalyst_effects[adjacent_tower].append(effect_to_apply)
-		
-		
+
+func clear_effects(instance: EffectInstance):
+	assert(instance.state.has("catalyst_effects")) #check for parameter prerequisites
+	
+	var catalyst_effects: Dictionary = instance.state.catalyst_effects
+	for affected_tower: Tower in catalyst_effects:
+		for effect_prototype: EffectPrototype in catalyst_effects[affected_tower]:
+			affected_tower.remove_effect(effect_prototype)

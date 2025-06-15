@@ -28,13 +28,12 @@ func attack(target: Unit):
 func deal_attack(target: Unit):
 	var damage: float = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 	
-	var hit_data := HitData.new()
+	var hit_data: HitData = attack_data.generate_hit_data() 
 	hit_data.source = unit
 	hit_data.target = target
 	hit_data.damage = damage
 	hit_data.expected_damage = damage
-	hit_data.modifiers = attack_data.generate_modifiers() #TODO: integrate hit modifiers with the modifiers system
-	
+
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id
 

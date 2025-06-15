@@ -2,7 +2,6 @@ extends Data
 class_name ModifierDataPrototype
 
 @export var attribute: Attributes.id = Attributes.id.MAX_HEALTH
-@export var status: Attributes.Status
 
 @export var additive: float = 0.0
 @export var multiplicative: float = 1.0 #multiplicative (ie * 1.0)
@@ -11,9 +10,8 @@ class_name ModifierDataPrototype
 @export var cooldown: float = -1.0 #negative cooldown -> permanent
 
 func generate_modifier() -> Modifier:
-	var modifier: = Modifier.new(attribute, status)
+	var modifier: = Modifier.new(attribute)
 	modifier.attribute = attribute
-	modifier.status = status
 	modifier.additive = additive
 	modifier.multiplicative = multiplicative
 	modifier.override = override

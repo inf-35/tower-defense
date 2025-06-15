@@ -31,12 +31,8 @@ class CatalystRecipe:
 
 var catalyst_recipes: Array[CatalystRecipe] = [
 	CatalystRecipe.new(
-		{Towers.Element.KINETIC: 1},
-		{},
-	),
-	CatalystRecipe.new(
 		{Towers.Element.KINETIC: 2},
-		{}
+		{Towers.Element.KINETIC: preload("res://Data/Effects/debug_on_hit_dealt.tres")}
 	)
 ]
 
@@ -51,7 +47,7 @@ func get_most_relevant_recipe(element_list: Dictionary[Towers.Element, int]):
 	var record_length: int = 0
 	var element_count: int = get_element_count(element_list)
 	
-	if element_count == 0: #early return for empty lists
+	if element_count <= 1: #early return for lists with only 1 element or less
 		return
 	
 	for recipe: CatalystRecipe in catalyst_recipes:

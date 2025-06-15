@@ -1,5 +1,5 @@
 extends EffectPrototype
-class_name AttackDebugEffect
+class_name HitDealtDebugEffect
 
 @export var params: Dictionary = {
 	"message": "pew pew!",

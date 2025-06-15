@@ -9,6 +9,8 @@ static func get_stringname(attribute: Attributes.id) -> StringName: #converts at
 			return StringName("max_health")
 		Attributes.id.REGENERATION:
 			return StringName("regeneration")
+		Attributes.id.REGEN_PERCENT:
+			return StringName("regen_percent")
 
 		Attributes.id.MAX_SPEED: #MovementData
 			return StringName("max_speed")

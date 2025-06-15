@@ -29,6 +29,7 @@ UI="*res://UI/ui_bus.gd"
 Targeting="*res://Singletons/targeting_coordinator.gd"
 Towers="*res://Singletons/towers.gd"
 CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
+Attributes="*res://Indexes/attributes.gd"
 
 [input]
 
