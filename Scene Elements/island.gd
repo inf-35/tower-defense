@@ -16,7 +16,6 @@ var active_boundary_tiles: Array[Vector2i] = [ Vector2i.ZERO ]
 var is_choosing_expansion: bool = false
 var current_expansion_options: Array[ExpansionChoice] = []
 
-
 const CELL_SIZE: int = 10
 const GRID_SIZE: int = 50
 const HALF: int = GRID_SIZE * 0.5
@@ -82,7 +81,7 @@ func generate_terrain():
 			terrain_level_grid[Vector2i(x, y)] = Terrain.Level.SEA
 			occupied_grid[Vector2i(x, y)] = false
 
-	expand_by_block(TerrainGen.generate_block(40))
+	expand_by_block(TerrainGen.generate_block(1000))
 	expand_by_block(TerrainGen.generate_block(6))
 	
 	_update_terrain()

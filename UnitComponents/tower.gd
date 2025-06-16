@@ -4,6 +4,8 @@ class_name Tower
 signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island hooks onto this
 
 @export var type: Towers.Type
+var level: int
+
 var facing: Facing: #which direction the tower is facing
 	set(new_facing):
 		facing = new_facing

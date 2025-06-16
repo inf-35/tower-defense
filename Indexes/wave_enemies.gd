@@ -11,7 +11,7 @@ const BASE_SCALING_FACTOR: float = 1.1
 
 const enemies_per_wave: Dictionary[int, Array] = {
 	1: [
-		[BASIC, 6],
+		[BASIC, 1],
 	],
 	2: [
 		[BASIC, 9],
