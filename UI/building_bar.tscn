@@ -2,35 +2,30 @@
 
 [ext_resource type="Script" uid="uid://csymfdpw41oh5" path="res://UI/sidebar_ui.gd" id="1_08diq"]
 
-[node name="building_bar" type="Control" node_paths=PackedStringArray("blueprint_bar", "start_wave_button", "flux_display")]
+[node name="building_bar" type="Control" node_paths=PackedStringArray("blueprint_bar", "start_wave_button")]
 layout_mode = 3
-anchor_left = 0.3
-anchor_top = 0.9
-anchor_right = 0.7
-anchor_bottom = 0.95
+anchor_top = 0.2
+anchor_right = 0.05
+anchor_bottom = 0.8
 script = ExtResource("1_08diq")
 blueprint_bar = NodePath("HBoxContainer/Panel/blueprint_bar")
 start_wave_button = NodePath("HBoxContainer/start_wave")
-flux_display = NodePath("HBoxContainer/flux_label")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 6.60004
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="flux_label" type="Label" parent="HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.2
 
 [node name="Panel" type="Panel" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="blueprint_bar" type="HBoxContainer" parent="HBoxContainer/Panel"]
+[node name="blueprint_bar" type="VBoxContainer" parent="HBoxContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,4 +36,6 @@ grow_vertical = 2
 [node name="start_wave" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
+autowrap_mode = 2

@@ -34,6 +34,6 @@ func get_stat(modifiers_component: ModifiersComponent, data: Data, attribute: At
 		
 func get_stat_raw(modifiers_component: ModifiersComponent, data: Data, attribute: Attributes.id) -> Variant:
 	if not data:
-		push_warning("no data found in", self)
-		return
+		push_warning("no data found in ", self, ", unit: ", unit)
+		return 0.0
 	return data.get(Data.get_stringname(attribute)) if (modifiers_component == null or modifiers_component.pull_stat(attribute) == null) else modifiers_component.pull_stat(attribute) 

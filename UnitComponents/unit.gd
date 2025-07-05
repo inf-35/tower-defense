@@ -28,7 +28,7 @@ var unit_id: int
 var flux_value: float #how much flux this unit drops when killed
 
 #runtime
-var _cooldown: float
+@onready var _cooldown: float = 0.0
 
 func _create_components() -> void:
 	if modifiers_component == null:
@@ -65,9 +65,10 @@ func _prepare_components() -> void:
 		)
 	
 	if attack_component != null:
+		attack_component.attack_data
 		attack_component.inject_components(modifiers_component)
 	
-	if range_component != null:
+	if range_component != null and attack_component.attack_data:
 		range_component.inject_components(attack_component, modifiers_component)
 	
 	for child in get_children(true):
@@ -124,14 +125,9 @@ func _ready():
 	_create_components()
 	_prepare_components()
 
-var future_position: Vector2 = Vector2(100000,1000000)
 func _process(delta: float):
 	_cooldown += delta
 	queue_redraw()
-	
-	if _cooldown > 0.5 and navigation_component: #DEBUG
-		future_position = navigation_component.get_position_in_future(0.5)
-		_cooldown = 0.0
 
 	if attack_component == null or range_component == null:
 		return
@@ -143,6 +139,7 @@ func _process(delta: float):
 			pass
 
 		if target:
+			#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
 			attack_component.attack(target)
 			_cooldown = 0.0
 			queue_redraw()
@@ -151,8 +148,7 @@ func take_hit(hit: HitData):
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit
-	
-	Targeting.add_damage(hit.target, -hit.expected_damage) #remove the expected damage now that its been dealt
+
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
 	
 	var benchmark: float = health_component.health
@@ -178,18 +174,19 @@ func take_hit(hit: HitData):
 	
 	hit.source.on_event.emit(hit_report_evt) #cause source of hit to emit report
 
-func deal_hit(hit: HitData):
+func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.PRE_HIT_DEALT
 	evt.data = hit
 	
-	Targeting.add_damage(hit.target, hit.expected_damage) #adds expected damage to target in targeting coordinator
 	on_event.emit(evt) #trigger any pre-hit-received effects, such as damage buffs
-	
-	#TODO: implement projectile traversal
-	
+	#------ HANDOVER --------
 	hit.recursion += 1 #increase recursion layer by 1
-	hit.target.take_hit(hit) #cause target to take hit
+	if delivery_data == null: #fallback on guaranteed instant hit
+		push_warning("no targeting data!")
+		hit.target.take_hit(hit) #cause target to take hit
+	else:
+		CombatManager.resolve_hit(hit, delivery_data)
 
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
 	return References.island.get_terrain_base(movement_component.cell_position)
@@ -215,15 +212,16 @@ var draw_color: Color = Color.BLACK
 	#draw_line(draw_start - position, draw_end - position, draw_color, 2.0)
 
 func _draw():
+	pass
 	# --- Existing Draw Call ---
-	if draw_end != Vector2.ZERO:
-		draw_line(draw_start - global_position, draw_end - global_position, draw_color, 2.0)
+	#if draw_end != Vector2.ZERO:
+		#draw_line(draw_start - global_position, draw_end - global_position, draw_color, 2.0)
 
-	if navigation_component != null:
-		var local_ghost_position = future_position - global_position
-		
-		# Draw a small, semi-transparent circle as a marker.
-		var marker_radius: float = 4.0
-		var marker_color = Color(0.2, 1.0, 0.8, 0.8) # A distinct teal color
-		
-		draw_circle(local_ghost_position, marker_radius, marker_color)
+	#if navigation_component != null:
+		#var local_ghost_position = future_position - global_position
+		#
+		## Draw a small, semi-transparent circle as a marker.
+		#var marker_radius: float = 4.0
+		#var marker_color = Color(0.2, 1.0, 0.8, 0.8) # A distinct teal color
+		#
+		#draw_circle(local_ghost_position, marker_radius, marker_color)

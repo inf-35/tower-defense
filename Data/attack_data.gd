@@ -1,6 +1,8 @@
 extends Data
 class_name AttackData
 
+@export var delivery_method: DeliveryData.DeliveryMethod
+
 @export var range: float = 20.0:
 	set(new_value):
 		range = new_value
@@ -20,6 +22,10 @@ class_name AttackData
 
 @export var status_effects: Array[StatusEffectPrototype] = []
 @export var modifiers: Array[ModifierDataPrototype] = []
+
+@export_category("Projectile Properties")
+@export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
+@export var vertical_force: float = -10.0
 #see unit.gd, deal_hit and take_hit, and HitData
 
 func generate_modifiers() -> Array[Modifier]: #transform Array[ModifierDataPrototype] -> Array[Modifier]

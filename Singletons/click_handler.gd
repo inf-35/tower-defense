@@ -12,7 +12,6 @@ signal click_on_island(world_position: Vector2, tower_type: Towers.Type, tower_f
 func _ready():
 	UI.tower_selected.connect(_on_tower_selected)
 
-# --- In _on_tower_selected(type_id) ---
 func _on_tower_selected(type_id: Towers.Type):
 	tower_type = type_id
 	References.tower_preview.setup(tower_type)
@@ -35,7 +34,6 @@ func _on_tower_selected(type_id: Towers.Type):
 	## Update the preview's visuals every frame
 	#current_preview.update_visuals(is_valid, current_rotation)
 
-
 # --- In _unhandled_input(event) ---
 func _unhandled_input(event: InputEvent) -> void:
 	# Rotation input is simpler: just update the direction vector.
@@ -45,9 +43,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and is_instance_valid(current_preview):
 		tower_position = Island.position_to_cell(world_camera_position)
 		is_valid = Player.has_blueprint(tower_type) and \
-							Player.flux >= Towers.tower_stats[tower_type].flux_cost and \
-							not References.island.is_occupied(tower_position) and \
-							Towers.tower_stats[tower_type].construct <= References.island.get_terrain_level(tower_position)
+		Player.flux >= Towers.tower_stats[tower_type].flux_cost and \
+		not References.island.is_occupied(tower_position) and \
+		Towers.tower_stats[tower_type].construct <= References.island.get_terrain_level(tower_position)
 
 		current_preview.update_visuals(is_valid, tower_facing, tower_position)
 

@@ -1,64 +1,14 @@
-## SidebarUI.gd
-#extends Control
-#class_name SidebarUI
-#
-#@export var blueprint_bar: HBoxContainer
-#@export var start_wave_button: Button
-#@export var flux_display: Label
-#
-#
-#func _ready() -> void:
-	#_populate_blueprint_bar()
-	#_update_flux(Player.flux)
-	#
-	#UI.update_blueprints.connect(func():
-		#_populate_blueprint_bar()
-	#)
-	#UI.update_flux.connect(_update_flux)
-	#UI.show_building_ui.connect(func():
-		#start_wave_button.text = "start wave."
-		#start_wave_button.disabled = false
-	#)
-	#UI.hide_building_ui.connect(func():
-		#start_wave_button.text = "wave in progress."
-		#start_wave_button.disabled = true
-	#)
-	#
-	#start_wave_button.pressed.connect(func():
-		#UI.building_phase_ended.emit()
-	#)
-#
-#func _populate_blueprint_bar() -> void:
-	#for child in blueprint_bar.get_children():
-		#child.free()
-#
-	#for type_id: Towers.Type in Towers.Type.values():
-		#var btn := Button.new()
-		#btn.text = str(type_id).pad_zeros(2) + ": " + str(type_id)
-		#btn.name = "Btn_%s" % str(type_id)
-		#btn.pressed.connect(_on_button_pressed.bind(type_id))
-		#blueprint_bar.add_child(btn)
-#
-#func _update_flux(flux: float):
-	#flux_display.text = "flux: " + str(round(flux))
-#
-#func _on_button_pressed(type_id: Towers.Type) -> void:
-	#UI.tower_selected.emit(type_id)
-
-# SidebarUI.gd
 extends Control
 class_name SidebarUI
 
-@export var blueprint_bar: HBoxContainer
+@export var blueprint_bar: VBoxContainer
 @export var start_wave_button: Button
-@export var flux_display: Label
 
 func _ready() -> void:
 	# Initial population and updates are handled by connecting to the signal.
 	# Player.blueprints setter will emit the initial list.
 	
 	UI.update_blueprints.connect(_on_player_blueprints_updated)
-	UI.update_flux.connect(_update_flux)
 	
 	UI.show_building_ui.connect(func():
 		start_wave_button.text = "Start Wave" # More descriptive
@@ -80,9 +30,6 @@ func _ready() -> void:
 		_on_player_blueprints_updated(Player.blueprints) # Manually call with current data
 	else:
 		_clear_blueprint_bar() # Ensure it's empty if no blueprints initially
-
-	if Player:
-		_update_flux(Player.flux)
 
 
 func _clear_blueprint_bar() -> void:
@@ -128,10 +75,7 @@ func _on_player_blueprints_updated(current_player_bps: Array[Blueprint]) -> void
 			btn.pressed.connect(_on_blueprint_button_pressed.bind(tower_type_enum_value))
 		
 		blueprint_bar.add_child(btn)
-
-func _update_flux(new_flux_value: float): 
-	flux_display.text = "Flux: %s" % str(round(new_flux_value * 10) * 0.1) # Using string formatting
-
+		
 func _on_blueprint_button_pressed(type_id: Towers.Type) -> void:
 	# This function is called when a blueprint button is pressed.
 	# It emits a signal that ClickHandler (or another system) will listen to

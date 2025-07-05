@@ -1,0 +1,110 @@
+[gd_scene load_steps=3 format=3 uid="uid://plk4oiflev5x"]
+
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="1_dm5sa"]
+[ext_resource type="Script" uid="uid://cr8iyxr7mn4kd" path="res://UI/inspector.gd" id="1_kvbly"]
+
+[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "inspector_title", "subtitle", "upgrade_button", "stats", "description")]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -360.0
+offset_top = -180.0
+offset_right = 360.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_kvbly")
+tower_overview = NodePath("tower_overview")
+inspector_icon = NodePath("tower_overview/MarginContainer/HBoxContainer/AspectRatioContainer/inspector_texture")
+inspector_title = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/inspector_title")
+subtitle = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/subtitle")
+upgrade_button = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/AspectRatioContainer/upgrade_button")
+stats = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats")
+description = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/description")
+
+[node name="tower_overview" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="tower_overview"]
+layout_mode = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="tower_overview/MarginContainer"]
+layout_mode = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="tower_overview/MarginContainer/HBoxContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment_horizontal = 0
+
+[node name="inspector_texture" type="TextureRect" parent="tower_overview/MarginContainer/HBoxContainer/AspectRatioContainer"]
+layout_mode = 2
+texture = ExtResource("1_dm5sa")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/HBoxContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="Title" type="HBoxContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="inspector_title" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title"]
+layout_mode = 2
+theme_type_variation = &"LabelHeader"
+text = "FLAMETHROWER"
+vertical_alignment = 2
+
+[node name="subtitle" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title"]
+layout_mode = 2
+theme_type_variation = &"LabelInlineheader"
+text = "mk 7"
+vertical_alignment = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title"]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch_mode = 1
+alignment_horizontal = 2
+
+[node name="upgrade_button" type="Button" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/AspectRatioContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="stats" type="GridContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 40
+columns = 2
+
+[node name="Label" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats"]
+layout_mode = 2
+text = "DMG 2.03"
+
+[node name="Label2" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats"]
+layout_mode = 2
+text = "HITS 4.20 / s"
+
+[node name="description" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 1
+size_flags_stretch_ratio = 0.5
+theme_type_variation = &"LabelDescriptive"
+text = "Inflicts flame to multiple enemies in a large cone."
+autowrap_mode = 3

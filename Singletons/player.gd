@@ -57,7 +57,7 @@ func _ready():
 			
 		var cell: Vector2i = Island.position_to_cell(world_position)
 		
-		if Towers.tower_stats[tower_type].construct > References.island.terrain_level_grid[cell]:
+		if (not References.island.terrain_level_grid.has(cell)) or Towers.tower_stats[tower_type].construct > References.island.terrain_level_grid[cell]:
 			print("incorrect terrain!")
 			return
 		
@@ -65,8 +65,6 @@ func _ready():
 		Player.flux -= Towers.tower_stats[tower_type].flux_cost
 		References.island.construct_tower(cell, tower_type, tower_facing)
 	)
-	
-	print(Towers.get_tower_stat(Towers.Type.TURRET, Attributes.id.RANGE))
 
 func choose_terrain_expansion():
 	pass

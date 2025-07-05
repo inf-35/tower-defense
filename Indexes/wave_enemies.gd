@@ -74,5 +74,5 @@ static func get_enemy_count(enemies: Array) -> int:
 	return counter
 
 static func get_wave_length_for_enemies(enemies: int) -> float:
-	return (0.0 + pow(float(enemies), 1.0/3.0)) #4 + cbrt(enemies)
+	return (2.0 + pow(float(enemies), 1.0/3.0)) #2 + cbrt(enemies)
 	
