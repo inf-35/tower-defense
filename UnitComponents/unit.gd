@@ -19,6 +19,9 @@ var effects: Dictionary[EffectPrototype.Schedule, Array] = {
 	EffectPrototype.Schedule.ADDITIVE: [],
 	EffectPrototype.Schedule.REACTIVE: [],
 } #sorted by Schedule, see EffectPrototype. each array contains EffectInstances
+var effects_by_type: Dictionary[Effects.Type, Array] = {
+	#each array contains EffectInstances
+} # for lookup by type
 
 signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
@@ -106,6 +109,12 @@ func apply_effect(effect_prototype: EffectPrototype) -> void:
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	effect_instance.attach_to(self)
 	effects[effect_prototype.schedule].append(effect_instance)
+	
+	var type = effect_prototype.effect_type
+	if not effects_by_type.has(type):
+		effects_by_type[type] = [] # Create an array for this type if it's the first one.
+
+	effects_by_type[type].append(effect_instance)
 
 func remove_effect(effect_prototype: EffectPrototype) -> void:
 	var effects_to_remove: Array[EffectInstance] = []
@@ -117,9 +126,37 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 	for effect in effects_to_remove:
 		effect.detach() #trigger effect's detach handler
 		effects[effect_prototype.schedule].erase(effect)
+		
+		var type : Effects.Type = effect.effect_type
+		if effects_by_type.has(type):
+			effects_by_type[type].erase(effect)
+			# If this was the last effect of its type, clean up the key.
+			if effects_by_type[type].is_empty():
+				effects_by_type.erase(type)
+		
 		effect.free()
-	
+
 	effect_prototypes.erase(effect_prototype)
+
+func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant:
+	print(effects_by_type)
+	if not effects_by_type.has(effect_type):
+		return null
+		
+	var instances = effects_by_type[effect_type]
+	if instances.is_empty():
+		return null
+		
+	#For intrinsic effects, we usually only care about the first one.
+	var first_instance: EffectInstance = instances[0]
+	# Using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
+	if first_instance.params.has(attribute_name): #first check params
+		return first_instance.params.get(attribute_name, null)
+	else: #fallback to checking state
+		return first_instance.state.get(attribute_name, null)
+	
+func _init():
+	pass
 
 func _ready():
 	_setup_event_bus()

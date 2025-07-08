@@ -15,9 +15,9 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 		DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT:
 			var intercept_time: float = (intercept_position - source.position).length() / delivery_data.projectile_speed
 			
-			References.projectiles.marker_position = intercept_position
-			References.projectiles.queue_redraw()
-			
+			#References.projectiles.marker_position = intercept_position
+			#References.projectiles.queue_redraw()
+			#
 			var projectile: Sprite2D = preload("res://projectile.tscn").instantiate()
 			projectile.position = source.position
 			References.projectiles.add_child.call_deferred(projectile)
@@ -30,8 +30,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
 			
 			projectile.queue_free()
-			References.projectiles.marker_position = Vector2(100000,10000)
-			References.projectiles.queue_redraw()
+			#References.projectiles.marker_position = Vector2(100000,10000)
+			#References.projectiles.queue_redraw()
 			
 			if check_enemy_in_radius(intercept_position, 20.0, target):
 				#print("intercepted with error: ", (intercept_position - target.position).length())

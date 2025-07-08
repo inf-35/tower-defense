@@ -36,10 +36,49 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	for child : Control in stats.get_children():
 		child.free()
 	
-	if tower.modifiers_component.has_stat(Attributes.id.DAMAGE):
-		var damage_label : Label = Label.new()
-		damage_label.text = "DMG " + str(tower.modifiers_component.pull_stat(Attributes.id.DAMAGE))
-		stats.add_child(damage_label)
-	else:
-		print("no retrieval")
+	_display_stat(tower, Attributes.id.NULL, "BPS", "", [DisplayStatModifier.HARVESTER_BLUEPRINTS_PER_WAVE])
+	_display_stat(tower, Attributes.id.NULL, "FLUX", "", [DisplayStatModifier.CORE_FLUX])
+	_display_stat(tower, Attributes.id.DAMAGE, "DMG")
+	_display_stat(tower, Attributes.id.COOLDOWN, "HIT", "/s", [DisplayStatModifier.RECIPROCAL])
+	_display_stat(tower, Attributes.id.RANGE, "RNG")
+	_display_stat(tower, Attributes.id.MAX_HEALTH, "MAX HP")
+	_display_stat(tower, Attributes.id.REGENERATION, "RGN")
+
+enum DisplayStatModifier {
+	RECIPROCAL,
+	CORE_FLUX,
+	HARVESTER_BLUEPRINTS_PER_WAVE,
+}
+
+func _display_stat(tower : Tower, attribute : Attributes.id, prefix : String = "", suffix : String = "", modifiers : Array[DisplayStatModifier] = []):
+	var value
+	var override : bool = false
+	
+	if modifiers.has(DisplayStatModifier.CORE_FLUX):
+		override = true
+		value = Player.flux
 		
+	if modifiers.has(DisplayStatModifier.HARVESTER_BLUEPRINTS_PER_WAVE):
+		override = true
+		value = tower.get_intrinsic_effect_attribute(Effects.Type.BLUEPRINT_ON_WAVE, "blueprints_per_wave"); WaveBlueprintEffect
+		#see WaveBlueprintEffect
+		if value == null: #not harvester or malformed harvester
+			return #abort
+	
+	if (not override) and tower.modifiers_component.has_stat(attribute):
+		value = tower.modifiers_component.pull_stat(attribute) #for existing towers
+	elif (not override) and Towers.get_tower_stat(tower.type, attribute):
+		value = Towers.get_tower_stat(tower.type, attribute) #for tower previews
+	
+	if value == null:
+		return
+		
+	if modifiers.has(DisplayStatModifier.RECIPROCAL):
+		value = 1.0 / value
+	
+	if typeof(value) == TYPE_FLOAT:
+		value = round(value * 100) / 100 #round float values to 2dp
+
+	var stat_label : Label = Label.new()
+	stat_label.text = prefix + " " + str(value) + suffix
+	stats.add_child(stat_label)

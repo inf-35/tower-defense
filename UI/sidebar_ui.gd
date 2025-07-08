@@ -82,4 +82,3 @@ func _on_blueprint_button_pressed(type_id: Towers.Type) -> void:
 	# to know which tower type the player intends to place next.
 	UI.tower_selected.emit(type_id)
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(type_id)) #update inspector bar to fit whatever we're selecting
-	print("SidebarUI: Blueprint button pressed for tower type: ", type_id)

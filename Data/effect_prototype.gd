@@ -3,7 +3,7 @@ class_name EffectPrototype #used for cause-and-effect structures -> this is the 
 #consult EffectInstance; for actual behaviour see sub-classes
 #i.e. things like thorns
 
-var effect_type: Effects.Type #id of this type of effect
+@export var effect_type: Effects.Type #id of this type of effect
 var event_hooks: Array[GameEvent.EventType] #just for information, the event hooks can be found in per-handler behaviour
 var duration: float = -1.0 #negative = permanent
 

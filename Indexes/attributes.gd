@@ -14,6 +14,8 @@ enum id { #trackable value
 	RANGE,
 	COOLDOWN,
 	RADIUS,
+	
+	NULL
 }
 
 enum Status { #diegetic statuses
