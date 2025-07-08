@@ -68,8 +68,7 @@ func receive_path_data(path_data: Navigation.PathData): #used by Navigation to f
 func get_position_in_future(t: float) -> Vector2:
 	if movement_component == null:
 		return unit.global_position
-	
-	var benchmark : float = Time.get_ticks_usec()
+		
 	var max_speed: float = unit.get_stat(Attributes.id.MAX_SPEED)
 	
 	if max_speed <= 0.0:
@@ -106,7 +105,6 @@ func get_position_in_future(t: float) -> Vector2:
 			simulated_position += direction_to_waypoint * distance_this_tick
 		
 		time_to_simulate -= SIMULATION_TICK_RATE
-	print(Time.get_ticks_usec() - benchmark, " microseconds taken to compute prediction for unit ", unit)
 	return simulated_position
 
 func fast_get_position_in_future(t: float) -> Vector2: #returns predicted position of unit t seconds from now
@@ -114,7 +112,6 @@ func fast_get_position_in_future(t: float) -> Vector2: #returns predicted positi
 		return unit.global_position # Not moving, will be at current position.
 
 	var max_speed: float = unit.get_stat(Attributes.id.MAX_SPEED)
-	var benchmark : float = Time.get_ticks_usec()
 
 	if max_speed <= 0.0:
 		return unit.global_position # Not moving.
@@ -130,7 +127,6 @@ func fast_get_position_in_future(t: float) -> Vector2: #returns predicted positi
 	if total_distance_to_travel <= distance_to_first_waypoint:
 		# Will not even reach the next waypoint.
 		var direction = (first_waypoint_pos - current_pos).normalized()
-		print(Time.get_ticks_usec() - benchmark, " microseconds taken to compute quick prediction for unit ", unit)
 		return current_pos + direction * total_distance_to_travel
 
 	# We reached the first waypoint, so subtract that distance and time.
@@ -154,14 +150,12 @@ func fast_get_position_in_future(t: float) -> Vector2: #returns predicted positi
 
 	# --- Final Step: Simulate the remaining partial step ---
 	if final_waypoint_index + 1 >= _path.size():
-		# We've reached the end of the path.
-		print(Time.get_ticks_usec() - benchmark, " microseconds taken to compute quick prediction for unit ", unit)
+		# We've reached the end of the path
 		return last_safe_waypoint_pos
 
 	var next_waypoint_pos := Island.cell_to_position(_path[final_waypoint_index + 1])
 	var direction_of_final_segment = (next_waypoint_pos - last_safe_waypoint_pos).normalized()
-	
-	print(Time.get_ticks_usec() - benchmark, " microseconds taken to compute quick prediction for unit ", unit)
+
 	return last_safe_waypoint_pos + direction_of_final_segment * total_distance_to_travel
 	
 func _process(delta: float):

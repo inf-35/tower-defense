@@ -18,7 +18,7 @@ func _ready() -> void:
 		start_wave_button.text = "Wave in Progress" # More descriptive
 		start_wave_button.disabled = true
 	)
-	
+
 	start_wave_button.pressed.connect(func():
 		UI.building_phase_ended.emit()
 	)
@@ -81,4 +81,5 @@ func _on_blueprint_button_pressed(type_id: Towers.Type) -> void:
 	# It emits a signal that ClickHandler (or another system) will listen to
 	# to know which tower type the player intends to place next.
 	UI.tower_selected.emit(type_id)
+	UI.update_inspector_bar.emit(Towers.get_tower_prototype(type_id)) #update inspector bar to fit whatever we're selecting
 	print("SidebarUI: Blueprint button pressed for tower type: ", type_id)

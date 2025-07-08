@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://c0v2rl1btmv55"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="1_h5q3w"]
+[ext_resource type="PackedScene" uid="uid://c184bi7kvtd4o" path="res://Units/Towers/palisade/palisade.tscn" id="2_8e64g"]
+
+[resource]
+script = ExtResource("1_h5q3w")
+id = 6
+cost = 1.5
+element = 6
+minimum_terrain = 1
+tower_name = "Palisade"
+tower_description = "Cheap unit redirector."
+tower_scene = ExtResource("2_8e64g")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

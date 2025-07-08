@@ -1,8 +1,15 @@
-extends Data
+extends Resource
 class_name TowerData
 
 @export var id: Towers.Type
 
 #meta-properties
-@export var cost: int = 20
+@export var cost: float = 10.0
+@export var element: Towers.Element
+@export var minimum_terrain: Terrain.Level = Terrain.Level.EARTH
+
+@export var tower_name: String
+@export var tower_description: String
+
+@export var tower_scene: PackedScene
 #...upgrades

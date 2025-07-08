@@ -4,7 +4,10 @@ class_name Tower
 signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island hooks onto this
 
 @export var type: Towers.Type
-var level: int
+var level: int = 0:
+	set(new_level):
+		level = new_level
+		UI.update_unit_state.emit(self)
 
 var facing: Facing: #which direction the tower is facing
 	set(new_facing):
@@ -45,6 +48,8 @@ func _ready():
 	_prepare_components()
 	_create_hitbox()
 	
+	level = 1
+		
 	adjacency_updated.connect(func(new_adjacencies: Dictionary[Vector2i, Tower]): #receive data from Island
 		var adjacency_data := AdjacencyReportData.new() #broadcast into effects system
 		adjacency_data.adjacent_towers = new_adjacencies

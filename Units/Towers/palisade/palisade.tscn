@@ -10,7 +10,7 @@
 [node name="Palisade" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_fmnx7")
-type = 4
+type = 6
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

@@ -46,25 +46,29 @@ func _ready():
 		])
 	add_blueprint(Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER))
 		
-	ClickHandler.click_on_island.connect(func(world_position: Vector2, tower_type: Towers.Type, tower_facing: Tower.Facing):
-		if not has_blueprint(tower_type):
-			print("no blueprint!")
-			return
-			
-		if Player.flux < Towers.tower_stats[tower_type].flux_cost:
-			print("no flux!")
-			return
-			
-		var cell: Vector2i = Island.position_to_cell(world_position)
+	ClickHandler.place_tower_requested.connect(request_tower_placement)
+	
+func request_tower_placement(tower_type : Towers.Type, cell : Vector2i, facing : Tower.Facing):
+	if not has_blueprint(tower_type): 
+		return #blueprint/curreny checks
 		
-		if (not References.island.terrain_level_grid.has(cell)) or Towers.tower_stats[tower_type].construct > References.island.terrain_level_grid[cell]:
-			print("incorrect terrain!")
-			return
+	if Player.flux < Towers.get_tower_cost(tower_type):
+		return
 		
-		consume_blueprint(tower_type)
-		Player.flux -= Towers.tower_stats[tower_type].flux_cost
-		References.island.construct_tower(cell, tower_type, tower_facing)
-	)
+	if References.island.tower_grid.has(cell): #tower already exists there
+		var host : Tower = References.island.tower_grid[cell]
+		if host.type == tower_type: #upgrade existing tower (of same type)
+			consume_blueprint(tower_type)
+			Player.flux -= Towers.get_tower_cost(tower_type)
+			host.level += 1
+		return
+	
+	if (not References.island.terrain_level_grid.has(cell)) or Towers.get_tower_minimum_terrain(tower_type) > References.island.terrain_level_grid[cell]:
+		return #terrain checks
+	
+	consume_blueprint(tower_type)
+	Player.flux -= Towers.get_tower_cost(tower_type)
+	References.island.construct_tower(cell, tower_type, facing)
 
 func choose_terrain_expansion():
 	pass

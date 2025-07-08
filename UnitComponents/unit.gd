@@ -40,7 +40,9 @@ func _create_components() -> void:
 		add_child(n_movement_component)
 
 func _prepare_components() -> void:
-	unit_id = References.assign_unit_id()
+	unit_id = References.assign_unit_id() #assign this unit a unit id
+	
+	
 	
 	died.connect(func():
 		Player.flux += flux_value

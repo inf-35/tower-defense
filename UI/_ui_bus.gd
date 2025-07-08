@@ -10,6 +10,10 @@ signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()
 signal show_building_ui()
 signal hide_building_ui()
+#multiple sources -> Inspector
+signal update_unit_state(unit : Unit)
 #Player -> UI
 signal update_blueprints(blueprints: Array[Blueprint])
 signal update_flux(flux: float)
+#Handler/Sidebar -> Inspector
+signal update_inspector_bar(tower: Tower)

@@ -5,10 +5,28 @@ signal stat_changed(attribute: Attributes.id)
 #base stats
 var base_stats: Dictionary[Attributes.id, float] = {}
 # internal storage of modifiers
-var _modifiers: Array[Modifier] = []
+var _permanent_modifiers: Array[Modifier] = [] #meant for permanent effects (ie local stat changes)
+var _modifiers: Array[Modifier] = [] #meant for transient effects (all status effects's effects automatically fall here)
 var _status_effects: Dictionary[Attributes.Status, StatusEffect] = {}
 # cache of computed effective stats
 var _effective_cache: Dictionary[Attributes.id, float] = {}
+
+func _ready():
+	stat_changed.connect(func(stat): #couple stat changes with ui changes
+		UI.update_unit_state.emit(unit)
+	)
+
+# add a permanent buff/debuff (for level-ups, skill choices, etc.)
+func add_permanent_modifier(mod: Modifier) -> void:
+	_permanent_modifiers.append(mod)
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+
+# remove a permanent buff/debuff (for respecs, etc.)
+func remove_permanent_modifier(mod: Modifier) -> void:
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+	_permanent_modifiers.erase(mod)
 
 # add a buff/debuff
 func add_modifier(mod: Modifier) -> void:
@@ -38,7 +56,7 @@ func remove_modifier(mod: Modifier) -> void:
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
 	if mod:
 		_modifiers.erase(mod)
-		_effective_cache.erase(mod.attribute)
+	_effective_cache.erase(mod.attribute)
 	add_modifier(replacement)
 
 #add a status effect
@@ -169,29 +187,29 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	
 	if not has_stat(attr):
 		return null #unregistered stat!
+		
+	var upgraded_value := base_stats[attr]
+	var perm_sum_add := 0.0
+	var perm_product_mult := 1.0
+	var perm_override = null
 	
-	#compute stat
-	var base_value := base_stats[attr]
-	var sum_add := 0.0 #consolidated addition figure
-	var product_mult := 1.0 #consolidated multiplication figure
-	var override = null #force-set figure, null if no such modifier exists
+	for modifier: Modifier in _permanent_modifiers:
+		if modifier.attribute != attr:
+			continue
+		
+		perm_sum_add += modifier.additive
+		perm_product_mult *= modifier.multiplicative
+		if modifier.override != null:
+			perm_override = modifier.override
 	
-	#var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
-	##this prevents endless stacking by a single unit
-	#for modifier: Modifier in _modifiers:
-		#if modifier.attribute != attr:
-			#continue
-		#
-		#var source_id: int = modifier.source_id
-		#if not best_modifier_by_source_id.has(source_id):
-			#best_modifier_by_source_id[source_id] = modifier
-			#continue
-		#
-		#var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
-		#if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
-			#best_modifier_by_source_id[source_id] = modifier
-	#TODO: decide whether we want per-unit filtering
-	for modifier: Modifier in _modifiers: #run over strongest attribute per source
+	upgraded_value = (upgraded_value + perm_sum_add) * perm_product_mult if perm_override == null else perm_override
+
+	# --- STAGE 2: Apply transient modifiers to the upgraded stat ---
+	var sum_add := 0.0
+	var product_mult := 1.0
+	var override = null
+	
+	for modifier: Modifier in _modifiers:
 		if modifier.attribute != attr:
 			continue
 	
@@ -200,6 +218,27 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		if modifier.override != null:
 			override = modifier.override
 	
-	var result = (base_value + sum_add) * product_mult if override == null else override
+	var result = (upgraded_value + sum_add) * product_mult if override == null else override
 	_effective_cache[attr] = result #cache result
 	return result
+	#TODO: decide whether we want per-unit filtering
+	##compute stat
+	#var base_value := base_stats[attr]
+	#var sum_add := 0.0 #consolidated addition figure
+	#var product_mult := 1.0 #consolidated multiplication figure
+	#var override = null #force-set figure, null if no such modifier exists
+	#
+	##var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
+	###this prevents endless stacking by a single unit
+	##for modifier: Modifier in _modifiers:
+		##if modifier.attribute != attr:
+			##continue
+		##
+		##var source_id: int = modifier.source_id
+		##if not best_modifier_by_source_id.has(source_id):
+			##best_modifier_by_source_id[source_id] = modifier
+			##continue
+		##
+		##var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
+		##if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
+			##best_modifier_by_source_id[source_id] = modifier

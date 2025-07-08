@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_vo116")
 params = {
-"counter": 2
+"waves_to_deatb": 2
 }
 schedule = 2
 metadata/_custom_type_script = "uid://ysv40p416cud"

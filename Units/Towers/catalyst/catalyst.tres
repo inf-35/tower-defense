@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://c0cv2x14ay858"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="1_7wenu"]
+[ext_resource type="PackedScene" uid="uid://c4bc4p3qhtgma" path="res://Units/Towers/catalyst/catalyst.tscn" id="2_wa4n2"]
+
+[resource]
+script = ExtResource("1_7wenu")
+id = 7
+cost = 10.0
+element = 5
+minimum_terrain = 2
+tower_name = "Catalyst"
+tower_description = "Enables multi-tower recipes."
+tower_scene = ExtResource("2_wa4n2")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://875w4bw14euc"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="1_pv1hg"]
+[ext_resource type="PackedScene" uid="uid://1mt24rkpxr7f" path="res://Units/Towers/player_core/player_core.tscn" id="2_28vir"]
+
+[resource]
+script = ExtResource("1_pv1hg")
+id = 2
+cost = 10.0
+element = 1
+minimum_terrain = 2
+tower_name = "Frost Tower"
+tower_description = "Slows down enemies"
+tower_scene = ExtResource("2_28vir")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

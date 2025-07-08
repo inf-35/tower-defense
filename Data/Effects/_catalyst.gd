@@ -50,7 +50,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 		
 		var element: Towers.Element = Towers.get_tower_element(tower.type)
 		
-		if not element_list.has(element): #create element lit, see catalyst_recipes
+		if not element_list.has(element): #create element list, see catalyst_recipes
 			element_list[element] = 1
 		else:
 			element_list[element] += 1
