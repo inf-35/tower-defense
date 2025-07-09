@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="CatalystEffect" load_steps=2 format=3 uid="uid://ljnntex6pvuy"]
 
-[ext_resource type="Script" uid="uid://dfxogp1ohj6rw" path="res://Data/Effects/_catalyst.gd" id="1_sucg1"]
+[ext_resource type="Script" uid="uid://dfxogp1ohj6rw" path="res://Content/Effects/_catalyst.gd" id="1_sucg1"]
 
 [resource]
 script = ExtResource("1_sucg1")

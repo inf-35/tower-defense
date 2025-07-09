@@ -2,6 +2,10 @@ extends Node2D
 class_name Unit
 
 @export var hostile: bool
+
+@export_category("Presentation")
+@export var stat_displays : Array[StatDisplayInfo] = []
+
 @export_category("Components")
 @export var graphics: Sprite2D
 @export var modifiers_component: ModifiersComponent #used by most things
@@ -27,6 +31,7 @@ signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
 
 var unit_id: int
+var disabled: bool
 
 var flux_value: float #how much flux this unit drops when killed
 
@@ -39,19 +44,18 @@ func _create_components() -> void:
 		add_child(n_modifiers_component)
 	if movement_component == null: #by default, add an immobile movement component
 		var n_movement_component: = MovementComponent.new()
-		n_movement_component.movement_data = preload("res://Data/Movement/immobile_mvmt.tres")
+		n_movement_component.movement_data = preload("res://Content/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
 
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
 	
-	
-	
 	died.connect(func():
-		Player.flux += flux_value
+		Player.flux += flux_value #reward player with flux
+		Targeting.clear_damage(self) #clear any damage that might be locked on to us
 		
 		for effect_prototype: EffectPrototype in effect_prototypes:
-			remove_effect(effect_prototype)
+			remove_effect(effect_prototype) #detach effects
 	
 		queue_free()
 	)
@@ -97,6 +101,8 @@ func _attach_intrinsic_effects() -> void:
 
 func _setup_event_bus() -> void:
 	on_event.connect(func(event: GameEvent):
+		if disabled:
+			return
 		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
 			var scheduled_effects: Array = effects[schedule_class] #multiplicative -> additive -> reactive
 			for effect_instance: EffectInstance in scheduled_effects:
@@ -242,25 +248,6 @@ func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be u
 	if attack_component != null:
 		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
-			
-var draw_start: Vector2 = position
-var draw_end: Vector2 = Vector2.ZERO
-var draw_color: Color = Color.BLACK
-
-#func _draw():
-	#draw_line(draw_start - position, draw_end - position, draw_color, 2.0)
 
 func _draw():
 	pass
-	# --- Existing Draw Call ---
-	#if draw_end != Vector2.ZERO:
-		#draw_line(draw_start - global_position, draw_end - global_position, draw_color, 2.0)
-
-	#if navigation_component != null:
-		#var local_ghost_position = future_position - global_position
-		#
-		## Draw a small, semi-transparent circle as a marker.
-		#var marker_radius: float = 4.0
-		#var marker_color = Color(0.2, 1.0, 0.8, 0.8) # A distinct teal color
-		#
-		#draw_circle(local_ghost_position, marker_radius, marker_color)

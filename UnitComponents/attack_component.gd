@@ -35,10 +35,6 @@ func attack(target: Unit):
 		modifier.source_id = unit.unit_id
 
 	unit.deal_hit(hit_data, delivery_data)
-	
-	unit.draw_start = unit.position
-	unit.draw_end = target.movement_component.position
-	unit.draw_color = Color.CYAN
 
 #used for projectile-based attacks with non-zero traverse times
 const MAXIMUM_ACCEPTABLE_INACCURACY: float = 1.0

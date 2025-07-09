@@ -1,10 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://y3fmjqd4dpgt"]
+[gd_scene load_steps=12 format=3 uid="uid://y3fmjqd4dpgt"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ein27"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_fjids"]
+[ext_resource type="Resource" uid="uid://dl5m4s1miyx1" path="res://Content/StatDisplays/blueprints_per_wave.tres" id="3_gwhlt"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_p4o20"]
-[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Data/Movement/immobile_mvmt.tres" id="4_0fd6n"]
-[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Data/effect_prototype.gd" id="4_sxhhn"]
-[ext_resource type="Script" uid="uid://bhssb1tl7sd1q" path="res://Data/Effects/_blueprint_on_wave.gd" id="5_8sfbc"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_0fd6n"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="4_sxhhn"]
+[ext_resource type="Script" uid="uid://bhssb1tl7sd1q" path="res://Content/Effects/_blueprint_on_wave.gd" id="5_8sfbc"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sxhhn"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_w5o8d"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
@@ -23,6 +25,7 @@ metadata/_custom_type_script = "uid://bhssb1tl7sd1q"
 z_index = 1
 script = ExtResource("1_ein27")
 type = 5
+stat_displays = Array[ExtResource("2_fjids")]([ExtResource("3_gwhlt")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

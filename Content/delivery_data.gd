@@ -18,3 +18,6 @@ var delivery_method: DeliveryMethod
 var projectile_speed: float #projectile speed across the 2d game plane
 var initial_vertical_velocity: float #used for pseudo-3d projectiles, initial vertical velocity
 var vertical_force: float #used for pseudo-3d projectiles, simulates gravity
+
+#for coneAOE
+var cone_angle : float #angle of the cone in degrees

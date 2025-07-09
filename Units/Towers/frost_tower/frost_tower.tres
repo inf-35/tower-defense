@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://cyoynq2rsxj6c"]
 
-[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="1_6qowr"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_6qowr"]
 [ext_resource type="PackedScene" uid="uid://b5w56jjx8pany" path="res://Units/Towers/frost_tower/frost_tower.tscn" id="2_6qowr"]
 
 [resource]

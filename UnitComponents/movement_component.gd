@@ -5,7 +5,7 @@ signal movement_to_cell(origin: Vector2i, destination: Vector2i)
 
 var _modifiers_component: ModifiersComponent
 
-@export var movement_data: MovementData = preload("res://Data/Movement/default_mvmt.tres")
+@export var movement_data: MovementData = preload("res://Content/Movement/default_mvmt.tres")
 var graphics: Node2D
 
 const _ERROR_SQUARED: float = 2.0 ** 2  #allowable error for units from target position

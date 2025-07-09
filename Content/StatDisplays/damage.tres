@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://chohow8sxqky1"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_5swmd"]
+
+[resource]
+script = ExtResource("1_5swmd")
+attribute = 6
+label = "DMG"
+suffix = ""
+special_modifier = 4
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

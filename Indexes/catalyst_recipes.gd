@@ -32,7 +32,7 @@ class CatalystRecipe:
 var catalyst_recipes: Array[CatalystRecipe] = [
 	CatalystRecipe.new(
 		{Towers.Element.KINETIC: 2},
-		{Towers.Element.KINETIC: preload("res://Data/Effects/debug_on_hit_dealt.tres")}
+		{Towers.Element.KINETIC: preload("res://Content/Effects/debug_on_hit_dealt.tres")}
 	)
 ]
 

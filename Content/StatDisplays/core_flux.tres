@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://bh2xrt4aqtxib"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_ksr4b"]
+
+[resource]
+script = ExtResource("1_ksr4b")
+attribute = 10
+label = "FLUX"
+suffix = ""
+special_modifier = 1
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

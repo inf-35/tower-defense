@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://b6anrk53urna4"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_1vs86"]
+
+[resource]
+script = ExtResource("1_1vs86")
+attribute = 8
+label = "RTE"
+suffix = ""
+special_modifier = 0
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://c0cv2x14ay858"]
 
-[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Data/tower_data.gd" id="1_7wenu"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_7wenu"]
 [ext_resource type="PackedScene" uid="uid://c4bc4p3qhtgma" path="res://Units/Towers/catalyst/catalyst.tscn" id="2_wa4n2"]
 
 [resource]

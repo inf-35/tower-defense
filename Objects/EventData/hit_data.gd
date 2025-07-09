@@ -5,6 +5,7 @@ var source: Unit #dealer of hit
 var target: Unit #receiver of hit
 
 var damage: float = 0.0
+var radius: float = 0.0 #AOE effect of the hit
 var modifiers: Array[Modifier] = []
 var status_effects: Dictionary[Attributes.Status, Vector2] = {} #Attributes.Status -> Vector2(stack, cooldown)
 

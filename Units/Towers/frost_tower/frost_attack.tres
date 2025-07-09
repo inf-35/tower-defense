@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="AttackData" load_steps=5 format=3 uid="uid://b4ac8wgm70768"]
 
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Data/modifier_data_prototype.gd" id="1_ly7l5"]
-[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Data/attack_data.gd" id="2_7up7a"]
-[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Data/status_effect_prototype.gd" id="3_7up7a"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_ly7l5"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_7up7a"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_7up7a"]
 
 [sub_resource type="Resource" id="Resource_h67ia"]
 script = ExtResource("3_7up7a")

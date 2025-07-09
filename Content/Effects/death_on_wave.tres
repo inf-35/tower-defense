@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="DeathOnWaveEffect" load_steps=2 format=3 uid="uid://bf8y15vtpbge"]
 
-[ext_resource type="Script" uid="uid://ysv40p416cud" path="res://Data/Effects/_death_on_wave.gd" id="1_vo116"]
+[ext_resource type="Script" uid="uid://ysv40p416cud" path="res://Content/Effects/_death_on_wave.gd" id="1_vo116"]
 
 [resource]
 script = ExtResource("1_vo116")

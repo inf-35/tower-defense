@@ -35,7 +35,7 @@ func _create_hitbox():
 	
 	collision_shape.shape = shape_bound
 	hitbox.collision_mask = 0
-	hitbox.collision_layer = 0b01 if hostile else 0b10
+	hitbox.collision_layer = Hitbox.get_mask(hostile)
 	hitbox.unit = self
 	
 	hitbox.add_child(collision_shape)

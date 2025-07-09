@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://esehe72tbwn4"]
 
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Data/modifier_data_prototype.gd" id="1_d3ff2"]
-[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Data/attack_data.gd" id="2_ffjr7"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_d3ff2"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_ffjr7"]
 
 [resource]
 script = ExtResource("2_ffjr7")

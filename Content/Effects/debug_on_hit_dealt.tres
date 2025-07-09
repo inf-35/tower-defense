@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="HitDealtDebugEffect" load_steps=2 format=3 uid="uid://bqavjjw4y7y81"]
 
-[ext_resource type="Script" uid="uid://c3opiy5vich7i" path="res://Data/Effects/_on_hit_dealt.gd" id="1_gdfej"]
+[ext_resource type="Script" uid="uid://c3opiy5vich7i" path="res://Content/Effects/_on_hit_dealt.gd" id="1_gdfej"]
 
 [resource]
 script = ExtResource("1_gdfej")
 params = {
 "message": "pew pew!"
 }
+effect_type = 0
 schedule = 2
 metadata/_custom_type_script = "uid://c3opiy5vich7i"

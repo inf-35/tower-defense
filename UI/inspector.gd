@@ -34,51 +34,59 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	description.text = Towers.get_tower_description(tower_type)
 	
 	for child : Control in stats.get_children():
-		child.free()
+		child.queue_free()
 	
-	_display_stat(tower, Attributes.id.NULL, "BPS", "", [DisplayStatModifier.HARVESTER_BLUEPRINTS_PER_WAVE])
-	_display_stat(tower, Attributes.id.NULL, "FLUX", "", [DisplayStatModifier.CORE_FLUX])
-	_display_stat(tower, Attributes.id.DAMAGE, "DMG")
-	_display_stat(tower, Attributes.id.COOLDOWN, "HIT", "/s", [DisplayStatModifier.RECIPROCAL])
-	_display_stat(tower, Attributes.id.RANGE, "RNG")
-	_display_stat(tower, Attributes.id.MAX_HEALTH, "MAX HP")
-	_display_stat(tower, Attributes.id.REGENERATION, "RGN")
+	# Get the list of display instructions from the tower's data resource
+	var displays_to_create : Array[StatDisplayInfo] = tower.stat_displays
+	# Loop through the instructions (in original order)
+	#NOTE: DO NOT MUTATE displays_to_create
+	for display_info : StatDisplayInfo in displays_to_create:
+		_display_stat(tower, display_info)
+		
 
 enum DisplayStatModifier {
 	RECIPROCAL,
 	CORE_FLUX,
 	HARVESTER_BLUEPRINTS_PER_WAVE,
+	LINE_BREAK,
+	NONE,
 }
 
-func _display_stat(tower : Tower, attribute : Attributes.id, prefix : String = "", suffix : String = "", modifiers : Array[DisplayStatModifier] = []):
-	var value
-	var override : bool = false
 	
-	if modifiers.has(DisplayStatModifier.CORE_FLUX):
-		override = true
-		value = Player.flux
-		
-	if modifiers.has(DisplayStatModifier.HARVESTER_BLUEPRINTS_PER_WAVE):
-		override = true
-		value = tower.get_intrinsic_effect_attribute(Effects.Type.BLUEPRINT_ON_WAVE, "blueprints_per_wave"); WaveBlueprintEffect
-		#see WaveBlueprintEffect
-		if value == null: #not harvester or malformed harvester
-			return #abort
+func _display_stat(tower: Tower, display_info: StatDisplayInfo):
+	var value : Variant
+	var override: bool = false
 	
-	if (not override) and tower.modifiers_component.has_stat(attribute):
-		value = tower.modifiers_component.pull_stat(attribute) #for existing towers
-	elif (not override) and Towers.get_tower_stat(tower.type, attribute):
-		value = Towers.get_tower_stat(tower.type, attribute) #for tower previews
+	print("Processing stat with label " ,  display_info.label)
 	
+	# Handle special cases first
+	match display_info.special_modifier:
+		DisplayStatModifier.CORE_FLUX:
+			override = true
+			value = Player.flux
+		DisplayStatModifier.HARVESTER_BLUEPRINTS_PER_WAVE:
+			override = true
+			value = tower.get_intrinsic_effect_attribute(Effects.Type.BLUEPRINT_ON_WAVE, &"blueprints_per_wave")
+			if value == null: return # Abort if this special stat isn't found
+	
+	# Get the value from the tower's components if not overridden
+	if not override:
+		var attribute = display_info.attribute
+		if tower.modifiers_component and tower.modifiers_component.has_stat(attribute):
+			value = tower.modifiers_component.pull_stat(attribute)
+		elif Towers.get_tower_stat(tower.type, attribute): # Fallback for previews
+			value = Towers.get_tower_stat(tower.type, attribute)
+
 	if value == null:
-		return
+		return # Don't display if no value could be found
 		
-	if modifiers.has(DisplayStatModifier.RECIPROCAL):
+	# Apply final modifiers
+	if display_info.special_modifier == DisplayStatModifier.RECIPROCAL and value != 0:
 		value = 1.0 / value
 	
 	if typeof(value) == TYPE_FLOAT:
-		value = round(value * 100) / 100 #round float values to 2dp
+		value = round(value * 100) / 100
 
-	var stat_label : Label = Label.new()
-	stat_label.text = prefix + " " + str(value) + suffix
+	var stat_label := Label.new()
+	stat_label.text = display_info.label + " " + str(value) + display_info.suffix
 	stats.add_child(stat_label)
