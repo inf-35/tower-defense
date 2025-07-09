@@ -28,8 +28,6 @@ func attack(target: Unit):
 	var hit_data: HitData = attack_data.generate_hit_data() 
 	hit_data.source = unit
 	hit_data.target = target
-	hit_data.damage = damage
-	hit_data.expected_damage = damage
 
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id

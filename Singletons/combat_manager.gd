@@ -7,17 +7,22 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	static var circle_shape := CircleShape2D.new() #we share the same circleshape object across all checks
 	
 	var hit_data : HitData
+	var delivery_data : DeliveryData
 	var intercept_position : Vector2
 	
-	func _init(_hit_data: HitData, _intercept_position: Vector2):
+	func _init(_hit_data: HitData, _delivery_data: DeliveryData):
 		hit_data = _hit_data
-		intercept_position = _intercept_position
+		delivery_data = _delivery_data
+		intercept_position = delivery_data.intercept_position
 	
 	func start(delay : float):
+		var source_to_target_normalized : Vector2 = (hit_data.target.global_position - hit_data.source.global_position).normalized()
+		VFXManager.play_vfx(hit_data.vfx_on_spawn, hit_data.source.global_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
 		await CombatManager.get_tree().create_timer(delay)
 		_on_timeout()
 	
 	func _on_timeout():
+		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
 		var target : Unit = hit_data.target
 		if not is_instance_valid(target): #if target is freed midway
 			return #abort resolution
@@ -87,7 +92,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			for collider_data : Dictionary in intersecting_colliders:
 				var hitbox = collider_data.collider as Hitbox
 				if not is_instance_valid(hitbox):
-					return
+					continue
 					
 				var unit : Unit = hitbox.unit
 				# Create a deep copy of the hit data for each target.
@@ -142,53 +147,5 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 		DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT:
 			var intercept_time: float = (intercept_position - source.position).length() / delivery_data.projectile_speed
 			#TODO: implement graphics here
-			var resolver := ProjectileAbstractResolver.new(hit_data, intercept_position)
+			var resolver := ProjectileAbstractResolver.new(hit_data, delivery_data)
 			resolver.start(intercept_time)
-			
-#func get_enemies_in_radius(center: Vector2, radius: float, max_results := 100) -> Array[Unit]:
-	#var space := References.island.get_world_2d().direct_space_state
-	#
-	#var shape := CircleShape2D.new()
-	#shape.radius = radius
-#
-	#var query := PhysicsShapeQueryParameters2D.new()
-	#query.shape = shape
-	#query.transform = Transform2D(0.0, center)
-	#query.collide_with_areas = true
-	#query.collide_with_bodies = false
-	#query.collision_mask = 0b0000_0001 #target only enemies
-#
-	#var result := space.intersect_shape(query, max_results)
-	#var enemies: Array[Unit] = []
-#
-	#for item in result:
-		#var collider = item["collider"]
-		#if collider == null:
-			#continue
-		#
-		#if not collider is Hitbox:
-			#continue
-			#
-		#if collider.unit == null:
-			#continue
-#
-		#enemies.append(collider.unit)
-	#return enemies
-	#
-#func check_enemy_in_radius(center: Vector2, radius: float, target: Unit) -> bool:
-	#if not is_instance_valid(target):
-		#return false
-#
-	##var potential_targets := get_enemies_in_radius(center, radius)
-	##var result: bool = false
-	##for potential_target: Unit in potential_targets:
-		##if potential_target == target:
-			##result = true
-			##break
-			##
-	##return result
-	#
-	#if (target.position - center).length_squared() > (radius * radius):
-		#return false
-	#else:
-		#return true

@@ -23,6 +23,10 @@ class_name AttackData
 @export var status_effects: Array[StatusEffectPrototype] = []
 @export var modifiers: Array[ModifierDataPrototype] = []
 
+@export_category("Presentation")
+@export var vfx_on_spawn : VFXInfo #covers the projectile's lifetime, should consist of the projectile itself
+@export var vfx_on_impact : VFXInfo #effects that occur when the projectile dies
+
 @export_category("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
@@ -46,7 +50,12 @@ func format_status_effects() -> Dictionary[Attributes.Status, Vector2]: #see Hit
 func generate_hit_data() -> HitData:
 	var hit_data := HitData.new()
 	hit_data.damage = damage
+	hit_data.expected_damage = damage
+	hit_data.radius = radius
 	hit_data.modifiers = generate_modifiers()
 	hit_data.status_effects = format_status_effects()
+	
+	hit_data.vfx_on_impact = vfx_on_impact
+	hit_data.vfx_on_spawn = vfx_on_spawn
 	
 	return hit_data
