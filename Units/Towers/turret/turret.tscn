@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=15 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_uhk0q"]
@@ -7,8 +7,9 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_joj2e"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_qo260"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_liko0"]
-[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_rvgqw"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="6_qo260"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_ug8w7"]
+[ext_resource type="Resource" uid="uid://enpppv6hq8bf" path="res://Content/StatDisplays/line_break.tres" id="6_yr17l"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_lkyt2"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_2r1vv"]
 [ext_resource type="Resource" uid="uid://b026mhuu7c8a1" path="res://Units/Towers/turret/turret_attack.tres" id="8_rghec"]
@@ -18,7 +19,7 @@
 z_index = 1
 script = ExtResource("1_lj076")
 type = 2
-stat_displays = Array[ExtResource("2_uhk0q")]([ExtResource("3_yr17l"), ExtResource("4_qo260"), ExtResource("5_rvgqw")])
+stat_displays = Array[ExtResource("2_uhk0q")]([ExtResource("3_yr17l"), ExtResource("4_qo260"), ExtResource("6_yr17l"), ExtResource("6_qo260")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

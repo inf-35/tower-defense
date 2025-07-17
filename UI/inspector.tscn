@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="1_dm5sa"]
 [ext_resource type="Script" uid="uid://cr8iyxr7mn4kd" path="res://UI/inspector.gd" id="1_kvbly"]
 
-[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "inspector_title", "subtitle", "upgrade_button", "stats", "description")]
+[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "inspector_title", "subtitle", "upgrade_button", "sell_button", "stats", "description")]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -20,7 +20,8 @@ tower_overview = NodePath("tower_overview")
 inspector_icon = NodePath("tower_overview/MarginContainer/HBoxContainer/AspectRatioContainer/inspector_texture")
 inspector_title = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/inspector_title")
 subtitle = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/subtitle")
-upgrade_button = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/AspectRatioContainer/upgrade_button")
+upgrade_button = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons/AspectRatioContainer2/upgrade_button")
+sell_button = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons/AspectRatioContainer3/sell_button")
 stats = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats")
 description = NodePath("tower_overview/MarginContainer/HBoxContainer/VBoxContainer/description")
 
@@ -72,13 +73,27 @@ theme_type_variation = &"LabelInlineheader"
 text = "mk 7"
 vertical_alignment = 2
 
-[node name="AspectRatioContainer" type="AspectRatioContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title"]
+[node name="Buttons" type="HBoxContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title"]
 layout_mode = 2
 size_flags_horizontal = 3
+alignment = 2
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
 stretch_mode = 1
 alignment_horizontal = 2
 
-[node name="upgrade_button" type="Button" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/AspectRatioContainer"]
+[node name="upgrade_button" type="Button" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons/AspectRatioContainer2"]
+layout_mode = 2
+
+[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+stretch_mode = 1
+alignment_horizontal = 2
+
+[node name="sell_button" type="Button" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/Title/Buttons/AspectRatioContainer3"]
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer"]
@@ -91,14 +106,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/h_separation = 40
 columns = 3
-
-[node name="Label" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats"]
-layout_mode = 2
-text = "DMG 2.03"
-
-[node name="Label2" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer/ScrollContainer/stats"]
-layout_mode = 2
-text = "HITS 4.20 / s"
 
 [node name="description" type="Label" parent="tower_overview/MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)

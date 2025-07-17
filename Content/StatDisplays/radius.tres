@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://cybuicau0bb6i"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_la11d"]
+
+[resource]
+script = ExtResource("1_la11d")
+attribute = 9
+label = "AOE"
+suffix = ""
+special_modifier = 4
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

@@ -4,7 +4,15 @@ class_name Tower
 signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island hooks onto this
 
 @export var type: Towers.Type
-var level: int = 0:
+
+enum Facing {
+	UP,
+	LEFT,
+	DOWN,
+	RIGHT,
+}
+
+var level: int = 0: #upgrade level of tower
 	set(new_level):
 		level = new_level
 		UI.update_unit_state.emit(self)
@@ -15,17 +23,18 @@ var facing: Facing: #which direction the tower is facing
 		if graphics:
 			graphics.rotation = facing * PI * 0.5
 
-enum Facing {
-	UP,
-	LEFT,
-	DOWN,
-	RIGHT,
-}
-
 var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
 		tower_position = new_pos
+		movement_component.unit = self #evil circular dependency resolution
 		movement_component.position = Island.cell_to_position(tower_position)
+
+func sell():
+	if not abstractive:
+		print("yes!")
+		print(flux_value)
+		Player.flux += flux_value * health_component.health / get_stat(Attributes.id.MAX_HEALTH) #towers only release flux value when sold
+		died.emit()
 
 func _create_hitbox():
 	var hitbox := Hitbox.new()
@@ -49,7 +58,7 @@ func _ready():
 	_create_hitbox()
 	
 	level = 1
-		
+
 	adjacency_updated.connect(func(new_adjacencies: Dictionary[Vector2i, Tower]): #receive data from Island
 		var adjacency_data := AdjacencyReportData.new() #broadcast into effects system
 		adjacency_data.adjacent_towers = new_adjacencies

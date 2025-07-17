@@ -7,6 +7,8 @@
 script = ExtResource("1_8vupa")
 id = 1
 cost = 10.0
+required_capacity = 1.0
+capacity_generated = 10.0
 element = 5
 minimum_terrain = 2
 tower_name = "Player Core"

@@ -26,6 +26,7 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE }
 @export var rotation_mode: RotationMode = RotationMode.STATIC # Changed default
 enum RotationMode { STATIC, FACE_VELOCITY, SPIN }
 @export var spin_speed: float = 360.0
+@export var graphical_layer: int = 1000
 
 @export var scale_over_lifetime: Curve
 @export var color_over_lifetime: Gradient

@@ -9,6 +9,8 @@ enum EventType {
 	WAVE_STARTED,
 	
 	ADJACENCY_UPDATED, #for towers only
+	ENVIRONMENT_CHANGED, #for towers only
+	CAPACITY_FORCE_UPDATE, #for capacity generation
 }
 
 var event_type: EventType

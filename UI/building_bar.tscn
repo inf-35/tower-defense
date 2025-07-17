@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" uid="uid://csymfdpw41oh5" path="res://UI/sidebar_ui.gd" id="1_08diq"]
 
-[node name="building_bar" type="Control" node_paths=PackedStringArray("blueprint_bar", "start_wave_button")]
+[node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button")]
 layout_mode = 3
 anchor_top = 0.2
 anchor_right = 0.05
 anchor_bottom = 0.8
 script = ExtResource("1_08diq")
-blueprint_bar = NodePath("HBoxContainer/Panel/blueprint_bar")
+towers_bar = NodePath("HBoxContainer/Panel/towers_bar")
 start_wave_button = NodePath("HBoxContainer/start_wave")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
@@ -25,7 +25,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="blueprint_bar" type="VBoxContainer" parent="HBoxContainer/Panel"]
+[node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

@@ -1,75 +1,98 @@
-extends Node #player
+# player.gd
+# MODIFIED: This script is now a data-centric manager for the player's state (flux, capacity).
+# It no longer handles world logic like disabling towers or validating placement.
+# It communicates state changes via signals.
+extends Node
 
-var flux: float = 20.0: #serves as both the player's base health and currency
-	set(val):
-		flux = val
+# MODIFIED: Signals are more specific and used for decoupling.
+signal flux_changed(new_flux: float)
+signal capacity_changed(used: float, total: float)
+signal unlocked_towers_changed(unlocked: Dictionary)
+
+# RETAINED: Flux management is a core player responsibility.
+var flux: float = 20.0:
+	set(value):
+		flux = value
+		flux_changed.emit(flux)
 		UI.update_flux.emit(flux)
 
-#blueprints
+# MODIFIED: Setters no longer call a complex logic function (_check_capacity_status).
+# They now simply emit a signal that other nodes (like Island and UI) can listen to.
+var used_capacity: float = 0.0:
+	set(value):
+		used_capacity = value
+		capacity_changed.emit(used_capacity, tower_capacity)
+		
+var tower_capacity: float = 0.0:
+	set(value):
+		tower_capacity = value
+		capacity_changed.emit(used_capacity, tower_capacity)
 
-var blueprints: Array[Blueprint] = []
+# RETAINED: Unlocked tower data is player-specific.
+var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
+	set(value):
+		unlocked_towers = value
+		unlocked_towers_changed.emit(unlocked_towers)
 
-func has_blueprint(tower_type: Towers.Type) -> bool:
-	var found: bool = false
-	for blueprint: Blueprint in blueprints:
-		if blueprint.tower_type == tower_type:
-			found = true
-			break
-
-	return found
-
-func add_blueprint(blueprint: Blueprint) -> void:
-	blueprints.append(blueprint)
-	UI.update_blueprints.emit(blueprints)
-	
-func consume_blueprint(tower_type: Towers.Type) -> bool:
-	for blueprint: Blueprint in blueprints:
-		if blueprint.tower_type == tower_type:
-			blueprints.erase(blueprint)
-			UI.update_blueprints.emit(blueprints)
-			return true
-
-	return false
-
-#player-side globals
-var effect_prototypes: Array[EffectPrototype] = [] #allied units will base their effectinstances off these prototypes
-
-#ready
+# RETAINED: Player-side global data.
+var effect_prototypes: Array[EffectPrototype] = []
 
 func _ready():
-	for i in 10:
-		blueprints.append_array([
-			Blueprint.new(Towers.Type.TURRET),
-			Blueprint.new(Towers.Type.PALISADE),
-			Blueprint.new(Towers.Type.CATALYST),
-			Blueprint.new(Towers.Type.FROST_TOWER),
-		])
-	add_blueprint(Blueprint.new(Towers.Type.BLUEPRINT_HARVESTER))
-		
-	ClickHandler.place_tower_requested.connect(request_tower_placement)
+	# Initial state setup
+	self.unlocked_towers = {
+		Towers.Type.PALISADE: true,
+		Towers.Type.GENERATOR: true,
+		Towers.Type.TURRET: true,
+	}
 	
-func request_tower_placement(tower_type : Towers.Type, cell : Vector2i, facing : Tower.Facing):
-	if not has_blueprint(tower_type): 
-		return #blueprint/curreny checks
-		
-	if Player.flux < Towers.get_tower_cost(tower_type):
-		return
-		
-	if References.island.tower_grid.has(cell): #tower already exists there
-		var host : Tower = References.island.tower_grid[cell]
-		if host.type == tower_type: #upgrade existing tower (of same type)
-			consume_blueprint(tower_type)
-			Player.flux -= Towers.get_tower_cost(tower_type)
-			host.level += 1
-		return
+	# RETAINED: Still connects to the input handler.
+	UI.place_tower_requested.connect(_on_place_tower_requested)
+	UI.sell_tower_requested.connect(_on_sell_tower_requested)
 	
-	if (not References.island.terrain_level_grid.has(cell)) or Towers.get_tower_minimum_terrain(tower_type) > References.island.terrain_level_grid[cell]:
-		return #terrain checks
-	
-	consume_blueprint(tower_type)
-	Player.flux -= Towers.get_tower_cost(tower_type)
-	References.island.construct_tower(cell, tower_type, facing)
+# REMOVED: All power management logic (_check_capacity_status, disable_towers_for_deficit, reenable_towers)
+# has been moved to island.gd, which is responsible for managing the towers.
 
-func choose_terrain_expansion():
-	pass
-	#... (expand terrain function is References.island.expand_by_block(n)
+# REMOVED: compute_capacity(). Capacity is now updated additively by towers when they
+# are created or destroyed, which is more efficient than recalculating.
+
+# MODIFIED: Tower placement request now focuses only on player-side checks.
+# It asks the Island to handle the actual placement validation and construction.
+func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: Tower.Facing):
+	# 1. Check player's own resources.
+	if not unlocked_towers.get(tower_type, false):
+		return
+		
+	if flux < Towers.get_tower_cost(tower_type):
+		return
+		
+	if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity:
+		# NOTE: You could add a UI warning here about insufficient capacity.
+		return
+
+	# 2. Ask the Island to perform the placement. The Island is responsible for world checks.
+	var success = References.island.request_tower_placement(tower_type, cell, facing)
+	
+	# 3. If the Island confirms placement, deduct resources.
+	if success:
+		self.flux -= Towers.get_tower_cost(tower_type)
+		#TODO: Towers.update_tower_cost(tower_type, 1)
+
+func _on_sell_tower_requested(tower : Tower):
+	tower.sell()
+# ADDED: New functions for additively changing total capacity.
+# These should be called by capacity-providing towers (e.g., Generators)
+# when they are built and destroyed.
+func add_to_used_capacity(amount: float):
+	self.used_capacity += amount
+
+func remove_from_used_capacity(amount: float):
+	self.used_capacity -= amount
+	
+func add_to_total_capacity(amount : float):
+	self.tower_capacity += amount
+
+func remove_from_total_capacity(amount : float):
+	self.tower_capacity -= amount
+	
+func has_capacity(tower_type : Towers.Type) -> bool:
+	return Player.used_capacity + Towers.get_tower_capacity(tower_type) < Player.tower_capacity

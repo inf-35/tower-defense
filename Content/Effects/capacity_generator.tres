@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CapacityGeneratorEffect" load_steps=2 format=3 uid="uid://bfougfx6aba1c"]
+
+[ext_resource type="Script" uid="uid://bigp8gkrdqok7" path="res://Content/Effects/_capacity_generator.gd" id="1_760fe"]
+
+[resource]
+script = ExtResource("1_760fe")
+params = {
+"base_capacity": 0.0,
+"terrain_conditional_capacity": [1, 5.0]
+}
+effect_type = 0
+schedule = 2
+metadata/_custom_type_script = "uid://bigp8gkrdqok7"

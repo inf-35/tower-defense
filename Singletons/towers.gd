@@ -1,30 +1,13 @@
 extends Node #Towers
 #repository of towers, and their associated info
 
-class TowerStat: #data container for stats
-	var element: Element
-	var construct: int = 0 #minimum terrain level to construct
-	var tower_scene: PackedScene
-	var flux_cost: float = 0.0
-	
-	var tower_name: String #TODO: replace with localisable variables
-	var tower_description: String
-	
-	func _init(_tower_scene: PackedScene, _element: Element, _construct: int = 0, _flux_cost: float = 0.0, _tower_name : String = "", _tower_description : String = ""):
-		tower_scene = _tower_scene
-		element = _element
-		construct = _construct
-		flux_cost = _flux_cost
-		tower_name = _tower_name
-		tower_description = _tower_description
-
 enum Type {
 	VOID, #custom type for tower destruction
 	PLAYER_CORE,
 	TURRET,
 	FROST_TOWER,
 	CANNON,
-	BLUEPRINT_HARVESTER,
+	GENERATOR,
 	PALISADE,
 	CATALYST,
 	FLAMETHROWER
@@ -55,9 +38,9 @@ func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat
 func get_tower_prototype(tower_type: Type) -> Tower:
 	if not tower_prototypes.has(tower_type): #if no prototype
 		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
+		tower_prototypes[tower_type].abstractive = true #disable all effects and events
 		add_child(tower_prototypes[tower_type]) #trigger _ready() calls
-		
-		tower_prototypes[tower_type].disabled = true #disable all effects and events
+
 		tower_prototypes[tower_type].tower_position = Vector2i(10000 * tower_type, 5000 * tower_type) #somewhere extremely far away
 		#these prototype towers provide a "default" baseline to lookup from.
 	return tower_prototypes[tower_type]
@@ -67,6 +50,12 @@ static func get_tower_element(tower_type: Type) -> Towers.Element:
 
 static func get_tower_cost(tower_type: Type) -> float:
 	return tower_stats[tower_type].cost
+
+static func get_max_level(tower_type : Type) -> int:
+	return 10 #TODO: actually implement this
+	
+static func get_tower_capacity(tower_type : Type) -> float:
+	return tower_stats[tower_type].required_capacity
 
 static func get_tower_minimum_terrain(tower_type: Type) -> Terrain.Level:
 	return tower_stats[tower_type].minimum_terrain
@@ -107,7 +96,6 @@ static func _load_all_tower_stats() -> void:
 				if stat_resource:
 					# The enum key is derived from the folder name, e.g., "frost_tower" -> "FROST_TOWER"
 					var type_name: String = folder_name.to_upper()
-					print(type_name)
 					# Convert the string name to the actual enum value
 					if Type.has(type_name):
 						print("Assigned " + resource_path + " to " + type_name)

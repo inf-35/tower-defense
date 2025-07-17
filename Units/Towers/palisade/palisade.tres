@@ -7,6 +7,7 @@
 script = ExtResource("1_h5q3w")
 id = 6
 cost = 1.5
+required_capacity = 1.0
 element = 6
 minimum_terrain = 1
 tower_name = "Palisade"

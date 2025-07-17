@@ -27,18 +27,21 @@ func _init():
 	pass
 	
 func detach() -> void:
-	if is_instance_valid(host):
+	if is_instance_valid(host) and not host.disabled:
 		effect_prototype.detach_handler.call(self)
 	
 func attach_to(_host: Unit) -> void:
-	if is_instance_valid(host):
-		effect_prototype.detach_handler.call(self)
-	
+	detach()
 	host = _host
-	effect_prototype.attach_handler.call(self)
+	
+	if is_instance_valid(host) and not host.disabled: #reject if host is disabled
+		effect_prototype.attach_handler.call(self)
 
 func handle_event_unfiltered(event: GameEvent) -> void: #called by Unit in setup_event_bus
 	if not is_instance_valid(host): #reject if host is dead
+		return
+	
+	if host.disabled: #reject if host is disabled
 		return
 	
 	#for i in stack:

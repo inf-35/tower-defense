@@ -4,9 +4,8 @@
 
 [resource]
 script = ExtResource("1_1v8l5")
-priority = 100
-attribute = 6
-label = "DMG"
+attribute = 7
+label = "RNG"
 suffix = ""
-special_modifier = 3
+special_modifier = 4
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

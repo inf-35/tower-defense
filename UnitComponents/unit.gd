@@ -31,9 +31,13 @@ signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
 
 var unit_id: int
+var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
+	set(na):
+		abstractive = na
+		disabled = true
 var disabled: bool
 
-var flux_value: float #how much flux this unit drops when killed
+var flux_value: float #how much flux this unit drops when killed / sold
 
 #runtime
 @onready var _cooldown: float = 0.0
@@ -51,7 +55,8 @@ func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
 	
 	died.connect(func():
-		Player.flux += flux_value #reward player with flux
+		if not self is Tower: #towers have their own flux value system 
+			Player.flux += flux_value #reward player with flux
 		Targeting.clear_damage(self) #clear any damage that might be locked on to us
 		
 		for effect_prototype: EffectPrototype in effect_prototypes:
@@ -85,9 +90,6 @@ func _prepare_components() -> void:
 			child.unit = self
 
 func _attach_intrinsic_effects() -> void:
-	for effect_prototype: EffectPrototype in intrinsic_effects:
-		apply_effect(effect_prototype)
-		
 	Waves.wave_started.connect(func(wave: int):
 		var wave_data := WaveData.new()
 		wave_data.wave = wave
@@ -98,6 +100,18 @@ func _attach_intrinsic_effects() -> void:
 		
 		on_event.emit(evt)
 	)
+	
+	#Player.before_compute_tower_capacity.connect(func():
+		##allows towers to affect tower capacity
+		#var evt := GameEvent.new()
+		#evt.event_type = GameEvent.EventType.PRE_TOWER_CAPACITY_COMPUTE
+		#evt.data = EventData.new()
+		#
+		#on_event.emit(evt)
+	#)
+	
+	for effect_prototype: EffectPrototype in intrinsic_effects:
+		apply_effect(effect_prototype)
 
 func _setup_event_bus() -> void:
 	on_event.connect(func(event: GameEvent):
@@ -113,8 +127,8 @@ func apply_effect(effect_prototype: EffectPrototype) -> void:
 	effect_prototypes.append(effect_prototype)
 	
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
-	effect_instance.attach_to(self)
 	effects[effect_prototype.schedule].append(effect_instance)
+	effect_instance.attach_to(self)
 	
 	var type = effect_prototype.effect_type
 	if not effects_by_type.has(type):
@@ -175,6 +189,9 @@ func _process(delta: float):
 	queue_redraw()
 
 	if attack_component == null or range_component == null:
+		return
+	
+	if disabled:
 		return
 		
 	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):

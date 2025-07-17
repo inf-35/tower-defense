@@ -77,7 +77,7 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float = -1.0) -
 
 	var status := StatusEffect.new(type, stack)
 	status.cooldown = cooldown
-	print("added: ", status.stack)
+
 	_status_effects[type] = status
 	update_status(status)
 	check_reactions_for_status(type)
@@ -101,7 +101,6 @@ func update_status(status: StatusEffect) -> void:
 	var new_modifier = create_underlying_modifier(status)
 	status._modifier = new_modifier # Link the new modifier to the status effect
 	replace_modifier(old_modifier, new_modifier) # Add the new modifier to the primary processing list
-	print("new modifier: ", new_modifier)
 # checks all reactions that involve the newly updated status type to see if any have been triggered.
 func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 	for reaction: Attributes.ReactionData in Attributes.reactions:
@@ -116,7 +115,6 @@ func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 			
 			# Check if the unit has the status and if the stacks are sufficient.
 			if not _status_effects.has(required_status) or _status_effects[required_status].stack < required_stacks:
-				print(required_status," ",_status_effects," ",required_stacks)
 				all_requisites_met = false
 				break # A requisite is not met, no need to check others for this reaction.
 			else:

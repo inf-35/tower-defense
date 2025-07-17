@@ -1,57 +1,3 @@
-#extends Node
-#
-#var selected_tower: Tower
-#var tower_type: Towers.Type
-#var tower_facing: Tower.Facing
-#var is_valid: bool
-#var tower_position: Vector2i
-#
-#@onready var current_preview: TowerPreview = References.tower_preview
-#
-#signal click_on_island(world_position: Vector2, tower_type: Towers.Type, tower_facing: Tower.Facing)
-#
-#func _ready():
-	#UI.tower_selected.connect(_on_tower_selected)
-#
-#func _on_tower_selected(type_id: Towers.Type):
-	#tower_type = type_id
-	#References.tower_preview.setup(tower_type)
-#
-## --- In _unhandled_input(event) ---
-#func _unhandled_input(event: InputEvent) -> void:
-	## Rotation input is simpler: just update the direction vector.
-	## The _process loop will handle applying the visual rotation.
-	#var world_camera_position: Vector2 = References.camera.get_global_mouse_position()
-	#
-	#if event is InputEventMouseMotion and is_instance_valid(current_preview):
-		#tower_position = Island.position_to_cell(world_camera_position)
-		#is_valid = Player.has_blueprint(tower_type) and \
-		#Player.flux >= Towers.get_tower_cost(tower_type) and \
-		#not References.island.is_occupied(tower_position) and \
-		#Towers.get_tower_minimum_terrain(tower_type) <= References.island.get_terrain_level(tower_position)
-#
-		#current_preview.update_visuals(is_valid, tower_facing, tower_position)
-#
-	#if is_instance_valid(current_preview) and event.is_action_pressed("rotate_preview"):
-		## Rotate the direction vector counter-clockwise
-		#tower_facing = (tower_facing + 1) % 4
-		#current_preview.update_visuals(is_valid, tower_facing, tower_position)
-#
-	## The rest of the input handling (left/right click) remains identical.
-	#if event is InputEventMouseButton:
-		#var mouse_event: InputEventMouseButton = event as InputEventMouseButton
-		#if selected_tower:
-			#return
-		## Check for left-button press
-		#if References.island.tower_grid.has(Island.position_to_cell(world_camera_position)):
-			#selected_tower = References.island.tower_grid[Island.position_to_cell(world_camera_position)]
-			#print(selected_tower, " select tower")
-			#return
-			#
-		#if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
-			#click_on_island.emit(world_camera_position, tower_type, tower_facing)
-		## ... (same as before)
-
 extends Node
 
 # --- State Management ---
@@ -67,7 +13,6 @@ var preview_tower_position: Vector2i
 
 @onready var current_preview: TowerPreview = References.tower_preview
 
-signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
 signal tower_was_selected(tower: Tower)
 signal tower_was_deselected()
 
@@ -151,7 +96,7 @@ func _handle_preview_input(event: InputEvent) -> void:
 			# If the placement is valid, emit the request.
 			if preview_is_valid:
 				# Use the last known valid position for the request.
-				place_tower_requested.emit(preview_tower_type, preview_tower_position, preview_tower_facing)
+				UI.place_tower_requested.emit(preview_tower_type, preview_tower_position, preview_tower_facing)
 				#we don't transition back to idle. this allows the player to build multiple towers at once
 				UI.update_inspector_bar.emit(References.island.tower_grid[preview_tower_position])
 				#this switches the inspector to the newly built tower
@@ -175,9 +120,8 @@ func _update_preview_visuals():
 	# This function centralizes the logic for updating the preview.
 	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
 	preview_tower_position = Island.position_to_cell(mouse_pos)
-	
-	# Centralize the long validity check.
-	preview_is_valid = Player.has_blueprint(preview_tower_type) and \
+
+	preview_is_valid = Player.has_capacity(preview_tower_type) and \
 		Player.flux >= Towers.get_tower_cost(preview_tower_type) and \
 		(not References.island.is_occupied(preview_tower_position) or References.island.tower_grid[preview_tower_position].type == preview_tower_type) and \
 		Towers.get_tower_minimum_terrain(preview_tower_type) <= References.island.get_terrain_level(preview_tower_position)

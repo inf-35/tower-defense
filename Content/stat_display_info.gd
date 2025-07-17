@@ -12,3 +12,4 @@ class_name StatDisplayInfo
 
 # For special cases like BPS, Flux, or inverse calculation.
 @export var special_modifier: Inspector.DisplayStatModifier = Inspector.DisplayStatModifier.NONE
+#see Inspector for special case implementation

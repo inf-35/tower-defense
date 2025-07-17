@@ -1,14 +1,12 @@
-[gd_scene load_steps=12 format=3 uid="uid://1mt24rkpxr7f"]
+[gd_scene load_steps=10 format=3 uid="uid://1mt24rkpxr7f"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2li7g"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_vum4a"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_yq3fw"]
 [ext_resource type="Resource" uid="uid://bh2xrt4aqtxib" path="res://Content/StatDisplays/core_flux.tres" id="3_hh2tl"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_yq3fw"]
-[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="4_cg3ju"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="4_hh2tl"]
 [ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="5_cg3ju"]
-[ext_resource type="Resource" uid="uid://cqoa0ljfot6ra" path="res://Content/Effects/capacity_player_core.tres" id="5_ok6e0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_ok6e0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
@@ -22,7 +20,6 @@ stat_displays = Array[ExtResource("2_yq3fw")]([ExtResource("3_hh2tl")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 movement_component = NodePath("MovementComponent")
-intrinsic_effects = Array[ExtResource("4_cg3ju")]([ExtResource("5_ok6e0")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]

@@ -28,8 +28,7 @@ func _process(delta: float):
 			VFXInfo.RotationMode.SPIN:
 				vfx.rotation += vfx.vfx_info.spin_speed * delta
 	
-	for vfx : VFXInstance in vfx_to_remove:
-		print("cleared ", vfx)
+	for vfx : VFXInstance in vfx_to_remove: #deferred cleanup
 		_cleanup_vfx(vfx)
 
 func _draw_vfx():
@@ -56,13 +55,12 @@ func _draw_vfx():
 				RenderingServer.canvas_item_set_modulate(canvas_item_rid, current_color)
 				
 				var frame = int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
-				var fx = frame % info.h_frames
-				var fy = frame / info.h_frames
-				var region = Rect2(fx * (info.texture.get_width() / info.h_frames), fy * (info.texture.get_height() / info.v_frames), info.texture.get_width() / info.h_frames, info.texture.get_height() / info.v_frames)
+				var fx : int = frame % info.h_frames
+				var fy : int = frame / info.h_frames
+				var region : Rect2 = Rect2(fx * (info.texture.get_width() / info.h_frames), fy * (info.texture.get_height() / info.v_frames), info.texture.get_width() / info.h_frames, info.texture.get_height() / info.v_frames)
 				RenderingServer.canvas_item_add_texture_rect_region(canvas_item_rid, Rect2(Vector2.ZERO, region.size), info.texture.get_rid(), region)
 
 			VFXInfo.VFXType.CIRCLE:
-				print("Drawn VFX: ","CIRCLE ", vfx, " ", vfx.age, " ", vfx.lifetime)
 				var radius : float = info.radius * current_scale_val
 				# For primitives, position is handled by the transform, not the primitive's offset.
 				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
@@ -104,7 +102,6 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	
 	vfx.canvas_item = RenderingServer.canvas_item_create()
 	RenderingServer.canvas_item_set_parent(vfx.canvas_item, get_viewport().world_2d.canvas)
-	RenderingServer.canvas_item_set_z_index(vfx.canvas_item, 1000)
-	print("parenting ", vfx.canvas_item ,"to", get_viewport().world_2d.canvas)
+	RenderingServer.canvas_item_set_z_index(vfx.canvas_item, vfx.vfx_info.graphical_layer)
 	#attach our orphan canvas item to the world canvas
 	_active_vfx.append(vfx)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://enpppv6hq8bf"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_5kmv4"]
+
+[resource]
+script = ExtResource("1_5kmv4")
+attribute = 10
+label = ""
+suffix = ""
+special_modifier = 3
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
