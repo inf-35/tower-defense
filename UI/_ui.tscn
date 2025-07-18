@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=7 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
 [ext_resource type="Script" uid="uid://u2j8pvnub2cs" path="res://UI/expansion_ui.gd" id="2_dajm1"]
 [ext_resource type="Script" uid="uid://df70wn2fe03ih" path="res://UI/flux_label.gd" id="3_aw3sh"]
 [ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector.tscn" id="3_rmtg4"]
+[ext_resource type="Script" uid="uid://bqtbpudkayswb" path="res://UI/capacity_label.gd" id="6_rvses"]
 
 [node name="UI" type="CanvasLayer"]
 
@@ -61,10 +62,23 @@ anchor_bottom = 0.6
 alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="FluxLabel" type="Label" parent="Margin/ui_space"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Margin/ui_space"]
 layout_mode = 0
-offset_right = 180.0
+offset_right = 360.0
 offset_bottom = 60.0
+
+[node name="FluxLabel" type="Label" parent="Margin/ui_space/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
 theme_type_variation = &"LabelInlineheader"
 text = "Flux Label"
 script = ExtResource("3_aw3sh")
+
+[node name="CapacityLabel" type="Label" parent="Margin/ui_space/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"LabelInlineheader"
+text = "Capacity Label"
+script = ExtResource("6_rvses")

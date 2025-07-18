@@ -4,7 +4,7 @@ extends Node #UI BUS (UI)
 signal tower_dying(tower: Tower) #called by towers before death
 #UI -> Phases
 signal tower_selected(type_id: Towers.Type) #called by sidebar_ui
-signal expansion_selected(expansion_id: int) #called by expansion_ui
+signal choice_selected(choice_id: int) #called by expansion_ui
 signal building_phase_ended() #called by sidebar_ui
 #ClickHandler/UI -> Player
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
@@ -20,5 +20,6 @@ signal update_unit_state(unit : Unit)
 #signal update_blueprints(blueprints: Array[Blueprint]) #WARNING: DEPRECATED
 signal update_tower_types(unlocked_tower_types : Dictionary[Towers.Type, bool])
 signal update_flux(flux: float)
+signal update_capacity(used: float, total: float)
 #Handler/Sidebar -> Inspector
 signal update_inspector_bar(tower: Tower)

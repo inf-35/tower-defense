@@ -31,4 +31,4 @@ func _populate_buttons(data: Array[ExpansionChoice]):
 		option_buttons.append(btn)
 		
 func _on_button_pressed(button_id: int):
-	UI.expansion_selected.emit(button_id)
+	UI.choice_selected.emit(button_id)

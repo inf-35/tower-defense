@@ -2,10 +2,15 @@
 extends Node
 #state machine for wave/phase progression
 # --- Game State Variables ---
-var current_wave_number: int = 0 # Phases now owns the wave progression
+var current_wave_number: int = 0 # Phases owns wave progression
 
-enum GamePhase { IDLE, EXPANSION, BUILDING, COMBAT_WAVE, GAME_OVER }
+enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
+enum ChoiceType { EXPANSION, REWARD }
 var current_phase: GamePhase = GamePhase.IDLE
+# a queue to hold upcoming choice phases, enabling dynamic injection
+var choice_queue: Array[ChoiceType] = []
+# a variable to track the current choice being made
+var current_choice_type: ChoiceType
 
 const DEBUG_PRINT_REPORTS: bool = true #debug -> print phase reports?
 
@@ -13,18 +18,27 @@ func _ready():
 	# Start the game flow
 	start_game.call_deferred()
 
-func _report(str: String): #allows us to easily silence reports
-	if not DEBUG_PRINT_REPORTS:
-		return
-		
-	print("Phases: ", str)
-
 func start_game():
 	_report("Starting game flow.")
 	current_wave_number = 0 # Reset or initialize
 	# The first action will be to prepare for wave 1.
 	# According to new flow: Expansion (if wave 1 is expansion trigger) -> Build -> Combat
 	_prepare_for_next_wave_cycle()
+
+func _prepare_for_next_wave_cycle():
+	current_wave_number += 1
+	_report("Preparing for wave cycle " + str(current_wave_number))
+
+	if current_wave_number % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
+		for i in 2:
+			add_choice_to_queue(ChoiceType.EXPANSION)
+		#NOTE:add other choice injections here
+	# if there is a choice to be made, start that phase
+	if not choice_queue.is_empty():
+		var next_choice: ChoiceType = choice_queue.pop_front()
+		_start_choice_phase(next_choice)
+	else: # otherwise, proceed directly to building
+		_start_building_phase()
 
 # Main state progression logic
 func _advance_phase():
@@ -35,9 +49,9 @@ func _advance_phase():
 			# For now, after IDLE (like after combat ends), we prepare next cycle.
 			_prepare_for_next_wave_cycle() #goes to either expansion or building
 
-		GamePhase.EXPANSION:
-			_report("Expansion phase successfully completed for wave " + str(current_wave_number) + ". Moving to Building phase.")
-			_start_building_phase() # Next is building phase
+		GamePhase.CHOICE: #differentiated by ChoiceType
+			_report("choice phase completed for wave " + str(current_wave_number) + ". moving to building phase.")
+			_start_building_phase()
 
 		GamePhase.BUILDING:
 			_report("Building phase successfully completed for wave " + str(current_wave_number) + ". Moving to Combat phase.")
@@ -51,68 +65,88 @@ func _advance_phase():
 			_report("Game Over state.")
 			# Handle game over UI, etc.
 
-func _prepare_for_next_wave_cycle():
-	current_wave_number += 1
-	_report("Preparing for wave cycle " + str(current_wave_number))
+# --- Choice Phase Logic ---
+func _start_choice_phase(type : ChoiceType):
+	current_phase = GamePhase.CHOICE
+	current_choice_type = type
+	_report("starting choice phase of type: " + str(ChoiceType.keys()[type]))
 
-	if current_wave_number > 0 and current_wave_number % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
-		_start_expansion_phase() #divert to expansion phase
-	else:
-		_start_building_phase()
+	# connect to a generic signal from the UI
+	UI.choice_selected.connect(_on_player_made_choice, CONNECT_ONE_SHOT)
 
-# --- Expansion Phase Logic ---
-func _start_expansion_phase():
-	current_phase = GamePhase.EXPANSION
-	_report("Starting Expansion Phase for upcoming wave " + str(current_wave_number))
-	
-	var options: Array[ExpansionChoice] = []
-	for i: int in Waves.EXPANSION_CHOICES_COUNT:
-		var new_block_data: Dictionary = TerrainGen.generate_block(Waves.EXPANSION_BLOCK_SIZE)
-		if new_block_data.is_empty():
-			push_warning("Phases: TerrainGen.generate_block returned empty for expansion option " + str(i) + " for wave " + str(current_wave_number))
-		
-		var choice = ExpansionChoice.new(i, new_block_data) # Use string ID
-		options.append(choice)
-	
-	if options.is_empty():
-		push_warning("Phases: All generated expansion options are empty for wave " + str(current_wave_number) + ". Skipping expansion.")
-		# If expansion fails, proceed to the next logical step (Building Phase)
-		_advance_phase() # This will move from EXPANSION to BUILDING
-		return
+	match type:
+		ChoiceType.EXPANSION:
+			# this block contains the logic from the old _start_expansion_phase
+			var options: Array[ExpansionChoice] = []
+			for i: int in Waves.EXPANSION_CHOICES_COUNT:
+				var new_block_data: Dictionary = TerrainGen.generate_block(Waves.EXPANSION_BLOCK_SIZE)
+				var choice = ExpansionChoice.new(i, new_block_data)
+				options.append(choice)
 
-	if not is_instance_valid(References.island):
-		push_error("Phases: Island is not valid when trying to present expansion choices.")
-		_advance_phase() # Try to recover by moving to next phase
-		return
-	
-	UI.expansion_selected.connect(_on_player_chose_expansion, CONNECT_ONE_SHOT) #now await player_chose_expansion...
-	References.island.present_expansion_choices(options)
-	UI.display_expansion_choices.emit(options) # To UI
+			if options.is_empty():
+				push_warning("Phases: All generated expansion options are empty for wave " + str(current_wave_number) + ". Skipping expansion.")
+				_advance_phase() # fail gracefully
+				return
+
+			References.island.present_expansion_choices(options)
+			UI.display_expansion_choices.emit(options)
+
+		ChoiceType.REWARD:
+			# this is the new logic for presenting reward choices
+			# TODO: generate these rewards from a proper system, not hardcoded
+			var reward_options: Array[String] = ["gain 50 flux", "unlock cannon tower", "+5% global damage"]
+			UI.display_reward_choices.emit(reward_options) # asks UI to show a different screen
 
 #see above: responds to player selecting expansion on UI
-func _on_player_chose_expansion(choice_id: int): # Ensure UI sends choice ID
-	if current_phase != GamePhase.EXPANSION:
-		push_warning("Phases: Player chose expansion, but not in Expansion phase.")
+func _on_player_made_choice(choice_id: int):
+	if current_phase != GamePhase.CHOICE:
+		push_warning("phases: player made choice, but not in choice phase.")
 		return
 	
-	_report("Player chose expansion ID: " + str(choice_id) + " for wave " + str(current_wave_number))
-	if not is_instance_valid(References.island):
-		push_error("Phases: Island is not valid when player chose expansion.")
-		# Even if island is invalid, we need to advance the phase to avoid stall
-		_advance_phase() 
+	_report("player chose option id: " + str(choice_id) + " for choice type " + str(ChoiceType.keys()[current_choice_type]))
+
+	match current_choice_type:
+		ChoiceType.EXPANSION:
+			# this block contains logic from the old _on_player_chose_expansion
+			if not is_instance_valid(References.island):
+				_advance_phase() # fail gracefully
+				return
+			
+			# the island applying an expansion is not instant, so we must wait
+			References.island.expansion_applied.connect(_on_choice_applied, CONNECT_ONE_SHOT)
+			References.island.select_expansion(choice_id)
+
+		ChoiceType.REWARD:
+			# NOTE: applying rewards is instant, so we don't need to wait for a signal
+			# a more complex reward might need a manager and an "_on_choice_applied" signal
+			match choice_id:
+				0:
+					Player.flux += 50
+				1:
+					Player.unlock_tower(Towers.Type.CANNON)
+				2:
+					# TODO: implement a global modifier system for this
+					pass
+			
+			UI.hide_reward_choices.emit()
+			_advance_phase() # advance immediately
+
+func add_choice_to_queue(type: ChoiceType):
+	choice_queue.append(type)
+	_report("added " + str(ChoiceType.keys()[type]) + " to choice queue.")
+
+func _on_choice_applied():
+	if current_phase != GamePhase.CHOICE:
 		return
 		
-	References.island.expansion_applied.connect(_on_island_expansion_applied, CONNECT_ONE_SHOT)
-	References.island.select_expansion(choice_id)
-
-func _on_island_expansion_applied():
-	if current_phase != GamePhase.EXPANSION:
-		# This might happen if an old signal fires, or state is already advanced.
-		# push_warning("Phases: _on_island_expansion_applied received, but not in Expansion phase. Current phase: " + str(current_phase))
-		return
-	_report("Island expansion applied by Island.gd for wave " + str(current_wave_number) + ".")
-	UI.hide_expansion_choices.emit()
-	_advance_phase() # Moves from EXPANSION to BUILDING
+	_report("a choice has been successfully applied by its handler.")
+	
+	# NOTE: the UI hiding is now specific to the choice type
+	match current_choice_type:
+		ChoiceType.EXPANSION:
+			UI.hide_expansion_choices.emit()
+	
+	_advance_phase() # move to the next phase in the sequence (building)
 
 # --- Building Phase Logic ---
 func _start_building_phase():
@@ -152,3 +186,9 @@ func _on_combat_wave_ended(): # Connected to Waves.wave_ended
 	_report("Combat wave " + str(current_wave_number) + " reported as ended by Waves.gd.")
 	current_phase = GamePhase.IDLE # Reset before preparing next cycle
 	_advance_phase() # Will call _prepare_for_next_wave_cycle
+
+func _report(str: String): #allows us to easily silence reports
+	if not DEBUG_PRINT_REPORTS:
+		return
+		
+	print("Phases: ", str)

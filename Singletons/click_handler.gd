@@ -98,8 +98,10 @@ func _handle_preview_input(event: InputEvent) -> void:
 				# Use the last known valid position for the request.
 				UI.place_tower_requested.emit(preview_tower_type, preview_tower_position, preview_tower_facing)
 				#we don't transition back to idle. this allows the player to build multiple towers at once
-				UI.update_inspector_bar.emit(References.island.tower_grid[preview_tower_position])
-				#this switches the inspector to the newly built tower
+				#this switches the inspector to the newly built tower (line below)
+				if References.island.tower_grid.has(preview_tower_position):
+					UI.update_inspector_bar.emit(References.island.tower_grid[preview_tower_position])
+
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			# Right-click cancels the preview.
 			_enter_idle_state()

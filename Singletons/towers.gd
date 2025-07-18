@@ -52,7 +52,7 @@ static func get_tower_cost(tower_type: Type) -> float:
 	return tower_stats[tower_type].cost
 
 static func get_max_level(tower_type : Type) -> int:
-	return 10 #TODO: actually implement this
+	return tower_stats[tower_type].max_level #TODO: actually implement this
 	
 static func get_tower_capacity(tower_type : Type) -> float:
 	return tower_stats[tower_type].required_capacity

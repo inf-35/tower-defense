@@ -62,6 +62,7 @@ enum DisplayStatModifier {
 	NONE,
 	RETRIEVE_FIRST_ATTACK_STATUS_STACK,
 	INVERT,
+	CAPACITY_GENERATION,
 }
 
 func _display_stat(tower: Tower, display_info: StatDisplayInfo):
@@ -79,6 +80,11 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 			value = Towers.get_tower_capacity(tower.type)
 			#value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"capacity_generated")
 			if value == null: return # Abort if this special stat isn't found
+		
+		DisplayStatModifier.CAPACITY_GENERATION:
+			override = true
+			value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation") ; CapacityGeneratorEffect
+			if value == null: return
 
 		DisplayStatModifier.LINE_BREAK:
 			override = true

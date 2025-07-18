@@ -6,6 +6,7 @@ class_name TowerData
 #meta-properties
 @export var cost: float = 10.0
 @export var required_capacity: float = 1.0
+@export var max_level: int = 5
 @export var element: Towers.Element
 @export var minimum_terrain: Terrain.Level = Terrain.Level.EARTH
 

@@ -1,7 +1,6 @@
 extends EffectPrototype
 class_name CapacityGeneratorEffect
 
-
 @export var params: Dictionary = {
 	"base_capacity" : 0.0, #base capacity produced
 	"terrain_conditional_capacity" : [Terrain.Base.EARTH, 0.0], #terrain conditional capacity

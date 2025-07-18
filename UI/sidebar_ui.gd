@@ -40,12 +40,15 @@ func _clear_towers_bar() -> void:
 func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type, bool]) -> void:
 	_clear_towers_bar()
 	
-	for unlocked_tower_type : Towers.Type in unlocked_tower_types:
+	var tower_types_by_id : Array[Towers.Type] = unlocked_tower_types.keys()
+	tower_types_by_id.sort()
+	
+	for unlocked_tower_type : Towers.Type in tower_types_by_id:
 		if not unlocked_tower_types[unlocked_tower_type]:
 			continue
 			
 		var btn := Button.new()
-		var tower_name : String = str(Towers.Type.values()[unlocked_tower_type]) #TODO: implement localisation
+		var tower_name : String = str(Towers.Type.keys()[unlocked_tower_type]) #TODO: implement localisation
 		tower_name = tower_name.replace("_", " ").capitalize()
 		
 		btn.text = tower_name

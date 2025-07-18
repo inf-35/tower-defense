@@ -1,23 +1,18 @@
 # player.gd
-# MODIFIED: This script is now a data-centric manager for the player's state (flux, capacity).
-# It no longer handles world logic like disabling towers or validating placement.
-# It communicates state changes via signals.
+# this script can be seen as the "agent" of the player interacting with game logic and UI
 extends Node
 
-# MODIFIED: Signals are more specific and used for decoupling.
 signal flux_changed(new_flux: float)
 signal capacity_changed(used: float, total: float)
-signal unlocked_towers_changed(unlocked: Dictionary)
+signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 
-# RETAINED: Flux management is a core player responsibility.
+#inclusion in Player is merited by their clear player-side nature.
+#various player-side states.
 var flux: float = 20.0:
 	set(value):
 		flux = value
 		flux_changed.emit(flux)
-		UI.update_flux.emit(flux)
 
-# MODIFIED: Setters no longer call a complex logic function (_check_capacity_status).
-# They now simply emit a signal that other nodes (like Island and UI) can listen to.
 var used_capacity: float = 0.0:
 	set(value):
 		used_capacity = value
@@ -27,34 +22,48 @@ var tower_capacity: float = 0.0:
 	set(value):
 		tower_capacity = value
 		capacity_changed.emit(used_capacity, tower_capacity)
+#capacity helper functions
+func add_to_used_capacity(amount: float):
+	self.used_capacity += amount
 
-# RETAINED: Unlocked tower data is player-specific.
+func remove_from_used_capacity(amount: float):
+	self.used_capacity -= amount
+	
+func add_to_total_capacity(amount : float):
+	self.tower_capacity += amount
+
+func remove_from_total_capacity(amount : float):
+	self.tower_capacity -= amount
+	
+func has_capacity(tower_type : Towers.Type) -> bool:
+	return Player.used_capacity + Towers.get_tower_capacity(tower_type) < Player.tower_capacity
+
 var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 	set(value):
 		unlocked_towers = value
 		unlocked_towers_changed.emit(unlocked_towers)
-
-# RETAINED: Player-side global data.
-var effect_prototypes: Array[EffectPrototype] = []
+#tower unlock helper functions
+func unlock_towers(tower_type : Towers.Type, unlock : bool = true):
+	unlocked_towers[tower_type] = unlock
+	
+func is_tower_unlocked(tower_type : Towers.Type) -> bool:
+	return unlocked_towers.get(tower_type, false)
 
 func _ready():
-	# Initial state setup
+	#initial state setup
 	self.unlocked_towers = {
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 	}
-	
-	# RETAINED: Still connects to the input handler.
+	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
+	#couple playerside logic signals with UI output signals
+	flux_changed.connect(UI.update_flux.emit)
+	capacity_changed.connect(UI.update_capacity.emit)
+	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	
-# REMOVED: All power management logic (_check_capacity_status, disable_towers_for_deficit, reenable_towers)
-# has been moved to island.gd, which is responsible for managing the towers.
-
-# REMOVED: compute_capacity(). Capacity is now updated additively by towers when they
-# are created or destroyed, which is more efficient than recalculating.
-
 # MODIFIED: Tower placement request now focuses only on player-side checks.
 # It asks the Island to handle the actual placement validation and construction.
 func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: Tower.Facing):
@@ -79,20 +88,3 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 
 func _on_sell_tower_requested(tower : Tower):
 	tower.sell()
-# ADDED: New functions for additively changing total capacity.
-# These should be called by capacity-providing towers (e.g., Generators)
-# when they are built and destroyed.
-func add_to_used_capacity(amount: float):
-	self.used_capacity += amount
-
-func remove_from_used_capacity(amount: float):
-	self.used_capacity -= amount
-	
-func add_to_total_capacity(amount : float):
-	self.tower_capacity += amount
-
-func remove_from_total_capacity(amount : float):
-	self.tower_capacity -= amount
-	
-func has_capacity(tower_type : Towers.Type) -> bool:
-	return Player.used_capacity + Towers.get_tower_capacity(tower_type) < Player.tower_capacity

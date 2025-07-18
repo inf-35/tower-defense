@@ -19,14 +19,11 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	func start(delay : float):
 		var source_to_target_normalized : Vector2 = (hit_data.target.global_position - hit_data.source.global_position).normalized()
 		VFXManager.play_vfx(hit_data.vfx_on_spawn, hit_data.source.global_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
-		print(delay, " delay by this")
 		CombatManager.get_tree().create_timer(delay).timeout.connect(func():
-			print("after delay")
 			_on_timeout()
 		)
 	
 	func _on_timeout():
-		print("timeout")
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
 		var target : Unit = hit_data.target
 		if not is_instance_valid(target): #if target is freed midway
@@ -34,7 +31,6 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage
 		if is_zero_approx(hit_data.radius): #this projectile has no aoe, so we just look for the primary target
-			print("zero aoe")
 			if (target.position - intercept_position).length_squared() > ERROR_TOLERANCE_SQUARED:
 				return #we missed by over error tolerance
 				
