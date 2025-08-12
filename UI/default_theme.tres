@@ -1,11 +1,11 @@
-[gd_resource type="Theme" load_steps=7 format=3 uid="uid://d1gcsqycnxqwm"]
+[gd_resource type="Theme" load_steps=23 format=3 uid="uid://d1gcsqycnxqwm"]
 
 [ext_resource type="FontFile" uid="uid://3ljny8osnibh" path="res://Fonts/PlusJakartaSans-VariableFont_wght.ttf" id="1_drjrk"]
 [ext_resource type="FontFile" uid="uid://cj6nbn7qhv5gi" path="res://Fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf" id="2_xj1xw"]
 
 [sub_resource type="FontVariation" id="FontVariation_drjrk"]
 base_font = ExtResource("1_drjrk")
-variation_embolden = 0.5
+variation_embolden = 0.8
 
 [sub_resource type="FontVariation" id="FontVariation_xj1xw"]
 base_font = ExtResource("2_xj1xw")
@@ -19,10 +19,44 @@ variation_embolden = 1.0
 base_font = ExtResource("1_drjrk")
 variation_embolden = 1.0
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xj1xw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5xyi0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1iw5r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xew0t"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oj63r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_iilnk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aqj6o"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_au85v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_u5het"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_by400"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xldbc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5vdr8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2iung"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5xyi0"]
+bg_color = Color(0.435294, 0.921569, 0.435294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj1xw"]
+
+[sub_resource type="FontVariation" id="FontVariation_1iw5r"]
+variation_embolden = 0.8
+
 [resource]
 default_font = SubResource("FontVariation_drjrk")
 default_font_size = 20
-HBoxContainer/constants/separation = 5
+HBoxContainer/constants/separation = 0
 Label/font_sizes/font_size = 20
 Label/fonts/font = SubResource("FontVariation_drjrk")
 LabelDescriptive/base_type = &"Label"
@@ -33,6 +67,10 @@ LabelHeader/fonts/font = SubResource("FontVariation_2iung")
 LabelInlineheader/base_type = &"Label"
 LabelInlineheader/font_sizes/font_size = 20
 LabelInlineheader/fonts/font = SubResource("FontVariation_5xyi0")
+MarginContainer/constants/margin_bottom = 0
+MarginContainer/constants/margin_left = 0
+MarginContainer/constants/margin_right = 0
+MarginContainer/constants/margin_top = 0
 MarginMajor/base_type = &"MarginContainer"
 MarginMajor/constants/margin_bottom = 20
 MarginMajor/constants/margin_left = 20
@@ -43,4 +81,49 @@ MarginMinor/constants/margin_bottom = 10
 MarginMinor/constants/margin_left = 10
 MarginMinor/constants/margin_right = 10
 MarginMinor/constants/margin_top = 10
-VBoxContainer/constants/separation = 5
+MarginSuper/base_type = &"MarginContainer"
+MarginSuper/constants/margin_bottom = 40
+MarginSuper/constants/margin_left = 40
+MarginSuper/constants/margin_right = 40
+MarginSuper/constants/margin_top = 40
+PanelContainer/styles/panel = SubResource("StyleBoxEmpty_xj1xw")
+VBoxContainer/constants/separation = 0
+button_empty/base_type = &"Button"
+button_empty/styles/disabled = SubResource("StyleBoxEmpty_5xyi0")
+button_empty/styles/disabled_mirrored = SubResource("StyleBoxEmpty_1iw5r")
+button_empty/styles/focus = SubResource("StyleBoxEmpty_xew0t")
+button_empty/styles/hover = SubResource("StyleBoxEmpty_oj63r")
+button_empty/styles/hover_mirrored = SubResource("StyleBoxEmpty_iilnk")
+button_empty/styles/hover_pressed = SubResource("StyleBoxEmpty_aqj6o")
+button_empty/styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_au85v")
+button_empty/styles/normal = SubResource("StyleBoxEmpty_u5het")
+button_empty/styles/normal_mirrored = SubResource("StyleBoxEmpty_by400")
+button_empty/styles/pressed = SubResource("StyleBoxEmpty_xldbc")
+button_empty/styles/pressed_mirrored = SubResource("StyleBoxEmpty_5vdr8")
+hbox_10/base_type = &"HBoxContainer"
+hbox_10/constants/separation = 10
+hbox_20/base_type = &"HBoxContainer"
+hbox_20/constants/separation = 20
+hbox_5/base_type = &"HBoxContainer"
+hbox_5/constants/separation = 5
+healthbar/base_type = &"ProgressBar"
+healthbar/styles/background = SubResource("StyleBoxEmpty_2iung")
+healthbar/styles/fill = SubResource("StyleBoxFlat_5xyi0")
+panel_blur/base_type = &"Panel"
+panel_blur/styles/panel = SubResource("StyleBoxFlat_xj1xw")
+text_s10/base_type = &"Label"
+text_s10/constants/line_spacing = 0
+text_s10/constants/paragraph_spacing = 0
+text_s10/font_sizes/font_size = 10
+text_s10/fonts/font = SubResource("FontVariation_1iw5r")
+text_s15/base_type = &"Label"
+text_s15/constants/line_spacing = 0
+text_s15/constants/paragraph_spacing = 0
+text_s15/font_sizes/font_size = 15
+text_s15/fonts/font = SubResource("FontVariation_drjrk")
+vbox_10/base_type = &"VBoxContainer"
+vbox_10/constants/separation = 10
+vbox_20/base_type = &"VBoxContainer"
+vbox_20/constants/separation = 20
+vbox_5/base_type = &"VBoxContainer"
+vbox_5/constants/separation = 5

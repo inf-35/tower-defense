@@ -23,7 +23,7 @@ class BaseStat: #defines stats for a terraintype
 	
 var terrain_base_stats: Dictionary[Base, BaseStat]= {
 	Base.EARTH : BaseStat.new(
-		Color.DARK_OLIVE_GREEN,
+		Color(0.2, 0.2, 0.2, 0.2),
 		true, true
 	),
 	Base.RUINS : BaseStat.new(
@@ -38,8 +38,8 @@ func get_color(terrain_level: Level, terrain_base: Base) -> Color:
 	color = terrain_base_stats[terrain_base].color
 	
 	match terrain_level:
-		Level.SEA: color = Color.CADET_BLUE
-		Level.SHORE: color = color.blend(Color(Color.BISQUE , 0.25))
+		Level.SEA: color = Color(0,0,0,0.0)
+		Level.SHORE: color = color
 		Level.EARTH: color = color #preserve base color
 
 	return color

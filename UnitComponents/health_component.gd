@@ -20,6 +20,8 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 			return
 		health = new_health
 		health_changed.emit(health)
+		UI.update_unit_health.emit(unit, max_health, health)
+		
 		if health < 0.01:
 			died.emit()
 

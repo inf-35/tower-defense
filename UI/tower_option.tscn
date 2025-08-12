@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://f6bwjb8pybpm"]
+
+[ext_resource type="Script" uid="uid://dn328ud17bfog" path="res://UI/tower_option.gd" id="1_3e04o"]
+[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://default_icon.svg" id="1_c6gwr"]
+
+[node name="tower selection" type="Button" node_paths=PackedStringArray("tower_icon", "tower_label")]
+custom_minimum_size = Vector2(0, 40)
+offset_right = 104.0
+offset_bottom = 40.0
+theme_type_variation = &"button_empty"
+script = ExtResource("1_3e04o")
+tower_icon = NodePath("HBoxContainer/icon")
+tower_label = NodePath("HBoxContainer/VBoxContainer/tower_label")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"hbox_10"
+
+[node name="icon" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("1_c6gwr")
+expand_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"vbox_5"
+
+[node name="tower_label" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"text_s15"
+text = "TRRT
+400 / 2"

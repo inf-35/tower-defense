@@ -56,7 +56,6 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 			var hit_copy = hit_data.duplicate(true)
 			hit_copy.target = unit_hit
 			unit_hit.take_hit(hit_copy)
-			
 
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 	var target: Unit = hit_data.target

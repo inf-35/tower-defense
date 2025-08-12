@@ -186,7 +186,7 @@ func generate_terrain():
 			terrain_level_grid[Vector2i(x, y)] = Terrain.Level.SEA
 			occupied_grid[Vector2i(x, y)] = false
 
-	expand_by_block(TerrainGen.generate_block(35))
+	expand_by_block(TerrainGen.generate_block(36))
 	expand_by_block(TerrainGen.generate_block(6))
 	_update_terrain()
 
@@ -280,7 +280,6 @@ func _get_terrain_boundary(_terrain_grid: Dictionary[Vector2i, Terrain.Level] = 
 	return boundary_tiles
 
 # --- RETAINED DRAWING & HELPER FUNCTIONS ---
-
 func _draw():
 	# ... (Function retained as is)
 	for cell_pos: Vector2i in terrain_base_grid.keys():

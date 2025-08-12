@@ -10,12 +10,14 @@ signal building_phase_ended() #called by sidebar_ui
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
 signal sell_tower_requested(tower: Tower)
 #Phases -> UI
+signal start_wave(wave : int)
 signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()
 signal show_building_ui()
 signal hide_building_ui()
 #multiple sources -> Inspector
 signal update_unit_state(unit : Unit)
+signal update_unit_health(unit : Unit, max_hp : float, hp : float)
 #Player -> UI
 #signal update_blueprints(blueprints: Array[Blueprint]) #WARNING: DEPRECATED
 signal update_tower_types(unlocked_tower_types : Dictionary[Towers.Type, bool])

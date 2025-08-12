@@ -3,6 +3,7 @@ class_name Inspector
 
 @export var tower_overview : Control #tower overview:
 @export var inspector_icon: TextureRect
+@export var healthbar: ProgressBar
 
 @export var inspector_title: Label
 @export var subtitle: Label
@@ -23,6 +24,8 @@ enum InspectorMode {
 }
 
 func _ready():
+	healthbar.value = 20.0
+	healthbar.max_value = 200.0
 	stats.columns = stats_per_line
 	
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
@@ -30,7 +33,12 @@ func _ready():
 
 	UI.update_inspector_bar.connect(_on_inspector_contents_tower_update)
 	UI.update_unit_state.connect(func(unit : Unit):
-		if unit == current_tower: _on_inspector_contents_tower_update(current_tower)
+		if unit == current_tower: 
+			_on_inspector_contents_tower_update(current_tower)
+	)
+	UI.update_unit_health.connect(func(unit : Unit, max_hp : float, hp : float):
+		if unit == current_tower:
+			_on_inspected_tower_health_update(current_tower, max_hp, hp)
 	)
 
 func _on_inspector_contents_tower_update(tower : Tower):
@@ -52,6 +60,10 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	#NOTE: DO NOT MUTATE displays_to_create
 	for display_info : StatDisplayInfo in displays_to_create:
 		_display_stat(tower, display_info)
+
+func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
+	healthbar.max_value = max_hp
+	healthbar.value = hp
 		
 
 enum DisplayStatModifier {

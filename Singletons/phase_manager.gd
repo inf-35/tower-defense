@@ -12,6 +12,10 @@ var choice_queue: Array[ChoiceType] = []
 # a variable to track the current choice being made
 var current_choice_type: ChoiceType
 
+enum WaveType { NORMAL, BOSS, REWARD, SURGE, EXPANSION }
+var wave_plan : Dictionary[int, WaveType] = {}
+const FINAL_WAVE : int = 50
+
 const DEBUG_PRINT_REPORTS: bool = true #debug -> print phase reports?
 
 func _ready():
@@ -25,12 +29,42 @@ func start_game():
 	# According to new flow: Expansion (if wave 1 is expansion trigger) -> Build -> Combat
 	_prepare_for_next_wave_cycle()
 
+# generates the sequence of wave events for the entire game
+func _generate_wave_plan():
+	# this function can be expanded with more complex procedural logic
+	_report("Generating wave plan.")
+	wave_plan = {} # clear any existing plan
+	for i : int in range(1, FINAL_WAVE + 1):
+		# default to a normal wave
+		wave_plan[i] = WaveType.NORMAL
+		#set expansion waves at fixed intervals
+		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
+			wave_plan[i] = WaveType.EXPANSION
+		# set boss waves at fixed intervals
+		if i % 10 == 0:
+			wave_plan[i] = WaveType.BOSS
+		# set reward waves to occur after a boss, for example
+		if (i - 1) % 10 == 0 and i > 1:
+			wave_plan[i] = WaveType.REWARD
+		# override specific waves for surge events
+		if i in [7, 13, 28]:
+			wave_plan[i] = WaveType.SURGE
+
+# safely get the type of a wave from the plan
+func get_wave_type(wave_num: int) -> WaveType:
+	return wave_plan.get(wave_num, WaveType.NORMAL)
+
 func _prepare_for_next_wave_cycle():
 	current_wave_number += 1
 	_report("Preparing for wave cycle " + str(current_wave_number))
-
-	if current_wave_number % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
-		for i in 2:
+	# consult the wave plan to decide the flow
+	var upcoming_wave_type: WaveType = get_wave_type(current_wave_number)
+	_report("Wave " + str(current_wave_number) + " is of type: " + WaveType.keys()[upcoming_wave_type])
+	# queue choices based on the plan
+	match upcoming_wave_type:
+		WaveType.REWARD:
+			add_choice_to_queue(ChoiceType.REWARD)
+		WaveType.EXPANSION:
 			add_choice_to_queue(ChoiceType.EXPANSION)
 		#NOTE:add other choice injections here
 	# if there is a choice to be made, start that phase
@@ -76,7 +110,7 @@ func _start_choice_phase(type : ChoiceType):
 
 	match type:
 		ChoiceType.EXPANSION:
-			# this block contains the logic from the old _start_expansion_phase
+			# this block contains logic for generating expansion choices
 			var options: Array[ExpansionChoice] = []
 			for i: int in Waves.EXPANSION_CHOICES_COUNT:
 				var new_block_data: Dictionary = TerrainGen.generate_block(Waves.EXPANSION_BLOCK_SIZE)
@@ -92,10 +126,10 @@ func _start_choice_phase(type : ChoiceType):
 			UI.display_expansion_choices.emit(options)
 
 		ChoiceType.REWARD:
-			# this is the new logic for presenting reward choices
+			# this is the logic for presenting reward choices
 			# TODO: generate these rewards from a proper system, not hardcoded
 			var reward_options: Array[String] = ["gain 50 flux", "unlock cannon tower", "+5% global damage"]
-			UI.display_reward_choices.emit(reward_options) # asks UI to show a different screen
+			#UI.display_reward_choices.emit(reward_options) # asks UI to show a different screen
 
 #see above: responds to player selecting expansion on UI
 func _on_player_made_choice(choice_id: int):
@@ -170,6 +204,9 @@ func _on_player_ended_building_phase():
 func _start_combat_wave():
 	current_phase = GamePhase.COMBAT_WAVE
 	_report("Ordering Waves.gd to start combat for wave " + str(current_wave_number))
+	
+	UI.start_wave.emit(current_wave_number) #start wvae signal triggered
+	
 	if is_instance_valid(Waves):
 		Waves.start_combat_wave(current_wave_number) # New function in Waves.gd
 		Waves.wave_ended.connect(_on_combat_wave_ended, CONNECT_ONE_SHOT)

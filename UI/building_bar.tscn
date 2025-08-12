@@ -1,14 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://d0k84g7agsotx"]
+[gd_scene load_steps=4 format=3 uid="uid://d0k84g7agsotx"]
 
 [ext_resource type="Script" uid="uid://csymfdpw41oh5" path="res://UI/sidebar_ui.gd" id="1_08diq"]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_uep1a"]
+[ext_resource type="PackedScene" uid="uid://f6bwjb8pybpm" path="res://UI/tower_option.tscn" id="3_uep1a"]
 
 [node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button")]
+custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
 anchor_top = 0.2
 anchor_right = 0.05
 anchor_bottom = 0.8
+offset_left = 18.0
+offset_right = 122.0
+offset_bottom = -48.0
+theme = ExtResource("1_uep1a")
 script = ExtResource("1_08diq")
-towers_bar = NodePath("HBoxContainer/Panel/towers_bar")
+towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
 start_wave_button = NodePath("HBoxContainer/start_wave")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
@@ -25,13 +32,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"vbox_10"
+
+[node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" instance=ExtResource("3_uep1a")]
+layout_mode = 2
 
 [node name="start_wave" type="Button" parent="HBoxContainer"]
 layout_mode = 2

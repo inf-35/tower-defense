@@ -36,7 +36,7 @@ func remove_from_total_capacity(amount : float):
 	self.tower_capacity -= amount
 	
 func has_capacity(tower_type : Towers.Type) -> bool:
-	return Player.used_capacity + Towers.get_tower_capacity(tower_type) < Player.tower_capacity
+	return Player.used_capacity + Towers.get_tower_capacity(tower_type) - 0.01 < Player.tower_capacity
 
 var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 	set(value):
