@@ -55,6 +55,7 @@ func _ready():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
+		Towers.Type.AMPLIFIER: true,
 	}
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)

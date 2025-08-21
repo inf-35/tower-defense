@@ -25,6 +25,7 @@ func _ready():
 func start_game():
 	_report("Starting game flow.")
 	current_wave_number = 0 # Reset or initialize
+	_generate_wave_plan()
 	# The first action will be to prepare for wave 1.
 	# According to new flow: Expansion (if wave 1 is expansion trigger) -> Build -> Combat
 	_prepare_for_next_wave_cycle()
@@ -41,18 +42,20 @@ func _generate_wave_plan():
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave_plan[i] = WaveType.EXPANSION
 		# set boss waves at fixed intervals
-		if i % 10 == 0:
+		if i % 5 == 0:
 			wave_plan[i] = WaveType.BOSS
 		# set reward waves to occur after a boss, for example
-		if (i - 1) % 10 == 0 and i > 1:
+		if (i - 1) % 5 == 0 and i > 1:
 			wave_plan[i] = WaveType.REWARD
 		# override specific waves for surge events
-		if i in [7, 13, 28]:
+		if i in [7, 13, 19]:
 			wave_plan[i] = WaveType.SURGE
+	
+	UI.update_wave_schedule.emit()
 
 # safely get the type of a wave from the plan
 func get_wave_type(wave_num: int) -> WaveType:
-	return wave_plan.get(wave_num, WaveType.NORMAL)
+	return wave_plan.get(wave_num, WaveType.REWARD)
 
 func _prepare_for_next_wave_cycle():
 	current_wave_number += 1
@@ -63,7 +66,7 @@ func _prepare_for_next_wave_cycle():
 	# queue choices based on the plan
 	match upcoming_wave_type:
 		WaveType.REWARD:
-			add_choice_to_queue(ChoiceType.REWARD)
+			add_choice_to_queue(ChoiceType.EXPANSION)
 		WaveType.EXPANSION:
 			add_choice_to_queue(ChoiceType.EXPANSION)
 		#NOTE:add other choice injections here

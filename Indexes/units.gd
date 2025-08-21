@@ -15,6 +15,7 @@ enum Type {
 	BASIC,
 	BUFF,
 	ARCHER,
+	DRIFTER,
 }
 
 static var unit_stats : Dictionary[Type, UnitStat] = {
@@ -30,6 +31,11 @@ static var unit_stats : Dictionary[Type, UnitStat] = {
 	),
 	Type.ARCHER: UnitStat.new(
 		preload("res://Units/Enemies/archer_unit/archer_unit.tscn"),
+		0.8,
+		2.0
+	),
+	Type.DRIFTER: UnitStat.new(
+		preload("res://Units/Enemies/drifter/drifter.tscn"),
 		0.8,
 		2.0
 	)

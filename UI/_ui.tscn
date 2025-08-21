@@ -102,6 +102,7 @@ text = "WAVE 30"
 horizontal_alignment = 2
 
 [node name="WaveTimeline" parent="Margin/ui_space/TimeControls" instance=ExtResource("6_4g3kg")]
+custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 
 [node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls"]
@@ -136,3 +137,5 @@ offset_left = -300.0
 offset_top = -150.0
 offset_right = 300.0
 size_flags_vertical = 8
+
+[editable path="Margin/ui_space/TimeControls/WaveTimeline"]

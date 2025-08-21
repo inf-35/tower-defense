@@ -1,0 +1,53 @@
+[gd_scene load_steps=10 format=3 uid="uid://bhpgyu3tdyuh6"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_0kato"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_74j81"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_2jjyj"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_2gn4h"]
+[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ayagf"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="6_mt1ix"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_oxo2e"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_5dfik"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
+size = Vector2(105, 105)
+
+[node name="Drifter" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+script = ExtResource("1_0kato")
+hostile = true
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_74j81")
+ignore_walls = true
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_2jjyj")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_2gn4h")
+health_data = ExtResource("5_ayagf")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("6_mt1ix")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("7_oxo2e")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_anqll")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("8_5dfik")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

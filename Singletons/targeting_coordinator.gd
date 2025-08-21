@@ -21,6 +21,9 @@ func is_unit_overkilled(unit: Unit) -> bool: #prevents overkill on units
 	if not damage_reservations.has(unit):
 		return false
 		
+	if not is_instance_valid(unit.health_component): #units without health component (bc they dont take damage) should always be ignored
+		return true
+		
 	if damage_reservations[unit] >= unit.health_component.health:
 		return true
 	else:

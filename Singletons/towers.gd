@@ -10,7 +10,7 @@ enum Type {
 	GENERATOR,
 	PALISADE,
 	CATALYST,
-	FLAMETHROWER
+	AMPLIFIER,
 }
 
 enum Element {
@@ -23,7 +23,7 @@ enum Element {
 	NEUTRAL,
 }
 
-static var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
+var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
@@ -45,34 +45,34 @@ func get_tower_prototype(tower_type: Type) -> Tower:
 		#these prototype towers provide a "default" baseline to lookup from.
 	return tower_prototypes[tower_type]
 
-static func get_tower_element(tower_type: Type) -> Towers.Element:
+func get_tower_element(tower_type: Type) -> Towers.Element:
 	return tower_stats[tower_type].element
 
-static func get_tower_cost(tower_type: Type) -> float:
+func get_tower_cost(tower_type: Type) -> float:
 	return tower_stats[tower_type].cost
 
-static func get_max_level(tower_type : Type) -> int:
+func get_max_level(tower_type : Type) -> int:
 	return tower_stats[tower_type].max_level #TODO: actually implement this
 	
-static func get_tower_capacity(tower_type : Type) -> float:
+func get_tower_capacity(tower_type : Type) -> float:
 	return tower_stats[tower_type].required_capacity
 
-static func get_tower_minimum_terrain(tower_type: Type) -> Terrain.Level:
+func get_tower_minimum_terrain(tower_type: Type) -> Terrain.Level:
 	return tower_stats[tower_type].minimum_terrain
 
-static func get_tower_scene(tower_type: Type) -> PackedScene:
+func get_tower_scene(tower_type: Type) -> PackedScene:
 	return tower_stats[tower_type].tower_scene
 
-static func get_tower_name(tower_type: Type) -> String:
+func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name
 
-static func get_tower_description(tower_type: Type) -> String:
+func get_tower_description(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_description
 
-static func create_tower(tower_type: Type) -> Tower:
+func create_tower(tower_type: Type) -> Tower:
 	return get_tower_scene(tower_type).instantiate()
 
-static func _load_all_tower_stats() -> void:
+func _load_all_tower_stats() -> void:
 	var base_directory = "res://Units/Towers/"
 	
 	var dir: DirAccess = DirAccess.open(base_directory)

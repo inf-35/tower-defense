@@ -1,38 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://dti7nnkxq7kl0"]
+[gd_scene load_steps=4 format=3 uid="uid://dti7nnkxq7kl0"]
 
 [ext_resource type="Script" uid="uid://bb82c31hvadrb" path="res://UI/wave_timeline.gd" id="1_1wgro"]
-[ext_resource type="PackedScene" uid="uid://c4i5jhj5l4itm" path="res://UI/pip.tscn" id="1_v4jre"]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_6kmjr"]
+[ext_resource type="PackedScene" uid="uid://c4i5jhj5l4itm" path="res://UI/pip.tscn" id="3_6kmjr"]
 
-[node name="WaveTimeline" type="Control" node_paths=PackedStringArray("pips_container")]
+[node name="WaveTimeline" type="Control"]
 custom_minimum_size = Vector2(100, 20)
 layout_mode = 3
 anchors_preset = 0
+offset_right = 100.0
+offset_bottom = 20.0
+theme = ExtResource("1_6kmjr")
 script = ExtResource("1_1wgro")
-pips_container = NodePath("PipsMask/PipsContainer")
 
-[node name="PipsMask" type="Control" parent="."]
-clip_contents = true
+[node name="TimelinePip" parent="." instance=ExtResource("3_6kmjr")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PipsContainer" type="HBoxContainer" parent="PipsMask"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"hbox_20"
-
-[node name="TimelinePip" parent="PipsMask/PipsContainer" instance=ExtResource("1_v4jre")]
-layout_mode = 2
-
-[node name="TimelinePip2" parent="PipsMask/PipsContainer" instance=ExtResource("1_v4jre")]
-layout_mode = 2
-
-[node name="TimelinePip3" parent="PipsMask/PipsContainer" instance=ExtResource("1_v4jre")]
-layout_mode = 2
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0

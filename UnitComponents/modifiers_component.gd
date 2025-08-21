@@ -49,9 +49,9 @@ func change_modifier(mod: Modifier) -> void:
 
 # remove a buff/debuff
 func remove_modifier(mod: Modifier) -> void:
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute)
 	_modifiers.erase(mod)
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
 	
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
 	if mod:
@@ -185,7 +185,7 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	
 	if not has_stat(attr):
 		return null #unregistered stat!
-		
+
 	var upgraded_value := base_stats[attr]
 	var perm_sum_add := 0.0
 	var perm_product_mult := 1.0

@@ -10,6 +10,7 @@ signal building_phase_ended() #called by sidebar_ui
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
 signal sell_tower_requested(tower: Tower)
 #Phases -> UI
+signal update_wave_schedule()
 signal start_wave(wave : int)
 signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()

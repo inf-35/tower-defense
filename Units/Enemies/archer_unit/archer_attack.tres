@@ -1,13 +1,18 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://bkuvyutqxnknt"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=4 format=3 uid="uid://bkuvyutqxnknt"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_v4fkb"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_syins"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_v64mi"]
 
 [resource]
 script = ExtResource("2_syins")
+delivery_method = 0
 range = 20.0
-cooldown = 4.0
+cooldown = 0.5
 radius = 0.0
-damage = 1.0
+damage = 100.0
+status_effects = Array[ExtResource("3_v64mi")]([])
 modifiers = Array[ExtResource("1_v4fkb")]([])
+projectile_speed = 10.0
+vertical_force = -10.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

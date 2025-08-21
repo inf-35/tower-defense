@@ -68,15 +68,6 @@ func _prepare_components() -> void:
 
 	if navigation_component != null:
 		navigation_component.inject_components(movement_component)
-		navigation_component.blocked_by_tower.connect(func(tower):
-			if is_instance_valid(tower) and tower is Tower:
-				#command range component to prioritise the tower
-				if is_instance_valid(range_component):
-					range_component.priority_target_override = tower
-				# command the movement component to stop.
-				if is_instance_valid(movement_component):
-					movement_component.target_direction = Vector2.ZERO
-		)
 	
 	if movement_component != null:
 		movement_component.inject_components(graphics, modifiers_component)

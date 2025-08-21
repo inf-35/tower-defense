@@ -5,8 +5,6 @@ var area: Area2D
 
 var _enemies_in_range: Array[Unit] = []
 var targeting_mode: TargetingMode = TargetingMode.CLOSEST
-# if this is set, get_target will prioritize it over all other logic.
-var priority_target_override: Unit = null
 
 var attack_component: AttackComponent
 var modifiers_component: ModifiersComponent
@@ -74,14 +72,6 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 func get_target():
 	if _enemies_in_range.is_empty():
 		return null
-	
-	if is_instance_valid(priority_target_override):
-		# check if the override target is still in range.
-		if _enemies_in_range.has(priority_target_override):
-			return priority_target_override
-		else:
-			# if the override target is dead or out of range, clear it and fall back to normal targeting.
-			priority_target_override = null 
 	
 	match targeting_mode:
 		TargetingMode.CLOSEST:

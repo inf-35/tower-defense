@@ -4,6 +4,7 @@ class_name Tower
 signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island hooks onto this
 
 @export var type: Towers.Type
+@export var blocking: bool = true #does this tower block enemy units from passing through
 
 enum Facing {
 	UP,

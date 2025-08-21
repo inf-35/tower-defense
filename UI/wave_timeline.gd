@@ -2,124 +2,159 @@
 extends Control
 class_name WaveTimeline
 
-# --- state ---
-# this component no longer owns the current_wave state, it mirrors it from Phases.gd
-var _current_wave: int = 0
-var _loaded_pip_count: int = 0
-
 # --- configuration ---
-const PIPS_LOADED_BUFFER: int = 15 # number of pips to show in the timeline
-var SPACING_BETWEEN_PIPS: int = 20:
-	set(new_spacing):
-		SPACING_BETWEEN_PIPS = new_spacing
-		_update_pips_style()
+const PIPS_LOADED_BUFFER: int = 8 # number of pips to display at once
+const SPACING_BETWEEN_PIPS: int = 20
+const TWEEN_TIME: float = 1.0
 
-# --- node references ---
-@export var pips_container: HBoxContainer
+# --- state ---
+var _current_wave: int = 0
+var _pip_nodes: Array[TimelinePip] = []
+var _is_tweening: bool = false
 
 # --- scenes ---
 const TIMELINE_PIP_SCENE: PackedScene = preload("res://UI/pip.tscn")
 
 func _ready() -> void:
 	# connect to the game's phase manager to sync state
-	# note: Phases should emit this signal at game start and when preparing a new wave cycle
 	UI.start_wave.connect(_on_wave_cycle_started)
+	UI.update_wave_schedule.connect(_regenerate_all_pips)
+	# connect to self resize to trigger repositioning
+	self.resized.connect(_update_all_pip_positions)
+	# initial setup call
 	
-	_update_pips_style()
-	# initial setup call to populate the timeline when the game loads
-	_on_wave_cycle_started(Phases.current_wave_number)
 
-# called by the Phases manager to sync the timeline's state
+# called by the phases manager to sync the timeline's state
 func _on_wave_cycle_started(new_wave_number: int) -> void:
-	print("NEW WAVE NUMBER: ", new_wave_number)
+	if _is_tweening:
+		return
+	
 	self._current_wave = new_wave_number
-	# if a tween isn't active, this is an initial setup or a hard reset
-	if _loaded_pip_count == 0:
+	# on first load, regenerate everything instantly
+	if _pip_nodes.is_empty():
 		_regenerate_all_pips()
-	# otherwise a wave just ended, trigger the scrolling animation
+	# otherwise, a wave just ended, so trigger the animation
 	else:
-		print("yep")
 		_progress_wave()
 
-func _update_pips_style() -> void:
-	pips_container.add_theme_constant_override(&"separation", SPACING_BETWEEN_PIPS)
+### EDITED SECTION START ###
+# this is the single, authoritative function for calculating pip positions
+func _calculate_pip_positions(pips: Array[TimelinePip]) -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	if pips.is_empty():
+		return positions
+		
+	# pre-calculate all visual properties to get an accurate total width
+	var pip_visuals: Array[TimelinePip.TimelinePipVisuals] = []
+	for pip: TimelinePip in pips:
+		pip_visuals.append(pip.get_target_visual_properties())
 
+	var total_width: float = 0.0
+	for visuals: TimelinePip.TimelinePipVisuals in pip_visuals:
+		# use the actual size from the visuals object, not get_visual_width
+		total_width += visuals.size.x
+	total_width += max(0, pips.size() - 1) * SPACING_BETWEEN_PIPS
+
+	# determine the x-offset needed to right-align the entire group
+	var x_offset: float = self.size.x - total_width
+	var current_x: float = x_offset
+
+	# calculate the final top-left position for each pip
+	for visuals: TimelinePip.TimelinePipVisuals in pip_visuals:
+		var pip_size: Vector2 = visuals.size
+		# calculate the center point for this slot
+		var center_x: float = current_x + pip_size.x / 2.0
+		var center_y: float = 50.0 / 2.0
+		# subtract half the size to get the correct top-left position
+		positions.append(Vector2(center_x - pip_size.x / 2.0, center_y - pip_size.y / 2.0))
+		current_x += pip_size.x + SPACING_BETWEEN_PIPS
+		
+	return positions
+
+# wrapper function to instantly apply new positions to the active pips
+func _update_all_pip_positions() -> void:
+	var target_positions: Array[Vector2] = _calculate_pip_positions(self._pip_nodes)
+	if target_positions.size() != _pip_nodes.size():
+		return # guard against size mismatch
+		
+	for i: int in _pip_nodes.size():
+		_pip_nodes[i].position = target_positions[i]
+### EDITED SECTION END ###
+
+# generates the initial set of pips without animation
 func _regenerate_all_pips() -> void:
-	# clear any pips that might already exist
-	for child: Node in pips_container.get_children():
+	for child: Node in get_children():
 		child.queue_free()
-	_loaded_pip_count = 0
-	
-	# generate a fresh set of pips based on the current game state
-	_fill_pip_buffer()
-	
-	# update the first pip to visually represent the 'current' wave
-	if pips_container.get_child_count() > 0:
-		var current_pip: TimelinePip = pips_container.get_child(0)
-		if is_instance_valid(current_pip):
-			current_pip.set_is_current(true)
+	_pip_nodes.clear()
 
-# intelligently loads pips from the external source until the buffer is full
-func _fill_pip_buffer() -> void:
-	# loop until the number of loaded pips meets our desired buffer size
-	while _loaded_pip_count < PIPS_LOADED_BUFFER:
-		# calculate the wave number for the next pip we need to load
-		var wave_to_load: int = _current_wave + _loaded_pip_count
-		
-		# get wave type from the central plan in the phases manager
-		var wave_type: Phases.WaveType = Phases.get_wave_type(wave_to_load)
-		
-		# instantiate and configure the pip
-		var pip: TimelinePip = TIMELINE_PIP_SCENE.instantiate()
-		pip.setup(wave_to_load, wave_type) # pass wave data to the pip
-		
-		pips_container.add_child(pip)
-		_loaded_pip_count += 1
+	for i: int in PIPS_LOADED_BUFFER:
+		var wave_num: int = _current_wave + i
+		var pip: TimelinePip = _create_pip_for_wave(wave_num)
+		if i == 0:
+			pip.set_is_current(true)
+			pip._apply_visuals_instantly()
+		_pip_nodes.append(pip)
+	# calculate and apply initial positions
+	_update_all_pip_positions()
 
-# public function to trigger the animation
+# factory function to create a configured pip
+func _create_pip_for_wave(wave_num: int) -> TimelinePip:
+	var wave_type: Phases.WaveType = Phases.get_wave_type(wave_num)
+	print(Phases.WaveType.keys()[wave_type], " ", wave_num)
+	var pip: TimelinePip = TIMELINE_PIP_SCENE.instantiate()
+	add_child(pip)
+	pip.setup(wave_num, wave_type)
+	return pip
+
+# orchestrates the entire wave transition animation
 func _progress_wave() -> void:
-	if pips_container.get_child_count() <= 1:
-		return
-
-	var current_pip: TimelinePip = pips_container.get_child(0)
-	if not is_instance_valid(current_pip):
-		return # exit if the pip is somehow invalid
-	current_pip.set_is_current(true)
-
-	# calculate the dynamic distance to travel
-	# this is the core advantage of using a tween
-	var pip_width: float = current_pip.size.x
-	var distance_to_travel: float = (pip_width + SPACING_BETWEEN_PIPS)
-	var target_position: Vector2 = Vector2(-distance_to_travel, pips_container.position.y)
+	_is_tweening = true
+	var tween: Tween = create_tween().set_parallel()
 	
-	# create and configure the tween
-	var tween: Tween = create_tween()
-	# set the animation's properties (target node, property, end value, duration)
-	tween.tween_property(pips_container, "position", target_position, 0.5)\
-		.set_trans(Tween.TRANS_SINE)\
-		.set_ease(Tween.EASE_OUT)
+	# define roles for the animation
+	var exiting_pip: TimelinePip = _pip_nodes.front()
+	var new_pip: TimelinePip = _create_pip_for_wave(_current_wave + PIPS_LOADED_BUFFER - 1)
 
-	# connect the tween's completion signal to our cleanup function
-	tween.finished.connect(_on_tween_finished)
-
-# renamed from _on_animation_finished to reflect the new source
-func _on_tween_finished() -> void:
-	# remove the leftmost pip (which is now off-screen)
-	if pips_container.get_child_count() > 0:
-		var old_pip: Node = pips_container.get_child(0)
-		pips_container.remove_child(old_pip)
-		old_pip.queue_free()
-		_loaded_pip_count -= 1
+	# update states before calculating positions
+	for i: int in _pip_nodes.size():
+		var pip: TimelinePip = _pip_nodes[i]
+		var future_i: int = i - 1
+		pip.set_is_current(future_i == 0)
 	
-	# reset the container's position for the next animation
-	# this snap is invisible to the user because the pips have been rearranged
-	pips_container.position = Vector2.ZERO
-
-	# generate a new pip to refill the buffer
-	_fill_pip_buffer()
+	# configure the new pip before animation
+	new_pip.modulate.a = 0.0 # start transparent
 	
-	# update the appearance of the new 'current' pip
-	if pips_container.get_child_count() > 0:
-		var new_current_pip: TimelinePip = pips_container.get_child(0)
-		if is_instance_valid(new_current_pip):
-			new_current_pip.set_is_current(true)
+	# create a temporary array representing the final visual state
+	var final_pip_order: Array[TimelinePip] = _pip_nodes.slice(1)
+	final_pip_order.append(new_pip)
+	
+	# calculate all final positions using the single authoritative function
+	var target_positions: Array[Vector2] = _calculate_pip_positions(final_pip_order)
+
+	# place the new pip just off-screen to the right, ready to tween in
+	new_pip.position = Vector2(self.size.x + SPACING_BETWEEN_PIPS, size.y / 2.0)
+
+	# animate all pips shifting to their new final positions
+	for i: int in final_pip_order.size():
+		var pip_to_shift: TimelinePip = final_pip_order[i]
+		pip_to_shift.add_visual_tweens_to(tween)
+		tween.parallel().tween_property(pip_to_shift, "position", target_positions[i], TWEEN_TIME)\
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
+	# fade in the new pip as it moves
+	new_pip.fade_to(tween, 1.0)
+	
+	# animate the exiting pip moving off-screen to the left
+	tween.parallel().tween_property(exiting_pip, "position", target_positions[0] - Vector2(SPACING_BETWEEN_PIPS + exiting_pip.size.x * 0.5, exiting_pip.size.y * -0.5), TWEEN_TIME)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	exiting_pip.fade_to(tween, 0.0)
+	
+	tween.finished.connect(func(): _on_tween_finished(exiting_pip, new_pip))
+
+# cleans up state after the animation is complete
+func _on_tween_finished(pip_to_destroy: TimelinePip, newly_added_pip: TimelinePip) -> void:
+	pip_to_destroy.queue_free()
+	# update the internal array to match the visual state
+	_pip_nodes.pop_front()
+	_pip_nodes.append(newly_added_pip)
+	_is_tweening = false

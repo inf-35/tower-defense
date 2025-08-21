@@ -3,7 +3,8 @@ class_name WaveEnemies #stores enemies per wave, see Waves for the spawning logi
 enum { #this is an anonymous copy of the units enum found in Units
 	BASIC,
 	BUFF,
-	ARCHER
+	ARCHER,
+	DRIFTER
 }
 
 const MAX_WAVE_IMPLEMENTED: int = 10
@@ -14,7 +15,7 @@ const enemies_per_wave: Dictionary[int, Array] = {
 		[BASIC, 1],
 	],
 	2: [
-		[BASIC, 9],
+		[DRIFTER, 9],
 	],
 	3 : [
 		[BASIC, 12],

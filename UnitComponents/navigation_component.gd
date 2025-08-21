@@ -1,18 +1,48 @@
 extends UnitComponent
 class_name NavigationComponent
 
+signal blocked_by_tower(tower: Tower)
+
 var movement_component: MovementComponent
+#pathfinding settings
+var goal: Vector2i = Vector2i.ZERO
+@export var ignore_walls: bool = false
+#local pathfinding variables
+var blocking_tower: Tower:
+	set(nt):
+		blocking_tower = nt
+		blocked_by_tower.emit(blocking_tower) #null signifies unblock
 
 func inject_components(movement: MovementComponent):
 	movement_component = movement
 
-var goal: Vector2i = Vector2i.ZERO
 var _current_waypoint_index: int:
 	set(ncwi):
 		_current_waypoint_index = ncwi
 		if len(_path) > (_current_waypoint_index):
 			_current_waypoint = _path[_current_waypoint_index]
 			movement_component.target_position = Island.cell_to_position(_current_waypoint)
+			# --- Path Blocking Logic ---
+			# we only perform this check for corporeal units that have a next waypoint to fllow
+			if not unit.incorporeal and _current_waypoint_index + 1 < _path.size():
+				var next_waypoint: Vector2i = _path[_current_waypoint_index + 1]
+				var unit_on_tile = References.island.get_tower_on_tile(next_waypoint) as Tower
+				# check if the unit on the next tile is a tower and has a different affiliation.
+				if unit_on_tile is Tower and unit_on_tile.hostile != unit.hostile and unit_on_tile.blocking:
+					# if we aren't already blocked by this tower, update our state.
+					if self.blocking_tower != unit_on_tile:
+						self.blocking_tower = unit_on_tile as Tower
+						# connect to the tower's died signal so we know when the path is clear.
+						blocking_tower.died.connect(
+							func(): self.blocking_tower = null,
+							CONNECT_ONE_SHOT
+						)
+				else:
+					# the path ahead is clear.
+					self.blocking_tower = null
+			else:
+				# we are incorporeal or have no path, so we can't be blocked.
+				self.blocking_tower = null
 		else:
 			movement_component.target_direction = Vector2(0,0)
 
@@ -32,12 +62,13 @@ func _ready():
 	_STAGGER_CYCLE = 5
 	
 func update_path():
-	var path_data: Navigation.PathData = Navigation.find_path(movement_component.cell_position)
+	var path_data: Navigation.PathData = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
 	if path_data.status == Navigation.PathData.Status.building_path:
 		Navigation.request_path_promise(Navigation.PathPromise.new( #request a path for later
 			self,
 			movement_component.cell_position,
-			goal
+			goal,
+			ignore_walls
 		))
 		unit.graphics.modulate = Color(0.0, 1.0, 1.0)
 		get_tree().create_timer(0.2).timeout.connect(func():
@@ -55,7 +86,8 @@ func receive_path_data(path_data: Navigation.PathData): #used by Navigation to f
 		Navigation.request_path_promise(Navigation.PathPromise.new(
 			self,
 			movement_component.cell_position,
-			goal
+			goal,
+			ignore_walls
 		))
 	else:
 		_path = path_data.path
@@ -170,9 +202,13 @@ func _process(delta: float):
 		update_path()
 		movement_component.target_position = Island.cell_to_position(_current_waypoint)
 	
-	if _path.is_empty(): #path still empty? path unavailable
-		movement_component.target_direction = Vector2.ZERO
-		return
+		if _path.is_empty(): #path still empty? path unavailable
+			movement_component.target_direction = Vector2.ZERO
+			return
+
+	# if blocked, we do not advance the waypoint. movement is handled by the main Unit script.
+	if is_instance_valid(blocking_tower):
+		return # halt further navigation logic until block is cleared
 	
 	if movement_component.cell_position == goal:
 		movement_component.target_position = Island.cell_to_position(goal)

@@ -148,7 +148,7 @@ func _disable_towers_for_deficit(deficit: float):
 		tower.type == Towers.Type.GENERATOR or tower.type == Towers.Type.PLAYER_CORE:
 			continue
 			
-		if not tower.is_disabled:
+		if not tower.disabled:
 			tower.disabled = true # Use the tower's own method.
 			disabled_towers.append(tower)
 			deficit_to_fill -= Towers.get_tower_capacity(tower.type)
@@ -307,6 +307,9 @@ func is_occupied(cell: Vector2i) -> bool:
 		return occupied_grid[cell]
 	else:
 		return false
+
+func get_tower_on_tile(cell: Vector2i):
+	return tower_grid.get(cell, null)
 
 func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]:
 	# ... (Function retained as is)
