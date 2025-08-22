@@ -37,7 +37,6 @@ func _on_wave_cycle_started(new_wave_number: int) -> void:
 	else:
 		_progress_wave()
 
-### EDITED SECTION START ###
 # this is the single, authoritative function for calculating pip positions
 func _calculate_pip_positions(pips: Array[TimelinePip]) -> Array[Vector2]:
 	var positions: Array[Vector2] = []
@@ -79,8 +78,6 @@ func _update_all_pip_positions() -> void:
 		
 	for i: int in _pip_nodes.size():
 		_pip_nodes[i].position = target_positions[i]
-### EDITED SECTION END ###
-
 # generates the initial set of pips without animation
 func _regenerate_all_pips() -> void:
 	for child: Node in get_children():
