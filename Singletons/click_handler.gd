@@ -125,8 +125,7 @@ func _update_preview_visuals():
 
 	preview_is_valid = Player.has_capacity(preview_tower_type) and \
 		Player.flux >= Towers.get_tower_cost(preview_tower_type) and \
-		(not References.island.is_occupied(preview_tower_position) or References.island.tower_grid[preview_tower_position].type == preview_tower_type) and \
-		Towers.get_tower_minimum_terrain(preview_tower_type) <= References.island.get_terrain_level(preview_tower_position)
+		TerrainService.is_cell_constructable(References.island, preview_tower_position, preview_tower_type)
 
 	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 

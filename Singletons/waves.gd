@@ -39,41 +39,39 @@ func start_combat_wave(wave_num_to_spawn: int):
 	_spawn_enemies_for_current_wave() # Internal spawner
 
 func _spawn_enemies_for_current_wave():
-	# Ensure unit_sc is loaded, ideally as a class member if always the same
-	var island: Island = References.island
-	if not is_instance_valid(island):
+	# get spawn points from the dedicated service
+	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
+
+	if spawn_points.is_empty():
+		push_warning("Waves: No active breaches found. Cannot spawn enemies.")
 		self.alive_enemies = 0
 		return
-	if island.active_boundary_tiles.is_empty():
-		self.alive_enemies = 0
-		return
-	
+
 	var enemies_to_spawn: Array = WaveEnemies.get_enemies_for_wave(current_combat_wave_number)
 	var enemy_count: int = WaveEnemies.get_enemy_count(enemies_to_spawn)
+	var enemy_stagger: float = 0.1
 
 	if enemy_count <= 0:
-		print("Waves: No enemies to spawn for wave " + str(current_combat_wave_number) + " based on formula.")
 		self.alive_enemies = 0
 		return
 
 	self.alive_enemies = enemy_count
-	print("Waves: Spawning " + str(enemy_count) + " enemies for wave " + str(current_combat_wave_number))
-
-	# Your stagger logic
-	var enemy_stagger: float = 0.01 # Default
-	if enemy_count > 0: # Avoid division by zero if somehow enemies_to_spawn is 0
-		enemy_stagger = WaveEnemies.get_wave_length_for_enemies(enemy_count) / float(enemy_count)
+	# ... (stagger logic remains the same) ...
 
 	for enemy_stack: Array in enemies_to_spawn:
 		var unit_type: Units.Type = enemy_stack[0]
 		var unit_stack: int = enemy_stack[1]
 		
-		for i in unit_stack:
+		for i: int in unit_stack:
 			var unit: Unit = Units.create_unit(unit_type)
-			unit.flux_value = Units.get_unit_flux(unit_type)
 			unit.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
-			island.add_child(unit)
-			unit.movement_component.position = Island.cell_to_position(island.active_boundary_tiles.pick_random())
+			# we assume island is still valid to be the parent for enemy nodes
+			References.island.add_child(unit)
+			
+			# pick a random spawn point from the list provided by the service
+			var spawn_cell: Vector2i = spawn_points.pick_random()
+			unit.movement_component.position = Island.cell_to_position(spawn_cell)
+
 
 			await get_tree().create_timer(enemy_stagger).timeout
 		

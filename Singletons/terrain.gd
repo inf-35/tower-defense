@@ -1,11 +1,6 @@
 extends Node #terrain
 #repository of data, purely static
 
-enum Level {
-	SEA, #all terrains unbuildable, with little exception
-	SHORE, #buildable only to large structures
-	EARTH #buildable in general
-}
 enum Base { #base terrain type
 	EARTH,
 	RUINS,
@@ -32,15 +27,10 @@ var terrain_base_stats: Dictionary[Base, BaseStat]= {
 	)
 }
 
-func get_color(terrain_level: Level, terrain_base: Base) -> Color:
+func get_color(terrain_base: Base) -> Color:
 	var color: Color
 
 	color = terrain_base_stats[terrain_base].color
-	
-	match terrain_level:
-		Level.SEA: color = Color(0,0,0,0.0)
-		Level.SHORE: color = color
-		Level.EARTH: color = color #preserve base color
 
 	return color
 

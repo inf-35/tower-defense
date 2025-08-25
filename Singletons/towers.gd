@@ -11,6 +11,10 @@ enum Type {
 	PALISADE,
 	CATALYST,
 	AMPLIFIER,
+	
+	#environmental or enemy features
+	BREACH,
+	BREACH_SEED,
 }
 
 enum Element {
@@ -57,9 +61,6 @@ func get_max_level(tower_type : Type) -> int:
 func get_tower_capacity(tower_type : Type) -> float:
 	return tower_stats[tower_type].required_capacity
 
-func get_tower_minimum_terrain(tower_type: Type) -> Terrain.Level:
-	return tower_stats[tower_type].minimum_terrain
-
 func get_tower_scene(tower_type: Type) -> PackedScene:
 	return tower_stats[tower_type].tower_scene
 
@@ -85,7 +86,7 @@ func _load_all_tower_stats() -> void:
 	while folder_name != "":
 		# Check if the current item is a directory and not "." or ".."
 		if dir.current_is_dir() and not folder_name.begins_with("."):
-			
+			#iterate through all folders in /Towers
 			# Construct the expected path to the .tres file based on the new structure
 			var resource_path: String = base_directory + folder_name + "/" + folder_name + ".tres"
 			#expectedstructure res://Units/Towers/[tower type]/[tower type].tres

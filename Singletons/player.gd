@@ -80,7 +80,7 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		return
 
 	# 2. Ask the Island to perform the placement. The Island is responsible for world checks.
-	var success = References.island.request_tower_placement(tower_type, cell, facing)
+	var success = References.island.request_tower_placement(cell, tower_type, facing)
 	
 	# 3. If the Island confirms placement, deduct resources.
 	if success:

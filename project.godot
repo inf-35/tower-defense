@@ -23,7 +23,6 @@ References="*res://Singletons/references.gd"
 ClickHandler="*res://Singletons/click_handler.gd"
 Waves="*res://Singletons/waves.gd"
 Terrain="*res://Singletons/terrain.gd"
-TerrainGen="*res://Singletons/terrain_generator.gd"
 Phases="*res://Singletons/phase_manager.gd"
 UI="*res://UI/_ui_bus.gd"
 Targeting="*res://Singletons/targeting_coordinator.gd"
@@ -32,6 +31,10 @@ CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 Attributes="*res://Indexes/attributes.gd"
 CombatManager="*res://Singletons/combat_manager.gd"
 VFXManager="*res://Singletons/vfx_manager.gd"
+ExpansionService="*res://Singletons/terrain_expansion.gd"
+TerrainService="*res://Singletons/terrain_service.gd"
+PowerService="*res://Singletons/power_service.gd"
+SpawnPointService="*res://Singletons/spawn_point_service.gd"
 
 [display]
 
