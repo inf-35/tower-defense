@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=4 format=3 uid="uid://doci7k8uh2yfj"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_qxe7x"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_w218f"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_h5pey"]
+
+[resource]
+script = ExtResource("2_w218f")
+delivery_method = 0
+range = 8.0
+cooldown = 1.0
+radius = 0.0
+damage = 2.0
+status_effects = Array[ExtResource("3_h5pey")]([])
+modifiers = Array[ExtResource("1_qxe7x")]([])
+projectile_speed = 10.0
+vertical_force = -10.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

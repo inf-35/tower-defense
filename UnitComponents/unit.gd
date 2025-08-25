@@ -1,8 +1,9 @@
 extends Node2D
 class_name Unit
-
-@export var hostile: bool
+#core behaviours
 @export var incorporeal: bool
+@export var hostile: bool
+@export var attack_only_when_blocked: bool
 
 @export_category("Presentation")
 @export var stat_displays : Array[StatDisplayInfo] = []
@@ -18,6 +19,8 @@ class_name Unit
 @export var attack_component: AttackComponent
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
+
+#effect-related state
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
 var effects: Dictionary[EffectPrototype.Schedule, Array] = {
 	EffectPrototype.Schedule.MULTIPLICATIVE: [],
@@ -27,6 +30,8 @@ var effects: Dictionary[EffectPrototype.Schedule, Array] = {
 var effects_by_type: Dictionary[Effects.Type, Array] = {
 	#each array contains EffectInstances
 } # for lookup by type
+#unit state
+var blocked: bool #whether this unit is currently blocked by a tower
 
 signal on_event(event: GameEvent) #polymorphic event bus
 signal died()
@@ -73,9 +78,12 @@ func _prepare_components() -> void:
 				#command range component to prioritise the tower
 				if is_instance_valid(range_component):
 					range_component.priority_target_override = tower
-				# command the movement component to stop.
+				# command the movement component to stop moving
 				if is_instance_valid(movement_component):
 					movement_component.target_direction = Vector2.ZERO
+				blocked = true
+			else:
+				blocked = false
 		)
 	
 	if movement_component != null:
@@ -184,9 +192,6 @@ func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: S
 		return first_instance.params.get(attribute_name, null)
 	else: #fallback to checking state
 		return first_instance.state.get(attribute_name, null)
-	
-func _init():
-	pass
 
 func _ready():
 	_setup_event_bus()
@@ -202,6 +207,9 @@ func _process(delta: float):
 		return
 	
 	if disabled:
+		return
+		
+	if attack_only_when_blocked and not blocked:
 		return
 		
 	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):
@@ -279,6 +287,3 @@ func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be u
 	if attack_component != null:
 		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
-
-func _draw():
-	pass
