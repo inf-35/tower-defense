@@ -18,7 +18,7 @@ enum Schedule { #schedule categories, used to enforce determinstic ordering of e
 }
 
 @export var schedule: Schedule = Schedule.REACTIVE #NOTE: schedule is a purely effect_prototype-handled variable
-
+#this means its impossible to modify schedule at runtime
 #inject handler functions into EffectInstance
 var attach_handler: Callable = _handle_attach
 var detach_handler: Callable = _handle_detach

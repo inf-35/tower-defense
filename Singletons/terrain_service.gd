@@ -1,16 +1,14 @@
 extends Node
-#terain_service.gd (autoload singleton)
+#terrain_service.gd (autoload singleton)
 # applies a block of new terrain data to the island
 func expand_island(island: Island, block: Dictionary) -> void:
 	for cell: Vector2i in block:
 		var cell_data: Dictionary = block[cell]
 		# apply terrain base
 		island.terrain_base_grid[cell] = cell_data["base"]
-		# the concept of terrain level is now obsolete
-		#
-		## check if a tower needs to be constructed as part of the expansion
-		#if cell_data.has("tower_type"):
-			#island.construct_tower_at(cell, cell_data["tower_type"])
+		# check if a tower needs to be constructed as part of the expansion
+		if cell_data.has("tower_type"):
+			island.construct_tower_at(cell, cell_data["tower_type"])
 
 	island.update_shore_boundary()
 	island.update_navigation_grid()
