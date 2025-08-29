@@ -2,7 +2,7 @@ extends Behavior
 class_name BreachBehavior
 
 # data for this specific breach type, can be exported or come from a resource
-@export var seed_duration_waves: int = 0
+@export var seed_duration_waves: int = 2
 @export var active_duration_waves: int = 5
 
 enum State { SEED, ACTIVE, CLOSING }
@@ -10,6 +10,7 @@ var _current_state: State
 var _waves_left_in_state: int
 
 func start() -> void:
+	print("started ", seed_duration_waves)
 	# connect to the game-wide signal to track wave progression
 	Phases.wave_cycle_started.connect(_on_wave_cycle_started)
 	# start in the initial state

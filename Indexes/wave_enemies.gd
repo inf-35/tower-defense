@@ -1,73 +1,139 @@
-class_name WaveEnemies #stores enemies per wave, see Waves for the spawning logic.
+class_name WaveEnemies
 
-enum { #this is an anonymous copy of the units enum found in Units
-	BASIC,
-	BUFF,
-	ARCHER,
-	DRIFTER
+# --- unit catalog ---
+# this is the master data definition for all spawnable units.
+# cost: the budget points required to spawn one unit.
+# tags: descriptors used by the director to make intelligent choices.
+enum WaveModifier {
+	SWARM,
+	ELITE,
+	MIXED_ARMS
 }
 
-const MAX_WAVE_IMPLEMENTED: int = 10
-const BASE_SCALING_FACTOR: float = 1.1
-
-const enemies_per_wave: Dictionary[int, Array] = {
-	1: [
-		[BASIC, 1],
-	],
-	2: [
-		[DRIFTER, 9],
-	],
-	3 : [
-		[BASIC, 12],
-	],
-	4 : [
-		[BASIC, 10],
-		[BUFF, 2],
-	],
-	5 : [
-		[BASIC, 12],
-		[BUFF, 4],
-	],
-	6 : [
-		[BASIC, 14],
-		[BUFF, 6],
-	],
-	7 : [
-		[BASIC, 16],
-		[BUFF, 10],
-	],
-	8 : [
-		[BASIC, 20],
-		[BUFF, 12],
-	],
-	9 : [
-		[BASIC, 24],
-		[BUFF, 14],
-	],
-	10 : [
-		[BASIC, 20],
-		[BUFF, 10],
-		[ARCHER, 4],
-	]
+const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
+	Units.Type.BASIC:   {"cost": 10, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
+	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 4},
+	Units.Type.DRIFTER: {"cost": 20, "tags": [&"GRUNT", &"SIEGE"], "wave": 8},
+	Units.Type.ARCHER:  {"cost": 20, "tags": [&"RANGED", &"SQUISHY"], "wave": 10},
 }
 
-const conversion_sheet: Dictionary[Array, int] = {
-	[BASIC, 2]: BUFF
-}
+# --- director configuration ---
+const BASE_BUDGET: float = 50.0
+const BUDGET_PER_WAVE: float = 20.0
+const QUADRATIC_BUDGET_SCALING: float = 0.4
 
+# the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array:
-	if enemies_per_wave.has(wave): #no need to implement scaling
-		return enemies_per_wave[wave].duplicate(true)
-		
-	var base_wave: int = ((wave - 1) % MAX_WAVE_IMPLEMENTED) + 1
-	var base_wave_enemies: Array = enemies_per_wave[base_wave].duplicate(true)
+	# 1. get the wave modifier from the central game director
+	var wave_type: Phases.WaveType = Phases.get_wave_type(wave)
+	var modifier: WaveModifier
 	
-	var scaling_factor: float = pow(BASE_SCALING_FACTOR, (wave - base_wave)) #base_scaling^(dW)
-	for enemy_stack: Array in base_wave_enemies:
-		enemy_stack[1] = floori(enemy_stack[1] * scaling_factor)
+	match wave_type:
+		Phases.WaveType.NORMAL:
+			modifier = WaveModifier.MIXED_ARMS
+		Phases.WaveType.BOSS:
+			modifier = WaveModifier.ELITE
+		Phases.WaveType.SURGE:
+			modifier = WaveModifier.SWARM
 	
-	return base_wave_enemies
+	# 2. calculate the base budget for this wave
+	var budget: float = BASE_BUDGET + (wave * BUDGET_PER_WAVE) + QUADRATIC_BUDGET_SCALING * (wave ** 2) 
+	
+	# 3. get the pool of available units and apply modifier rules
+	var unit_pool: Array[Units.Type] = UNIT_DATA.keys() as Array[Units.Type]
+	unit_pool = _get_units_by_wave(unit_pool, wave)
+	
+	# apply modifier effects
+	match modifier:
+		WaveModifier.SWARM:
+			budget *= 1.5 # larger budget
+			# only allow cheap grunt units
+			unit_pool = _get_units_by_tag(unit_pool, &"GRUNT")
+			unit_pool = _get_units_by_max_cost(unit_pool, 20)
+		WaveModifier.ELITE:
+			budget *= 0.7 # smaller budget, but units will be stronger
+			# only allow expensive units
+			unit_pool = _get_units_by_min_cost(unit_pool, 25)
+		WaveModifier.MIXED_ARMS:
+			# no change to budget or pool, but the purchase logic will be different
+			pass
 
+	# 4. "spend" the budget to compose the wave
+	var composed_wave: Array[Units.Type] = _compose_wave_from_budget(budget, unit_pool, modifier)
+	
+	# 5. consolidate the raw list into the required [[TYPE, count]] format
+	return _consolidate_enemy_list(composed_wave)
+
+# --- private director logic ---
+
+# the core algorithm for spending the budget
+static func _compose_wave_from_budget(budget: float, pool: Array[Units.Type], modifier: WaveModifier) -> Array[Units.Type]:
+	var budget_remaining: float = budget
+	var composed_enemies: Array[Units.Type] = []
+	
+	# sort the pool by cost so we can always find the cheapest unit
+	pool.sort_custom(func(a, b): return UNIT_DATA[a].cost < UNIT_DATA[b].cost)
+	if pool.is_empty():
+		return []
+	
+	var cheapest_cost: float = UNIT_DATA[pool[0]].cost
+	
+	while budget_remaining >= cheapest_cost:
+		var unit_to_buy: Units.Type
+		# for mixed arms, use a more structured approach
+		if modifier == WaveModifier.MIXED_ARMS and randf() < 0.4:
+			var ranged_pool: Array = _get_units_by_tag(pool, &"RANGED")
+			if not ranged_pool.is_empty():
+				unit_to_buy = ranged_pool.pick_random()
+			else:
+				unit_to_buy = pool.pick_random() # fallback
+		else:
+			# for other modes, just pick randomly from the allowed pool
+			unit_to_buy = pool.pick_random()
+		
+		var cost: float = UNIT_DATA[unit_to_buy].cost
+		
+		if budget_remaining >= cost:
+			composed_enemies.append(unit_to_buy)
+			budget_remaining -= cost
+		else:
+			# if we can't afford the random pick, try to buy the cheapest unit instead
+			var cheapest_unit: Units.Type = pool[0]
+			if budget_remaining >= UNIT_DATA[cheapest_unit].cost:
+				composed_enemies.append(cheapest_unit)
+				budget_remaining -= UNIT_DATA[cheapest_unit].cost
+			else:
+				# if we can't even afford the cheapest, we're done
+				break
+				
+	return composed_enemies
+
+# consolidates a list like [BASIC, BASIC, ARCHER] into [[BASIC, 2], [ARCHER, 1]]
+static func _consolidate_enemy_list(enemies: Array[Units.Type]) -> Array:
+	var counts: Dictionary = {}
+	for enemy_type: Units.Type in enemies:
+		counts[enemy_type] = counts.get(enemy_type, 0) + 1
+	
+	var final_list: Array = []
+	for type: Units.Type in counts:
+		final_list.append([type, counts[type]])
+		
+	return final_list
+
+# --- helper functions for filtering the unit pool ---
+static func _get_units_by_tag(pool: Array[Units.Type], tag: StringName) -> Array[Units.Type]:
+	return pool.filter(func(type): return UNIT_DATA[type].tags.has(tag))
+	
+static func _get_units_by_wave(pool: Array[Units.Type], wave: int) -> Array[Units.Type]:
+	return pool.filter(func(type): return wave >= UNIT_DATA[type].wave)
+
+static func _get_units_by_max_cost(pool: Array[Units.Type], max_cost: int) -> Array[Units.Type]:
+	return pool.filter(func(type): return UNIT_DATA[type].cost <= max_cost)
+	
+static func _get_units_by_min_cost(pool: Array[Units.Type], min_cost: int) -> Array[Units.Type]:
+	return pool.filter(func(type): return UNIT_DATA[type].cost >= min_cost)
+
+# --- existing functions ---
 static func get_enemy_count(enemies: Array) -> int:
 	var counter: int = 0
 	for enemy_stack: Array in enemies:
@@ -75,5 +141,4 @@ static func get_enemy_count(enemies: Array) -> int:
 	return counter
 
 static func get_wave_length_for_enemies(enemies: int) -> float:
-	return (2.0 + pow(float(enemies), 1.0/3.0)) #2 + cbrt(enemies)
-	
+	return (2.0 + pow(float(enemies), 1.0/3.0))

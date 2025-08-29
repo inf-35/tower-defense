@@ -12,9 +12,11 @@ func register_breach(breach_tower: Tower, seed: bool = true) -> void:
 			_breach_seeds.append(breach_tower)
 		else:
 			_active_breaches.append(breach_tower)
-			_breach_seeds.erase(breach_tower)
 		# listen for its destruction to remove it from tracking
-		breach_tower.died.connect(_on_breach_destroyed.bind(breach_tower), CONNECT_ONE_SHOT)
+		if not _breach_seeds.has(breach_tower):
+			breach_tower.died.connect(_on_breach_destroyed.bind(breach_tower), CONNECT_ONE_SHOT)
+		else:
+			_breach_seeds.erase(breach_tower)
 
 # the main public API for the Waves service
 func get_spawn_points() -> Array[Vector2i]:

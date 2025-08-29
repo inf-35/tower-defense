@@ -50,7 +50,7 @@ func _spawn_enemies_for_current_wave():
 
 	var enemies_to_spawn: Array = WaveEnemies.get_enemies_for_wave(current_combat_wave_number)
 	var enemy_count: int = WaveEnemies.get_enemy_count(enemies_to_spawn)
-	var enemy_stagger: float = 0.1
+	var enemy_stagger: float = 0.3
 
 	if enemy_count <= 0:
 		self.alive_enemies = 0
@@ -72,7 +72,6 @@ func _spawn_enemies_for_current_wave():
 			# pick a random spawn point from the list provided by the service
 			var spawn_cell: Vector2i = spawn_points.pick_random()
 			unit.movement_component.position = Island.cell_to_position(spawn_cell)
-
 
 			await get_tree().create_timer(enemy_stagger).timeout
 		

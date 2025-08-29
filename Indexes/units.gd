@@ -21,7 +21,7 @@ enum Type {
 static var unit_stats : Dictionary[Type, UnitStat] = {
 	Type.BASIC: UnitStat.new(
 		preload("res://Units/Enemies/basic_unit/basic_unit.tscn"),
-		0.4,
+		1.0,
 		1.0
 	),
 	Type.BUFF: UnitStat.new(
@@ -48,4 +48,6 @@ static func get_unit_scene(unit: Type) -> PackedScene:
 	return unit_stats[unit].unit_scene
 
 static func create_unit(unit: Type) -> Unit:
-	return get_unit_scene(unit).instantiate()
+	var _unit: Unit = get_unit_scene(unit).instantiate()
+	_unit.flux_value = get_unit_flux(unit)
+	return _unit

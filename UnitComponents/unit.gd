@@ -192,9 +192,14 @@ func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: S
 		return first_instance.state.get(attribute_name, null)
 		
 func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
+	if not is_instance_valid(behavior):
+		components_ready.connect(set_initial_behaviour_state.bind(behavior_packet), CONNECT_ONE_SHOT)
+		return
+	
 	for attribute: StringName in behavior_packet:
-		if behavior.has(attribute):
+		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
+			print(attribute, " set! value:", behavior[attribute])
 		else:
 			push_warning(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 

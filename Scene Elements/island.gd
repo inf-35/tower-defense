@@ -58,9 +58,9 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower_grid[cell] = tower
 	tower.facing = tower_facing
 	tower.tower_position = cell
+	tower.set_initial_behaviour_state(tower_behavior)
 	add_child(tower)
 	
-	tower.components_ready.connect(tower.set_initial_behaviour_state.bind(tower_behavior), CONNECT_ONE_SHOT)
 	tower.died.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))

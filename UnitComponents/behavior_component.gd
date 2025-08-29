@@ -24,7 +24,7 @@ func initialise(host_unit: Unit):
 	self.navigation_component = unit.navigation_component
 	self.range_component = unit.range_component
 	self.attack_component = unit.attack_component
-	
+	push_warning("initialised")
 	start()
 
 #behavior start function, called at the start of behavior
