@@ -97,7 +97,6 @@ func _regenerate_all_pips() -> void:
 # factory function to create a configured pip
 func _create_pip_for_wave(wave_num: int) -> TimelinePip:
 	var wave_type: Phases.WaveType = Phases.get_wave_type(wave_num)
-	print(Phases.WaveType.keys()[wave_type], " ", wave_num)
 	var pip: TimelinePip = TIMELINE_PIP_SCENE.instantiate()
 	add_child(pip)
 	pip.setup(wave_num, wave_type)

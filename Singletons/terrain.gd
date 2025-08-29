@@ -6,6 +6,16 @@ enum Base { #base terrain type
 	RUINS,
 }
 
+class CellData:
+	var terrain: Base
+	var feature: Towers.Type
+	var behavior_packet: Dictionary
+	
+	func _init(_terrain: Base, _feature: Towers.Type, _behavior_packet: Dictionary = {}):
+		terrain = _terrain
+		feature = _feature
+		behavior_packet = _behavior_packet
+
 class BaseStat: #defines stats for a terraintype
 	var color: Color #default base color
 	var navigable: bool #unaltered, is this terrain navigable

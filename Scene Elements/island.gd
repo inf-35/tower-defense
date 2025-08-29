@@ -10,7 +10,7 @@ var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
 
 var shore_boundary_tiles: Array[Vector2i] = []
-var _preview_grid: Dictionary[Vector2i, Dictionary] = {}
+var _preview_grid: Dictionary[Vector2i, Terrain.CellData] = {}
 var _preview_tint_grid: Dictionary[Vector2i, Color] = {}
 
 # --- constants ---
@@ -23,7 +23,6 @@ func _ready():
 	
 	# initial terrain generation
 	var starting_block: Dictionary = ExpansionService._generate_block(self, 36)
-	
 	# 3. delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
@@ -53,19 +52,16 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 
 # --- internal construction & update logic ---
 # this function is now called by services or the public API
-func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP) -> Tower:
+func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, tower_behavior: Dictionary = {}) -> Tower:
+	print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
 	tower_grid[cell] = tower
-	
 	tower.facing = tower_facing
 	tower.tower_position = cell
 	add_child(tower)
-
-	tower.died.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 	
-	# if this is a breach, register it with the spawn service
-	if tower_type == Towers.Type.BREACH_SEED or tower_type == Towers.Type.BREACH:
-		SpawnPointService.register_breach(tower)
+	tower.components_ready.connect(tower.set_initial_behaviour_state.bind(tower_behavior), CONNECT_ONE_SHOT)
+	tower.died.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
 	_update_adjacencies_around(cell)
@@ -99,7 +95,7 @@ func update_shore_boundary() -> void:
 				shore_boundary_tiles.append(cell)
 				break
 
-func update_previews(preview_data: Dictionary, tint_data: Dictionary) -> void:
+func update_previews(preview_data: Dictionary[Vector2i, Terrain.CellData], tint_data: Dictionary[Vector2i, Color]) -> void:
 	_preview_grid = preview_data
 	_preview_tint_grid = tint_data
 	queue_redraw()

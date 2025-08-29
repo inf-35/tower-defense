@@ -71,6 +71,15 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 		_enemies_in_range.erase(exiting_area_candidate.unit)
 	)
 
+func is_target_valid(unit: Unit) -> bool:
+	if Targeting.is_unit_overkilled(unit):
+		return false
+		
+	if unit.incorporeal:
+		return false
+		
+	return true
+	
 func get_target():
 	if _enemies_in_range.is_empty():
 		return null
@@ -89,7 +98,7 @@ func get_target():
 			var record_unit: Unit
 			for enemy: Unit in _enemies_in_range:
 				var distance: float = enemy.movement_component.position.length_squared()
-				if Targeting.is_unit_overkilled(enemy):
+				if not is_target_valid(enemy):
 					continue
 				if distance < record_distance:
 					record_distance = distance
@@ -101,7 +110,7 @@ func get_target():
 			var record_unit: Unit
 			for enemy: Unit in _enemies_in_range:
 				var health: float = enemy.health_component.health
-				if Targeting.is_unit_overkilled(enemy):
+				if not is_target_valid(enemy):
 					continue
 				if health > record_health:
 					record_health = health

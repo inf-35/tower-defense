@@ -133,6 +133,7 @@ func _on_player_made_choice(choice_id: int) -> void:
 			# ... (reward logic remains the same) ...
 			_advance_phase()
 
+
 func add_choice_to_queue(type: ChoiceType) -> void:
 	choice_queue.append(type)
 	_report("added " + str(ChoiceType.keys()[type]) + " to choice queue.")
@@ -167,8 +168,8 @@ func _start_combat_wave() -> void:
 	_report("ordering Waves.gd to start combat for wave " + str(current_wave_number))
 	
 	if is_instance_valid(Waves):
-		Waves.start_combat_wave(current_wave_number)
 		Waves.wave_ended.connect(_on_combat_wave_ended, CONNECT_ONE_SHOT)
+		Waves.start_combat_wave(current_wave_number)
 	else:
 		push_error("Phases: Waves node not found. Cannot start combat wave.")
 		current_phase = GamePhase.IDLE

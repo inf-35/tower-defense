@@ -11,10 +11,7 @@ enum Type {
 	PALISADE,
 	CATALYST,
 	AMPLIFIER,
-	
-	#environmental or enemy features
-	BREACH,
-	BREACH_SEED,
+	BREACH
 }
 
 enum Element {

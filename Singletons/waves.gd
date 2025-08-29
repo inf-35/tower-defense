@@ -16,6 +16,7 @@ var alive_enemies: int = 0:
 			wave_ended.emit() # No payload needed as Phases knows current_wave_number
 
 # Constants for waves
+# Constants for waves
 const CONCURRENT_ENEMY_SPAWNS: int = 10
 const EXPANSION_BLOCK_SIZE: int = 12
 const WAVES_PER_EXPANSION_CHOICE: int = 3 # e.g., expansion before wave 5, 10, etc.

@@ -1,5 +1,9 @@
 extends Node2D
 class_name Unit
+
+signal on_event(event: GameEvent) #polymorphic event bus
+signal components_ready()
+signal died()
 #core behaviours
 @export var incorporeal: bool
 @export var hostile: bool
@@ -9,6 +13,7 @@ class_name Unit
 @export var stat_displays : Array[StatDisplayInfo] = []
 
 @export_category("Components")
+@export var behavior: Behavior
 @export var graphics: Sprite2D
 @export var modifiers_component: ModifiersComponent #used by most things
 @export var health_component: HealthComponent
@@ -20,6 +25,7 @@ class_name Unit
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 
+var flux_value: float #how much flux this unit drops when killed / sold
 #effect-related state
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
 var effects: Dictionary[EffectPrototype.Schedule, Array] = {
@@ -31,22 +37,14 @@ var effects_by_type: Dictionary[Effects.Type, Array] = {
 	#each array contains EffectInstances
 } # for lookup by type
 #unit state
+var unit_id: int = References.assign_unit_id()
 var blocked: bool #whether this unit is currently blocked by a tower
 
-signal on_event(event: GameEvent) #polymorphic event bus
-signal died()
-
-var unit_id: int
 var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
 	set(na):
 		abstractive = na
 		disabled = true
 var disabled: bool
-
-var flux_value: float #how much flux this unit drops when killed / sold
-
-#runtime
-@onready var _cooldown: float = 0.0
 
 func _create_components() -> void:
 	if modifiers_component == null:
@@ -192,33 +190,33 @@ func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: S
 		return first_instance.params.get(attribute_name, null)
 	else: #fallback to checking state
 		return first_instance.state.get(attribute_name, null)
+		
+func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
+	for attribute: StringName in behavior_packet:
+		if behavior.has(attribute):
+			behavior[attribute] = behavior_packet[attribute]
+		else:
+			push_warning(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 
 func _ready():
+	name = name + " " + str(unit_id)
 	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
+	
+	if not is_instance_valid(behavior):
+		behavior = DefaultBehavior.new()
+		add_child(behavior)
+	
+	components_ready.emit()
+	behavior.initialise(self)
+	
+	
 
 func _process(delta: float):
-	_cooldown += delta
-	queue_redraw()
-
-	if attack_component == null or range_component == null:
-		return
-	
-	if disabled:
-		return
-		
-	if attack_only_when_blocked and not blocked:
-		return
-		
-	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):
-		var target = range_component.get_target() as Unit
-		if target:
-			#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
-			attack_component.attack(target)
-			_cooldown = 0.0
-			queue_redraw()
+	if not disabled and is_instance_valid(behavior):
+		behavior.update(delta)
 	
 func take_hit(hit: HitData):
 	if not is_instance_valid(self):

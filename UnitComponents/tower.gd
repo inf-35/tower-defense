@@ -52,13 +52,21 @@ func _create_hitbox():
 	add_child(hitbox)
 		
 func _ready():
+	name = name + " " + str(unit_id)
+	level = 1
+	
 	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
 	_create_hitbox()
 	
-	level = 1
+	if not is_instance_valid(behavior):
+		behavior = DefaultBehavior.new()
+		add_child(behavior)
+	
+	components_ready.emit()
+	behavior.initialise(self)
 
 	adjacency_updated.connect(func(new_adjacencies: Dictionary[Vector2i, Tower]): #receive data from Island
 		var adjacency_data := AdjacencyReportData.new() #broadcast into effects system

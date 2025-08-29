@@ -1,30 +1,23 @@
-[gd_scene load_steps=12 format=3 uid="uid://ccf4np3sitvsx"]
+[gd_scene load_steps=7 format=3 uid="uid://ccf4np3sitvsx"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_wfd5r"]
-[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_arlcu"]
-[ext_resource type="Resource" uid="uid://bh2xrt4aqtxib" path="res://Content/StatDisplays/core_flux.tres" id="3_1mh3o"]
-[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="4_hdkxk"]
-[ext_resource type="Resource" uid="uid://cqoa0ljfot6ra" path="res://Content/Effects/capacity_player_core.tres" id="5_lqs4i"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bnfe5"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_i8ig8"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_nbca8"]
-[ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="9_1b6fx"]
+[ext_resource type="Script" uid="uid://bf3ddv1v3h1o7" path="res://Content/Behaviors/breach_unit.gd" id="9_fnp7j"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_br75j"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
-radius = 6.0
-
-[node name="Breach" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "movement_component")]
+[node name="Breach" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_wfd5r")
-type = 1
+type = 9
 blocking = false
+incorporeal = true
 hostile = true
-stat_displays = Array[ExtResource("2_arlcu")]([ExtResource("3_1mh3o")])
+behavior = NodePath("BreachBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 movement_component = NodePath("MovementComponent")
-intrinsic_effects = Array[ExtResource("4_hdkxk")]([ExtResource("5_lqs4i")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]
@@ -33,18 +26,14 @@ movement_data = ExtResource("7_i8ig8")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 0, 1)
+modulate = Color(1, 0.372549, 0, 1)
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("8_nbca8")
-
-[node name="CoreHitbox" type="Area2D" parent="."]
-collision_layer = 0
-script = ExtResource("9_1b6fx")
-metadata/_custom_type_script = "uid://qpwm2iqakx70"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CoreHitbox"]
-shape = SubResource("CircleShape2D_6akvo")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("10_br75j")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="BreachBehavior" type="Node" parent="."]
+script = ExtResource("9_fnp7j")
+metadata/_custom_type_script = "uid://bf3ddv1v3h1o7"

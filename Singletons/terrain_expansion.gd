@@ -24,8 +24,8 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	is_choosing_expansion = true
 	_current_expansion_options = options
 	
-	var preview_grid: Dictionary = {}
-	var tint_grid: Dictionary = {}
+	var preview_grid: Dictionary[Vector2i, Terrain.CellData] = {}
+	var tint_grid: Dictionary[Vector2i, Color] = {}
 	for option: ExpansionChoice in options:
 		var rand_color := Color(randf(), randf(), randf(), 0.5)
 		for cell: Vector2i in option.block_data:
@@ -52,6 +52,7 @@ func select_expansion(island: Island, choice_id: int) -> void:
 	
 	_clear_expansion_state(island)
 	expansion_process_complete.emit()
+	UI.hide_expansion_choices.emit()
 
 func _clear_expansion_state(island: Island) -> void:
 	is_choosing_expansion = false
@@ -59,8 +60,8 @@ func _clear_expansion_state(island: Island) -> void:
 	island.update_previews({}, {})
 
 # procedural generation logic, adapted from the old TerrainGen
-func _generate_block(island: Island, block_size: int) -> Dictionary:
-	var block_data: Dictionary = {} # format: { Vector2i: {"base": Terrain.Base, "tower_type": Towers.Type} }
+func _generate_block(island: Island, block_size: int) -> Dictionary[Vector2i, Terrain.CellData]:
+	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}
 	
 	var start_pos: Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
 	var to_visit: Array[Vector2i] = [start_pos]
@@ -85,11 +86,12 @@ func _generate_block(island: Island, block_size: int) -> Dictionary:
 	
 	if generated_coords.is_empty():
 		return {}
-
 	# assign terrain base to the chosen coordinates
 	for coord: Vector2i in generated_coords:
+		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
+		
 		var base: Terrain.Base = Terrain.Base.EARTH if randf() > 0.08 else Terrain.Base.RUINS
-		block_data[coord] = {"base": base}
+		block_data[coord].terrain = base
 
 	# --- Breach Spawning Logic ---
 	# find a suitable edge tile on the *newly generated* block to place the seed
@@ -104,6 +106,7 @@ func _generate_block(island: Island, block_size: int) -> Dictionary:
 	
 	if not potential_breach_locations.is_empty():
 		var breach_cell: Vector2i = potential_breach_locations.pick_random()
-		block_data[breach_cell]["tower_type"] = Towers.Type.BREACH_SEED
+		block_data[breach_cell].feature = Towers.Type.BREACH
+		block_data[breach_cell].behavior_packet[&"seed_duration_waves"] = 0
 
 	return block_data
