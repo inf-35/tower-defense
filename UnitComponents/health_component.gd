@@ -6,6 +6,7 @@ signal health_changed(new_health: float)
 
 @export var health_data: HealthData = preload("res://Content/Health/tower_default.tres")
 
+
 var _modifiers_component: ModifiersComponent
 
 var max_health: float #updated by health setter
@@ -13,7 +14,7 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 	set(new_health):
 		if health_data == null:
 			return
-		
+
 		max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
 		new_health = clampf(new_health, 0.0, max_health)
 		if new_health == health:

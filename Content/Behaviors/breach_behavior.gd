@@ -51,3 +51,9 @@ func _on_wave_cycle_started(wave_number: int) -> void:
 # the breach has no active behavior in its _process loop, so update is empty
 func update(delta: float) -> void:
 	pass
+	
+func get_display_data() -> Dictionary:
+	# we use StringNames (&) for performance and to avoid typos.
+	return {
+		&"waves_left_in_phase": _waves_left_in_state
+	}

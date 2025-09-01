@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bnfe5"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_i8ig8"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_nbca8"]
-[ext_resource type="Script" uid="uid://bf3ddv1v3h1o7" path="res://Content/Behaviors/breach_unit.gd" id="9_fnp7j"]
+[ext_resource type="Script" uid="uid://bf3ddv1v3h1o7" path="res://Content/Behaviors/breach_behavior.gd" id="9_fnp7j"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_br75j"]
 
 [node name="Breach" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]

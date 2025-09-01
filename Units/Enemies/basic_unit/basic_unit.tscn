@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene load_steps=14 format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_anqll"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_n3sy1"]
@@ -8,12 +8,15 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="6_n0rgw"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_j01gd"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bsfdp"]
-[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_unit.gd" id="9_n3sy1"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="9_n3sy1"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_ns662"]
+[ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="11_n0rgw"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_j01gd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
 size = Vector2(105, 105)
 
-[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_anqll")
 hostile = true
 behavior = NodePath("DefaultBehavior")
@@ -22,6 +25,8 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
@@ -56,3 +61,12 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 [node name="DefaultBehavior" type="Node" parent="."]
 script = ExtResource("9_n3sy1")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("10_ns662")
+attack_data = ExtResource("11_n0rgw")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("12_j01gd")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"

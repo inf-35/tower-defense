@@ -75,6 +75,7 @@ enum DisplayStatModifier {
 	RETRIEVE_FIRST_ATTACK_STATUS_STACK,
 	INVERT,
 	CAPACITY_GENERATION,
+	WAVES_LEFT_IN_PHASE
 }
 
 func _display_stat(tower: Tower, display_info: StatDisplayInfo):
@@ -113,6 +114,13 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 		DisplayStatModifier.RETRIEVE_FIRST_ATTACK_STATUS_STACK:
 			override = true
 			value = tower.attack_component.attack_data.status_effects[0].stack
+			
+		DisplayStatModifier.WAVES_LEFT_IN_PHASE:
+			override = true
+			# call the new, generic function on the unit.
+			# the inspector does not know or care how the unit gets this data.
+			value = tower.get_behavior_attribute(&"waves_left_in_phase")
+			if value == null: return # abort if this special stat isn't found
 
 	# Get the value from the tower's components if not overridden
 	if not override:

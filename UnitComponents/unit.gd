@@ -190,7 +190,19 @@ func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: S
 		return first_instance.params.get(attribute_name, null)
 	else: #fallback to checking state
 		return first_instance.state.get(attribute_name, null)
+
+func get_behavior_attribute(attribute_name: StringName) -> Variant:
+	if not is_instance_valid(behavior):
+		return null
+	
+	# check that the behavior actually implements the function before calling it.
+	if behavior.has_method("get_display_data"):
+		var data: Dictionary = behavior.get_display_data()
+		# use .get() for a safe lookup that returns null if the key doesn't exist.
+		return data.get(attribute_name, null)
 		
+	return null
+
 func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
 	if not is_instance_valid(behavior):
 		components_ready.connect(set_initial_behaviour_state.bind(behavior_packet), CONNECT_ONE_SHOT)
@@ -216,8 +228,6 @@ func _ready():
 	
 	components_ready.emit()
 	behavior.initialise(self)
-	
-	
 
 func _process(delta: float):
 	if not disabled and is_instance_valid(behavior):

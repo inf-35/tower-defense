@@ -71,7 +71,6 @@ func _enter_tower_selected_state(tower: Tower):
 	selected_tower = tower
 	tower_was_selected.emit(selected_tower)
 	UI.update_inspector_bar.emit(selected_tower)
-	print(selected_tower, " select tower")
 
 # --- Input Handlers (Called by _unhandled_input) ---
 

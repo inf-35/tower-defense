@@ -11,7 +11,7 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_xmpgh"]
 [ext_resource type="Resource" uid="uid://bkuvyutqxnknt" path="res://Units/Enemies/archer_unit/archer_attack.tres" id="10_x6e3e"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_nfsk5"]
-[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_unit.gd" id="12_xmpgh"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="12_xmpgh"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]
 radius = 60.0

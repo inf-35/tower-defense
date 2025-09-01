@@ -24,7 +24,6 @@ func initialise(host_unit: Unit):
 	self.navigation_component = unit.navigation_component
 	self.range_component = unit.range_component
 	self.attack_component = unit.attack_component
-	push_warning("initialised")
 	start()
 
 #behavior start function, called at the start of behavior
@@ -37,6 +36,11 @@ func update(delta: float) -> void:
 	# this virtual function will be overridden by concrete behaviors
 	_cooldown += delta
 	_attempt_attack()
+
+# this virtual function is the new, generic entrypoint for the UI to query
+# custom data from a behavior. concrete behaviors should override this.
+func get_display_data() -> Dictionary:
+	return {} # return an empty dictionary by default
 
 #helper functions for child classes to use
 func _attempt_attack() -> bool:

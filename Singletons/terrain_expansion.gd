@@ -4,17 +4,37 @@ extends Node
 signal expansion_process_complete
 
 var is_choosing_expansion: bool = false
-var _current_expansion_options: Array[ExpansionChoice] = []
+var _choices_by_id: Dictionary[int, ExpansionChoice] = {}
+var _hovered_choice_id: int = -1 # -1 means no choice is hovered`
+
+func _ready():
+	UI.choice_hovered.connect(func(choice_id: int):
+		if not is_choosing_expansion:
+			return
+		_on_choice_hovered(choice_id)
+	)
+	
+	UI.choice_unhovered.connect(func(choice_id: int):
+		if not is_choosing_expansion:
+			return
+		_on_choice_unhovered()
+	)
 
 # the main public API called by Phases.gd
 func generate_and_present_choices(island: Island, block_size: int, choice_count: int) -> void:
+	_choices_by_id.clear()
+	_hovered_choice_id = -1
+	
 	var options: Array[ExpansionChoice] = []
 	for i: int in range(choice_count):
 		# generate the block data, which may now include a breach seed
 		var block_data: Dictionary = _generate_block(island, block_size)
 		if block_data.is_empty():
 			continue
-		options.append(ExpansionChoice.new(i, block_data))
+			
+		var choice := ExpansionChoice.new(i, block_data)
+		options.append(choice)
+		_choices_by_id[i] = choice # store for easy lookup
 
 	if options.is_empty():
 		push_warning("ExpansionService: All generated options were empty. Skipping.")
@@ -22,43 +42,41 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 		return
 
 	is_choosing_expansion = true
-	_current_expansion_options = options
 	
-	var preview_grid: Dictionary[Vector2i, Terrain.CellData] = {}
-	var tint_grid: Dictionary[Vector2i, Color] = {}
-	for option: ExpansionChoice in options:
-		var rand_color := Color(randf(), randf(), randf(), 0.5)
-		for cell: Vector2i in option.block_data:
-			preview_grid[cell] = option.block_data[cell]
-			tint_grid[cell] = rand_color
-	
-	island.update_previews(preview_grid, tint_grid)
+	island.update_previews(_choices_by_id)
 	UI.display_expansion_choices.emit(options)
 
 # applies the chosen expansion
 func select_expansion(island: Island, choice_id: int) -> void:
-	if not is_choosing_expansion:
+	if not is_choosing_expansion or not _choices_by_id.has(choice_id):
 		expansion_process_complete.emit()
 		return
 
-	var chosen_option: ExpansionChoice = null
-	for option: ExpansionChoice in _current_expansion_options:
-		if option.id == choice_id:
-			chosen_option = option
-			break
-	
-	if chosen_option and not chosen_option.block_data.is_empty():
-		TerrainService.expand_island(island, chosen_option.block_data)
+	var chosen_option: ExpansionChoice = _choices_by_id[choice_id]
+	TerrainService.expand_island(island, chosen_option.block_data)
 	
 	_clear_expansion_state(island)
 	expansion_process_complete.emit()
 	UI.hide_expansion_choices.emit()
-
+	
+# called when the UI emits that a choice button is being hovered
+func _on_choice_hovered(choice_id: int) -> void:
+	if not is_choosing_expansion or _hovered_choice_id == choice_id:
+		return
+	_hovered_choice_id = choice_id
+	# command the island to update its visual highlighting
+	References.island.set_highlighted_choice(choice_id)
+# called when the UI emits that the mouse has left a choice button
+func _on_choice_unhovered() -> void:
+	if not is_choosing_expansion or _hovered_choice_id == -1:
+		return
+	_hovered_choice_id = -1
+	References.island.set_highlighted_choice(-1)
 func _clear_expansion_state(island: Island) -> void:
 	is_choosing_expansion = false
-	_current_expansion_options.clear()
-	island.update_previews({}, {})
-
+	_choices_by_id.clear()
+	_hovered_choice_id = -1
+	island.update_previews({}) # clear all previews from the island
 # procedural generation logic, adapted from the old TerrainGen
 func _generate_block(island: Island, block_size: int) -> Dictionary[Vector2i, Terrain.CellData]:
 	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}

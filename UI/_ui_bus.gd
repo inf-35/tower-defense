@@ -4,6 +4,8 @@ extends Node #UI BUS (UI)
 signal tower_dying(tower: Tower) #called by towers before death
 #UI -> Phases
 signal tower_selected(type_id: Towers.Type) #called by sidebar_ui
+signal choice_hovered(choice_id: int)
+signal choice_unhovered(choice_id: int)
 signal choice_selected(choice_id: int) #called by expansion_ui
 signal building_phase_ended() #called by sidebar_ui
 #ClickHandler/UI -> Player

@@ -13,6 +13,9 @@ var shore_boundary_tiles: Array[Vector2i] = []
 var _preview_grid: Dictionary[Vector2i, Terrain.CellData] = {}
 var _preview_tint_grid: Dictionary[Vector2i, Color] = {}
 
+var _preview_choices: Dictionary[int, ExpansionChoice] = {}
+var _highlighted_choice_id: int = -1
+
 # --- constants ---
 const CELL_SIZE: int = 13
 const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1) ]
@@ -94,22 +97,48 @@ func update_shore_boundary() -> void:
 			if not terrain_base_grid.has(cell + dir):
 				shore_boundary_tiles.append(cell)
 				break
-
-func update_previews(preview_data: Dictionary[Vector2i, Terrain.CellData], tint_data: Dictionary[Vector2i, Color]) -> void:
-	_preview_grid = preview_data
-	_preview_tint_grid = tint_data
+func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
+	_preview_choices = choices_by_id
+	_highlighted_choice_id = -1 # reset highlight
 	queue_redraw()
 
-# --- RETAINED DRAWING & HELPER FUNCTIONS ---
-func _draw():
-	# ... (Function retained as is)
-	for cell_pos: Vector2i in terrain_base_grid.keys():
-		var rect_position: Vector2 = cell_pos * CELL_SIZE
-		var rect = Rect2(rect_position, Vector2(CELL_SIZE, CELL_SIZE))
-		var color: Color = Terrain.get_color(terrain_base_grid[cell_pos])
-		if _preview_grid.has(cell_pos):
-			color = color.blend(_preview_tint_grid[cell_pos])
+# called by ExpansionService to tell the island which choice to highlight
+func set_highlighted_choice(choice_id: int) -> void:
+	if _highlighted_choice_id != choice_id:
+		_highlighted_choice_id = choice_id
+		queue_redraw()
+
+# --- updated drawing logic ---
+func _draw() -> void:
+	# 1. draw base terrain
+	for cell_pos: Vector2i in terrain_base_grid:
+		var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
+		var color := Terrain.get_color(terrain_base_grid[cell_pos])
 		draw_rect(rect, color)
+	
+	# 2. draw previews on top
+	for choice_id: int in _preview_choices:
+		var choice: ExpansionChoice = _preview_choices[choice_id]
+		var is_highlighted: bool = (choice_id == _highlighted_choice_id)
+		
+		for cell_pos: Vector2i in choice.block_data:
+			var cell_data: Terrain.CellData = choice.block_data[cell_pos]
+			var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
+			
+			# determine color and draw the base preview
+			var base_color := Terrain.get_color(cell_data.terrain)
+			var preview_color := base_color.lightened(0.2) if is_highlighted else base_color
+			draw_rect(rect, preview_color)
+
+			# draw a highlight border if this choice is hovered
+			if is_highlighted:
+				draw_rect(rect, Color.WHITE, false, 2.0)
+
+			# draw tower previews (e.g., for breach seeds)
+			if cell_data.feature != Towers.Type.VOID:
+				var center: Vector2 = Vector2(cell_pos * CELL_SIZE) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
+				var tower_color: Color = Color.CRIMSON if is_highlighted else Color.DARK_RED
+				draw_circle(center, CELL_SIZE * 0.4, tower_color)
 
 func _update_adjacencies_around(cell: Vector2i):
 	# ... (Function retained as is)
