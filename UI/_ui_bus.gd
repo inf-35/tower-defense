@@ -16,7 +16,8 @@ signal update_wave_schedule()
 signal start_wave(wave : int)
 signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()
-signal display_reward_choices()
+signal display_reward_choices() #the frontend isnt actually done yet
+signal hide_reward_choices()
 signal show_building_ui()
 signal hide_building_ui()
 #multiple sources -> Inspector

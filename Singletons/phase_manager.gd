@@ -5,7 +5,8 @@ extends Node
 # --- signals ---
 # this is the authoritative signal that a new wave cycle has begun.
 # UI and other systems should listen to this.
-signal wave_cycle_started(wave_number: int)
+signal wave_cycle_started(wave_number: int) #wave cycle started
+signal wave_ended(wave_number: int) #combat wave ended
 
 # --- game state variables ---
 var current_wave_number: int = 0
@@ -29,7 +30,7 @@ func _ready() -> void:
 func start_game() -> void:
 	_report("starting game flow.")
 	_generate_wave_plan()
-	current_wave_number = 0
+	current_wave_number = 100
 	_prepare_for_next_wave_cycle()
 
 func _generate_wave_plan() -> void:
@@ -41,8 +42,8 @@ func _generate_wave_plan() -> void:
 			wave_plan[i] = WaveType.EXPANSION
 		if i % 5 == 0:
 			wave_plan[i] = WaveType.BOSS
-		if (i - 1) % 5 == 0 and i > 1:
-			wave_plan[i] = WaveType.REWARD
+		#if (i - 1) % 5 == 0 and i > 1:  NOT FULLY IMPLEMENTED
+			#wave_plan[i] = WaveType.REWARD
 		if i in [7, 13, 19]:
 			wave_plan[i] = WaveType.SURGE
 	
@@ -62,8 +63,7 @@ func _prepare_for_next_wave_cycle() -> void:
 	var upcoming_wave_type: WaveType = get_wave_type(current_wave_number)
 	_report("wave " + str(current_wave_number) + " is of type: " + WaveType.keys()[upcoming_wave_type])
 
-### EDITED SECTION START ###
-	# queue choices based on the plan. logic is now cleaner.
+	# queue choices based on the plan.
 	match upcoming_wave_type:
 		WaveType.REWARD:
 			add_choice_to_queue(ChoiceType.REWARD)
@@ -111,9 +111,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 			)
 
 		ChoiceType.REWARD:
-			# this logic is fine for now, but could be delegated to a RewardService in the future
-			var reward_options: Array[String] = ["gain 50 flux", "unlock cannon tower", "+5% global damage"]
-			UI.display_reward_choices.emit(reward_options)
+			RewardService.generate_and_present_choices(3)
 
 # responds to the player selecting an option on the UI
 func _on_player_made_choice(choice_id: int) -> void:
@@ -130,8 +128,9 @@ func _on_player_made_choice(choice_id: int) -> void:
 			ExpansionService.select_expansion(References.island, choice_id)
 
 		ChoiceType.REWARD:
-			# ... (reward logic remains the same) ...
-			_advance_phase()
+			# applying rewards is instant, so we connect to the signal immediately
+			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
+			RewardService.select_reward(choice_id)
 
 
 func add_choice_to_queue(type: ChoiceType) -> void:
@@ -145,7 +144,6 @@ func _on_choice_applied() -> void:
 	_report("a choice has been successfully applied by its handler.")
 	# the service is responsible for hiding its own UI, so we don't need to do it here
 	_advance_phase()
-### EDITED SECTION END ###
 
 # --- Building Phase Logic ---
 func _start_building_phase() -> void:
@@ -179,6 +177,7 @@ func _on_combat_wave_ended() -> void:
 	if current_phase != GamePhase.COMBAT_WAVE:
 		return
 	_report("combat wave " + str(current_wave_number) + " reported as ended by Waves.gd.")
+	wave_ended.emit(current_wave_number)
 	current_phase = GamePhase.IDLE
 	_advance_phase()
 

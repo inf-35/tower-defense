@@ -13,6 +13,7 @@ config_version=5
 config/name="tower_defense"
 run/main_scene="uid://dj5u4rlrnurt7"
 config/features=PackedStringArray("4.4", "Mobile")
+run/max_fps=200
 config/icon="res://icon.svg"
 
 [autoload]
@@ -35,6 +36,7 @@ ExpansionService="*res://Singletons/terrain_expansion.gd"
 TerrainService="*res://Singletons/terrain_service.gd"
 PowerService="*res://Singletons/power_service.gd"
 SpawnPointService="*res://Singletons/spawn_point_service.gd"
+RewardService="*res://Singletons/reward_service.gd"
 
 [display]
 

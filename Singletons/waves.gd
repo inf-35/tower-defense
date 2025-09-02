@@ -6,14 +6,17 @@ signal wave_ended
 
 # --- state ---
 var current_combat_wave_number: int = 0
-var _total_enemies_planned: int = 0
+var _total_enemies_planned: int = 0:
+	set(nia):
+		_total_enemies_planned = nia
 var _enemies_spawned: int = 0
 var _enemies_killed: int = 0
+var _enemies_planned: Array[Array] = []
 
 # --- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
 const EXPANSION_BLOCK_SIZE: int = 12
-const WAVES_PER_EXPANSION_CHOICE: int = 3
+const WAVES_PER_EXPANSION_CHOICE: int = 2
 const EXPANSION_CHOICES_COUNT: int = 3
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
 
@@ -24,8 +27,9 @@ var _reconciliation_timer: Timer
 func _ready() -> void:
 	_reconciliation_timer = Timer.new()
 	add_child(_reconciliation_timer)
-	_reconciliation_timer.wait_time = 3.0 # check every 3 seconds
+	_reconciliation_timer.one_shot = false
 	_reconciliation_timer.autostart = true
+	_reconciliation_timer.start(3.0)
 	_reconciliation_timer.timeout.connect(_reconcile_enemy_count)
 
 # main function called by Phases.gd to start a combat wave
@@ -41,10 +45,11 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 	
 	### EDITED SECTION START ###
 	# reset all counters for the new wave
-	_total_enemies_planned = WaveEnemies.get_enemy_count(WaveEnemies.get_enemies_for_wave(current_combat_wave_number))
+	_enemies_planned = WaveEnemies.get_enemies_for_wave(current_combat_wave_number)
+	_total_enemies_planned = WaveEnemies.get_enemy_count(_enemies_planned)
 	_enemies_spawned = 0
 	_enemies_killed = 0
-	### EDITED SECTION END ###
+
 
 	print("Waves: Starting combat for wave %d with %d planned enemies." % [current_combat_wave_number, _total_enemies_planned])
 	wave_started.emit(current_combat_wave_number)
@@ -62,8 +67,8 @@ func _spawn_enemies_for_current_wave() -> void:
 		_end_combat_wave() # end the wave if we can't spawn anything
 		return
 
-	var enemies_to_spawn: Array = WaveEnemies.get_enemies_for_wave(current_combat_wave_number)
-	var enemy_stagger: float = 0.3
+	var enemies_to_spawn: Array = _enemies_planned
+	var enemy_stagger: float = 5.0 / _total_enemies_planned
 	var spawn_point_index: int = 0
 	
 	for enemy_stack: Array in enemies_to_spawn:
@@ -113,7 +118,6 @@ func _reconcile_enemy_count() -> void:
 	
 	# calculate what the system *thinks* should be in the scene
 	var expected_count_in_scene: int = _enemies_spawned - _enemies_killed
-	
 	# if reality has fewer enemies than expected, it means signals were missed
 	if true_count_in_scene < expected_count_in_scene:
 		var missed_deaths: int = expected_count_in_scene - true_count_in_scene
@@ -136,6 +140,6 @@ func _end_combat_wave() -> void:
 	# clear any remaining enemies from the group in case reconciliation hasn't run
 	for enemy: Node in get_tree().get_nodes_in_group(ENEMY_GROUP):
 		enemy.queue_free()
-
-	current_combat_wave_number = 0
+		
 	wave_ended.emit()
+	current_combat_wave_number = 0

@@ -72,6 +72,7 @@ func _on_choice_unhovered() -> void:
 		return
 	_hovered_choice_id = -1
 	References.island.set_highlighted_choice(-1)
+
 func _clear_expansion_state(island: Island) -> void:
 	is_choosing_expansion = false
 	_choices_by_id.clear()
