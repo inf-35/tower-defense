@@ -1,7 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://b5w56jjx8pany"]
+[gd_scene load_steps=11 format=3 uid="uid://b5w56jjx8pany"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8tw53"]
-[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_u0bn4"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_6aoul"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_ywqh1"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_r2l7t"]
@@ -11,14 +10,6 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_j0i6s"]
 [ext_resource type="Resource" uid="uid://b4ac8wgm70768" path="res://Units/Towers/frost_tower/frost_attack.tres" id="10_wqvsu"]
 
-[sub_resource type="Resource" id="Resource_k1n6d"]
-script = ExtResource("2_u0bn4")
-attribute = 10
-label = "FROST"
-suffix = ""
-special_modifier = 5
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
 
@@ -26,7 +17,6 @@ radius = 600.0
 z_index = 1
 script = ExtResource("1_8tw53")
 type = 3
-stat_displays = Array[ExtResource("2_u0bn4")]([SubResource("Resource_k1n6d")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")

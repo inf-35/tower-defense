@@ -30,6 +30,9 @@ class_name AttackData
 @export_category("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
+
+@export_category("Hit Properties")
+@export var cone_angle: float = 0.0 #for coneAOE in degrees
 #see unit.gd, deal_hit and take_hit, and HitData
 
 func generate_modifiers() -> Array[Modifier]: #transform Array[ModifierDataPrototype] -> Array[Modifier]

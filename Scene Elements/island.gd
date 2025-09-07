@@ -25,7 +25,7 @@ func _ready():
 	PowerService.register_island(self)
 	
 	# initial terrain generation
-	var starting_block: Dictionary = ExpansionService._generate_block(self, 36)
+	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 36)
 	# 3. delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
@@ -55,13 +55,13 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 
 # --- internal construction & update logic ---
 # this function is now called by services or the public API
-func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, tower_behavior: Dictionary = {}) -> Tower:
+func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, initial_state: Dictionary = {}) -> Tower:
 	print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
 	tower_grid[cell] = tower
 	tower.facing = tower_facing
 	tower.tower_position = cell
-	tower.set_initial_behaviour_state(tower_behavior)
+	tower.set_initial_behaviour_state(initial_state)
 	add_child(tower)
 	
 	tower.died.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)

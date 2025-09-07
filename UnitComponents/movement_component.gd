@@ -76,9 +76,9 @@ func _physics_process(delta: float) -> void:
 
 	velocity = velocity.move_toward(
 		target_direction * target_speed,
-		local_acceleration * delta,
+		local_acceleration * Clock.physics_game_delta,
 	)
 
-	position += velocity * delta
+	position += velocity * Clock.physics_game_delta
 	
 	#_accumulated_delta = 0.0 #reset accumulated delta

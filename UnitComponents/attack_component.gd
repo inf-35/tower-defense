@@ -1,7 +1,7 @@
 extends UnitComponent
 class_name AttackComponent
 #polymorphic, stateless class that takes in AttackData and executes attacks
-@export var attack_data: Data
+@export var attack_data: AttackData
 var _modifiers_component: ModifiersComponent
 
 func inject_components(modifiers_component: ModifiersComponent):
@@ -16,6 +16,7 @@ func attack(target: Unit):
 		
 	var delivery_data := DeliveryData.new()
 	delivery_data.delivery_method = attack_data.delivery_method
+	delivery_data.cone_angle = attack_data.cone_angle
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
 		delivery_data.projectile_speed = attack_data.projectile_speed

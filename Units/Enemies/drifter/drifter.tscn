@@ -43,10 +43,12 @@ health_data = ExtResource("5_ayagf")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
+self_modulate = Color(1, 0.4, 0.4, 1)
 scale = Vector2(0.08, 0.08)
 texture = ExtResource("6_mt1ix")
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("7_oxo2e")

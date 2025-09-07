@@ -27,7 +27,6 @@ enum Status { #diegetic statuses
 
 class StatusEffectData:
 	var attribute: id #what attribute is this status effect targeting
-	
 	var additive_per_stack: float = 0.0
 	var multiplicative_per_stack: float = 0.0
 	var can_stack: bool = true
@@ -46,11 +45,11 @@ class ReactionData:
 		requisites = _requisites
 		effect = _effect
 
-#NOTE to designers, these status effects should be normalised i.e. one stakc
-#of FROST should be equivalent to one stack of POISON in importance
+#NOTE to designers, these status effects should be normalised i.e. one stack
+#of FROST should be equivalent to one stack of POISON in importance/severity
 var status_effects : Dictionary[Status, StatusEffectData] = {
 	Status.FROST: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.7
+		id.MAX_SPEED, 0.0, 0.5
 	),
 	Status.BURN: StatusEffectData.new(
 		id.REGENERATION, -1, 0.0

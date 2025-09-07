@@ -51,6 +51,9 @@ func _reenable_towers() -> void:
 	# iterate backwards to reactivate in reverse order of deactivation
 	for i: int in range(_disabled_towers.size() - 1, -1, -1):
 		var tower: Tower = _disabled_towers[i]
+		if not is_instance_valid(tower):
+			continue
+
 		var tower_cap_cost: float = Towers.get_tower_capacity(tower.type)
 		
 		if capacity_surplus >= tower_cap_cost:

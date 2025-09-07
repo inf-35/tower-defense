@@ -7,6 +7,12 @@ var is_choosing_expansion: bool = false
 var _choices_by_id: Dictionary[int, ExpansionChoice] = {}
 var _hovered_choice_id: int = -1 # -1 means no choice is hovered`
 
+var STANDARD_EXPANSION_PARAMS: GenerationParameters = GenerationParameters.new({
+	&"ruins_chance" : 0.08,
+	&"breach_seed_duration": 2,
+	&"spawn_breach": true,
+})
+
 func _ready():
 	UI.choice_hovered.connect(func(choice_id: int):
 		if not is_choosing_expansion:
@@ -19,6 +25,20 @@ func _ready():
 			return
 		_on_choice_unhovered()
 	)
+	
+class GenerationParameters:
+	# --- terrain composition rules ---
+	var ruins_chance: float = 0.1
+	# --- feature spawning rules ---
+	var spawn_breach: bool = true
+	# --- feature state rules ---
+	# this will be used to populate the 'initial_state' packet for generated towers
+	var breach_seed_duration: int = 2
+	
+	func _init(params: Dictionary = {}):
+		for parameter in params:
+			if parameter in self:
+				self[parameter] = params[parameter]
 
 # the main public API called by Phases.gd
 func generate_and_present_choices(island: Island, block_size: int, choice_count: int) -> void:
@@ -28,7 +48,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	var options: Array[ExpansionChoice] = []
 	for i: int in range(choice_count):
 		# generate the block data, which may now include a breach seed
-		var block_data: Dictionary = _generate_block(island, block_size)
+		var block_data: Dictionary = _generate_block(island, block_size, STANDARD_EXPANSION_PARAMS)
 		if block_data.is_empty():
 			continue
 			
@@ -45,6 +65,18 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	
 	island.update_previews(_choices_by_id)
 	UI.display_expansion_choices.emit(options)
+
+# this is a new helper function for creating the initial island
+func generate_initial_island_block(island: Island, block_size: int) -> Dictionary:
+	# --- EDITED SECTION START ---
+	# for the very first block, we create a custom ruleset in code
+	var initial_params := GenerationParameters.new()
+	initial_params.ruins_chance = 0.05 # lower chance of ruins at the start
+	initial_params.spawn_breach = true
+	# the key requirement: the initial breach is already active
+	initial_params.breach_seed_duration = 0
+	
+	return _generate_block(island, block_size, initial_params)
 
 # applies the chosen expansion
 func select_expansion(island: Island, choice_id: int) -> void:
@@ -79,7 +111,7 @@ func _clear_expansion_state(island: Island) -> void:
 	_hovered_choice_id = -1
 	island.update_previews({}) # clear all previews from the island
 # procedural generation logic, adapted from the old TerrainGen
-func _generate_block(island: Island, block_size: int) -> Dictionary[Vector2i, Terrain.CellData]:
+func _generate_block(island: Island, block_size: int, params: GenerationParameters) -> Dictionary[Vector2i, Terrain.CellData]:
 	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}
 	
 	var start_pos: Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
@@ -109,7 +141,7 @@ func _generate_block(island: Island, block_size: int) -> Dictionary[Vector2i, Te
 	for coord: Vector2i in generated_coords:
 		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
 		
-		var base: Terrain.Base = Terrain.Base.EARTH if randf() > 0.08 else Terrain.Base.RUINS
+		var base: Terrain.Base = Terrain.Base.EARTH if randf() > params.ruins_chance else Terrain.Base.RUINS
 		block_data[coord].terrain = base
 
 	# --- Breach Spawning Logic ---
@@ -126,6 +158,6 @@ func _generate_block(island: Island, block_size: int) -> Dictionary[Vector2i, Te
 	if not potential_breach_locations.is_empty():
 		var breach_cell: Vector2i = potential_breach_locations.pick_random()
 		block_data[breach_cell].feature = Towers.Type.BREACH
-		block_data[breach_cell].behavior_packet[&"seed_duration_waves"] = 0
+		block_data[breach_cell].initial_state[ID.UnitState.SEED_DURATION_WAVES] = params.breach_seed_duration
 
 	return block_data

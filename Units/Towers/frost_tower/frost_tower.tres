@@ -6,9 +6,10 @@
 [resource]
 script = ExtResource("1_6qowr")
 id = 2
-cost = 10.0
+cost = 8.0
+required_capacity = 1.0
+max_level = 5
 element = 1
-minimum_terrain = 2
 tower_name = "Frost Tower"
 tower_description = "Slows down enemies"
 tower_scene = ExtResource("2_6qowr")

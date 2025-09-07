@@ -1,13 +1,38 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://esehe72tbwn4"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=6 format=3 uid="uid://cr2yw0v4l47xc"]
 
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_d3ff2"]
-[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_ffjr7"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_t80r1"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5rt8p"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_rxcdb"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_7d5v8"]
+
+[sub_resource type="Resource" id="Resource_e3651"]
+script = ExtResource("4_7d5v8")
+vfx_type = 1
+is_spritesheet = false
+h_frames = 1
+v_frames = 1
+fps = 12.0
+radius = 3.0
+size = Vector2(20, 20)
+filled = true
+primitive_width = 2.0
+lifetime = 1.0
+rotation_mode = 1
+spin_speed = 360.0
+graphical_layer = 1000
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
-script = ExtResource("2_ffjr7")
-range = 20.0
-cooldown = 3.0
-radius = 20.0
-damage = 3.0
-modifiers = Array[ExtResource("1_d3ff2")]([])
+script = ExtResource("2_5rt8p")
+delivery_method = 1
+range = 40.0
+cooldown = 2.0
+radius = 10.0
+damage = 2.0
+status_effects = Array[ExtResource("3_rxcdb")]([])
+modifiers = Array[ExtResource("1_t80r1")]([])
+vfx_on_spawn = SubResource("Resource_e3651")
+projectile_speed = 80.0
+vertical_force = -10.0
+cone_angle = 0.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

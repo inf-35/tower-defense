@@ -46,6 +46,25 @@ var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
 		disabled = true
 var disabled: bool
 
+
+func _ready():
+	name = name + " " + str(unit_id)
+	_setup_event_bus()
+	_attach_intrinsic_effects()
+	_create_components()
+	_prepare_components()
+	
+	if not is_instance_valid(behavior):
+		behavior = DefaultBehavior.new()
+		add_child(behavior)
+	
+	components_ready.emit()
+	behavior.initialise(self)
+
+func _process(delta: float):
+	if not disabled and is_instance_valid(behavior):
+		behavior.update(Clock.game_delta)
+
 func _create_components() -> void:
 	if modifiers_component == null:
 		var n_modifiers_component: = ModifiersComponent.new()
@@ -215,24 +234,6 @@ func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environ
 		else:
 			push_warning(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 
-func _ready():
-	name = name + " " + str(unit_id)
-	_setup_event_bus()
-	_attach_intrinsic_effects()
-	_create_components()
-	_prepare_components()
-	
-	if not is_instance_valid(behavior):
-		behavior = DefaultBehavior.new()
-		add_child(behavior)
-	
-	components_ready.emit()
-	behavior.initialise(self)
-
-func _process(delta: float):
-	if not disabled and is_instance_valid(behavior):
-		behavior.update(delta)
-	
 func take_hit(hit: HitData):
 	if not is_instance_valid(self):
 		return
@@ -261,7 +262,7 @@ func take_hit(hit: HitData):
 	for status: Attributes.Status in hit.status_effects:
 		var stack: float = hit.status_effects[status].x
 		var cooldown: float = hit.status_effects[status].y
-		modifiers_component.add_status(status, stack, cooldown)
+		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id)
 	
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT

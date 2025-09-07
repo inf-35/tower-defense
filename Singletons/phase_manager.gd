@@ -30,7 +30,7 @@ func _ready() -> void:
 func start_game() -> void:
 	_report("starting game flow.")
 	_generate_wave_plan()
-	current_wave_number = 100
+	current_wave_number = 0
 	_prepare_for_next_wave_cycle()
 
 func _generate_wave_plan() -> void:
@@ -40,7 +40,7 @@ func _generate_wave_plan() -> void:
 		wave_plan[i] = WaveType.NORMAL
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave_plan[i] = WaveType.EXPANSION
-		if i % 5 == 0:
+		if i == 20:
 			wave_plan[i] = WaveType.BOSS
 		#if (i - 1) % 5 == 0 and i > 1:  NOT FULLY IMPLEMENTED
 			#wave_plan[i] = WaveType.REWARD

@@ -9,12 +9,12 @@ enum Base { #base terrain type
 class CellData:
 	var terrain: Base
 	var feature: Towers.Type
-	var behavior_packet: Dictionary
+	var initial_state: Dictionary
 	
-	func _init(_terrain: Base, _feature: Towers.Type, _behavior_packet: Dictionary = {}):
+	func _init(_terrain: Base, _feature: Towers.Type, _initial_state: Dictionary = {}):
 		terrain = _terrain
 		feature = _feature
-		behavior_packet = _behavior_packet
+		initial_state = _initial_state
 
 class BaseStat: #defines stats for a terraintype
 	var color: Color #default base color

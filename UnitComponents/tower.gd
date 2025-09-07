@@ -32,8 +32,7 @@ var tower_position: Vector2i = Vector2i.ZERO:
 
 func sell():
 	if not abstractive:
-		print(flux_value)
-		Player.flux += flux_value * health_component.health / get_stat(Attributes.id.MAX_HEALTH) #towers only release flux value when sold
+		Player.flux += flux_value * 0.75 * health_component.health / get_stat(Attributes.id.MAX_HEALTH) #towers only release flux value when sold
 		died.emit()
 
 func _create_hitbox():

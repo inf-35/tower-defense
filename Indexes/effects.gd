@@ -8,6 +8,4 @@ enum Type {
 	
 	DEATH_ON_WAVE,
 	DEBUG_ON_HIT,
-	
-	BREACH #custom logic for breach
 }

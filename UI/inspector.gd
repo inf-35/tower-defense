@@ -119,7 +119,7 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 			override = true
 			# call the new, generic function on the unit.
 			# the inspector does not know or care how the unit gets this data.
-			value = tower.get_behavior_attribute(&"waves_left_in_phase")
+			value = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 			if value == null: return # abort if this special stat isn't found
 
 	# Get the value from the tower's components if not overridden

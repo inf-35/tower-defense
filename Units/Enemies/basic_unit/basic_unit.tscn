@@ -19,6 +19,7 @@ size = Vector2(105, 105)
 [node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_anqll")
 hostile = true
+attack_only_when_blocked = true
 behavior = NodePath("DefaultBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

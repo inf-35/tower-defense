@@ -1,19 +1,19 @@
-[gd_scene load_steps=10 format=3 uid="uid://bcwm6fakktk8t"]
+[gd_scene load_steps=10 format=3 uid="uid://crffqaa5utxrm"]
 
-[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2qmy6"]
-[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_mqjx8"]
-[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_8g1yo"]
-[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_0yqpy"]
-[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="5_orqd4"]
-[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="6_tepng"]
-[ext_resource type="Resource" uid="uid://esehe72tbwn4" path="res://Units/Towers/cannon/cannon_attack.tres" id="7_nx7ew"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="8_ij6wa"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_ybq1v"]
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8ywdl"]
+[ext_resource type="Resource" uid="uid://cr2yw0v4l47xc" path="res://Units/Towers/cannon/cannon_attack.tres" id="7_2qmy6"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="7_7aysu"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="8_y05ec"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="9_5ulem"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="10_pkx8d"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_hbpja"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="13_tnmyg"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_nh6s4"]
 
 [node name="Cannon" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
-script = ExtResource("1_2qmy6")
-type = 4
+script = ExtResource("1_8ywdl")
+type = 2
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -23,28 +23,28 @@ attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("2_mqjx8")
-movement_data = ExtResource("3_8g1yo")
+script = ExtResource("7_7aysu")
+movement_data = ExtResource("8_y05ec")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("4_0yqpy")
+script = ExtResource("9_5ulem")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="RangeComponent" type="Node" parent="."]
-script = ExtResource("5_orqd4")
+script = ExtResource("10_pkx8d")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="AttackComponent" type="Node" parent="."]
-script = ExtResource("6_tepng")
-attack_data = ExtResource("7_nx7ew")
+script = ExtResource("11_hbpja")
+attack_data = ExtResource("7_2qmy6")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(1, 0, 0, 1)
+modulate = Color(1, 0.51, 0.51, 1)
 scale = Vector2(0.1, 0.1)
-texture = ExtResource("8_ij6wa")
+texture = ExtResource("13_tnmyg")
 
 [node name="ModifiersComponent" type="Node" parent="."]
-script = ExtResource("9_ybq1v")
+script = ExtResource("14_nh6s4")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

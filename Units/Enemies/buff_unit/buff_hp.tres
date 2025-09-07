@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_gt57u")
-max_health = 5.0
+max_health = 8.0
 regeneration = 0.0
+regen_percent = 0.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"

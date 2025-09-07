@@ -72,6 +72,9 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 	)
 
 func is_target_valid(unit: Unit) -> bool:
+	if not is_instance_valid(unit.movement_component) or not is_instance_valid(unit.health_component):
+		return false
+
 	if Targeting.is_unit_overkilled(unit):
 		return false
 		
@@ -97,9 +100,9 @@ func get_target():
 			var record_distance: float = INF
 			var record_unit: Unit
 			for enemy: Unit in _enemies_in_range:
-				var distance: float = enemy.movement_component.position.length_squared()
 				if not is_target_valid(enemy):
 					continue
+				var distance: float = enemy.movement_component.position.length_squared()
 				if distance < record_distance:
 					record_distance = distance
 					record_unit = enemy
@@ -109,9 +112,9 @@ func get_target():
 			var record_health: float = -INF
 			var record_unit: Unit
 			for enemy: Unit in _enemies_in_range:
-				var health: float = enemy.health_component.health
 				if not is_target_valid(enemy):
 					continue
+				var health: float = enemy.health_component.health
 				if health > record_health:
 					record_health = health
 					record_unit = enemy

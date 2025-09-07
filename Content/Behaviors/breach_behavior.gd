@@ -3,7 +3,7 @@ class_name BreachBehavior
 
 # data for this specific breach type, can be exported or come from a resource
 @export var seed_duration_waves: int = 2
-@export var active_duration_waves: int = 5
+@export var active_duration_waves: int = Waves.WAVES_PER_EXPANSION_CHOICE * 2 #this ensures we dont accidentally create a scenario where there are no active breaches
 
 enum State { SEED, ACTIVE, CLOSING }
 var _current_state: State
@@ -47,6 +47,8 @@ func _on_wave_cycle_started(wave_number: int) -> void:
 			_enter_state(State.ACTIVE)
 		elif _current_state == State.ACTIVE:
 			_enter_state(State.CLOSING)
+	
+	UI.update_unit_state.emit(unit)
 
 # the breach has no active behavior in its _process loop, so update is empty
 func update(delta: float) -> void:
@@ -55,5 +57,5 @@ func update(delta: float) -> void:
 func get_display_data() -> Dictionary:
 	# we use StringNames (&) for performance and to avoid typos.
 	return {
-		&"waves_left_in_phase": _waves_left_in_state
+		ID.UnitState.WAVES_LEFT_IN_PHASE: _waves_left_in_state
 	}

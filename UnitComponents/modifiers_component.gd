@@ -38,7 +38,7 @@ func add_modifier(mod: Modifier) -> void:
 		push_warning("modifier ", self, " has no source id!")
 
 	if mod.cooldown >= 0.0: #TODO: make this editable in change modifier.
-		get_tree().create_timer(mod.cooldown).timeout.connect(func():
+		Clock.await_game_time(mod.cooldown).connect(func():
 			remove_modifier(mod)
 		)
 
@@ -54,53 +54,60 @@ func remove_modifier(mod: Modifier) -> void:
 	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
 	
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
-	if mod:
-		_modifiers.erase(mod)
+	if not is_instance_valid(mod):
+		return
+
+	_modifiers.erase(mod)
 	_effective_cache.erase(mod.attribute)
 	add_modifier(replacement)
 
-#add a status effect
-func add_status(type: Attributes.Status, stack: float, cooldown: float = -1.0) -> void:
+# add a status effect with new precedence rules
+func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int) -> void:
+	# if a status of this type already exists, refresh it
 	if _status_effects.has(type):
 		var existing_status: StatusEffect = _status_effects[type]
-		if existing_status.can_stack():
-			existing_status.stack += stack #consolidate statuses together
-			update_status(existing_status)
-			check_reactions_for_status(type)
-			
-			if cooldown >= 0.0:
-				get_tree().create_timer(cooldown).timeout.connect(func():
-					existing_status.stack -= stack
-					update_status(existing_status)
-				)
+		# delegate the refresh logic to the status effect object itself
+		existing_status.refresh(stack, cooldown)
+		# apply the updated state
+		update_status(existing_status)
+		check_reactions_for_status(type)
 		return
 
-	var status := StatusEffect.new(type, stack)
-	status.cooldown = cooldown
-
+	# if it's a new status, create and configure it
+	var status := StatusEffect.new(type, stack, cooldown, source_id)
 	_status_effects[type] = status
+	
+	# create and manage a dedicated timer for this new status if it's not permanent
+	if cooldown > 0.0:
+		var new_timer := Clock.create_game_timer(cooldown)
+		# link the timer and the status object
+		status.timer = new_timer
+		# connect the timer's timeout to the status object's handler
+		status.timer.timeout.connect(func():
+			status.on_timeout()
+			update_status(status) # tell the component to process the change
+		)
+		#gametimers automatically start
+
 	update_status(status)
 	check_reactions_for_status(type)
 
-	if status.cooldown >= 0.0:
-		get_tree().create_timer(status.cooldown).timeout.connect(func():
-			status.stack -= stack #so we can subtract it after cooldown ends
-			update_status(status)
-		)
-#update a status effect
+# update a status effect
 func update_status(status: StatusEffect) -> void:
-	# If the status has no stacks left, we're done. Remove it from tracking.
+	# if the status has no stacks left, remove it from tracking
 	if status.stack <= 0.0:
+		status.cleanup() # tell the status to clean up its timer
 		remove_modifier(status._modifier)
-		_status_effects.erase(status.type)
-		#status._modifier = null # Clear the reference
+		if _status_effects.has(status.type):
+			_status_effects.erase(status.type)
 		return
 
-	# Create a new modifier that reflects the current state of the status effect.
-	var old_modifier = status._modifier
-	var new_modifier = create_underlying_modifier(status)
-	status._modifier = new_modifier # Link the new modifier to the status effect
-	replace_modifier(old_modifier, new_modifier) # Add the new modifier to the primary processing list
+	# create a new modifier that reflects the current state of the status effect
+	var old_modifier: Modifier = status._modifier
+	var new_modifier: Modifier = create_underlying_modifier(status)
+	status._modifier = new_modifier
+	replace_modifier(old_modifier, new_modifier)
+
 # checks all reactions that involve the newly updated status type to see if any have been triggered.
 func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 	for reaction: Attributes.ReactionData in Attributes.reactions:

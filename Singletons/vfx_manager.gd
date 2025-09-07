@@ -7,7 +7,8 @@ func _ready():
 	# We draw our effects ourselves during the frame_post_draw signal.
 	RenderingServer.frame_post_draw.connect(_draw_vfx)
 
-func _process(delta: float):
+func _process(_d: float):
+	var delta: float = Clock.game_delta
 	if _active_vfx.is_empty():
 		return
 	
