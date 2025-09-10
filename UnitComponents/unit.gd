@@ -89,6 +89,11 @@ func _prepare_components() -> void:
 	
 		queue_free()
 	)
+	
+	if graphics != null:
+		var unit_effects_shader_material: ShaderMaterial = ShaderMaterial.new()
+		unit_effects_shader_material.shader = preload("res://Shaders/unit_effects.gdshader")
+		graphics.material = unit_effects_shader_material
 
 	if navigation_component != null:
 		navigation_component.inject_components(movement_component)
@@ -247,11 +252,15 @@ func take_hit(hit: HitData):
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
 		
+	var source_position: Vector2 = hit.source.global_position if is_instance_valid(hit.source) else self.global_position #used to render ccosmetic particle effects
+		
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit
 
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
+	
+	Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, self.global_position)
 	
 	var benchmark: float = health_component.health
 	health_component.health -= evt.data.damage
@@ -261,6 +270,16 @@ func take_hit(hit: HitData):
 	hit_report.damage_caused = delta_health
 	if benchmark >= 0.01 and health_component.health < 0.01:
 		hit_report.death_caused = true
+		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
+	else:
+		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, (self.global_position - source_position).angle())
+		
+		var material: ShaderMaterial = graphics.material as ShaderMaterial
+		material.set_shader_parameter(&"flash_intensity", 1.0)
+		
+		var flash_tween := create_tween()
+		flash_tween.tween_property(material, "shader_parameter/flash_intensity", 0.0, 0.25)
+		flash_tween.play()
 		
 	for modifier: Modifier in hit.modifiers:
 		modifiers_component.add_modifier(modifier)

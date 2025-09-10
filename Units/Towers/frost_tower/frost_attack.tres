@@ -8,7 +8,7 @@
 script = ExtResource("3_7up7a")
 type = 0
 stack = 1.0
-cooldown = 2.0
+cooldown = 1.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [resource]

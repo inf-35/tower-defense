@@ -54,12 +54,9 @@ func remove_modifier(mod: Modifier) -> void:
 	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
 	
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
-	if not is_instance_valid(mod):
-		return
-
 	_modifiers.erase(mod)
-	_effective_cache.erase(mod.attribute)
-	add_modifier(replacement)
+	_effective_cache.erase(replacement.attribute)
+	add_modifier(replacement) #this calls stat_changed
 
 # add a status effect with new precedence rules
 func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int) -> void:
@@ -88,9 +85,9 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 			update_status(status) # tell the component to process the change
 		)
 		#gametimers automatically start
-
 	update_status(status)
 	check_reactions_for_status(type)
+	_recalculate_overlay_color()
 
 # update a status effect
 func update_status(status: StatusEffect) -> void:
@@ -106,7 +103,31 @@ func update_status(status: StatusEffect) -> void:
 	var old_modifier: Modifier = status._modifier
 	var new_modifier: Modifier = create_underlying_modifier(status)
 	status._modifier = new_modifier
-	replace_modifier(old_modifier, new_modifier)
+	if old_modifier != null:
+		replace_modifier(old_modifier, new_modifier)
+	else:
+		add_modifier(new_modifier)
+		
+	_recalculate_overlay_color()
+	
+#helper function to recalculate the visual overlay of units when under effects
+func _recalculate_overlay_color() -> void:
+	if not is_instance_valid(unit) or not is_instance_valid(unit.graphics) or not is_instance_valid(unit.graphics.material):
+		return
+		
+	var material: ShaderMaterial = unit.graphics.material as ShaderMaterial
+	var best_overlay: Color = Color.TRANSPARENT
+	
+	# find the dominant status effect to display visually
+	for status_type: Attributes.Status in _status_effects:
+		var status: StatusEffect = _status_effects[status_type]
+		var status_color: Color = Attributes.status_effects[status_type].overlay_color
+		# prioritize the overlay with the highest alpha (intensity)
+		if status_color.a > best_overlay.a:
+			best_overlay = status_color
+			
+	# push the calculated color to the shader uniform
+	material.set_shader_parameter(&"overlay_color", best_overlay)
 
 # checks all reactions that involve the newly updated status type to see if any have been triggered.
 func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
@@ -157,7 +178,6 @@ func create_underlying_modifier(status: StatusEffect) -> Modifier:
 	)
 	new_mod.cooldown = -1.0 #status-modifiers are ALWAYS permanent
 	#they are manually removed when their parent status runs out
-	
 	return new_mod
 
 func register_stat(attr: Attributes.id, value: float) -> void: #registers a stat
@@ -226,24 +246,3 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	var result = (upgraded_value + sum_add) * product_mult if override == null else override
 	_effective_cache[attr] = result #cache result
 	return result
-	#TODO: decide whether we want per-unit filtering
-	##compute stat
-	#var base_value := base_stats[attr]
-	#var sum_add := 0.0 #consolidated addition figure
-	#var product_mult := 1.0 #consolidated multiplication figure
-	#var override = null #force-set figure, null if no such modifier exists
-	#
-	##var best_modifier_by_source_id: Dictionary[int, Modifier] = {} #best_modifier_by_source_id[source_id] -> Modifier
-	###this prevents endless stacking by a single unit
-	##for modifier: Modifier in _modifiers:
-		##if modifier.attribute != attr:
-			##continue
-		##
-		##var source_id: int = modifier.source_id
-		##if not best_modifier_by_source_id.has(source_id):
-			##best_modifier_by_source_id[source_id] = modifier
-			##continue
-		##
-		##var modifier_to_beat: Modifier = best_modifier_by_source_id[source_id]
-		##if abs(modifier.additive) > abs(modifier_to_beat.additive) or abs(modifier.multiplicative - 1) > abs(modifier_to_beat.multiplicative - 1):
-			##best_modifier_by_source_id[source_id] = modifier

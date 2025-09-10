@@ -34,6 +34,12 @@ func initialise(host_unit: Unit):
 	if &"turret" in unit:
 		self.turret = unit.turret
 	start()
+	
+	unit.on_event.connect(func(event: GameEvent):
+		if event.event_type == GameEvent.EventType.WAVE_STARTED:
+			_cooldown = 0.0 #reset timer upon wave starting
+			print("reset!")
+	)
 
 #behavior start function, called at the start of behavior
 func start() -> void:

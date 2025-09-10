@@ -89,5 +89,8 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		self.flux -= Towers.get_tower_cost(tower_type)
 		#TODO: Towers.update_tower_cost(tower_type, 1)
 
-func _on_sell_tower_requested(tower : Tower):
-	tower.sell()
+func _on_sell_tower_requested(tower):
+	if not is_instance_valid(tower):
+		return
+	if tower is Tower:
+		tower.sell()

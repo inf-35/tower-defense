@@ -5,6 +5,7 @@ signal movement_to_cell(origin: Vector2i, destination: Vector2i)
 
 var _modifiers_component: ModifiersComponent
 
+@export var face_towards_movement: bool = true
 @export var movement_data: MovementData = preload("res://Content/Movement/default_mvmt.tres")
 var graphics: Node2D
 
@@ -79,6 +80,9 @@ func _physics_process(delta: float) -> void:
 		target_direction * target_speed,
 		local_acceleration * Clock.physics_game_delta,
 	)
+	
+	if face_towards_movement:
+		unit.rotation = velocity.angle()
 
 	position += velocity * Clock.physics_game_delta
 	

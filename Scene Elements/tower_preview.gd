@@ -19,7 +19,7 @@ func _ready():
 func setup(_tower_type: Towers.Type):
 	#TODO: implement sprites for each tower
 	tower_type = _tower_type
-	tower_sprite.texture = preload("res://icon.svg")
+	tower_sprite.texture = preload("res://Assets/icon.svg")
 
 # Call this every frame to update rotation and validity tint
 func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i):

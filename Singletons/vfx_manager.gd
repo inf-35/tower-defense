@@ -11,6 +11,9 @@ func _process(_d: float):
 	var delta: float = Clock.game_delta
 	if _active_vfx.is_empty():
 		return
+		
+	if delta == 0.0: #the game is paused, probably
+		return
 	
 	var vfx_to_remove : Array[VFXInstance] = []
 	# --- Update the state of all active effects ---

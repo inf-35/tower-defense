@@ -8,3 +8,9 @@ class UnitState:
 	const CAPACITY_GENERATED: StringName = &"capacity_generated"
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"
 	
+class Particles:
+	const ENEMY_HIT_SPARKS: StringName = &"enemy_hit_sparks"
+	const ENEMY_DEATH_SPARKS: StringName = &"enemy_death_sparks"
+	
+class Sounds:
+	const ENEMY_HIT_SOUND: StringName = &"enemy_hit_sound"

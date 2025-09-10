@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bfdfbl6dljf00"]
 
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="1_a85iw"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="1_a85iw"]
 
 [node name="Node2D" type="Sprite2D"]
 self_modulate = Color(2, 20, 20, 1)

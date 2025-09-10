@@ -30,12 +30,14 @@ class StatusEffectData:
 	var additive_per_stack: float = 0.0
 	var multiplicative_per_stack: float = 0.0
 	var can_stack: bool = true
+	var overlay_color: Color = Color.TRANSPARENT
 	
-	func _init(_attribute: id, _aps: float, _mps: float, _cs: bool = true):
+	func _init(_attribute: id, _aps: float, _mps: float, _cs: bool = true, _oc: Color = Color.TRANSPARENT):
 		attribute = _attribute
 		additive_per_stack = _aps
 		multiplicative_per_stack = _mps
 		can_stack = _cs
+		overlay_color = _oc
 
 class ReactionData:
 	var requisites: Dictionary[Status, float] #what statuses in what amount does this reaction need
@@ -49,13 +51,13 @@ class ReactionData:
 #of FROST should be equivalent to one stack of POISON in importance/severity
 var status_effects : Dictionary[Status, StatusEffectData] = {
 	Status.FROST: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.5
+		id.MAX_SPEED, 0.0, 0.2, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
 		id.REGENERATION, -1, 0.0
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_PERCENT, -2, 0.0
+		id.REGEN_PERCENT, -2, 0.0, true, Color(0, 1, 0, 0.5)
 	),
 	Status.HEAT: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 1.0  #this effect does nothing by itself, but reacts with FROST 

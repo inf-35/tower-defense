@@ -2,7 +2,7 @@ class_name VFXInfo
 extends Resource
 
 # The new enum to select the renderer.
-enum VFXType { TEXTURE, CIRCLE, RECTANGLE }
+enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES }
 @export var vfx_type: VFXType = VFXType.TEXTURE
 
 # --- Properties for TEXTURE type ---

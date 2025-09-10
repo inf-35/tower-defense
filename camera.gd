@@ -1,8 +1,8 @@
 extends Camera2D
 class_name Camera
-# This script is attached to a Camera2D node for a zoom example.
 
-# This script is attached to a Camera2D node for a zoom example.
+func _ready():
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _process(delta: float) -> void:
 	# Check if the abstract action was just triggered this frame.

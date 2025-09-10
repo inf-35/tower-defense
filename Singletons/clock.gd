@@ -13,8 +13,11 @@ const PAUSE_SPEED: float = 0.0
 
 # --- public api ---
 # this is the variable the UI will control (e.g., 1.0 for normal, 2.0 for double speed)
-var speed_multiplier: float = BASE_SPEED
-
+var speed_multiplier: float = BASE_SPEED:
+	set(value):
+		speed_multiplier = max(0.0, value)
+		# if the multiplier is 0, pause the entire scene tree.
+		get_tree().paused = is_zero_approx(speed_multiplier)
 # these are the values that game logic components will read each frame
 var game_delta: float = 0.0
 var physics_game_delta: float = 0.0
@@ -22,6 +25,8 @@ var physics_game_delta: float = 0.0
 # --- private state ---
 var _active_timers: Array[GameTimer] = []
 
+func _ready():
+	process_mode = Node.PROCESS_MODE_ALWAYS
 # the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
 	game_delta = delta * speed_multiplier

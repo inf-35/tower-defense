@@ -1,11 +1,12 @@
-[gd_scene load_steps=14 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene load_steps=16 format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_anqll"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_n3sy1"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_phfvd"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_urfjf"]
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ns662"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="6_n0rgw"]
+[ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_n0rgw"]
+[ext_resource type="Texture2D" uid="uid://cop5x8s5y2krl" path="res://Assets/grunt.png" id="6_ns662"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_j01gd"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bsfdp"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="9_n3sy1"]
@@ -13,8 +14,13 @@
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="11_n0rgw"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_j01gd"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
-size = Vector2(105, 105)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
+shader = ExtResource("6_n0rgw")
+shader_parameter/flash_intensity = 0.0
+shader_parameter/overlay_color = Color(0, 0, 1, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
+size = Vector2(70, 80)
 
 [node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_anqll")
@@ -44,16 +50,19 @@ health_data = ExtResource("5_ns662")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.08, 0.08)
-texture = ExtResource("6_n0rgw")
+material = SubResource("ShaderMaterial_j01gd")
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("6_ns662")
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("7_j01gd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-shape = SubResource("RectangleShape2D_anqll")
+position = Vector2(5, -2.38418e-06)
+shape = SubResource("RectangleShape2D_n0rgw")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("8_bsfdp")

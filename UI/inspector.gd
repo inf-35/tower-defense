@@ -65,7 +65,6 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	
 
 func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
-	print(hp, " / ", max_hp)
 	healthbar.max_value = max_hp
 	healthbar.value = hp
 		

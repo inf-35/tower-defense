@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://bh2xrt4aqtxib" path="res://Content/StatDisplays/core_flux.tres" id="3_hh2tl"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_yq3fw"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="4_cg3ju"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="4_hh2tl"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="4_hh2tl"]
 [ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="5_cg3ju"]
 [ext_resource type="Resource" uid="uid://cqoa0ljfot6ra" path="res://Content/Effects/capacity_player_core.tres" id="5_ok6e0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_ok6e0"]

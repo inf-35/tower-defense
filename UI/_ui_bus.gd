@@ -10,7 +10,7 @@ signal choice_selected(choice_id: int) #called by expansion_ui
 signal building_phase_ended() #called by sidebar_ui
 #ClickHandler/UI -> Player
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
-signal sell_tower_requested(tower: Tower)
+signal sell_tower_requested(tower)
 #Phases -> UI
 signal update_wave_schedule()
 signal start_wave(wave : int)

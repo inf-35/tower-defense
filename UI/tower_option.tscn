@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://f6bwjb8pybpm"]
 
 [ext_resource type="Script" uid="uid://dn328ud17bfog" path="res://UI/tower_option.gd" id="1_3e04o"]
-[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://default_icon.svg" id="1_c6gwr"]
+[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="1_c6gwr"]
 
 [node name="tower selection" type="Button" node_paths=PackedStringArray("tower_icon", "tower_label")]
 custom_minimum_size = Vector2(0, 40)

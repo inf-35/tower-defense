@@ -19,6 +19,7 @@ signal tower_was_deselected()
 # --- Engine Callbacks ---
 func _ready():
 	# Connect to UI signal for when the player picks a tower from the build bar.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	UI.tower_selected.connect(_on_build_tower_selected)
 
 func _unhandled_input(event: InputEvent) -> void:

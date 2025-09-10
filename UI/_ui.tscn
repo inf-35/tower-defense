@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector.tscn" id="3_rmtg4"]
 [ext_resource type="PackedScene" uid="uid://dti7nnkxq7kl0" path="res://UI/wave_timeline.tscn" id="6_4g3kg"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
-[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://default_icon.svg" id="6_g36sl"]
+[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="6_g36sl"]
 [ext_resource type="Script" uid="uid://bqtbpudkayswb" path="res://UI/capacity_label.gd" id="6_rvses"]
 
 [node name="UI" type="CanvasLayer"]

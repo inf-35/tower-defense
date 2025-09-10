@@ -67,7 +67,6 @@ func _enter_state(new_state: State) -> void:
 # this function is called BY THE ANIMATIONPLAYER via a Call Method Track
 # at the precise frame the arrow should be released.
 func _fire_projectile() -> void:
-	print("ea")
 	# check if our target is still valid
 	if not is_instance_valid(_current_target):
 		# if the target died during the wind-up, transition back to idle
