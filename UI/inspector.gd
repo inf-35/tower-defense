@@ -24,8 +24,7 @@ enum InspectorMode {
 }
 
 func _ready():
-	healthbar.value = 20.0
-	healthbar.max_value = 200.0
+	healthbar.min_value = 0.0
 	stats.columns = stats_per_line
 	
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
@@ -60,8 +59,13 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	#NOTE: DO NOT MUTATE displays_to_create
 	for display_info : StatDisplayInfo in displays_to_create:
 		_display_stat(tower, display_info)
+	
+	tower.get_unit_state() #this prompts the tower to send us its health too
+		
+	
 
 func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
+	print(hp, " / ", max_hp)
 	healthbar.max_value = max_hp
 	healthbar.value = hp
 		

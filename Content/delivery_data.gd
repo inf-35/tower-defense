@@ -10,6 +10,7 @@ enum DeliveryMethod {
 	ENTITY,
 }
 
+var target: Unit #reference to the actual target of this projectile
 var intercept_position: Vector2 #predicted intercept position of described projectile
 var tower_rotation: float #initial rotation of the tower (or whatever is firing this projectile)
 var delivery_method: DeliveryMethod

@@ -15,6 +15,7 @@ signal died()
 @export_category("Components")
 @export var behavior: Behavior
 @export var graphics: Sprite2D
+@export var animation_player: AnimationPlayer
 @export var modifiers_component: ModifiersComponent #used by most things
 @export var health_component: HealthComponent
 @export var movement_component: MovementComponent
@@ -46,7 +47,6 @@ var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
 		disabled = true
 var disabled: bool
 
-
 func _ready():
 	name = name + " " + str(unit_id)
 	_setup_event_bus()
@@ -69,11 +69,13 @@ func _create_components() -> void:
 	if modifiers_component == null:
 		var n_modifiers_component: = ModifiersComponent.new()
 		add_child(n_modifiers_component)
+		modifiers_component = n_modifiers_component
 	if movement_component == null: #by default, add an immobile movement component
 		var n_movement_component: = MovementComponent.new()
 		n_movement_component.movement_data = preload("res://Content/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
-
+		movement_component = n_movement_component
+	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
 	
@@ -221,6 +223,10 @@ func get_behavior_attribute(attribute_name: StringName) -> Variant:
 		return data.get(attribute_name, null)
 		
 	return null
+	
+func get_unit_state() -> void:
+	if is_instance_valid(health_component):
+		UI.update_unit_health.emit(self, health_component.max_health, health_component.health)
 
 func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
 	if not is_instance_valid(behavior):

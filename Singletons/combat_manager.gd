@@ -1,7 +1,7 @@
 extends Node
 
 class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
-	const ERROR_TOLERANCE : float = 15.0 #error tolerance for no AOE projectiles.
+	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
 	const ERROR_TOLERANCE_SQUARED : float = ERROR_TOLERANCE ** 2 #length_squared optimisation
 	
 	static var circle_shape := CircleShape2D.new() #we share the same circleshape object across all checks
@@ -10,6 +10,7 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	var hit_data : HitData
 	var delivery_data : DeliveryData
 	var intercept_position : Vector2
+	var source_position: Vector2
 	var target_affiliation : bool
 	
 	func _init(_hit_data: HitData, _delivery_data: DeliveryData):
@@ -17,10 +18,12 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 		delivery_data = _delivery_data
 		intercept_position = delivery_data.intercept_position
 		target_affiliation = hit_data.target.hostile
+		source_position = hit_data.source.attack_component.muzzle.global_position\
+			if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	
 	func start(delay : float):
-		var source_to_target_normalized : Vector2 = (hit_data.target.global_position - hit_data.source.global_position).normalized()
-		VFXManager.play_vfx(hit_data.vfx_on_spawn, hit_data.source.global_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
+		var source_to_target_normalized : Vector2 = (hit_data.target.global_position - source_position).normalized()
+		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
 		Clock.await_game_time(delay).connect(func():
 			_on_timeout()
 		)
@@ -64,6 +67,8 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 	var target: Unit = hit_data.target
 	var source: Unit = hit_data.source
+	var source_position: Vector2 = hit_data.source.attack_component.muzzle.global_position\
+		if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	var intercept_position: Vector2 = delivery_data.intercept_position
 	
 	Targeting.add_damage(hit_data.target, hit_data.expected_damage) #adds expected damage to target in targeting coordinator
@@ -77,7 +82,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			var space_state : PhysicsDirectSpaceState2D = source.get_world_2d().direct_space_state
 			var query_params := PhysicsShapeQueryParameters2D.new()
 			
-			var line_vector = intercept_position - source.global_position
+			var line_vector = intercept_position - source_position
 			var line_length = line_vector.length()
 			# Use the hit's radius for the line's width.
 			var line_width = hit_data.radius
@@ -88,7 +93,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			
 			query_params.shape = shape
 			# Position the query halfway along the line and rotate it to face the target.
-			query_params.transform = Transform2D(line_vector.angle(), source.global_position + line_vector / 2.0)
+			query_params.transform = Transform2D(line_vector.angle(), source_position + line_vector / 2.0)
 			query_params.collide_with_areas = true
 			query_params.collision_mask = Hitbox.get_mask(target.hostile)
 			
@@ -121,7 +126,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			shape.radius = hit_data.radius #TODO: FIX
 			
 			query_params.shape = shape
-			query_params.transform = Transform2D(0.0, source.global_position)
+			query_params.transform = Transform2D(0.0, source_position)
 			query_params.collide_with_areas = true
 			query_params.collision_mask = Hitbox.get_mask(target.hostile)
 			
@@ -130,7 +135,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 				return #no potential targets
 			
 			# Narrow-phase: Filter the units to find those within the cone's angle.
-			var aim_direction : Vector2 = (intercept_position - source.global_position).normalized()
+			var aim_direction : Vector2 = (intercept_position - source_position).normalized()
 			var cone_half_angle_rad : float = deg_to_rad(delivery_data.cone_angle * 0.5)
 			
 			for collider_data : Dictionary in potential_targets:
@@ -139,7 +144,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 					continue
 					
 				var unit : Unit = hitbox.unit
-				var to_target_direction : Vector2 = (unit.global_position - source.global_position).normalized()
+				var to_target_direction : Vector2 = (unit.global_position - source_position).normalized()
 				
 				# Use the dot product to check if the target is within the cone.
 				var dot_product : float = aim_direction.dot(to_target_direction) #this equals to cos(t) where t is the angle betwee centreline and targetline
@@ -152,7 +157,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			Targeting.add_damage(target, -hit_data.expected_damage)
 		
 		DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT:
-			var intercept_time: float = (intercept_position - source.position).length() / delivery_data.projectile_speed
+			var intercept_time: float = (intercept_position - source_position).length() / delivery_data.projectile_speed
 			var resolver := ProjectileAbstractResolver.new(hit_data, delivery_data)
 			resolver.start(intercept_time)
 			

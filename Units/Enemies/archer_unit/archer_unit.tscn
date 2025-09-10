@@ -1,26 +1,68 @@
-[gd_scene load_steps=14 format=3 uid="uid://bmjm05pjgv3df"]
+[gd_scene load_steps=19 format=3 uid="uid://bmjm05pjgv3df"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_afgbb"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_5ykig"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_25jjc"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_3ns8u"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_rlh67"]
-[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ha1o6"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="6_3ns8u"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="6_yocns"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_c8nbp"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_obpax"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_xmpgh"]
 [ext_resource type="Resource" uid="uid://bkuvyutqxnknt" path="res://Units/Enemies/archer_unit/archer_attack.tres" id="10_x6e3e"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_nfsk5"]
-[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="12_xmpgh"]
+[ext_resource type="Script" uid="uid://e35uu0p4erew" path="res://Content/Behaviors/archer_behavior.gd" id="13_3ns8u"]
+
+[sub_resource type="Resource" id="Resource_2kj5t"]
+script = ExtResource("4_3ns8u")
+mobile = true
+max_speed = 20.0
+acceleration = 200.0
+turn_speed = 1000.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="Resource" id="Resource_nfsk5"]
+script = ExtResource("6_3ns8u")
+max_health = 3.0
+regeneration = 0.0
+regen_percent = 0.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]
 radius = 60.0
 
-[node name="ArcherUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[sub_resource type="Animation" id="Animation_2kj5t"]
+resource_name = "attack"
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ArcherBehavior")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.5, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"_fire_projectile"
+}, {
+"args": [],
+"method": &"_on_attack_animation_finished"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nfsk5"]
+_data = {
+&"attack": SubResource("Animation_2kj5t")
+}
+
+[node name="ArcherUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_afgbb")
 hostile = true
-behavior = NodePath("DefaultBehavior")
+behavior = NodePath("ArcherBehavior")
 graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
@@ -35,11 +77,12 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_25jjc")
+movement_data = SubResource("Resource_2kj5t")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_rlh67")
-health_data = ExtResource("5_ha1o6")
+health_data = SubResource("Resource_nfsk5")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
@@ -68,6 +111,11 @@ metadata/_custom_type_script = "uid://detgar3t50qgi"
 script = ExtResource("12_nfsk5")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="DefaultBehavior" type="Node" parent="."]
-script = ExtResource("12_xmpgh")
-metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+[node name="ArcherBehavior" type="Node" parent="."]
+script = ExtResource("13_3ns8u")
+metadata/_custom_type_script = "uid://e35uu0p4erew"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_nfsk5")
+}

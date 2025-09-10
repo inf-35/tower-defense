@@ -57,13 +57,15 @@ func inject_components(modifiers_component: ModifiersComponent):
 		hitbox.collision_mask = 0
 		hitbox.monitoring = false
 		hitbox.monitorable = true
+	
+	UI.update_unit_health.emit(unit, max_health, health)
 
 
 func _ready():
-	_STAGGER_CYCLE = 5
-	_stagger = randi_range(0, _STAGGER_CYCLE)
+	pass
+	#_STAGGER_CYCLE = 5
+	#_stagger = randi_range(0, _STAGGER_CYCLE)
 	
-
 func _process(delta : float) -> void:
 	#_stagger += 1
 	#_accumulated_delta += delta

@@ -1,17 +1,38 @@
-[gd_scene load_steps=7 format=3 uid="uid://drp3bgm0uvb35"]
+[gd_scene load_steps=10 format=3 uid="uid://drp3bgm0uvb35"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tb8yo"]
+[ext_resource type="Script" uid="uid://bdhsnunw7upow" path="res://Content/Behaviors/amplifier_behavior.gd" id="2_686l8"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_wqpev"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_lt4mf"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_6amt4"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_7d4kk"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://icon.svg" id="7_m3al0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bes4o"]
 
-[node name="Amplifier" type="Node2D"]
+[sub_resource type="Resource" id="Resource_hpk50"]
+script = ExtResource("3_wqpev")
+attribute = 8
+additive = 0.0
+multiplicative = 0.75
+override = null
+cooldown = -1.0
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[node name="Amplifier" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_tb8yo")
 type = 8
+behavior = NodePath("AmplifierBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="AmplifierBehavior" type="Node" parent="."]
+script = ExtResource("2_686l8")
+modifier_prototype = SubResource("Resource_hpk50")
+metadata/_custom_type_script = "uid://bdhsnunw7upow"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("4_lt4mf")

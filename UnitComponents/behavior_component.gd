@@ -11,6 +11,10 @@ var movement_component: MovementComponent
 var navigation_component: NavigationComponent
 var range_component: RangeComponent
 var attack_component: AttackComponent
+var animation_player: AnimationPlayer
+
+var graphics: Node2D
+var turret: Node2D
 #generic "timer" variable
 var _cooldown: float = 0.0
 
@@ -24,6 +28,11 @@ func initialise(host_unit: Unit):
 	self.navigation_component = unit.navigation_component
 	self.range_component = unit.range_component
 	self.attack_component = unit.attack_component
+	self.animation_player = unit.animation_player
+	
+	self.graphics = unit.graphics
+	if &"turret" in unit:
+		self.turret = unit.turret
 	start()
 
 #behavior start function, called at the start of behavior
@@ -42,8 +51,12 @@ func update(delta: float) -> void:
 func get_display_data() -> Dictionary:
 	return {} # return an empty dictionary by default
 
+# a helper function for safe animation playback
+func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
+	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):
+		animation_player.play(anim_name, -1, custom_speed)
 #helper functions for child classes to use
-func _attempt_attack() -> bool:
+func _is_attack_possible() -> bool:
 	if attack_component == null or range_component == null:
 		return false
 	
@@ -54,15 +67,24 @@ func _attempt_attack() -> bool:
 		return false
 		
 	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):
-
 		var target = range_component.get_target() as Unit
 		if target:
-			#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
-			attack_component.attack(target)
-			_cooldown = 0.0
-			unit.queue_redraw()
 			return true
-			
+
+	return false
+
+func _attempt_attack() -> bool:
+	if not _is_attack_possible():
+		return false
+		
+	var target = range_component.get_target() as Unit
+	if target:
+		#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
+		attack_component.attack(target)
+		_cooldown = 0.0
+		unit.queue_redraw()
+		return true
+		
 	return false
 
 func _attempt_navigate_to_origin() -> bool:

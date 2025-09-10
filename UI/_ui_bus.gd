@@ -23,6 +23,8 @@ signal hide_building_ui()
 #multiple sources -> Inspector
 signal update_unit_state(unit : Unit)
 signal update_unit_health(unit : Unit, max_hp : float, hp : float)
+#Inspector -> unit
+signal get_unit_state(unit: Unit)
 #Player -> UI
 #signal update_blueprints(blueprints: Array[Blueprint]) #WARNING: DEPRECATED
 signal update_tower_types(unlocked_tower_types : Dictionary[Towers.Type, bool])

@@ -31,6 +31,7 @@ var target_direction: Vector2:
 		target_direction = ntd.normalized()
 
 var velocity: Vector2
+var speed_control: float = 1.0 #goes for 0 to 1, how fast this unit is deciding to move at
 
 func inject_components(n_graphics: Node2D, modifiers_component = null):
 	graphics = n_graphics
@@ -70,8 +71,8 @@ func _physics_process(delta: float) -> void:
 			target_direction = Vector2.ZERO
 
 	# accelerate/decelerate to match max_speed
-	var target_speed = local_max_speed
-	if target_direction.length_squared() < 0.0001: #Vector2.ZERO
+	var target_speed: float = local_max_speed * speed_control
+	if target_direction.length_squared() < 0.001: #Vector2.ZERO
 		target_speed = 0.0
 
 	velocity = velocity.move_toward(
