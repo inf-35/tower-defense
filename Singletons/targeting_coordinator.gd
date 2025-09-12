@@ -28,3 +28,6 @@ func is_unit_overkilled(unit: Unit) -> bool: #prevents overkill on units
 		return true
 	else:
 		return false
+
+func _ready():
+	set_process(false)

@@ -42,8 +42,8 @@ func _generate_wave_plan() -> void:
 			wave_plan[i] = WaveType.EXPANSION
 		if i == 20:
 			wave_plan[i] = WaveType.BOSS
-		#if (i - 1) % 5 == 0 and i > 1:  NOT FULLY IMPLEMENTED
-			#wave_plan[i] = WaveType.REWARD
+		if (i - 1) % 5 == 0 and i > 1:  #NOT FULLY IMPLEMENTED
+			wave_plan[i] = WaveType.REWARD
 		if i in [7, 13, 19]:
 			wave_plan[i] = WaveType.SURGE
 	
@@ -128,10 +128,9 @@ func _on_player_made_choice(choice_id: int) -> void:
 			ExpansionService.select_expansion(References.island, choice_id)
 
 		ChoiceType.REWARD:
-			# applying rewards is instant, so we connect to the signal immediately
+			# likewise
 			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			RewardService.select_reward(choice_id)
-
 
 func add_choice_to_queue(type: ChoiceType) -> void:
 	choice_queue.append(type)

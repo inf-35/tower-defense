@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://du1eklnwuh3wr"
-path="res://.godot/imported/turret_base.png-b0b23a112de6de135d036660185d6134.ctex"
+uid="uid://bpvugaljod6nx"
+path="res://.godot/imported/railgun_head.svg-2673a5259392247b85b8439ed39d3d27.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/turret_base.png"
-dest_files=["res://.godot/imported/turret_base.png-b0b23a112de6de135d036660185d6134.ctex"]
+source_file="res://Assets/railgun_head.svg"
+dest_files=["res://.godot/imported/railgun_head.svg-2673a5259392247b85b8439ed39d3d27.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=4.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

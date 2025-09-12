@@ -5,6 +5,9 @@ class_name AttackComponent
 @export var muzzle: Marker2D #where the bullets are coming from
 var _modifiers_component: ModifiersComponent
 
+func _ready():
+	set_process(false)
+
 func inject_components(modifiers_component: ModifiersComponent):
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)

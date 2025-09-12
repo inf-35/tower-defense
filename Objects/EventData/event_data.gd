@@ -26,7 +26,9 @@ func duplicate() -> EventData:
 				# to represent the broken reference, and skip to the next property.
 				new_instance.set(prop_name, null)
 				continue
-	
+
+		if value == null:
+			continue
 		# if the value is another duplicatable object, call its duplicate method recursively.
 		if value is EventData:
 			new_instance.set(prop_name, value.duplicate())

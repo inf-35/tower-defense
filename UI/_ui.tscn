@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=11 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
 [ext_resource type="Script" uid="uid://u2j8pvnub2cs" path="res://UI/expansion_ui.gd" id="2_dajm1"]
 [ext_resource type="Script" uid="uid://df70wn2fe03ih" path="res://UI/flux_label.gd" id="3_aw3sh"]
 [ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector.tscn" id="3_rmtg4"]
+[ext_resource type="Script" uid="uid://bffvatofklaff" path="res://UI/reward_ui.gd" id="4_q3aj2"]
 [ext_resource type="PackedScene" uid="uid://dti7nnkxq7kl0" path="res://UI/wave_timeline.tscn" id="6_4g3kg"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
 [ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="6_g36sl"]
@@ -40,8 +41,8 @@ offset_bottom = 300.0
 grow_vertical = 2
 size_flags_horizontal = 0
 
-[node name="Expansion" type="Panel" parent="Margin/ui_space"]
-visible = false
+[node name="Expansion" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("_vbox")]
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -52,8 +53,32 @@ offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_dajm1")
+_vbox = NodePath("OptionsContainer")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/Expansion"]
+[node name="OptionsContainer" type="VBoxContainer" parent="Margin/ui_space/Expansion"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.4
+anchor_right = 0.7
+anchor_bottom = 0.6
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Reward" type="Panel" parent="Margin/ui_space"]
+visible = false
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_q3aj2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/Reward"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.4

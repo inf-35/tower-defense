@@ -15,7 +15,18 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 	island.terrain_changed.emit()
 
 # checks if a tower can be built on a specific cell
-func is_cell_constructable(island: Island, cell: Vector2i, tower_type: Towers.Type) -> bool:
+func is_cell_constructable(island: Island, cell: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
+	if general: #includes player-side construction checks
+		if not Player.unlocked_towers.get(tower_type, false):
+			return false
+		
+		if Player.flux < Towers.get_tower_cost(tower_type):
+			return false
+			
+		if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.RUINS):
+			if Player.used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity:
+				return false
+
 	if not island.terrain_base_grid.has(cell):
 		return false # cannot build outside the map
 	if island.tower_grid.has(cell):

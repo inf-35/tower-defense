@@ -15,6 +15,7 @@ func _ready():
 	stat_changed.connect(func(stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
 	)
+	set_process(false)
 
 # add a permanent buff/debuff (for level-ups, skill choices, etc.)
 func add_permanent_modifier(mod: Modifier) -> void:
@@ -68,6 +69,7 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 		# apply the updated state
 		update_status(existing_status)
 		check_reactions_for_status(type)
+		_recalculate_overlay_color()
 		return
 
 	# if it's a new status, create and configure it
@@ -97,6 +99,8 @@ func update_status(status: StatusEffect) -> void:
 		remove_modifier(status._modifier)
 		if _status_effects.has(status.type):
 			_status_effects.erase(status.type)
+		
+		_recalculate_overlay_color()
 		return
 
 	# create a new modifier that reflects the current state of the status effect
@@ -110,7 +114,7 @@ func update_status(status: StatusEffect) -> void:
 		
 	_recalculate_overlay_color()
 	
-#helper function to recalculate the visual overlay of units when under effects
+#helper function to recalculate the visual overlay of units when under status effects
 func _recalculate_overlay_color() -> void:
 	if not is_instance_valid(unit) or not is_instance_valid(unit.graphics) or not is_instance_valid(unit.graphics.material):
 		return

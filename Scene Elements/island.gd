@@ -17,7 +17,7 @@ var _preview_choices: Dictionary[int, ExpansionChoice] = {}
 var _highlighted_choice_id: int = -1
 
 # --- constants ---
-const CELL_SIZE: int = 13
+const CELL_SIZE: int = 10
 const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1) ]
 
 func _ready():
@@ -53,8 +53,7 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 		
 	return false
 
-# --- internal construction & update logic ---
-# this function is now called by services or the public API
+# public APIs (used by TerrainService)
 func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, initial_state: Dictionary = {}) -> Tower:
 	print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
@@ -71,16 +70,6 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	update_navigation_grid()
 	return tower
 
-func _on_tower_destroyed(tower: Tower):
-	var cell: Vector2i = tower.tower_position
-	if tower_grid.has(cell):
-		# Clean up grids and state
-		tower_grid.erase(cell)
-		Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
-		# Update neighbors
-		_update_adjacencies_around(cell)
-		update_navigation_grid()
-		
 func update_navigation_grid() -> void:
 	Navigation.grid.clear()
 	for cell: Vector2i in terrain_base_grid:
@@ -88,8 +77,8 @@ func update_navigation_grid() -> void:
 		var is_occupied: bool = tower_grid.has(cell)
 		Navigation.grid[cell] = is_navigable and not is_occupied
 	Navigation.clear_field()
-#not used
-func update_shore_boundary() -> void:
+
+func update_shore_boundary() -> void: #DEPRECATED
 	# simplified logic to find all land tiles adjacent to nothing
 	shore_boundary_tiles.clear()
 	for cell: Vector2i in terrain_base_grid:
@@ -97,13 +86,14 @@ func update_shore_boundary() -> void:
 			if not terrain_base_grid.has(cell + dir):
 				shore_boundary_tiles.append(cell)
 				break
+
 func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	_preview_choices = choices_by_id
 	_highlighted_choice_id = -1 # reset highlight
 	queue_redraw()
 
 # called by ExpansionService to tell the island which choice to highlight
-func set_highlighted_choice(choice_id: int) -> void:
+func set_highlighted_choice(choice_id: int = -1) -> void:
 	if _highlighted_choice_id != choice_id:
 		_highlighted_choice_id = choice_id
 		queue_redraw()
@@ -140,6 +130,16 @@ func _draw() -> void:
 				var tower_color: Color = Color.CRIMSON if is_highlighted else Color.DARK_RED
 				draw_circle(center, CELL_SIZE * 0.4, tower_color)
 
+func _on_tower_destroyed(tower: Tower):
+	var cell: Vector2i = tower.tower_position
+	if tower_grid.has(cell):
+		# Clean up grids and state
+		tower_grid.erase(cell)
+		Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
+		# Update neighbors
+		_update_adjacencies_around(cell)
+		update_navigation_grid()
+
 func _update_adjacencies_around(cell: Vector2i):
 	# ... (Function retained as is)
 	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
@@ -150,6 +150,7 @@ func _update_adjacencies_around(cell: Vector2i):
 		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
 		tower.adjacency_updated.emit(local_adjacencies)
 
+#static data access functions
 func get_tower_on_tile(cell: Vector2i):
 	return tower_grid.get(cell, null)
 
@@ -163,8 +164,29 @@ func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]:
 	
 func get_terrain_base(cell : Vector2i) -> Terrain.Base:
 	return terrain_base_grid.get(cell, Terrain.Base.EARTH)
+	
+# calculates the total bounding box of all existing terrain tiles.
+func get_island_bounds() -> Rect2:
+	if terrain_base_grid.is_empty():
+		return Rect2(global_position, Vector2.ONE * CELL_SIZE)
 
-# Static position helpers are still useful.
+	# find the min and max cell coordinates
+	var min_coord := Vector2i(INF, INF)
+	var max_coord := Vector2i(-INF, -INF)
+	for cell: Vector2i in terrain_base_grid.keys():
+		min_coord.x = min(min_coord.x, cell.x)
+		min_coord.y = min(min_coord.y, cell.y)
+		max_coord.x = max(max_coord.x, cell.x)
+		max_coord.y = max(max_coord.y, cell.y)
+
+	# convert the cell-based rect to a world-coordinate rect
+	var top_left_pos: Vector2 = Island.cell_to_position(min_coord)
+	var size_in_cells: Vector2i = (max_coord - min_coord) + Vector2i.ONE
+	var size_in_pixels: Vector2 = Vector2(size_in_cells) * CELL_SIZE
+	
+	return Rect2(top_left_pos, size_in_pixels)
+
+# static position helpers
 static func position_to_cell(position: Vector2) -> Vector2i:
 	return floor(position / CELL_SIZE)
 

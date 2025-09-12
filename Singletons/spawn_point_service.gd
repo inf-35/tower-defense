@@ -28,3 +28,6 @@ func get_spawn_points() -> Array[Vector2i]:
 func _on_breach_destroyed(breach_tower: Tower) -> void:
 	_breach_seeds.erase(breach_tower)
 	_active_breaches.erase(breach_tower)
+
+func _ready():
+	set_process(false)

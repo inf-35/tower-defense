@@ -40,6 +40,7 @@ func initialise(host_unit: Unit):
 			_cooldown = 0.0 #reset timer upon wave starting
 			print("reset!")
 	)
+	set_process(false)
 
 #behavior start function, called at the start of behavior
 func start() -> void:

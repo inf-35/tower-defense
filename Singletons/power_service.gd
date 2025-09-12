@@ -7,6 +7,7 @@ var _island_ref: Island # a reference to the active island
 func _ready() -> void:
 	# this service listens for player capacity changes to trigger its logic
 	Player.capacity_changed.connect(_on_player_capacity_changed)
+	set_process(false)
 
 # should be called by the Island when it is ready
 func register_island(island: Island) -> void:
@@ -23,6 +24,7 @@ func _on_player_capacity_changed(used: float, total: float) -> void:
 		_reenable_towers()
 
 func _disable_towers_for_deficit(deficit: float) -> void:
+	print(deficit)
 	var towers: Array[Tower] = _island_ref.tower_grid.values()
 	# sort by most recently constructed to shut them down first
 	towers.sort_custom(func(a,b): return a.unit_id > b.unit_id)

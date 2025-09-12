@@ -123,9 +123,7 @@ func _update_preview_visuals():
 	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
 	preview_tower_position = Island.position_to_cell(mouse_pos)
 
-	preview_is_valid = Player.has_capacity(preview_tower_type) and \
-		Player.flux >= Towers.get_tower_cost(preview_tower_type) and \
-		TerrainService.is_cell_constructable(References.island, preview_tower_position, preview_tower_type)
+	preview_is_valid = TerrainService.is_cell_constructable(References.island, preview_tower_position, preview_tower_type, true)
 
 	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 

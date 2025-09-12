@@ -16,8 +16,8 @@ var _enemies_planned: Array[Array] = []
 # --- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
 const EXPANSION_BLOCK_SIZE: int = 12
-const WAVES_PER_EXPANSION_CHOICE: int = 4
-const EXPANSION_CHOICES_COUNT: int = 3
+const WAVES_PER_EXPANSION_CHOICE: int = 2
+const EXPANSION_CHOICES_COUNT: int = 4
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
 
 # --- reconciliation system ---
@@ -91,7 +91,6 @@ func _spawn_enemies_for_current_wave() -> void:
 			
 			# increment the spawned counter only after the unit is created
 			_enemies_spawned += 1
-
 			await Clock.await_game_time(enemy_stagger)
 		
 		await Clock.await_game_time(enemy_stagger * 2)

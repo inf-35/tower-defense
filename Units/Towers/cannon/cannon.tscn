@@ -1,19 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://crffqaa5utxrm"]
+[gd_scene load_steps=12 format=3 uid="uid://crffqaa5utxrm"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8ywdl"]
+[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/default_tower_behavior.gd" id="2_8g1yo"]
 [ext_resource type="Resource" uid="uid://cr2yw0v4l47xc" path="res://Units/Towers/cannon/cannon_attack.tres" id="7_2qmy6"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="7_7aysu"]
+[ext_resource type="Texture2D" uid="uid://xqdlxxt01vpm" path="res://Assets/railgun_base.svg" id="8_mqjx8"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="8_y05ec"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="9_5ulem"]
+[ext_resource type="Texture2D" uid="uid://bpvugaljod6nx" path="res://Assets/railgun_head.svg" id="9_8g1yo"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="10_pkx8d"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_hbpja"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="13_tnmyg"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_nh6s4"]
 
-[node name="Cannon" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Cannon" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_8ywdl")
 type = 2
+turret = NodePath("Graphics/Turret")
+behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -21,6 +25,10 @@ movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="DefaultTowerBehavior" type="Node" parent="."]
+script = ExtResource("2_8g1yo")
+metadata/_custom_type_script = "uid://cs61b35p7jme8"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("7_7aysu")
@@ -35,15 +43,22 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 script = ExtResource("10_pkx8d")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
 script = ExtResource("11_hbpja")
 attack_data = ExtResource("7_2qmy6")
+muzzle = NodePath("../Graphics/Turret/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(1, 0.51, 0.51, 1)
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("13_tnmyg")
+scale = Vector2(0.048, 0.048)
+texture = ExtResource("8_mqjx8")
+
+[node name="Turret" type="Sprite2D" parent="Graphics"]
+z_index = 1
+texture = ExtResource("9_8g1yo")
+
+[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
+position = Vector2(104.167, 0)
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("14_nh6s4")

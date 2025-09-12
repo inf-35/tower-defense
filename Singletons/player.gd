@@ -8,7 +8,7 @@ signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
-var flux: float = 20.0:
+var flux: float = 40.0:
 	set(value):
 		flux = value
 		flux_changed.emit(flux)
@@ -43,8 +43,9 @@ var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 		unlocked_towers = value
 		unlocked_towers_changed.emit(unlocked_towers)
 #tower unlock helper functions
-func unlock_towers(tower_type : Towers.Type, unlock : bool = true):
+func unlock_tower(tower_type : Towers.Type, unlock : bool = true):
 	unlocked_towers[tower_type] = unlock
+	unlocked_towers_changed.emit(unlocked_towers)
 	
 func is_tower_unlocked(tower_type : Towers.Type) -> bool:
 	return unlocked_towers.get(tower_type, false)
@@ -57,7 +58,6 @@ func _ready():
 		Towers.Type.TURRET: true,
 		Towers.Type.AMPLIFIER: true,
 		Towers.Type.CANNON: true,
-		Towers.Type.FROST_TOWER: true,
 	}
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
@@ -76,10 +76,11 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		
 	if flux < Towers.get_tower_cost(tower_type):
 		return
-		
-	if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity:
-		# NOTE: You could add a UI warning here about insufficient capacity.
-		return
+	
+	if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.RUINS):
+		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity:
+			# NOTE: You could add a UI warning here about insufficient capacity.
+			return
 
 	# 2. Ask the Island to perform the placement. The Island is responsible for world checks.
 	var success = References.island.request_tower_placement(cell, tower_type, facing)

@@ -18,6 +18,9 @@ enum TargetingMode {
 	SCATTER,
 }
 
+func _ready():
+	set_process(false)
+
 func inject_components(_attack_component: AttackComponent, _modifiers_component: ModifiersComponent):
 	attack_component = _attack_component
 	modifiers_component = _modifiers_component

@@ -61,8 +61,6 @@ func _on_inspector_contents_tower_update(tower : Tower):
 		_display_stat(tower, display_info)
 	
 	tower.get_unit_state() #this prompts the tower to send us its health too
-		
-	
 
 func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
 	healthbar.max_value = max_hp
@@ -138,13 +136,14 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 		
 	# Apply final modifiers
 	if display_info.special_modifier == DisplayStatModifier.RECIPROCAL and value != 0:
-		value = 1.0 / value
-	
+		value = 1.0 / float(value)
+		print(value)
+
 	if display_info.special_modifier == DisplayStatModifier.INVERT:
 		value *= -1
 	
 	if typeof(value) == TYPE_FLOAT: #round to 2dp
-		value = roundi(value * 100) / 100
+		value = snappedf(value, 0.01)
 
 	var stat_label := Label.new()
 	stat_label.text = display_info.label + " " + str(value) + display_info.suffix

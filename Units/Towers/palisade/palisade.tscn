@@ -1,11 +1,19 @@
-[gd_scene load_steps=7 format=3 uid="uid://c184bi7kvtd4o"]
+[gd_scene load_steps=9 format=3 uid="uid://c184bi7kvtd4o"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_fmnx7"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_gwako"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_n2qx0"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_ahe76"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_wty5f"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="8_qgmek"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_l85yc"]
+
+[sub_resource type="Resource" id="Resource_ylobt"]
+script = ExtResource("5_wty5f")
+max_health = 15.0
+regeneration = 0.0
+regen_percent = 0.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [node name="Palisade" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
@@ -24,6 +32,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("5_ahe76")
+health_data = SubResource("Resource_ylobt")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]

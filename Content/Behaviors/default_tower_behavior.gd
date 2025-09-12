@@ -31,13 +31,11 @@ func update(delta: float) -> void:
 		
 		# --- Dynamic Turn Speed Calculation ---
 		# if we have time left on the cooldown, calculate the exact speed needed to arrive on time.
-		if cooldown_left > 0.001: # use a small epsilon to avoid division by zero
-			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
-			var required_turn_speed: float = angle_diff / cooldown_left
-			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
-		else:
-			# if cooldown is up, snap to the final angle instantly.
-			turret.rotation = target_angle
+		cooldown_left = max(cooldown_left, 0.05) #small minimum turning time
+		var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
+		var required_turn_speed: float = angle_diff / cooldown_left
+		_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
+
 
 	# --- 3. Firing Logic ---
 	# the firing decision is now completely decoupled from aiming.

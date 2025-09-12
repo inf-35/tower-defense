@@ -32,7 +32,7 @@ CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 Attributes="*res://Indexes/attributes.gd"
 CombatManager="*res://Singletons/combat_manager.gd"
 VFXManager="*res://Singletons/vfx_manager.gd"
-ExpansionService="*res://Singletons/terrain_expansion.gd"
+ExpansionService="*res://Singletons/expansion_service.gd"
 TerrainService="*res://Singletons/terrain_service.gd"
 PowerService="*res://Singletons/power_service.gd"
 SpawnPointService="*res://Singletons/spawn_point_service.gd"
@@ -47,6 +47,7 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/vsync/vsync_mode=0
 
 [gui]
 

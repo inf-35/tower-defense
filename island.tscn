@@ -10,7 +10,7 @@
 script = ExtResource("1_0iamf")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
+zoom = Vector2(4, 4)
 script = ExtResource("2_04hb4")
 
 [node name="Tooltips" type="CanvasLayer" parent="."]

@@ -13,7 +13,7 @@
 script = ExtResource("3_wqpev")
 attribute = 8
 additive = 0.0
-multiplicative = 0.75
+multiplicative = 0.6
 override = null
 cooldown = -1.0
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
