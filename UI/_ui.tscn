@@ -42,6 +42,7 @@ grow_vertical = 2
 size_flags_horizontal = 0
 
 [node name="Expansion" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("_vbox")]
+visible = false
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 anchor_right = 1.0
