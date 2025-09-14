@@ -85,3 +85,9 @@ func _clear_all_modifiers() -> void:
 	var towers_to_clear: Array[Tower] = _applied_modifiers.keys()
 	for tower: Tower in towers_to_clear:
 		_remove_modifier_from_tower(tower)
+
+func get_display_data() -> Dictionary:
+	# we use StringNames (&) for performance and to avoid typos.
+	return {
+		ID.UnitState.AMPLIFIER_MODIFIER : modifier_prototype
+	}

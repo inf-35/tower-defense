@@ -6,6 +6,8 @@ enum Type {
 	ADD_FLUX,
 	UNLOCK_TOWER,
 	APPLY_MODIFIER,
+	
+	EXPORT #workaround, this tells the initialiser that the reward is defined in inspector
 }
 
 @export var type: Type
@@ -15,6 +17,6 @@ enum Type {
 	ID.Rewards.TOWER_TYPE : Towers.Type.TURRET,
 }
 
-func _init(_type: Type, _params: Dictionary):
-	self.type = _type
-	self.params = _params
+func _init(_type: Type = Type.EXPORT, _params: Dictionary = {}):
+	if _type != Type.EXPORT: self.type = _type
+	if not _params.is_empty(): self.params = _params

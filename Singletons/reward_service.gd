@@ -53,7 +53,7 @@ func select_reward(choice_id: int) -> void:
 		return
 
 	var chosen_reward: Reward = _current_reward_options_by_id[choice_id]
-	_apply_reward(chosen_reward)
+	apply_reward(chosen_reward)
 	
 	_current_reward_options_by_id.clear() # clear the state after a choice is made
 	is_choosing_reward = false
@@ -62,7 +62,7 @@ func select_reward(choice_id: int) -> void:
 	reward_process_complete.emit()
 	
 # internal logic for executing the reward's effect
-func _apply_reward(reward: Reward) -> void:
+func apply_reward(reward: Reward) -> void:
 	match reward.type:
 		Reward.Type.ADD_FLUX:
 			var amount: int = reward.params.get(ID.Rewards.FLUX_AMOUNT, 0)

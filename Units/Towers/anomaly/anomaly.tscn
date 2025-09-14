@@ -1,0 +1,65 @@
+[gd_scene load_steps=13 format=3 uid="uid://yb7vgd4nljii"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5uxnm"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_hd4ab"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_dq7x7"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_4q3qk"]
+[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="5_7uy27"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_0e6gm"]
+[ext_resource type="Script" uid="uid://bwh4er8ltu171" path="res://Content/Behaviors/anomaly_behavior.gd" id="7_5gpfh"]
+[ext_resource type="Script" uid="uid://cbmgjrfxxauja" path="res://Objects/reward.gd" id="8_7yihv"]
+[ext_resource type="Script" uid="uid://dwpna5u0ynf44" path="res://Content/anomaly_data.gd" id="9_0knjx"]
+
+[sub_resource type="Resource" id="Resource_shlxc"]
+script = ExtResource("2_hd4ab")
+attribute = 10
+label = "WAV"
+suffix = ""
+special_modifier = 8
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_cynh5"]
+script = ExtResource("8_7yihv")
+type = 0
+params = {
+&"flux_amount": 500.0,
+&"tower_type": 2
+}
+metadata/_custom_type_script = "uid://cbmgjrfxxauja"
+
+[sub_resource type="Resource" id="Resource_4vd3g"]
+script = ExtResource("9_0knjx")
+reward = SubResource("Resource_cynh5")
+waves_to_charge = 3
+title = "Unstable Anomaly"
+description = "Maintain adjacent towers for waves to stabilise and claim its reward."
+metadata/_custom_type_script = "uid://dwpna5u0ynf44"
+
+[node name="Anomaly" type="Node2D" node_paths=PackedStringArray("behavior", "modifiers_component", "movement_component")]
+z_index = 1
+script = ExtResource("1_5uxnm")
+type = 10
+stat_displays = Array[ExtResource("2_hd4ab")]([SubResource("Resource_shlxc")])
+behavior = NodePath("AnomalyBehavior")
+modifiers_component = NodePath("ModifiersComponent")
+movement_component = NodePath("MovementComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_dq7x7")
+movement_data = ExtResource("4_4q3qk")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+modulate = Color(4.42803e-06, 0.727944, 0.298674, 1)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("5_7uy27")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("6_0e6gm")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnomalyBehavior" type="Node" parent="."]
+script = ExtResource("7_5gpfh")
+_anomaly_data = SubResource("Resource_4vd3g")
+metadata/_custom_type_script = "uid://bwh4er8ltu171"

@@ -13,25 +13,29 @@ var _choices_by_id: Dictionary[int, ExpansionChoice] = {}
 var _hovered_choice_id: int = -1 # -1 means no choice is hovered
 var _pending_choice_id: int = -1 # the choice waiting for confirmation
 
-var STANDARD_EXPANSION_PARAMS: GenerationParameters = GenerationParameters.new({
-	&"ruins_chance" : 0.08,
-	&"breach_seed_duration": 2,
-	&"spawn_breach": true,
-})
+var STANDARD_EXPANSION_PARAMS: GenerationParameters #see _init for definition
 
-class GenerationParameters:
-	# --- terrain composition rules ---
-	var ruins_chance: float = 0.1
-	# --- feature spawning rules ---
-	var spawn_breach: bool = true
-	# --- feature state rules ---
-	# this will be used to populate the 'initial_state' packet for generated towers
-	var breach_seed_duration: int = 2
+# --- terrain generation ---
+enum PlacementLogic {
+	ANYWHERE,
+	EDGE,
+}
+
+func _init():
+	STANDARD_EXPANSION_PARAMS = GenerationParameters.new()
+	STANDARD_EXPANSION_PARAMS.ruins_chance = 0.10
 	
-	func _init(params: Dictionary = {}):
-		for parameter in params:
-			if parameter in self:
-				self[parameter] = params[parameter]
+	var breach_rule := PlacementRule.new()
+	breach_rule.tower_type = Towers.Type.BREACH
+	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
+	breach_rule.initial_state = {"seed_duration_waves": 2}
+	
+	var anomaly_rule := PlacementRule.new()
+	anomaly_rule.tower_type = Towers.Type.ANOMALY
+	anomaly_rule.placement = PlacementRule.PlacementLogic.EDGE
+	
+	STANDARD_EXPANSION_PARAMS.placement_rules.append(breach_rule)
+	STANDARD_EXPANSION_PARAMS.placement_rules.append(anomaly_rule)
 
 func _ready():
 	set_process(false)
@@ -45,13 +49,16 @@ func _ready():
 
 #helper function for creating the initial island
 func generate_initial_island_block(island: Island, block_size: int) -> Dictionary:
-	# --- EDITED SECTION START ---
 	# for the very first block, we create a custom ruleset in code
 	var initial_params := GenerationParameters.new()
 	initial_params.ruins_chance = 0.05 # lower chance of ruins at the start
-	initial_params.spawn_breach = true
-	# the key requirement: the initial breach is already active
-	initial_params.breach_seed_duration = 0
+	# rule 1: place one active breach
+	var breach_rule := PlacementRule.new()
+	breach_rule.tower_type = Towers.Type.BREACH
+	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
+	breach_rule.initial_state = {"seed_duration_waves": 0} # 0 = active immediately
+	
+	initial_params.placement_rules.append(breach_rule)
 	
 	return _generate_block(island, block_size, initial_params)
 
@@ -178,24 +185,69 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 		
 		var base: Terrain.Base = Terrain.Base.EARTH if randf() > params.ruins_chance else Terrain.Base.RUINS
 		block_data[coord].terrain = base
-
-	# --- Breach Spawning Logic ---
-	# find a suitable edge tile on the *newly generated* block to place the seed
-	var potential_breach_locations: Array[Vector2i] = []
-	for coord: Vector2i in generated_coords:
-		for dir: Vector2i in island.DIRS:
-			var neighbor: Vector2i = coord + dir
-			# an edge tile is one that is adjacent to a tile not in our new block
-			if not block_data.has(neighbor):
-				potential_breach_locations.append(coord)
-				break
+		
+	# --- Feature Placement Pipeline ---
 	
-	if not potential_breach_locations.is_empty():
-		var breach_cell: Vector2i = potential_breach_locations.pick_random()
-		block_data[breach_cell].feature = Towers.Type.BREACH
-		block_data[breach_cell].initial_state[ID.UnitState.SEED_DURATION_WAVES] = params.breach_seed_duration
+	# 2. create a mutable pool of available locations for feature placement
+	var available_cells: Array[Vector2i] = generated_coords.duplicate()
+	# 3. iterate through the rules defined in the GenerationParameters
+	for rule: PlacementRule in params.placement_rules:
+		# find all cells in the pool that are valid for this rule's placement logic
+		var candidate_cells: Array[Vector2i] = _get_candidate_cells(available_cells, island, rule.placement)
+		# place the feature 'count' times
+		for i: int in rule.count:
+			if candidate_cells.is_empty():
+				# if we run out of valid spots, break the inner loop and move to the next rule
+				break
+			
+			# pick a random valid cell
+			var chosen_cell: Vector2i = candidate_cells.pick_random()
+			
+			# place the feature
+			block_data[chosen_cell].feature = rule.tower_type
+			block_data[chosen_cell].initial_state = rule.initial_state
+			
+			# CRITICAL: remove the chosen cell from all pools to prevent conflicts
+			candidate_cells.erase(chosen_cell)
+			available_cells.erase(chosen_cell)
+	## --- Breach Spawning Logic ---
+	## find a suitable edge tile on the *newly generated* block to place the seed
+	#var potential_breach_locations: Array[Vector2i] = []
+	#for coord: Vector2i in generated_coords:
+		#for dir: Vector2i in island.DIRS:
+			#var neighbor: Vector2i = coord + dir
+			## an edge tile is one that is adjacent to a tile not in our new block
+			#if not block_data.has(neighbor):
+				#potential_breach_locations.append(coord)
+				#break
+	#
+	#if not potential_breach_locations.is_empty():
+		#var breach_cell: Vector2i = potential_breach_locations.pick_random()
+		#block_data[breach_cell].feature = Towers.Type.BREACH
+		#block_data[breach_cell].initial_state[ID.UnitState.SEED_DURATION_WAVES] = params.breach_seed_duration
 
 	return block_data
+	
+#helper function to find valid locations based on a placement rule
+func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic: PlacementRule.PlacementLogic) -> Array[Vector2i]:
+	match placement_logic:
+		PlacementRule.PlacementLogic.ANYWHERE:
+			return pool # all available cells are valid
+			
+		PlacementRule.PlacementLogic.EDGE:
+			var edge_cells: Array[Vector2i] = []
+			for cell: Vector2i in pool:
+				var is_edge: bool = false
+				for dir: Vector2i in island.DIRS:
+					# an edge tile is one that is adjacent to the existing island or sea (a non-pool tile)
+					if not pool.has(cell + dir):
+						is_edge = true
+						break
+				if is_edge:
+					edge_cells.append(cell)
+			return edge_cells
+			
+	return [] # fallback
 
 func _trigger_camera_overview(island: Island) -> void:
 	# 1. get references and handle invalid states

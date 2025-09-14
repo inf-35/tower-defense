@@ -11,7 +11,8 @@ enum Type {
 	PALISADE,
 	CATALYST,
 	AMPLIFIER,
-	BREACH
+	BREACH,
+	ANOMALY
 }
 
 enum Element {

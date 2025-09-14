@@ -2,11 +2,18 @@
 class_name ID
 
 class UnitState:
-	const WAVES_LEFT_IN_PHASE: StringName = &"waves_left_in_phase" #for Breach
+	const WAVES_LEFT_IN_PHASE: StringName = &"waves_left_in_phase" #for breach
 	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves"
+	const AMPLIFIER_MODIFIER: StringName = &"modifier" #for amplifier
+	const ANOMALY_WAVES_LEFT: StringName = &"anomaly_waves_left" #for anomaly
 	
 	const CAPACITY_GENERATED: StringName = &"capacity_generated"
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"
+	
+class TerrainGen:
+	const RUINS_CHANCE: StringName = &"ruins_chance"
+	const SPAWN_BREACH: StringName = &"spawn_breach"
+	const BREACH_SEED_DURATION: StringName = &"breach_seed_duration"
 	
 class Rewards:
 	const TOWER_TYPE: StringName = &"tower_type"

@@ -16,7 +16,7 @@ var _enemies_planned: Array[Array] = []
 # --- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
 const EXPANSION_BLOCK_SIZE: int = 12
-const WAVES_PER_EXPANSION_CHOICE: int = 2
+const WAVES_PER_EXPANSION_CHOICE: int = 5
 const EXPANSION_CHOICES_COUNT: int = 4
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
 

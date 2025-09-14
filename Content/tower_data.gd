@@ -10,7 +10,7 @@ class_name TowerData
 @export var element: Towers.Element
 
 @export var tower_name: String
-@export var tower_description: String
+@export_multiline var tower_description: String
 
 @export var tower_scene: PackedScene
 #...upgrades
