@@ -5,7 +5,6 @@ signal expansion_process_complete
 
 #configuration
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
-#expansion state
 # --- state machine ---
 enum State { IDLE, CHOOSING, CONFIRMING }
 var _current_state: State = State.IDLE
@@ -28,7 +27,7 @@ func _init():
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
 	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
-	breach_rule.initial_state = {"seed_duration_waves": 2}
+	breach_rule.initial_state = {ID.TerrainGen.SEED_DURARTION_WAVES: 2}
 	
 	var anomaly_rule := PlacementRule.new()
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
@@ -161,19 +160,19 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	var visited: Dictionary[Vector2i, bool] = {}
 	var generated_coords: Array[Vector2i] = []
 
-	# this is a simplified breadth-first search to find adjacent sea tiles
+	# simplified breadth-first search to find adjacent sea tiles (find tile-coordinates to expand)
 	while not to_visit.is_empty() and generated_coords.size() < block_size:
 		var cell: Vector2i = to_visit.pop_front()
 		if visited.has(cell):
 			continue
 		visited[cell] = true
 		
-		# only sea tiles can be converted to land
-		if island.terrain_base_grid.get(cell) == null: # a proxy for being SEA
+		# only empty tiles can be converted to land
+		if island.terrain_base_grid.get(cell) == null:
 			generated_coords.append(cell)
 
 		for dir: Vector2i in island.DIRS:
-			var neighbor: Vector2i = cell + dir
+			var neighbor: Vector2i = cell + dir #NOTE: we also visit non-empty tiles. this allows more "smooth" expansion blobs
 			if not visited.has(neighbor):
 				to_visit.append(neighbor)
 	
@@ -187,7 +186,6 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 		block_data[coord].terrain = base
 		
 	# --- Feature Placement Pipeline ---
-	
 	# 2. create a mutable pool of available locations for feature placement
 	var available_cells: Array[Vector2i] = generated_coords.duplicate()
 	# 3. iterate through the rules defined in the GenerationParameters
@@ -210,22 +208,6 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 			# CRITICAL: remove the chosen cell from all pools to prevent conflicts
 			candidate_cells.erase(chosen_cell)
 			available_cells.erase(chosen_cell)
-	## --- Breach Spawning Logic ---
-	## find a suitable edge tile on the *newly generated* block to place the seed
-	#var potential_breach_locations: Array[Vector2i] = []
-	#for coord: Vector2i in generated_coords:
-		#for dir: Vector2i in island.DIRS:
-			#var neighbor: Vector2i = coord + dir
-			## an edge tile is one that is adjacent to a tile not in our new block
-			#if not block_data.has(neighbor):
-				#potential_breach_locations.append(coord)
-				#break
-	#
-	#if not potential_breach_locations.is_empty():
-		#var breach_cell: Vector2i = potential_breach_locations.pick_random()
-		#block_data[breach_cell].feature = Towers.Type.BREACH
-		#block_data[breach_cell].initial_state[ID.UnitState.SEED_DURATION_WAVES] = params.breach_seed_duration
-
 	return block_data
 	
 #helper function to find valid locations based on a placement rule
@@ -262,7 +244,7 @@ func _trigger_camera_overview(island: Island) -> void:
 	# 3. guard against a zero-sized island to prevent division by zero
 	if island_bounds.size.x <= 0 or island_bounds.size.y <= 0:
 		return
-	# 5. calculate the required zoom level
+	# 4. calculate the required zoom level
 	var longest_distance: float = max(island_bounds.size.x, island_bounds.size.y)
 	# the final zoom must be the larger of the two ratios to ensure everything fits
 	var required_zoom_level: float = 4.0 / (longest_distance * 0.01) #this is derived from the camera's default zoom and the island's intiial size (1/100)
@@ -270,7 +252,7 @@ func _trigger_camera_overview(island: Island) -> void:
 
 	var target_zoom: Vector2 = Vector2.ONE * required_zoom_level
 	
-	# 4. calculate the target position (the center of the island)
+	# 5. calculate the target position (offset such that the rightmots edge of the island appears at the centre of the screen, offset by OVERVIEW_ISLAND_OFFSET
 	var target_position: Vector2 = island_bounds.get_center() + Vector2(island_bounds.size.x * 0.5, 0) + Vector2(OVERVIEW_ISLAND_OFFSET * viewport_size.x / required_zoom_level, 0)
 
 	# 6. command the camera to execute the transition
@@ -306,7 +288,7 @@ func _trigger_camera_focus_on_choice(island: Island, choice_id: int) -> void:
 	var required_zoom_level: float = 4.0 / (longest_distance * 0.01)
 	var target_zoom: Vector2 = Vector2.ONE * required_zoom_level
 	
-	# 4. calculate the target position (the center of the choice)
+	# 4. calculate the target position (see above, but this time for the selection in particular)
 	var target_position: Vector2 = world_bounds.get_center() + Vector2(world_bounds.size.x * 0.5, 0) + Vector2(OVERVIEW_ISLAND_OFFSET * viewport_size.x / required_zoom_level, 0)
 
 	# 5. command the camera to execute the transition

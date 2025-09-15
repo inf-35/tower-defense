@@ -11,9 +11,7 @@ class UnitState:
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"
 	
 class TerrainGen:
-	const RUINS_CHANCE: StringName = &"ruins_chance"
-	const SPAWN_BREACH: StringName = &"spawn_breach"
-	const BREACH_SEED_DURATION: StringName = &"breach_seed_duration"
+	const SEED_DURARTION_WAVES: StringName = &"seed_duration_waves" #used for pregen feature initial state definition
 	
 class Rewards:
 	const TOWER_TYPE: StringName = &"tower_type"

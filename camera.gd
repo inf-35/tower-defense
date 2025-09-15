@@ -72,7 +72,6 @@ func release_override() -> void:
 	_active_tween.finished.connect(func(): _is_overridden = false)
 
 # --- private signal handler ---
-
 # this function is called automatically when the override tween completes.
 func _on_override_finished() -> void:
 	# 2. clear the reference to the now-finished tween.

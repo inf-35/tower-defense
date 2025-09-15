@@ -38,7 +38,6 @@ func initialise(host_unit: Unit):
 	unit.on_event.connect(func(event: GameEvent):
 		if event.event_type == GameEvent.EventType.WAVE_STARTED:
 			_cooldown = 0.0 #reset timer upon wave starting
-			print("reset!")
 	)
 	set_process(false)
 
