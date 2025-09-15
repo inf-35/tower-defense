@@ -20,6 +20,8 @@ var _cooldown: float = 0.0
 
 # this function is called by the unit to give the behavior all the tools it needs
 func initialise(host_unit: Unit):
+	set_process(false)
+	
 	self.unit = host_unit
 	# safely get references
 	self.modifiers_component = unit.modifiers_component
@@ -33,13 +35,16 @@ func initialise(host_unit: Unit):
 	self.graphics = unit.graphics
 	if &"turret" in unit:
 		self.turret = unit.turret
+		
+	if unit.abstractive:
+		return
+
 	start()
 	
 	unit.on_event.connect(func(event: GameEvent):
 		if event.event_type == GameEvent.EventType.WAVE_STARTED:
 			_cooldown = 0.0 #reset timer upon wave starting
 	)
-	set_process(false)
 
 #behavior start function, called at the start of behavior
 func start() -> void:

@@ -8,7 +8,7 @@ class GameTimer:
 	var time_elapsed: float = 0.0
 	var is_active: bool = true
 	
-const BASE_SPEED: float = 1.0
+const BASE_SPEED: float = 8.0
 const PAUSE_SPEED: float = 0.0
 
 # --- public api ---

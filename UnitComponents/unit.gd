@@ -239,11 +239,12 @@ func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environ
 		return
 	
 	for attribute: StringName in behavior_packet:
+		print("Applied! ", attribute," ", behavior_packet[attribute])
 		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
-			print(attribute, " set! value:", behavior[attribute])
 		else:
 			push_warning(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
+	UI.update_unit_state.emit(self)
 
 func take_hit(hit: HitData):
 	if not is_instance_valid(self):

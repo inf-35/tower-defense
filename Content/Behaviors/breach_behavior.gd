@@ -10,7 +10,6 @@ var _current_state: State
 var _waves_left_in_state: int
 
 func start() -> void:
-	print("started ", seed_duration_waves)
 	# connect to the game-wide signal to track wave progression
 	Phases.wave_cycle_started.connect(_on_wave_cycle_started)
 	# start in the initial state
@@ -56,6 +55,11 @@ func update(delta: float) -> void:
 	
 func get_display_data() -> Dictionary:
 	# we use StringNames (&) for performance and to avoid typos.
+	if _waves_left_in_state == 0: #not initialised
+		return { #for preview inspection
+			ID.UnitState.WAVES_LEFT_IN_PHASE: seed_duration_waves
+		}
+
 	return {
 		ID.UnitState.WAVES_LEFT_IN_PHASE: _waves_left_in_state
 	}

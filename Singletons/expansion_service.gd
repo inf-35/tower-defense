@@ -102,6 +102,17 @@ func select_expansion(island: Island, choice_id: int) -> void:
 	UI.hide_expansion_choices.emit()
 	UI.hide_expansion_confirmation.emit()
 	
+# returns the CellData for a previewed tile, or null if no preview exists there.
+func get_preview_data_at_cell(cell: Vector2i) -> Terrain.CellData:
+	if _current_state == State.IDLE:
+		return null
+	# iterate through the choices to find which one, if any, contains this cell
+	for choice: ExpansionChoice in _choices_by_id.values():
+		if choice.block_data.has(cell):
+			return choice.block_data[cell]
+
+	return null
+	
 # called when the UI emits that a choice button is being hovered
 func _on_choice_hovered(choice_id: int) -> void:
 	if _current_state != State.CHOOSING:

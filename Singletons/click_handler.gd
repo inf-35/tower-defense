@@ -10,6 +10,8 @@ var preview_tower_type: Towers.Type   # The tower type being previewed for build
 var preview_tower_facing: Tower.Facing
 var preview_is_valid: bool
 var preview_tower_position: Vector2i
+# --- new state variable for managing "ghost" units for inspection
+var _ghost_unit_for_inspection: Unit = null
 
 @onready var current_preview: TowerPreview = References.tower_preview
 
@@ -46,6 +48,11 @@ func _enter_idle_state():
 		selected_tower = null
 		tower_was_deselected.emit()
 	
+	# CRITICAL: ensure the ghost unit is destroyed when leaving a selection state
+	if is_instance_valid(_ghost_unit_for_inspection):
+		_ghost_unit_for_inspection.free()
+		_ghost_unit_for_inspection = null
+	
 	if is_instance_valid(current_preview):
 		current_preview.hide()
 	
@@ -81,9 +88,17 @@ func _handle_idle_input(event: InputEvent) -> void:
 		var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
 		var cell_pos : Vector2i = Island.position_to_cell(mouse_pos)
 		
+		# check for a previewed feature from the ExpansionService
+		var preview_data: Terrain.CellData = ExpansionService.get_preview_data_at_cell(cell_pos)
+		if is_instance_valid(preview_data) and preview_data.feature != Towers.Type.VOID:
+			# preview found! create a temporary "ghost" unit for inspection.
+			_create_and_inspect_ghost_unit(preview_data, cell_pos)
+			return # stop further processing
+		
 		if References.island.tower_grid.has(cell_pos):
-			var clicked_tower = References.island.tower_grid[cell_pos]
+			var clicked_tower: Tower = References.island.tower_grid[cell_pos]
 			_enter_tower_selected_state(clicked_tower)
+		#else do nothing
 
 func _handle_preview_input(event: InputEvent) -> void:
 	# Handle mouse motion to update the preview visuals.
@@ -110,6 +125,13 @@ func _handle_tower_selected_input(event: InputEvent) -> void:
 	# Any click while a tower is selected will deselect it.
 	if event is InputEventMouseButton and event.is_pressed():
 		var cell_pos : Vector2i = Island.position_to_cell(References.camera.get_global_mouse_position())
+		
+		# check for previews first
+		var preview_data: Terrain.CellData = ExpansionService.get_preview_data_at_cell(cell_pos)
+		if is_instance_valid(preview_data) and preview_data.feature != Towers.Type.VOID:
+			_create_and_inspect_ghost_unit(preview_data, cell_pos)
+			return
+		
 		if References.island.tower_grid.has(cell_pos): #seamlessly switches between towers
 			var clicked_tower = References.island.tower_grid[cell_pos]
 			_enter_tower_selected_state(clicked_tower)
@@ -117,7 +139,6 @@ func _handle_tower_selected_input(event: InputEvent) -> void:
 			_enter_idle_state()
 
 # --- Helper Functions ---
-
 func _update_preview_visuals():
 	# This function centralizes the logic for updating the preview.
 	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
@@ -126,9 +147,37 @@ func _update_preview_visuals():
 	preview_is_valid = TerrainService.is_cell_constructable(References.island, preview_tower_position, preview_tower_type, true)
 
 	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
+	
+# new helper to create and manage the temporary inspection unit
+func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vector2i) -> void:
+	# first, clean up any previous state
+	_enter_idle_state()
+	
+	# create the temporary tower instance
+	_ghost_unit_for_inspection = Towers.create_tower(cell_data.feature)
+	if not is_instance_valid(_ghost_unit_for_inspection):
+		return # failed to create
+		
+	# configure the ghost unit
+	_ghost_unit_for_inspection.abstractive = true # IMPORTANT: prevents it from interacting with gameplay
+	_ghost_unit_for_inspection.visible = false
+	_ghost_unit_for_inspection.tower_position = cell_pos
+	# pass the preview's initial state data to the ghost unit so its behavior is configured correctly
+	if not cell_data.initial_state.is_empty():
+		_ghost_unit_for_inspection.set_initial_behaviour_state(cell_data.initial_state)
+	
+	# add it to the scene tree so it's a valid node
+	add_child(_ghost_unit_for_inspection)
+	
+	# transition to the TOWER_SELECTED state using the ghost unit
+	# we don't call the full _enter_tower_selected_state because we don't want to
+	# clear the ghost; we just set the state and tell the inspector to update.
+	current_state = State.TOWER_SELECTED
+	selected_tower = _ghost_unit_for_inspection
+	tower_was_selected.emit(selected_tower)
+	UI.update_inspector_bar.emit(selected_tower)
 
 # --- Signal Connections ---
-
 func _on_build_tower_selected(type_id: Towers.Type):
 	# The UI is requesting to start building a tower.
 	_enter_preview_state(type_id)
