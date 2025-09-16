@@ -21,7 +21,7 @@ enum Type {
 static var unit_stats : Dictionary[Type, UnitStat] = {
 	Type.BASIC: UnitStat.new(
 		preload("res://Units/Enemies/basic_unit/basic_unit.tscn"),
-		1.0,
+		0.5,
 		1.0
 	),
 	Type.BUFF: UnitStat.new(
