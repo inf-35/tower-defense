@@ -15,7 +15,7 @@ func _ready() -> void:
 func register_island(island: Island) -> void:
 	_island_ref = island
 
-func _on_player_capacity_changed(used: float, total: float) -> void:
+func _on_player_capacity_changed(_used: float, _total: float) -> void:
 	if not is_instance_valid(_island_ref):
 		return
 
