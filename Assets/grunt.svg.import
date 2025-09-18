@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cop5x8s5y2krl"
-path="res://.godot/imported/grunt.png-8aef077421f22bbaf6c8c0d72dd51c90.ctex"
+uid="uid://bgjoysbfjljt6"
+path="res://.godot/imported/grunt.svg-13c301a6babb0c287ee90bb367a3c720.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/grunt.png"
-dest_files=["res://.godot/imported/grunt.png-8aef077421f22bbaf6c8c0d72dd51c90.ctex"]
+source_file="res://Assets/grunt.svg"
+dest_files=["res://.godot/imported/grunt.svg-13c301a6babb0c287ee90bb367a3c720.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=4.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

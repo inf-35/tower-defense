@@ -24,7 +24,6 @@ func _on_player_capacity_changed(used: float, total: float) -> void:
 		_reenable_towers()
 
 func _disable_towers_for_deficit(deficit: float) -> void:
-	print(deficit)
 	var towers: Array[Tower] = _island_ref.tower_grid.values()
 	# sort by most recently constructed to shut them down first
 	towers.sort_custom(func(a,b): return a.unit_id > b.unit_id)

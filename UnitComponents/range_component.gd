@@ -4,7 +4,7 @@ class_name RangeComponent
 var area: Area2D
 
 var _enemies_in_range: Array[Unit] = []
-var targeting_mode: TargetingMode = TargetingMode.CLOSEST
+@export var targeting_mode: TargetingMode = TargetingMode.CLOSEST
 # if this is set, get_target will prioritize it over all other logic.
 var priority_target_override: Unit = null
 
@@ -105,7 +105,7 @@ func get_target():
 			for enemy: Unit in _enemies_in_range:
 				if not is_target_valid(enemy):
 					continue
-				var distance: float = enemy.movement_component.position.length_squared()
+				var distance: float = (enemy.position - unit.position).length_squared()
 				if distance < record_distance:
 					record_distance = distance
 					record_unit = enemy

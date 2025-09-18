@@ -62,7 +62,7 @@ func _is_charge_condition_met(adjacencies: Dictionary[Vector2i, Tower]) -> bool:
 # signal handler for when neighboring towers change
 func _on_adjacency_updated(adjacencies: Dictionary[Vector2i, Tower]) -> void:
 	if _current_state == State.COMPLETE: return
-
+	print("anomaly adjacency updated")
 	var condition_met: bool = _is_charge_condition_met(adjacencies)
 	
 	if condition_met and _current_state == State.INACTIVE:
@@ -75,6 +75,7 @@ func _on_wave_ended(wave_number: int) -> void:
 	if _current_state != State.CHARGING: return
 	
 	_waves_charged += 1
+	print("charged!", _waves_charged," / ",_anomaly_data.waves_to_charge)
 	if _waves_charged >= _anomaly_data.waves_to_charge:
 		_enter_state(State.COMPLETE)
 

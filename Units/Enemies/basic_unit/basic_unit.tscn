@@ -6,8 +6,8 @@
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_urfjf"]
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ns662"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_n0rgw"]
-[ext_resource type="Texture2D" uid="uid://cop5x8s5y2krl" path="res://Assets/grunt.png" id="6_ns662"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_j01gd"]
+[ext_resource type="Texture2D" uid="uid://bgjoysbfjljt6" path="res://Assets/grunt.svg" id="7_n0rgw"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bsfdp"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="9_n3sy1"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_ns662"]
@@ -20,7 +20,7 @@ shader_parameter/flash_intensity = 0.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
-size = Vector2(70, 80)
+size = Vector2(60, 60)
 
 [node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_anqll")
@@ -51,17 +51,16 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_j01gd")
-scale = Vector2(0.4, 0.4)
-texture = ExtResource("6_ns662")
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("7_n0rgw")
 
 [node name="Hitbox" type="Area2D" parent="."]
-visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("7_j01gd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(5, -2.38418e-06)
+position = Vector2(-1.78814e-06, -8.9407e-07)
 shape = SubResource("RectangleShape2D_n0rgw")
 
 [node name="ModifiersComponent" type="Node" parent="."]

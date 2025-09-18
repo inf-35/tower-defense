@@ -250,7 +250,6 @@ func _trigger_camera_overview(island: Island) -> void:
 		return
 	# 2. get the island's bounds and the camera's viewport size
 	var island_bounds: Rect2 = island.get_island_bounds()
-	print(island_bounds)
 	var viewport_size: Vector2 = camera.get_viewport_rect().size
 	# 3. guard against a zero-sized island to prevent division by zero
 	if island_bounds.size.x <= 0 or island_bounds.size.y <= 0:
@@ -259,7 +258,6 @@ func _trigger_camera_overview(island: Island) -> void:
 	var longest_distance: float = max(island_bounds.size.x, island_bounds.size.y)
 	# the final zoom must be the larger of the two ratios to ensure everything fits
 	var required_zoom_level: float = 4.0 / (longest_distance * 0.01) #this is derived from the camera's default zoom and the island's intiial size (1/100)
-	print(1 / required_zoom_level)
 
 	var target_zoom: Vector2 = Vector2.ONE * required_zoom_level
 	

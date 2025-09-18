@@ -111,7 +111,6 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 				#would affect each other.
 				var hit_copy: HitData = hit_data.duplicate()
 				hit_copy.target = unit
-				print(hit_copy.damage," ",hit_data.damage)
 				unit.take_hit(hit_copy)
 			
 			# Clean up the initial damage estimate for the primary target.

@@ -137,7 +137,6 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 	# Apply final modifiers
 	if display_info.special_modifier == DisplayStatModifier.RECIPROCAL and value != 0:
 		value = 1.0 / float(value)
-		print(value)
 
 	if display_info.special_modifier == DisplayStatModifier.INVERT:
 		value *= -1

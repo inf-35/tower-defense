@@ -201,7 +201,6 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 	effect_prototypes.erase(effect_prototype)
 
 func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant:
-	print(effects_by_type)
 	if not effects_by_type.has(effect_type):
 		return null
 		
