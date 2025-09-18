@@ -15,8 +15,6 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	
 	assert(instance.params.has("message") and instance.state.has("counter"))
 
-	var hit_data: HitReportData = event.data as HitReportData
-
 	print(instance.params.message," ",instance.state.counter)
 	instance.state.counter += 1
 	

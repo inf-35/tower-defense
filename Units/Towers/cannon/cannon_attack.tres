@@ -8,18 +8,8 @@
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_7d5v8")
 vfx_type = 1
-is_spritesheet = false
-h_frames = 1
-v_frames = 1
-fps = 12.0
 radius = 3.0
-size = Vector2(20, 20)
-filled = true
-primitive_width = 2.0
-lifetime = 1.0
 rotation_mode = 1
-spin_speed = 360.0
-graphical_layer = 1000
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
@@ -29,10 +19,6 @@ range = 40.0
 cooldown = 2.0
 radius = 10.0
 damage = 2.0
-status_effects = Array[ExtResource("3_rxcdb")]([])
-modifiers = Array[ExtResource("1_t80r1")]([])
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0
-vertical_force = -10.0
-cone_angle = 0.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

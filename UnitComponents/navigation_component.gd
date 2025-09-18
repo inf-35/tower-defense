@@ -126,14 +126,19 @@ func _process(delta: float):
 	_STAGGER_CYCLE = 5
 	# 2. check for a block *before* issuing any movement commands
 	if is_instance_valid(blocking_tower):
-		# if blocked, command the movement component to stop at its current position
-		movement_component.target_position = unit.global_position
+		var current_cell_center: Vector2 = Island.cell_to_position(movement_component.cell_position)
+		var tower_position: Vector2 = blocking_tower.global_position
+		var direction_to_tower: Vector2 = (tower_position - current_cell_center).normalized()
+		
+		# the target is halfway towards the edge of the current cell, facing the tower
+		var target_pos: Vector2 = current_cell_center + direction_to_tower * (Island.CELL_SIZE * 0.1)
+		
+		# command the movement component to move to this intermediate point
+		movement_component.target_position = target_pos
 		return
 	
 	# 3. if not blocked, issue the command to move to the current waypoint
 	movement_component.target_position = Island.cell_to_position(_current_waypoint)
-	 #+ Vector2(Island.CELL_SIZE * randf_range(-0.5, 0.5), Island.CELL_SIZE * randf_range(-0.5, 0.5)) * 0.2
-	
 	# 4. check for arrival at the waypoint to advance the path
 	if movement_component.cell_position == goal:
 		return

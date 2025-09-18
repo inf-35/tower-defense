@@ -45,7 +45,11 @@ var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
 	set(na):
 		abstractive = na
 		disabled = true
-var disabled: bool
+var disabled: bool:
+	set(nd):
+		disabled = nd
+		if graphics and graphics.material != null:
+			graphics.material.set_shader_parameter(&"overlay_color", Color(0,0,0,0.5) if disabled else Color(0,0,0,0))
 
 func _ready():
 	name = name + " " + str(unit_id)
@@ -61,7 +65,7 @@ func _ready():
 	components_ready.emit()
 	behavior.initialise(self)
 
-func _process(delta: float):
+func _process(_delta: float):
 	if not disabled and is_instance_valid(behavior):
 		behavior.update(Clock.game_delta)
 
@@ -121,7 +125,6 @@ func _prepare_components() -> void:
 		)
 	
 	if attack_component != null:
-		attack_component.attack_data
 		attack_component.inject_components(modifiers_component)
 	
 	if range_component != null and attack_component.attack_data:
@@ -274,11 +277,11 @@ func take_hit(hit: HitData):
 	else:
 		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, (self.global_position - source_position).angle())
 		
-		var material: ShaderMaterial = graphics.material as ShaderMaterial
-		material.set_shader_parameter(&"flash_intensity", 1.0)
+		var shader_material: ShaderMaterial = graphics.material as ShaderMaterial
+		shader_material.set_shader_parameter(&"flash_intensity", 1.0)
 		
 		var flash_tween := create_tween()
-		flash_tween.tween_property(material, "shader_parameter/flash_intensity", 0.0, 0.25)
+		flash_tween.tween_property(shader_material, "shader_parameter/flash_intensity", 0.0, 0.25)
 		flash_tween.play()
 		
 	for modifier: Modifier in hit.modifiers:

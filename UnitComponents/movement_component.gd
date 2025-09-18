@@ -49,13 +49,7 @@ func _ready():
 	position = position #trigger setter functions, esp. cell
 	unit.position = position
 
-func _physics_process(delta: float) -> void:
-	#_stagger += 1
-	#_accumulated_delta += delta
-		#
-	#if _stagger % _STAGGER_CYCLE != 1:
-		#return
-	
+func _physics_process(_delta: float) -> void:
 	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
 	var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
 		
@@ -81,7 +75,7 @@ func _physics_process(delta: float) -> void:
 		local_acceleration * Clock.physics_game_delta,
 	)
 	
-	if face_towards_movement:
+	if face_towards_movement and velocity.length_squared() > 0.01:
 		unit.rotation = velocity.angle()
 
 	position += velocity * Clock.physics_game_delta

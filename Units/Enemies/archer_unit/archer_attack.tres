@@ -8,18 +8,8 @@
 [sub_resource type="Resource" id="Resource_g53xw"]
 script = ExtResource("4_jdyjk")
 vfx_type = 1
-is_spritesheet = false
-h_frames = 1
-v_frames = 1
-fps = 12.0
 radius = 3.0
-size = Vector2(20, 20)
-filled = true
-primitive_width = 2.0
-lifetime = 1.0
 rotation_mode = 1
-spin_speed = 360.0
-graphical_layer = 1000
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
@@ -27,12 +17,7 @@ script = ExtResource("2_syins")
 delivery_method = 1
 range = 50.0
 cooldown = 2.0
-radius = 0.0
 damage = 2.0
-status_effects = Array[ExtResource("3_v64mi")]([])
-modifiers = Array[ExtResource("1_v4fkb")]([])
 vfx_on_spawn = SubResource("Resource_g53xw")
 projectile_speed = 80.0
-vertical_force = -10.0
-cone_angle = 0.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

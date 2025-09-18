@@ -71,7 +71,7 @@ func _on_adjacency_updated(adjacencies: Dictionary[Vector2i, Tower]) -> void:
 		_enter_state(State.INACTIVE)
 
 # signal handler for when a combat wave is successfully completed
-func _on_wave_ended(wave_number: int) -> void:
+func _on_wave_ended(_wave_number: int) -> void:
 	if _current_state != State.CHARGING: return
 	
 	_waves_charged += 1
