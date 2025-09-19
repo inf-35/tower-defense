@@ -3,7 +3,7 @@ class_name BreachBehavior
 
 # data for this specific breach type, can be exported or come from a resource
 @export var seed_duration_waves: int = 2
-@export var active_duration_waves: int = Waves.WAVES_PER_EXPANSION_CHOICE * 2 #this ensures we dont accidentally create a scenario where there are no active breaches
+@export var active_duration_waves: int = Waves.WAVES_PER_EXPANSION_CHOICE * 4 #this ensures we dont accidentally create a scenario where there are no active breaches
 
 enum State { SEED, ACTIVE, CLOSING }
 var _current_state: State

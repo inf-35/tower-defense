@@ -17,8 +17,27 @@ script = ExtResource("2_04hb4")
 process_mode = 3
 layer = 2
 
-[node name="UI" parent="." instance=ExtResource("2_hdtfb")]
-process_mode = 3
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SubViewport" type="SubViewport" parent="UI/SubViewportContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+size_2d_override = Vector2i(1920, 1080)
+size_2d_override_stretch = true
+render_target_update_mode = 4
+
+[node name="UI" parent="UI/SubViewportContainer/SubViewport" instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
 script = ExtResource("3_qurb2")

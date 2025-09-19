@@ -8,7 +8,7 @@ signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
-var flux: float = 40.0:
+var flux: float = 20.0:
 	set(value):
 		flux = value
 		flux_changed.emit(flux)
