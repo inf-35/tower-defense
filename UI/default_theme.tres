@@ -19,7 +19,8 @@ variation_embolden = 1.0
 base_font = ExtResource("1_drjrk")
 variation_embolden = 1.0
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xj1xw"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2iung"]
+bg_color = Color(0, 0, 0, 0.19607843)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5xyi0"]
 
@@ -86,7 +87,7 @@ MarginSuper/constants/margin_bottom = 40
 MarginSuper/constants/margin_left = 40
 MarginSuper/constants/margin_right = 40
 MarginSuper/constants/margin_top = 40
-PanelContainer/styles/panel = SubResource("StyleBoxEmpty_xj1xw")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_2iung")
 VBoxContainer/constants/separation = 0
 button_empty/base_type = &"Button"
 button_empty/styles/disabled = SubResource("StyleBoxEmpty_5xyi0")
