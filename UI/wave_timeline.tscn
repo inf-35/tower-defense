@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dti7nnkxq7kl0"]
+[gd_scene load_steps=5 format=3 uid="uid://dti7nnkxq7kl0"]
 
 [ext_resource type="Script" uid="uid://bb82c31hvadrb" path="res://UI/wave_timeline.gd" id="1_1wgro"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_6kmjr"]
 [ext_resource type="PackedScene" uid="uid://c4i5jhj5l4itm" path="res://UI/pip.tscn" id="3_6kmjr"]
+[ext_resource type="Script" uid="uid://dn3fa48m1iuq6" path="res://UI/line_drawer.gd" id="4_p8gmq"]
 
 [node name="WaveTimeline" type="Control"]
 custom_minimum_size = Vector2(100, 20)
@@ -19,3 +20,17 @@ offset_left = -5.0
 offset_top = -5.0
 offset_right = 5.0
 offset_bottom = 5.0
+
+[node name="LineDrawer" type="Control" parent="." node_paths=PackedStringArray("_timeline")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_p8gmq")
+line_width = 5.0
+line_cap_style = 1
+_timeline = NodePath("..")
+metadata/_custom_type_script = "uid://dn3fa48m1iuq6"

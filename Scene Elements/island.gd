@@ -1,17 +1,16 @@
 extends Node2D
 class_name Island
 
-# --- RETAINED SIGNALS ---
+@warning_ignore_start("unused_signal")
 signal terrain_changed
 signal expansion_applied
+signal navigation_grid_updated
 
 # --- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
 
 var shore_boundary_tiles: Array[Vector2i] = []
-var _preview_grid: Dictionary[Vector2i, Terrain.CellData] = {}
-var _preview_tint_grid: Dictionary[Vector2i, Color] = {}
 
 var _preview_choices: Dictionary[int, ExpansionChoice] = {}
 var _highlighted_choice_id: int = -1
@@ -45,7 +44,8 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 			tower_grid[cell].sell()
 			return true
 		# handle upgrading (can be expanded)
-		return false
+		tower_grid[cell].level += 1
+		return true
 	
 	if TerrainService.is_cell_constructable(self, cell, tower_type):
 		construct_tower_at(cell, tower_type, facing)
@@ -76,7 +76,10 @@ func update_navigation_grid() -> void:
 		var is_navigable: bool = Terrain.is_navigable(terrain_base_grid[cell])
 		var is_occupied: bool = tower_grid.has(cell)
 		Navigation.grid[cell] = is_navigable and not is_occupied
+
 	Navigation.clear_field()
+	
+	navigation_grid_updated.emit()
 
 func update_shore_boundary() -> void: #DEPRECATED
 	# simplified logic to find all land tiles adjacent to nothing
@@ -104,7 +107,7 @@ func _draw() -> void:
 	for cell_pos: Vector2i in terrain_base_grid:
 		var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
 		var color := Terrain.get_color(terrain_base_grid[cell_pos])
-		draw_rect(rect, color)
+		draw_texture_rect(preload("res://Assets/grid_outline.svg"), rect.grow(-4.0), false)
 	
 	# 2. draw previews on top
 	for choice_id: int in _preview_choices:
@@ -187,8 +190,8 @@ func get_island_bounds() -> Rect2:
 	return Rect2(top_left_pos, size_in_pixels)
 
 # static position helpers
-static func position_to_cell(position: Vector2) -> Vector2i:
-	return floor(position / CELL_SIZE)
+static func position_to_cell(_position: Vector2) -> Vector2i:
+	return floor(_position / CELL_SIZE)
 
 static func cell_to_position(cell: Vector2i) -> Vector2:
 	return Vector2(cell * CELL_SIZE) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5

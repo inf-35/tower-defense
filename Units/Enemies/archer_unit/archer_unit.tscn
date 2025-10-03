@@ -16,7 +16,6 @@
 
 [sub_resource type="Resource" id="Resource_2kj5t"]
 script = ExtResource("4_3ns8u")
-mobile = true
 max_speed = 20.0
 acceleration = 200.0
 turn_speed = 1000.0
@@ -25,8 +24,6 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="Resource" id="Resource_nfsk5"]
 script = ExtResource("6_3ns8u")
 max_health = 3.0
-regeneration = 0.0
-regen_percent = 0.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7w2p3"]

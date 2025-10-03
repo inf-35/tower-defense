@@ -12,15 +12,12 @@
 
 [sub_resource type="Resource" id="Resource_shlxc"]
 script = ExtResource("2_hd4ab")
-attribute = 10
 label = "WAV"
-suffix = ""
 special_modifier = 8
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_cynh5"]
 script = ExtResource("8_7yihv")
-type = 0
 params = {
 &"flux_amount": 500.0,
 &"tower_type": 2
@@ -30,8 +27,6 @@ metadata/_custom_type_script = "uid://cbmgjrfxxauja"
 [sub_resource type="Resource" id="Resource_4vd3g"]
 script = ExtResource("9_0knjx")
 reward = SubResource("Resource_cynh5")
-waves_to_charge = 3
-title = "Unstable Anomaly"
 description = "Maintain adjacent towers for waves to stabilise and claim its reward."
 metadata/_custom_type_script = "uid://dwpna5u0ynf44"
 

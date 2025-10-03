@@ -10,9 +10,7 @@
 
 [sub_resource type="Resource" id="Resource_shlxc"]
 script = ExtResource("2_llxgu")
-attribute = 10
 label = "WAV"
-suffix = ""
 special_modifier = 8
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
@@ -21,6 +19,7 @@ z_index = 1
 script = ExtResource("1_wfd5r")
 type = 9
 blocking = false
+hostile = true
 stat_displays = Array[ExtResource("2_llxgu")]([SubResource("Resource_shlxc")])
 behavior = NodePath("BreachBehavior")
 modifiers_component = NodePath("ModifiersComponent")

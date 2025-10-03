@@ -1,7 +1,9 @@
 extends Node #UI BUS (UI)
 #all ui-logic communication should occur through this bus
-
+@warning_ignore_start("unused_signal")
 signal tower_dying(tower: Tower) #called by towers before death
+#UI -> clock
+signal gamespeed_toggled(speed: Clock.GameSpeed)
 #UI -> Phases
 signal tower_selected(type_id: Towers.Type) #called by sidebar_ui
 signal choice_hovered(choice_id: int) #generic choice ui handlers

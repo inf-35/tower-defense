@@ -33,6 +33,9 @@ var tower_position: Vector2i = Vector2i.ZERO:
 		movement_component.position = Island.cell_to_position(tower_position)
 
 func sell():
+	if hostile or incorporeal:
+		return
+
 	if not abstractive:
 		Player.flux += flux_value * 0.75 * health_component.health / get_stat(Attributes.id.MAX_HEALTH) #towers only release flux value when sold
 		died.emit()

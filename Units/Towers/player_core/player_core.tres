@@ -1,17 +1,15 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://0cqntmclest"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://0cqntmclest"]
 
+[ext_resource type="Texture2D" uid="uid://c5ktn87da86ym" path="res://Assets/player_core.svg" id="1_0prgp"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_8vupa"]
 [ext_resource type="PackedScene" uid="uid://1mt24rkpxr7f" path="res://Units/Towers/player_core/player_core.tscn" id="2_0prgp"]
 
 [resource]
 script = ExtResource("1_8vupa")
 id = 1
-cost = 10.0
-required_capacity = 1.0
-capacity_generated = 10.0
 element = 5
-minimum_terrain = 2
 tower_name = "Player Core"
 tower_description = "Defend at all costs."
+icon = ExtResource("1_0prgp")
 tower_scene = ExtResource("2_0prgp")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

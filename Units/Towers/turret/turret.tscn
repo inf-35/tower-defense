@@ -3,9 +3,12 @@
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_bjwbf"]
 [ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/default_tower_behavior.gd" id="3_i3qpa"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_qo260"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_soln4"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_joj2e"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="4_rvgqw"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_liko0"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="5_u6um7"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_ug8w7"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_lkyt2"]
 [ext_resource type="Resource" uid="uid://b026mhuu7c8a1" path="res://Units/Towers/turret/turret_attack.tres" id="8_rghec"]
@@ -13,36 +16,12 @@
 [ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="10_i3qpa"]
 [ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="11_uhk0q"]
 
-[sub_resource type="Resource" id="Resource_6ogs4"]
-script = ExtResource("2_bjwbf")
-attribute = 6
-label = "ATK"
-suffix = ""
-special_modifier = 4
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_i3qpa"]
-script = ExtResource("2_bjwbf")
-attribute = 7
-label = "RNG"
-suffix = ""
-special_modifier = 4
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_uhk0q"]
-script = ExtResource("2_bjwbf")
-attribute = 8
-label = "HIT"
-suffix = "/s"
-special_modifier = 0
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
 [node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_lj076")
 type = 2
 turret = NodePath("Graphics/Turret")
-stat_displays = Array[ExtResource("2_bjwbf")]([SubResource("Resource_6ogs4"), SubResource("Resource_i3qpa"), SubResource("Resource_uhk0q")])
+stat_displays = Array[ExtResource("2_bjwbf")]([ExtResource("3_qo260"), ExtResource("4_rvgqw"), ExtResource("5_u6um7")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

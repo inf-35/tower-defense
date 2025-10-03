@@ -19,12 +19,13 @@ func _ready():
 func setup(_tower_type: Towers.Type):
 	#TODO: implement sprites for each tower
 	tower_type = _tower_type
-	tower_sprite.texture = preload("res://Assets/icon.svg")
+	tower_sprite.texture = Towers.get_tower_icon(_tower_type)
 
 # Call this every frame to update rotation and validity tint
 func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i):
 	tower_sprite.modulate = VALID_TINT if is_valid else INVALID_TINT
 	tower_sprite.rotation = facing * PI * 0.5
+	tower_sprite.scale = (Vector2.ONE * Island.CELL_SIZE) / tower_sprite.texture.get_size() 
 	tower_sprite.position = Island.cell_to_position(tower_position)
 	# Trigger the _draw() function to update any custom overlays
 	queue_redraw()

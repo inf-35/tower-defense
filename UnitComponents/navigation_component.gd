@@ -73,7 +73,7 @@ func _ready():
 	
 func update_path():
 	var path_data: Navigation.PathData = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
-	if path_data.status == Navigation.PathData.Status.building_path:
+	if path_data.status == Navigation.PathData.Status.BUILDING_PATH:
 		Navigation.request_path_promise(Navigation.PathPromise.new( #request a path for later
 			self,
 			movement_component.cell_position,
@@ -92,7 +92,7 @@ func update_path():
 		)
 
 func receive_path_data(path_data: Navigation.PathData): #used by Navigation to fulfill promises
-	if path_data.status == Navigation.PathData.Status.building_path: #keep requesting path until we get back a good reply
+	if path_data.status == Navigation.PathData.Status.BUILDING_PATH: #keep requesting path until we get back a good reply
 		Navigation.request_path_promise(Navigation.PathPromise.new(
 			self,
 			movement_component.cell_position,

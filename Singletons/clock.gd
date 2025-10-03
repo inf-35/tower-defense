@@ -8,8 +8,15 @@ class GameTimer:
 	var time_elapsed: float = 0.0
 	var is_active: bool = true
 	
-const BASE_SPEED: float = 1.0
+enum GameSpeed {
+	PAUSE,
+	BASE,
+	FAST_FORWARD
+}
+
 const PAUSE_SPEED: float = 0.0
+const BASE_SPEED: float = 1.0
+const FAST_FORWARD_SPEED: float = 2.0
 
 # --- public api ---
 # this is the variable the UI will control (e.g., 1.0 for normal, 2.0 for double speed)
@@ -27,6 +34,15 @@ var _active_timers: Array[GameTimer] = []
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	UI.gamespeed_toggled.connect(func(gamespeed: GameSpeed):
+		match gamespeed:
+			GameSpeed.PAUSE:
+				speed_multiplier = PAUSE_SPEED
+			GameSpeed.BASE:
+				speed_multiplier = BASE_SPEED
+			GameSpeed.FAST_FORWARD:
+				speed_multiplier = FAST_FORWARD_SPEED
+	)
 # the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
 	game_delta = delta * speed_multiplier

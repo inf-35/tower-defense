@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
 [ext_resource type="PackedScene" uid="uid://bbh3fi3s5ng5p" path="res://UI/_ui.tscn" id="2_hdtfb"]
 [ext_resource type="Script" uid="uid://baq25cbcbk0eh" path="res://Scene Elements/tower_preview.gd" id="3_fgmf3"]
-[ext_resource type="Script" uid="uid://0b247m1x2amq" path="res://ui_viewport.gd" id="3_gljqa"]
 [ext_resource type="Script" uid="uid://vbik6qfqhxwb" path="res://projectiles_display.gd" id="3_qurb2"]
+[ext_resource type="Script" uid="uid://bngvtmcvgq4vj" path="res://path_renderer.gd" id="6_gljqa"]
 
 [node name="Island" type="Node2D"]
 script = ExtResource("1_0iamf")
@@ -18,32 +18,7 @@ script = ExtResource("2_04hb4")
 process_mode = 3
 layer = 2
 
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="SubViewportContainer" type="SubViewportContainer" parent="UI"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="UI/SubViewportContainer"]
-disable_3d = true
-transparent_bg = true
-handle_input_locally = false
-snap_2d_transforms_to_pixel = true
-snap_2d_vertices_to_pixel = true
-oversampling_override = 3.0
-size = Vector2i(1920, 1080)
-size_2d_override = Vector2i(1920, 1080)
-size_2d_override_stretch = true
-render_target_update_mode = 4
-script = ExtResource("3_gljqa")
-
-[node name="UI" parent="UI/SubViewportContainer/SubViewport" instance=ExtResource("2_hdtfb")]
+[node name="UI" parent="." instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
 script = ExtResource("3_qurb2")
@@ -51,3 +26,8 @@ script = ExtResource("3_qurb2")
 [node name="TowerPreview" type="Node2D" parent="."]
 process_mode = 3
 script = ExtResource("3_fgmf3")
+
+[node name="PathRenderer" type="Node2D" parent="."]
+z_index = -1
+script = ExtResource("6_gljqa")
+metadata/_custom_type_script = "uid://bngvtmcvgq4vj"

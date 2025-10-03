@@ -30,6 +30,7 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	
 	func _on_timeout():
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, intercept_position)
 		var target : Unit = hit_data.target
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage

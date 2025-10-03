@@ -12,5 +12,6 @@ class_name TowerData
 @export var tower_name: String
 @export_multiline var tower_description: String
 
+@export var icon: Texture2D = preload("res://Assets/palisade.svg")
 @export var tower_scene: PackedScene
 #...upgrades

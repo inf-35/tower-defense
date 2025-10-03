@@ -45,6 +45,8 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	
 	current_tower = tower
 	var tower_type : Towers.Type = tower.type
+	
+	inspector_icon.texture = Towers.get_tower_icon(tower_type)
 
 	inspector_title.text = Towers.get_tower_name(tower_type)
 	subtitle.text = "mk" + str(tower.level) #TODO: implement localisation
@@ -62,7 +64,7 @@ func _on_inspector_contents_tower_update(tower : Tower):
 	
 	tower.get_unit_state() #this prompts the tower to send us its health too
 
-func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
+func _on_inspected_tower_health_update(_tower : Tower, max_hp : float, hp : float):
 	healthbar.max_value = max_hp
 	healthbar.value = hp
 		
@@ -97,7 +99,7 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 		
 		DisplayStatModifier.CAPACITY_GENERATION:
 			override = true
-			value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation") ; CapacityGeneratorEffect
+			value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation") #see CapacityGeneratorEffect
 			if value == null: return
 
 		DisplayStatModifier.LINE_BREAK:

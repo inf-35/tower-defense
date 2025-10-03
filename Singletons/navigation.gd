@@ -42,6 +42,7 @@ func generate_field_code(goal: Vector2i, ignore_walls: bool) -> int:
 
 # Clears the current flow field; next find_path() rebuilds
 func clear_field() -> void:
+	print("FIELD UPDATED")
 	for goal in _build_threads:
 		var thread: Thread = _build_threads[goal]
 		if thread.is_alive():
@@ -65,26 +66,32 @@ func clear_field_for_goal(goal: Vector2i, ignore_walls : bool) -> void:
 		_flow_fields.erase(key)
 	if _path_caches.has(key):
 		_path_caches.erase(key)
-
-#entry point to building the flow field
-func _build_flow_field_async(goal: Vector2i, ignore_walls : bool) -> void:
-	var key : int = generate_field_code(goal, ignore_walls)
-	#prevent starting a new thread if one for this goal is alr running
+	
+func _build_flow_field_async(goal: Vector2i, ignore_walls: bool) -> void:
+	var key: int = generate_field_code(goal, ignore_walls)
 	if _build_threads.has(key):
 		return
 	
 	var build_thread := Thread.new()
 	_build_threads[key] = build_thread
-	build_thread.start(_build_flow_field.bind(goal, ignore_walls))
+	
+	# --- THE CRITICAL FIX ---
+	# create a deep copy of the grid at this exact moment in time.
+	# this is a complete, consistent snapshot of the world state.
+	var grid_snapshot: Dictionary[Vector2i, bool] = grid.duplicate(true)
+	
+	# pass this safe, local copy to the thread. the thread will no longer
+	# touch the global 'self.grid' variable.
+	build_thread.start(_build_flow_field.bind(goal, ignore_walls, grid_snapshot))
 
 #this function computes a local field and returns it
 #this is CRITICAL for thread safety, as it no longer writes to a shared global variable
 #NOTE: this function reads goal and grid in an unsafe manner. 
 #the reason this code is acceptably safe is not because race conditions are impossible
 #but bc its resilient to stale data, and the write operations on grid are strictly controlled.
-func _build_flow_field(goal: Vector2i, ignore_walls: bool) -> Dictionary[Vector2i, Vector2i]:
+func _build_flow_field(goal: Vector2i, ignore_walls: bool, p_grid: Dictionary[Vector2i, bool]) -> Dictionary[Vector2i, Vector2i]:
 	var local_flow_field: Dictionary[Vector2i, Vector2i] = {}
-	if not grid.has(goal):
+	if not p_grid.has(goal):
 		return local_flow_field
 	
 	var open_set := PriorityQueue.new([ [_heuristic(goal, goal), goal] ])
@@ -98,12 +105,12 @@ func _build_flow_field(goal: Vector2i, ignore_walls: bool) -> Dictionary[Vector2
 
 		for dir: Vector2i in DIRECTIONS:
 			var neighbor: Vector2i = current + dir
-			if (not grid.has(neighbor)):
+			if (not p_grid.has(neighbor)):
 				continue #ignore cells out-of-bounds
 				
 			#evaluate move cost
 			var move_cost: float
-			var is_walkable: bool = grid.get(neighbor, false)
+			var is_walkable: bool = p_grid.get(neighbor, false)
 			
 			if is_walkable or ignore_walls:
 				move_cost = 1.0
@@ -130,7 +137,6 @@ func _on_flow_field_built(goal: Vector2i, ignore_walls: bool, new_flow_field: Di
 	var key: int = generate_field_code(goal, ignore_walls)
 	#ensure the thread from the dictionary is the one we wait 
 	if _build_threads.has(key):
-		_build_threads[key].wait_to_finish()
 		_build_threads.erase(key) # remove from the list of running threads
 	
 	_flow_fields[key] = new_flow_field
@@ -154,12 +160,12 @@ class PathData: #path output/input data, includes peripheral status codes
 	var status: Status
 	
 	enum Status {
-		found_path, #path found, contained in path variable.
-		building_path, #path still building
-		no_path, #unreachable
+		FOUND_PATH, #path found, contained in path variable.
+		BUILDING_PATH, #path still building
+		NO_PATH, #unreachable
 	}
 	
-	func _init(_path: Array[Vector2i] = [], _status: PathData.Status = PathData.Status.found_path):
+	func _init(_path: Array[Vector2i] = [], _status: PathData.Status = PathData.Status.FOUND_PATH):
 		path = _path
 		status = _status
 		
@@ -176,13 +182,14 @@ class PathPromise: #path promise, used to reconcile async deficits
 		ignore_walls = _ignore_walls
 
 func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bool = false) -> PathData:
+	print(start," ",goal)
 	var key: int = generate_field_code(goal, ignore_walls)
 	# if a field for this goal isn't built yet...
 	if not _flow_fields.has(key):
 		# ...check if it's currently being built. if not, start building it.
 		if not _build_threads.has(key):
 			_build_flow_field_async(goal, ignore_walls)
-		return PathData.new([], PathData.Status.building_path) #agent will keep calling us until we fulfill our promise
+		return PathData.new([], PathData.Status.BUILDING_PATH) #agent will keep calling us until we fulfill our promise
 
 	# retrieve the specific flow field and path cache for this goal (by reference)
 	var current_flow_field: Dictionary = _flow_fields[key]
@@ -193,7 +200,7 @@ func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bo
 
 	while current != goal: # reconstruct path from the specific field
 		if not current_flow_field.has(current):
-			return PathData.new([], PathData.Status.no_path)
+			return PathData.new([], PathData.Status.NO_PATH)
 			
 		if current_path_cache.has(current):
 			path.append_array(current_path_cache[current])
@@ -203,7 +210,7 @@ func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bo
 			path.append(current)
 
 	current_path_cache[start] = path # cache the path in the correct cache
-	return PathData.new(path, PathData.Status.found_path)
+	return PathData.new(path, PathData.Status.FOUND_PATH)
 
 func request_path_promise(path_promise: PathPromise):
 	_path_promises.append(path_promise)

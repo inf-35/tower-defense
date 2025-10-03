@@ -241,7 +241,6 @@ func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environ
 		return
 	
 	for attribute: StringName in behavior_packet:
-		print("Applied! ", attribute," ", behavior_packet[attribute])
 		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
 		else:
@@ -262,8 +261,6 @@ func take_hit(hit: HitData):
 	evt.data = hit
 
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
-	
-	Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, self.global_position)
 	
 	var benchmark: float = health_component.health
 	health_component.health -= evt.data.damage

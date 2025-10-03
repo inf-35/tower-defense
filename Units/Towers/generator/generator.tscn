@@ -12,9 +12,7 @@
 
 [sub_resource type="Resource" id="Resource_v8yu7"]
 script = ExtResource("2_fjids")
-attribute = 10
 label = "CAP "
-suffix = ""
 special_modifier = 7
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 

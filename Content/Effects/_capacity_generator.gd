@@ -21,6 +21,8 @@ func _handle_detach(instance: EffectInstance):
 	Player.remove_from_total_capacity(amount_to_remove)
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
+	if event.event_type != GameEvent.EventType.ADJACENCY_UPDATED:
+		return
 	# this function handles dynamic updates while the effect is active.
 	# for example, if the terrain under the tower is changed by an expansion.
 	var old_contribution: float = instance.state.get("last_capacity_generation", 0.0)

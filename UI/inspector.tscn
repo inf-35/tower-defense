@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bxcpffjdkujg" path="res://UI/aspect_ratio_container.gd" id="2_6mo1h"]
 [ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="4_2ber5"]
 
-[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "healthbar", "inspector_title", "subtitle", "upgrade_button", "sell_button", "stats", "description")]
+[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "healthbar", "inspector_title", "subtitle", "upgrade_button", "sell_button", "stats", "description")]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -20,6 +20,7 @@ grow_vertical = 0
 theme = ExtResource("1_2ber5")
 script = ExtResource("1_kvbly")
 tower_overview = NodePath("tower_overview")
+inspector_icon = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid/TextureRect")
 healthbar = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer2/HealthBar")
 inspector_title = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/Title/inspector_title")
 subtitle = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/Title/subtitle")
@@ -57,6 +58,7 @@ metadata/_custom_type_script = "uid://bxcpffjdkujg"
 [node name="TextureRect" type="TextureRect" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid"]
 layout_mode = 2
 texture = ExtResource("4_2ber5")
+expand_mode = 1
 
 [node name="HealthBar" type="ProgressBar" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2"]
 custom_minimum_size = Vector2(0, 20)

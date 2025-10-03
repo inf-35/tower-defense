@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://d0k84g7agsotx"]
+[gd_scene load_steps=5 format=3 uid="uid://d0k84g7agsotx"]
 
 [ext_resource type="Script" uid="uid://csymfdpw41oh5" path="res://UI/sidebar_ui.gd" id="1_08diq"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_uep1a"]
 [ext_resource type="PackedScene" uid="uid://f6bwjb8pybpm" path="res://UI/tower_option.tscn" id="3_uep1a"]
+[ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_tkmsn"]
 
 [node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button")]
 custom_minimum_size = Vector2(200, 600)
@@ -59,3 +60,4 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
 autowrap_mode = 2
+script = ExtResource("4_tkmsn")

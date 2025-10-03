@@ -63,9 +63,9 @@ func _calculate_pip_positions(pips: Array[TimelinePip]) -> Array[Vector2]:
 		var pip_size: Vector2 = visuals.size
 		# calculate the center point for this slot
 		var center_x: float = current_x + pip_size.x / 2.0
-		var center_y: float = 50.0 / 2.0
+		var center_y: float = size.y * 0.5
 		# subtract half the size to get the correct top-left position
-		positions.append(Vector2(center_x - pip_size.x / 2.0, center_y - pip_size.y / 2.0))
+		positions.append(Vector2(center_x - pip_size.x / 2.0, center_y))
 		current_x += pip_size.x + SPACING_BETWEEN_PIPS
 		
 	return positions
@@ -81,7 +81,8 @@ func _update_all_pip_positions() -> void:
 # generates the initial set of pips without animation
 func _regenerate_all_pips() -> void:
 	for child: Node in get_children():
-		child.queue_free()
+		if child is TimelinePip:
+			child.queue_free()
 	_pip_nodes.clear()
 
 	for i: int in PIPS_LOADED_BUFFER:
@@ -128,7 +129,7 @@ func _progress_wave() -> void:
 	var target_positions: Array[Vector2] = _calculate_pip_positions(final_pip_order)
 
 	# place the new pip just off-screen to the right, ready to tween in
-	new_pip.position = Vector2(self.size.x + SPACING_BETWEEN_PIPS, size.y / 2.0)
+	new_pip.position = Vector2(self.size.x + SPACING_BETWEEN_PIPS, size.y * 0)
 
 	# animate all pips shifting to their new final positions
 	for i: int in final_pip_order.size():
@@ -141,7 +142,7 @@ func _progress_wave() -> void:
 	new_pip.fade_to(tween, 1.0)
 	
 	# animate the exiting pip moving off-screen to the left
-	tween.parallel().tween_property(exiting_pip, "position", target_positions[0] - Vector2(SPACING_BETWEEN_PIPS + exiting_pip.size.x * 0.5, exiting_pip.size.y * -0.5), TWEEN_TIME)\
+	tween.parallel().tween_property(exiting_pip, "position", target_positions[0] - Vector2(SPACING_BETWEEN_PIPS + exiting_pip.size.x * 0.5, exiting_pip.size.y * 0.5), TWEEN_TIME)\
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	exiting_pip.fade_to(tween, 0.0)
 	

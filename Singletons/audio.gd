@@ -6,6 +6,8 @@ extends Node
 # to support variations, a value can also be an Array of AudioStreams.
 @export var sound_library: Dictionary[StringName, Variant] = {
 	ID.Sounds.ENEMY_HIT_SOUND : preload("res://Sounds/enemy_hit_light.wav"),
+	ID.Sounds.BUTTON_CLICK_SOUND : preload("res://Sounds/click.wav"),
+	ID.Sounds.BUTTON_HOVER_SOUND : preload("res://Sounds/hover.wav"),
 }
 
 # --- object pooling ---
@@ -22,7 +24,7 @@ func _ready() -> void:
 		_sfx_player_pool.append(player)
 
 # the main public API for playing positional, one-shot sound effects.
-func play_sound(sound_name: StringName, position: Vector2) -> void:
+func play_sound(sound_name: StringName, position: Vector2 = References.camera.global_position) -> void:
 	# 1. check if the requested sound exists in our library
 	if not sound_library.has(sound_name):
 		push_warning("AudioManager: Sound '%s' not found in library." % sound_name)

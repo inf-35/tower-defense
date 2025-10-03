@@ -23,3 +23,5 @@ class Particles:
 	
 class Sounds:
 	const ENEMY_HIT_SOUND: StringName = &"enemy_hit_sound"
+	const BUTTON_HOVER_SOUND: StringName = &"button_hover_sound"
+	const BUTTON_CLICK_SOUND: StringName = &"button_click_sound"

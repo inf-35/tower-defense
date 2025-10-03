@@ -8,6 +8,5 @@ params = {
 "base_capacity": 0.0,
 "terrain_conditional_capacity": [1, 5.0]
 }
-effect_type = 0
-schedule = 2
+effect_type = 2
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"
