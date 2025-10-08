@@ -24,7 +24,7 @@ func _ready():
 	PowerService.register_island(self)
 	
 	# initial terrain generation
-	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 36)
+	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 50)
 	# 3. delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
@@ -34,8 +34,7 @@ func _ready():
 	update_navigation_grid()
 	queue_redraw()
 	
-	# --- public api / request handlers ---
-
+# --- public api / request handlers ---
 # this is the main entry point for player actions like building or selling
 func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: Tower.Facing) -> bool:
 	if tower_grid.has(cell):
@@ -47,7 +46,7 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 		tower_grid[cell].level += 1
 		return true
 	
-	if TerrainService.is_cell_constructable(self, cell, tower_type):
+	if TerrainService.is_area_constructable(self, cell, tower_type):
 		construct_tower_at(cell, tower_type, facing)
 		return true
 		
@@ -57,7 +56,12 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, initial_state: Dictionary = {}) -> Tower:
 	print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
-	tower_grid[cell] = tower
+	var tower_size: Vector2i = Vector2i(Vector2(Towers.get_tower_size(tower_type)).rotated(tower_facing * 0.5 * PI))
+	
+	tower.size = tower_size
+	for x: int in tower_size.x:
+		for y: int in tower_size.y:
+			tower_grid[cell + Vector2i(x,y)] = tower
 	tower.facing = tower_facing
 	tower.tower_position = cell
 	tower.set_initial_behaviour_state(initial_state)
@@ -75,13 +79,17 @@ func update_navigation_grid() -> void:
 	for cell: Vector2i in terrain_base_grid:
 		var is_navigable: bool = Terrain.is_navigable(terrain_base_grid[cell])
 		var is_occupied: bool = tower_grid.has(cell)
-		Navigation.grid[cell] = is_navigable and not is_occupied
+		if Terrain.is_navigable(terrain_base_grid[cell]):
+			if is_occupied:
+				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
+			else:
+				Navigation.grid[cell] = 0
 
 	Navigation.clear_field()
 	
 	navigation_grid_updated.emit()
 
-func update_shore_boundary() -> void: #DEPRECATED
+func update_shore_boundary() -> void: #used for expansion
 	# simplified logic to find all land tiles adjacent to nothing
 	shore_boundary_tiles.clear()
 	for cell: Vector2i in terrain_base_grid:
@@ -100,6 +108,26 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 	if _highlighted_choice_id != choice_id:
 		_highlighted_choice_id = choice_id
 		queue_redraw()
+#signal handlers
+func _on_tower_destroyed(tower: Tower):
+	var cell: Vector2i = tower.tower_position
+	#clear tower grid
+	for local_cell: Vector2i in tower.get_occupied_cells():
+		tower_grid.erase(local_cell)
+		_update_adjacencies_around(cell) #update adjacencies
+	#update capacity, caches, navigation
+	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
+	update_navigation_grid()
+
+func _update_adjacencies_around(cell: Vector2i):
+	# ... (Function retained as is)
+	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
+	if tower_grid.has(cell):
+		tower_grid[cell].adjacency_updated.emit(adjacent_towers)
+	
+	for tower: Tower in adjacent_towers.values():
+		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
+		tower.adjacency_updated.emit(local_adjacencies)
 
 # --- updated drawing logic ---
 func _draw() -> void:
@@ -132,26 +160,6 @@ func _draw() -> void:
 				var center: Vector2 = Vector2(cell_pos * CELL_SIZE) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
 				var tower_color: Color = Color.CRIMSON if is_highlighted else Color.DARK_RED
 				draw_circle(center, CELL_SIZE * 0.4, tower_color)
-
-func _on_tower_destroyed(tower: Tower):
-	var cell: Vector2i = tower.tower_position
-	if tower_grid.has(cell):
-		# Clean up grids and state
-		tower_grid.erase(cell)
-		Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
-		# Update neighbors
-		_update_adjacencies_around(cell)
-		update_navigation_grid()
-
-func _update_adjacencies_around(cell: Vector2i):
-	# ... (Function retained as is)
-	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
-	if tower_grid.has(cell):
-		tower_grid[cell].adjacency_updated.emit(adjacent_towers)
-	
-	for tower: Tower in adjacent_towers.values():
-		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
-		tower.adjacency_updated.emit(local_adjacencies)
 
 #static data access functions
 func get_tower_on_tile(cell: Vector2i):

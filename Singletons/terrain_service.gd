@@ -15,7 +15,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 	island.terrain_changed.emit()
 
 # checks if a tower can be built on a specific cell
-func is_cell_constructable(island: Island, cell: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
+func is_area_constructable(island: Island, tower_position: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
 	if general: #includes player-side construction checks
 		if not Player.unlocked_towers.get(tower_type, false):
 			return false
@@ -23,15 +23,20 @@ func is_cell_constructable(island: Island, cell: Vector2i, tower_type: Towers.Ty
 		if Player.flux < Towers.get_tower_cost(tower_type):
 			return false
 			
-		if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.RUINS):
-			if Player.used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity:
+		if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(tower_position) == Terrain.Base.RUINS): #TODO: fix this for non-1x1 generators
+			if Player.used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity: #and make this non-hardcoded
 				return false
+				
+	var size: Vector2i = Towers.get_tower_size(tower_type)
+	for x: int in size.x:
+		for y: int in size.y:
+			var cell: Vector2i = Vector2i(x,y) + tower_position	
 
-	if not island.terrain_base_grid.has(cell):
-		return false # cannot build outside the map
-	if island.tower_grid.has(cell):
-		return false # cannot build on an existing tower (upgrading is a different logic path)
-		
-	var base: Terrain.Base = island.terrain_base_grid[cell]
-	# use the data repository to check the base's properties
-	return Terrain.is_constructable(base)
+			if not island.terrain_base_grid.has(cell):
+				return false # cannot build outside the map
+			if island.tower_grid.has(cell):
+				return false # cannot build on an existing tower (upgrading is a different logic path)
+			if not Terrain.is_constructable(island.terrain_base_grid[cell]):
+				return false
+	
+	return true

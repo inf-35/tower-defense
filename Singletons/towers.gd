@@ -47,6 +47,12 @@ func get_tower_prototype(tower_type: Type) -> Tower:
 		#these prototype towers provide a "default" baseline to lookup from.
 	return tower_prototypes[tower_type]
 
+func get_tower_size(tower_type: Type) -> Vector2i:
+	return tower_stats[tower_type].size
+	
+func get_tower_navcost(tower_type: Type) -> int:
+	return tower_stats[tower_type].navcost
+
 func get_tower_icon(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].icon
 

@@ -11,8 +11,6 @@
 [sub_resource type="Resource" id="Resource_ylobt"]
 script = ExtResource("5_wty5f")
 max_health = 15.0
-regeneration = 0.0
-regen_percent = 0.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [node name="Palisade" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]

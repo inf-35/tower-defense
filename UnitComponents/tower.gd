@@ -30,7 +30,17 @@ var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
 		tower_position = new_pos
 		movement_component.unit = self #evil circular dependency resolution
-		movement_component.position = Island.cell_to_position(tower_position)
+		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
+		
+var size: Vector2i = Vector2i.ONE #this is inclusive of facing
+
+func get_occupied_cells() -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for x: int in size.x:
+		for y: int in size.y:
+			cells.append(tower_position + Vector2i(x,y))
+			
+	return cells
 
 func sell():
 	if hostile or incorporeal:

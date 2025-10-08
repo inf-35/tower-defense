@@ -10,8 +10,8 @@ const DIRECTIONS: Array[Vector2i] = [
 	Vector2i( 0, -1),
 ]
 
-# Grid: Vector2i -> bool (true = walkable)
-var grid: Dictionary[Vector2i, bool] = {}
+# Grid: Vector2i -> int (navcost)
+var grid: Dictionary[Vector2i, int] = {}
 #flow_fields containes multiple flow fields indexed by 64-bit field code (see generate_field_code)
 #flow field: Vector2i -> Vector2i (direction step toward goal); built at once
 var _flow_fields: Dictionary[int, Dictionary] = {}
@@ -78,7 +78,7 @@ func _build_flow_field_async(goal: Vector2i, ignore_walls: bool) -> void:
 	# --- THE CRITICAL FIX ---
 	# create a deep copy of the grid at this exact moment in time.
 	# this is a complete, consistent snapshot of the world state.
-	var grid_snapshot: Dictionary[Vector2i, bool] = grid.duplicate(true)
+	var grid_snapshot: Dictionary[Vector2i, int] = grid.duplicate(true)
 	
 	# pass this safe, local copy to the thread. the thread will no longer
 	# touch the global 'self.grid' variable.
@@ -89,7 +89,7 @@ func _build_flow_field_async(goal: Vector2i, ignore_walls: bool) -> void:
 #NOTE: this function reads goal and grid in an unsafe manner. 
 #the reason this code is acceptably safe is not because race conditions are impossible
 #but bc its resilient to stale data, and the write operations on grid are strictly controlled.
-func _build_flow_field(goal: Vector2i, ignore_walls: bool, p_grid: Dictionary[Vector2i, bool]) -> Dictionary[Vector2i, Vector2i]:
+func _build_flow_field(goal: Vector2i, ignore_walls: bool, p_grid: Dictionary[Vector2i, int]) -> Dictionary[Vector2i, Vector2i]:
 	var local_flow_field: Dictionary[Vector2i, Vector2i] = {}
 	if not p_grid.has(goal):
 		return local_flow_field
@@ -109,13 +109,13 @@ func _build_flow_field(goal: Vector2i, ignore_walls: bool, p_grid: Dictionary[Ve
 				continue #ignore cells out-of-bounds
 				
 			#evaluate move cost
-			var move_cost: float
-			var is_walkable: bool = p_grid.get(neighbor, false)
+			var move_cost: int
+			var base_nav_cost: int = p_grid.get(neighbor, 0)
 			
-			if is_walkable or ignore_walls:
-				move_cost = 1.0
+			if ignore_walls:
+				move_cost = 0
 			else:
-				move_cost = 100.0
+				move_cost = base_nav_cost
 
 			var tentative_g = g_score[current] + move_cost
 			if not g_score.has(neighbor) or tentative_g < g_score[neighbor]:

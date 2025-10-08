@@ -7,7 +7,9 @@
 [resource]
 script = ExtResource("1_8vupa")
 id = 1
+size = Vector2i(2, 2)
 element = 5
+navcost = 0
 tower_name = "Player Core"
 tower_description = "Defend at all costs."
 icon = ExtResource("1_0prgp")
