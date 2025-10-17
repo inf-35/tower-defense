@@ -5,6 +5,7 @@ extends Node
 signal flux_changed(new_flux: float)
 signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
+signal relics_changed()
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
@@ -22,6 +23,31 @@ var tower_capacity: float = 0.0:
 	set(value):
 		tower_capacity = value
 		capacity_changed.emit(used_capacity, tower_capacity)
+		
+var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
+	set(value):
+		unlocked_towers = value
+		unlocked_towers_changed.emit(unlocked_towers)
+		
+var active_relics: Array[RelicData]
+
+func _ready():
+	#initial state setup
+	self.unlocked_towers = {
+		Towers.Type.PALISADE: true,
+		Towers.Type.GENERATOR: true,
+		Towers.Type.TURRET: true,
+		Towers.Type.AMPLIFIER: true,
+	}
+
+	#connect to UI player input signals
+	UI.place_tower_requested.connect(_on_place_tower_requested)
+	UI.sell_tower_requested.connect(_on_sell_tower_requested)
+	#couple playerside logic signals with UI output signals
+	flux_changed.connect(UI.update_flux.emit)
+	capacity_changed.connect(UI.update_capacity.emit)
+	unlocked_towers_changed.connect(UI.update_tower_types.emit)
+
 #capacity helper functions
 func add_to_used_capacity(amount: float):
 	self.used_capacity += amount
@@ -38,10 +64,6 @@ func remove_from_total_capacity(amount : float):
 func has_capacity(tower_type : Towers.Type) -> bool:
 	return Player.used_capacity + Towers.get_tower_capacity(tower_type) - 0.01 < Player.tower_capacity
 
-var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
-	set(value):
-		unlocked_towers = value
-		unlocked_towers_changed.emit(unlocked_towers)
 #tower unlock helper functions
 func unlock_tower(tower_type : Towers.Type, unlock : bool = true):
 	unlocked_towers[tower_type] = unlock
@@ -49,26 +71,44 @@ func unlock_tower(tower_type : Towers.Type, unlock : bool = true):
 	
 func is_tower_unlocked(tower_type : Towers.Type) -> bool:
 	return unlocked_towers.get(tower_type, false)
-
-func _ready():
-	#initial state setup
-	self.unlocked_towers = {
-		Towers.Type.PALISADE: true,
-		Towers.Type.GENERATOR: true,
-		Towers.Type.TURRET: true,
-		Towers.Type.AMPLIFIER: true,
-		Towers.Type.CANNON: true,
-	}
-	#connect to UI player input signals
-	UI.place_tower_requested.connect(_on_place_tower_requested)
-	UI.sell_tower_requested.connect(_on_sell_tower_requested)
-	#couple playerside logic signals with UI output signals
-	flux_changed.connect(UI.update_flux.emit)
-	capacity_changed.connect(UI.update_capacity.emit)
-	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	
+#relic entry point (to add new relics)
+func add_relic(relic: RelicData) -> void:
+	if not is_instance_valid(relic):
+		return
+	active_relics.append(relic)
+	# announce that the global state has changed
+	relics_changed.emit()
+# this is the core query function used by ModifiersComponent
+func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
+	var relevant_modifiers: Array[Modifier] = []
+	
+	for relic: RelicData in active_relics:
+		# check if the unit matches the relic's targeting rules
+		if _unit_matches_target(unit, relic):
+			var new_modifier := relic.modifier_prototype.generate_modifier()
+			# brand it with a source ID for debugging, if needed
+			new_modifier.source_id = -1 # use a special ID for global mods
+			relevant_modifiers.append(new_modifier)
+			
+	return relevant_modifiers
+# internal helper for checking targeting rules
+func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:
+	match relic.target_type:
+		RelicData.TargetType.ALL_TOWERS:
+			return unit is Tower
+		RelicData.TargetType.ALL_ENEMIES:
+			return not (unit is Tower) # a simple proxy for being an enemy
+		RelicData.TargetType.SPECIFIC_TOWER_TYPE:
+			return unit is Tower and unit.type == relic.specific_tower_type
+		RelicData.TargetType.PLAYER:
+			# this would apply to player-specific stats like starting flux, etc.
+			# not implemented in ModifiersComponent yet, but the structure supports it
+			return false 
+			
+	return false
 # MODIFIED: Tower placement request now focuses only on player-side checks.
-# It asks the Island to handle the actual placement validation and construction.
+# it asks the Island to handle the actual placement validation and construction.
 func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: Tower.Facing):
 	# 1. Check player's own resources.
 	if not unlocked_towers.get(tower_type, false):

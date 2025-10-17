@@ -9,12 +9,12 @@ signal reward_process_complete
 		{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON}
 	),
 	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.FROST_TOWER}
+		Reward.Type.ADD_RELIC,
+		{ID.Rewards.RELIC: Relics.TOWER_SPEED_UP}
 	),
 	Reward.new(
 		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON}
+		{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN}
 	)
 ]
 # --- state ---
@@ -73,5 +73,7 @@ func apply_reward(reward: Reward) -> void:
 			if tower_type != Towers.Type.VOID:
 				Player.unlock_tower(tower_type)
 
-		Reward.Type.APPLY_MODIFIER:
-			push_warning("RewardService: APPLY_GLOBAL_MODIFIER not yet implemented.")
+		Reward.Type.ADD_RELIC:
+			var relic: RelicData = reward.params.get(ID.Rewards.RELIC)
+			if relic:
+				Player.add_relic(relic)

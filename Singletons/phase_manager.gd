@@ -42,8 +42,6 @@ func _generate_wave_plan() -> void:
 			wave_plan[i] = WaveType.EXPANSION
 		if i == 20:
 			wave_plan[i] = WaveType.BOSS
-		if (i - 1) % 5 == 0 and i > 1:  #NOT FULLY IMPLEMENTED
-			wave_plan[i] = WaveType.REWARD
 		if i in [7, 13, 19]:
 			wave_plan[i] = WaveType.SURGE
 	

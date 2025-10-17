@@ -15,7 +15,17 @@ func _ready():
 	stat_changed.connect(func(stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
 	)
+	Player.relics_changed.connect(_on_global_modifiers_changed)
 	set_process(false)
+	
+# called by the signal from player (indicating relic/global modifier change)
+func _on_global_modifiers_changed() -> void:
+	# clear the entire cache, as any stat could now be different
+	_effective_cache.clear()
+	
+	# re-emit stat_changed for all stats this unit possesses to update ui
+	for attribute: Attributes.id in base_stats:
+		stat_changed.emit(attribute)
 
 # add a permanent buff/debuff (for level-ups, skill choices, etc.)
 func add_permanent_modifier(mod: Modifier) -> void:
@@ -233,7 +243,7 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	
 	upgraded_value = (upgraded_value + perm_sum_add) * perm_product_mult if perm_override == null else perm_override
 
-	# --- STAGE 2: Apply transient modifiers to the upgraded stat ---
+	# --- STAGE 2: apply transient modifiers to the upgraded stat ---
 	var sum_add := 0.0
 	var product_mult := 1.0
 	var override = null
@@ -247,6 +257,26 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		if modifier.override != null:
 			override = modifier.override
 	
-	var result = (upgraded_value + sum_add) * product_mult if override == null else override
-	_effective_cache[attr] = result #cache result
-	return result
+	var transient_value: float = (upgraded_value + sum_add) * product_mult if override == null else override
+	
+	# --- STAGE 3: apply global (relic) modifiers ---
+	var final_value: float = transient_value # start with the result of stage 2
+	var global_modifiers: Array[Modifier] = Player.get_modifiers_for_unit(self.unit)
+
+	if not global_modifiers.is_empty():
+		var global_sum_add: float = 0.0
+		var global_product_mult: float = 1.0
+		var global_override = null # global overrides are powerful, use with care
+
+		for modifier: Modifier in global_modifiers:
+			if modifier.attribute != attr:
+				continue
+			
+			global_sum_add += modifier.additive
+			global_product_mult *= modifier.multiplicative
+			if modifier.override != null:
+				global_override = modifier.override
+		
+		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
+
+	return final_value

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://yb7vgd4nljii"]
+[gd_scene load_steps=11 format=3 uid="uid://yb7vgd4nljii"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5uxnm"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_hd4ab"]
@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="5_7uy27"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_0e6gm"]
 [ext_resource type="Script" uid="uid://bwh4er8ltu171" path="res://Content/Behaviors/anomaly_behavior.gd" id="7_5gpfh"]
-[ext_resource type="Script" uid="uid://cbmgjrfxxauja" path="res://Objects/reward.gd" id="8_7yihv"]
 [ext_resource type="Script" uid="uid://dwpna5u0ynf44" path="res://Content/anomaly_data.gd" id="9_0knjx"]
 
 [sub_resource type="Resource" id="Resource_shlxc"]
@@ -16,17 +15,8 @@ label = "WAV"
 special_modifier = 8
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
-[sub_resource type="Resource" id="Resource_cynh5"]
-script = ExtResource("8_7yihv")
-params = {
-&"flux_amount": 500.0,
-&"tower_type": 2
-}
-metadata/_custom_type_script = "uid://cbmgjrfxxauja"
-
 [sub_resource type="Resource" id="Resource_4vd3g"]
 script = ExtResource("9_0knjx")
-reward = SubResource("Resource_cynh5")
 description = "Maintain adjacent towers for waves to stabilise and claim its reward."
 metadata/_custom_type_script = "uid://dwpna5u0ynf44"
 

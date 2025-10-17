@@ -1,0 +1,70 @@
+[gd_scene load_steps=16 format=3 uid="uid://c05d2jkf6watt"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_p8fod"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_hnuds"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_xyohd"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="4_6sr55"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_u5d3m"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_rcw2d"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="5_tso3j"]
+[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/default_tower_behavior.gd" id="6_ae8wi"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_xfntl"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_7vwtd"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="10_eqxdd"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_0ksq5"]
+[ext_resource type="Resource" uid="uid://bin4onwg3vwwg" path="res://Units/Towers/minigun/minigun_attack.tres" id="12_f4vhj"]
+[ext_resource type="Texture2D" uid="uid://xqdlxxt01vpm" path="res://Assets/railgun_base.svg" id="13_8mgd4"]
+[ext_resource type="Texture2D" uid="uid://bpvugaljod6nx" path="res://Assets/railgun_head.svg" id="14_10p4y"]
+
+[node name="Minigun" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 1
+script = ExtResource("1_p8fod")
+type = 4
+turret = NodePath("Graphics/Turret")
+stat_displays = Array[ExtResource("2_hnuds")]([ExtResource("3_xyohd"), ExtResource("4_6sr55"), ExtResource("5_tso3j")])
+behavior = NodePath("DefaultTowerBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="DefaultTowerBehavior" type="Node" parent="."]
+script = ExtResource("6_ae8wi")
+metadata/_custom_type_script = "uid://cs61b35p7jme8"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("4_u5d3m")
+movement_data = ExtResource("5_rcw2d")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("6_xfntl")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("10_eqxdd")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+script = ExtResource("11_0ksq5")
+attack_data = ExtResource("12_f4vhj")
+muzzle = NodePath("../Graphics/Turret/Muzzle")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.048, 0.048)
+texture = ExtResource("13_8mgd4")
+
+[node name="Turret" type="Sprite2D" parent="Graphics"]
+z_index = 1
+texture = ExtResource("14_10p4y")
+
+[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
+position = Vector2(104.167, 0)
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("8_7vwtd")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

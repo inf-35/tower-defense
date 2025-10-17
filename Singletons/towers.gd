@@ -12,7 +12,8 @@ enum Type {
 	CATALYST,
 	AMPLIFIER,
 	BREACH,
-	ANOMALY
+	ANOMALY,
+	MINIGUN
 }
 
 enum Element {

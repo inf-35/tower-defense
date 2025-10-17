@@ -11,11 +11,12 @@ class UnitState:
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"
 	
 class TerrainGen:
-	const SEED_DURARTION_WAVES: StringName = &"seed_duration_waves" #used for pregen feature initial state definition
+	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves" #used for pregen feature initial state definition
 	
 class Rewards:
 	const TOWER_TYPE: StringName = &"tower_type"
 	const FLUX_AMOUNT: StringName = &"flux_amount"
+	const RELIC: StringName = &"relic"
 	
 class Particles:
 	const ENEMY_HIT_SPARKS: StringName = &"enemy_hit_sparks"

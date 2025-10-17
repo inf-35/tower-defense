@@ -27,11 +27,12 @@ func _init():
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
 	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
-	breach_rule.initial_state = {ID.TerrainGen.SEED_DURARTION_WAVES: 2}
+	breach_rule.initial_state = {ID.TerrainGen.SEED_DURATION_WAVES: 2}
 	
 	var anomaly_rule := PlacementRule.new()
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
 	anomaly_rule.placement = PlacementRule.PlacementLogic.EDGE
+	anomaly_rule.initial_state = {}
 	
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(breach_rule)
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(anomaly_rule)
@@ -71,6 +72,32 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	var options: Array[ExpansionChoice] = []
 	for i: int in range(choice_count):
 		# generate the block data, which may now include a breach seed
+		var anomaly_rule: PlacementRule = STANDARD_EXPANSION_PARAMS.placement_rules[1]
+		var seed: float = randf_range(0.0, 1.0)
+		anomaly_rule.initial_state["_anomaly_data"] = AnomalyData.new(
+			Reward.new(
+				Reward.Type.UNLOCK_TOWER,
+				{
+					ID.Rewards.TOWER_TYPE: Towers.Type.CANNON
+				}
+			) if seed > 0.7 else 
+			(
+				Reward.new(
+					Reward.Type.UNLOCK_TOWER,
+					{
+						ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN
+					}
+				) if seed > 0.3 else 
+				Reward.new(
+					Reward.Type.ADD_RELIC,
+					{
+						ID.Rewards.RELIC: Relics.TOWER_SPEED_UP
+					}
+				)
+			)
+			,
+			2
+		)
 		var block_data: Dictionary = _generate_block(island, block_size, STANDARD_EXPANSION_PARAMS)
 		if block_data.is_empty():
 			continue

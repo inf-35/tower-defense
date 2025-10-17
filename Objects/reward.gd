@@ -1,11 +1,11 @@
-#reward.gd - see RewardService for implementation
+#reward.gd - see RewardService for implementation and Rewards for data
 extends Resource
 class_name Reward
 
 enum Type {
 	ADD_FLUX,
 	UNLOCK_TOWER,
-	APPLY_MODIFIER,
+	ADD_RELIC,
 	
 	EXPORT #workaround, this tells the initialiser that the reward is defined in inspector
 }
@@ -15,6 +15,7 @@ enum Type {
 	#examples
 	ID.Rewards.FLUX_AMOUNT : 0.0,
 	ID.Rewards.TOWER_TYPE : Towers.Type.TURRET,
+	ID.Rewards.RELIC : Relics.TOWER_SPEED_UP,
 }
 
 func _init(_type: Type = Type.EXPORT, _params: Dictionary = {}):

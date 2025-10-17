@@ -33,7 +33,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 modulate = Color(1, 0.372549, 0, 1)
-scale = Vector2(0.1, 0.1)
+scale = Vector2(0.08, 0.08)
 texture = ExtResource("8_nbca8")
 
 [node name="ModifiersComponent" type="Node" parent="."]
