@@ -42,7 +42,6 @@ func generate_field_code(goal: Vector2i, ignore_walls: bool) -> int:
 
 # Clears the current flow field; next find_path() rebuilds
 func clear_field() -> void:
-	print("FIELD UPDATED")
 	for goal in _build_threads:
 		var thread: Thread = _build_threads[goal]
 		if thread.is_alive():
@@ -182,7 +181,6 @@ class PathPromise: #path promise, used to reconcile async deficits
 		ignore_walls = _ignore_walls
 
 func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bool = false) -> PathData:
-	print(start," ",goal)
 	var key: int = generate_field_code(goal, ignore_walls)
 	# if a field for this goal isn't built yet...
 	if not _flow_fields.has(key):

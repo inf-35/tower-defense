@@ -28,11 +28,11 @@ class BaseStat: #defines stats for a terraintype
 	
 var terrain_base_stats: Dictionary[Base, BaseStat]= {
 	Base.EARTH : BaseStat.new(
-		Color(0.2, 0.2, 0.2, 0.2),
+		Color(1,1,1,1),
 		true, true
 	),
 	Base.RUINS : BaseStat.new(
-		Color.WEB_GRAY,
+		Color(2,2,2,2),
 		true, true
 	)
 }

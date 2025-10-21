@@ -224,7 +224,7 @@ func get_behavior_attribute(attribute_name: StringName) -> Variant:
 		return null
 	
 	# check that the behavior actually implements the function before calling it.
-	if behavior.has_method("get_display_data"):
+	if behavior.has_method(&"get_display_data"):
 		var data: Dictionary = behavior.get_display_data()
 		# use .get() for a safe lookup that returns null if the key doesn't exist.
 		return data.get(attribute_name, null)
@@ -241,10 +241,12 @@ func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environ
 		return
 	
 	for attribute: StringName in behavior_packet:
+		print("Attempt set attribute ", attribute)
 		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
+			print("Attribute set! ", attribute, " ", behavior[attribute])
 		else:
-			push_warning(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
+			push_error(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 	UI.update_unit_state.emit(self)
 
 func take_hit(hit: HitData):

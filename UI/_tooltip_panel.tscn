@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://ms2w6jihumk"]
+
+[ext_resource type="Script" uid="uid://c2xp1qmu85wad" path="res://UI/_tooltip_panel.gd" id="1_c5s8d"]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_t0qdu"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_fg2ep"]
+
+[node name="TooltipPanel" type="PanelContainer" node_paths=PackedStringArray("title_label", "description_label")]
+script = ExtResource("1_c5s8d")
+title_label = NodePath("MarginContainer/VBoxContainer/title")
+description_label = NodePath("MarginContainer/VBoxContainer/description")
+metadata/_custom_type_script = "uid://c2xp1qmu85wad"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme = ExtResource("2_t0qdu")
+theme_type_variation = &"MarginMinor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"vbox_10"
+
+[node name="title" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "aeaeaeaea"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("3_fg2ep")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="description" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "aeaeaeaeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+fit_content = true
+scroll_active = false
+script = ExtResource("3_fg2ep")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"

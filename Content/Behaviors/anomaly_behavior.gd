@@ -7,7 +7,10 @@ enum State { INACTIVE, CHARGING, COMPLETE }
 var _current_state: State = State.INACTIVE
 
 # --- internal state ---
-@export var _anomaly_data: AnomalyData
+@export var _anomaly_data: AnomalyData:
+	set(a):
+		_anomaly_data = a
+
 var _waves_charged: int = 0
 
 # called by the base Behavior class after initial_state is set
@@ -47,7 +50,7 @@ func _enter_state(new_state: State) -> void:
 			
 			# 3. command the graphics to show a "depleted" state
 			# 4. after a delay, remove the anomaly from the map
-			await get_tree().create_timer(2.0).timeout
+			await get_tree().create_timer(0.2).timeout
 			if is_instance_valid(unit):
 				unit.died.emit() # this triggers cleanup in the Island script
 
@@ -62,7 +65,6 @@ func _is_charge_condition_met(adjacencies: Dictionary[Vector2i, Tower]) -> bool:
 # signal handler for when neighboring towers change
 func _on_adjacency_updated(adjacencies: Dictionary[Vector2i, Tower]) -> void:
 	if _current_state == State.COMPLETE: return
-	print("anomaly adjacency updated")
 	var condition_met: bool = _is_charge_condition_met(adjacencies)
 	
 	if condition_met and _current_state == State.INACTIVE:
@@ -75,15 +77,16 @@ func _on_wave_ended(_wave_number: int) -> void:
 	if _current_state != State.CHARGING: return
 	
 	_waves_charged += 1
-	print("charged!", _waves_charged," / ",_anomaly_data.waves_to_charge)
 	if _waves_charged >= _anomaly_data.waves_to_charge:
 		_enter_state(State.COMPLETE)
+	UI.update_unit_state.emit(unit)
 
 # override to provide UI data to the inspector
 func get_display_data() -> Dictionary:
 	if not is_instance_valid(_anomaly_data): return {}
-	
+
 	var waves_left: int = _anomaly_data.waves_to_charge - _waves_charged
 	return {
-		ID.UnitState.ANOMALY_WAVES_LEFT: waves_left
+		ID.UnitState.WAVES_LEFT_IN_PHASE: waves_left,
+		ID.UnitState.REWARD_PREVIEW: _anomaly_data.reward,
 	}

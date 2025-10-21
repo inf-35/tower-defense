@@ -31,7 +31,6 @@ func start() -> void:
 
 # this is the main logic, triggered whenever the host tower's neighbors change.
 func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:
-	print("adjacency updated")
 	# fail gracefully if no modifier is defined for this amplifier.
 	if not is_instance_valid(modifier_prototype):
 		_clear_all_modifiers() # clear any existing effects and stop

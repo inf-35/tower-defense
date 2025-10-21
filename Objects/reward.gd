@@ -18,6 +18,9 @@ enum Type {
 	ID.Rewards.RELIC : Relics.TOWER_SPEED_UP,
 }
 
-func _init(_type: Type = Type.EXPORT, _params: Dictionary = {}):
+@export_multiline var description: String = "Reward description"
+
+func _init(_type: Type = Type.EXPORT, _params: Dictionary = {}, _description: String = ""):
 	if _type != Type.EXPORT: self.type = _type
 	if not _params.is_empty(): self.params = _params
+	description = _description

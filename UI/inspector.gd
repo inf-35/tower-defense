@@ -12,7 +12,7 @@ class_name Inspector
 
 @export var stats: GridContainer
 
-@export var description: Label
+@export var description: InteractiveRichTextLabel
 
 @export var stats_per_line: int = 3
 
@@ -50,7 +50,7 @@ func _on_inspector_contents_tower_update(tower : Tower):
 
 	inspector_title.text = Towers.get_tower_name(tower_type)
 	subtitle.text = "mk" + str(tower.level) #TODO: implement localisation
-	description.text = Towers.get_tower_description(tower_type)
+	description.set_parsed_text(Towers.get_tower_description(tower_type))
 	
 	for child : Control in stats.get_children():
 		child.free() #queue_free will cause bugs with get_child_count()
@@ -67,8 +67,7 @@ func _on_inspector_contents_tower_update(tower : Tower):
 func _on_inspected_tower_health_update(_tower : Tower, max_hp : float, hp : float):
 	healthbar.max_value = max_hp
 	healthbar.value = hp
-		
-
+	
 enum DisplayStatModifier {
 	RECIPROCAL,
 	CORE_FLUX,
@@ -78,7 +77,8 @@ enum DisplayStatModifier {
 	RETRIEVE_FIRST_ATTACK_STATUS_STACK,
 	INVERT,
 	CAPACITY_GENERATION,
-	WAVES_LEFT_IN_PHASE
+	WAVES_LEFT_IN_PHASE,
+	ANOMALY_REWARD_PREVIEW,
 }
 
 func _display_stat(tower: Tower, display_info: StatDisplayInfo):
@@ -120,10 +120,16 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 			
 		DisplayStatModifier.WAVES_LEFT_IN_PHASE:
 			override = true
-			# call the new, generic function on the unit.
-			# the inspector does not know or care how the unit gets this data.
 			value = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
+			#used by any tower which has a wave-based state i.e. anomaly, breach, etc.
 			if value == null: return # abort if this special stat isn't found
+			
+		DisplayStatModifier.ANOMALY_REWARD_PREVIEW:
+			override = true
+			var waves_left_to_reward: int = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
+			var reward: Reward = tower.get_behavior_attribute(ID.UnitState.REWARD_PREVIEW)
+			
+			value = reward.description + " in " + str(waves_left_to_reward) + " waves."
 
 	# Get the value from the tower's components if not overridden
 	if not override:

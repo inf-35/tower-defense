@@ -14,7 +14,5 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 		return
 	
 	assert(instance.params.has("message") and instance.state.has("counter"))
-
-	print(instance.params.message," ",instance.state.counter)
 	instance.state.counter += 1
 	

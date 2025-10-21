@@ -135,7 +135,7 @@ func _draw() -> void:
 	for cell_pos: Vector2i in terrain_base_grid:
 		var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
 		var color := Terrain.get_color(terrain_base_grid[cell_pos])
-		draw_texture_rect(preload("res://Assets/grid_outline.svg"), rect.grow(-4.0), false)
+		draw_texture_rect(preload("res://Assets/grid_outline.svg"), rect.grow(-4.0), false, color)
 	
 	# 2. draw previews on top
 	for choice_id: int in _preview_choices:

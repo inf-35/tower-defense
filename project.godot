@@ -28,7 +28,6 @@ Phases="*res://Singletons/phase_manager.gd"
 UI="*res://UI/_ui_bus.gd"
 Targeting="*res://Singletons/targeting_coordinator.gd"
 Towers="*res://Singletons/towers.gd"
-CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 Attributes="*res://Indexes/attributes.gd"
 CombatManager="*res://Singletons/combat_manager.gd"
 VFXManager="*res://Singletons/vfx_manager.gd"
@@ -40,6 +39,8 @@ RewardService="*res://Singletons/reward_service.gd"
 Clock="*res://Singletons/clock.gd"
 ParticleManager="*res://Singletons/particle_manager.gd"
 Audio="*res://Singletons/audio.gd"
+KeywordService="*res://Singletons/keyword_service.gd"
+CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 
 [display]
 

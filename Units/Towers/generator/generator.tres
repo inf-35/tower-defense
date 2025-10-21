@@ -1,15 +1,13 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://kiqqpyvi5e1s"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://kiqqpyvi5e1s"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_2oild"]
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_5gso1"]
 [ext_resource type="PackedScene" uid="uid://y3fmjqd4dpgt" path="res://Units/Towers/generator/generator.tscn" id="2_2oild"]
 
 [resource]
 script = ExtResource("1_2oild")
 id = 5
-cost = 8.0
-required_capacity = 1.0
 element = 5
-minimum_terrain = 2
 tower_name = "Generator"
 tower_description = "Generates tower capacity when placed on RUINS tiles."
 tower_scene = ExtResource("2_2oild")

@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_y5gus")
 id = 8
-cost = 8.0
+cost = 12.0
 element = 5
 tower_name = "Amplifier"
 tower_description = "Enhances nearby towers"

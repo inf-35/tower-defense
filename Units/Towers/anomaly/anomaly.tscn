@@ -11,8 +11,7 @@
 
 [sub_resource type="Resource" id="Resource_shlxc"]
 script = ExtResource("2_hd4ab")
-label = "WAV"
-special_modifier = 8
+special_modifier = 9
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_4vd3g"]

@@ -179,7 +179,7 @@ stretch_mode = 5
 script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
-[node name="inspector" parent="Margin/ui_space" instance=ExtResource("3_rmtg4")]
+[node name="Inspector" parent="Margin/ui_space" instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 offset_left = -300.0
 offset_top = -150.0

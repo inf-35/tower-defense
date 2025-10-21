@@ -39,7 +39,7 @@ func _enter_state(new_state: State) -> void:
 			# command the unit to play a closing animation and then destroy itself
 			unit.died.emit() #killing ourselves triggers the deregistering mechanism
 
-func _on_wave_cycle_started(wave_number: int) -> void:
+func _on_wave_cycle_started(_wave_number: int) -> void:
 	_waves_left_in_state -= 1
 	if _waves_left_in_state <= 0:
 		if _current_state == State.SEED:
@@ -50,7 +50,7 @@ func _on_wave_cycle_started(wave_number: int) -> void:
 	UI.update_unit_state.emit(unit)
 
 # the breach has no active behavior in its _process loop, so update is empty
-func update(delta: float) -> void:
+func update(_delta: float) -> void:
 	pass
 	
 func get_display_data() -> Dictionary:

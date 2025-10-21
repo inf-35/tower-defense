@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1_h5q3w")
 id = 6
-cost = 1.5
+cost = 2.0
 element = 6
 tower_name = "Palisade"
 tower_description = "Cheap unit redirector."
