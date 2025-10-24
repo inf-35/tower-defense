@@ -6,7 +6,6 @@ signal health_changed(new_health: float)
 
 @export var health_data: HealthData = preload("res://Content/Health/tower_default.tres")
 
-
 var _modifiers_component: ModifiersComponent
 
 var max_health: float #updated by health setter
@@ -25,6 +24,8 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 		
 		if health < 0.01:
 			died.emit()
+var shield: float = health_data.max_shield #not linked to a attribute, simple counter
+#NOTE: shield does not support fancy effects, like boosts to shield as it is not linked to the modifiers component system
 
 func inject_components(modifiers_component: ModifiersComponent):
 	if modifiers_component != null:
@@ -58,8 +59,8 @@ func inject_components(modifiers_component: ModifiersComponent):
 		hitbox.monitoring = false
 		hitbox.monitorable = true
 	
+	shield = health_data.max_shield
 	UI.update_unit_health.emit(unit, max_health, health)
-
 
 func _ready():
 	pass
@@ -67,11 +68,6 @@ func _ready():
 	#_stagger = randi_range(0, _STAGGER_CYCLE)
 	
 func _process(delta : float) -> void:
-	#_stagger += 1
-	#_accumulated_delta += delta
-	#if _stagger % _STAGGER_CYCLE != 1:
-		#return
-		
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
 	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
 	if regeneration == 0 and regen_percent == 0:

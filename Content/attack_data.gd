@@ -7,11 +7,11 @@ class_name AttackData
 	set(new_value):
 		range = new_value
 		value_changed.emit(Attributes.id.RANGE)
-@export var cooldown: float = 1.0:
+@export var cooldown: float = 1.0: ##cooldown between attacks
 	set(new_value):
 		cooldown = new_value
 		value_changed.emit(Attributes.id.COOLDOWN)
-@export var radius: float = 0.0:
+@export var radius: float = 0.0: ##range of AOE effect
 	set(new_value):
 		radius = new_value
 		value_changed.emit(Attributes.id.RADIUS)
@@ -19,6 +19,7 @@ class_name AttackData
 	set(new_value):
 		damage = new_value
 		value_changed.emit(Attributes.id.DAMAGE)
+@export var breaking: bool = false ##can this attack damage shields?
 
 @export var status_effects: Array[StatusEffectPrototype] = []
 @export var modifiers: Array[ModifierDataPrototype] = []
@@ -55,6 +56,7 @@ func generate_hit_data() -> HitData:
 	hit_data.damage = damage
 	hit_data.expected_damage = damage
 	hit_data.radius = radius
+	hit_data.breaking = breaking
 	hit_data.modifiers = generate_modifiers()
 	hit_data.status_effects = format_status_effects()
 	

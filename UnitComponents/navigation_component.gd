@@ -6,7 +6,14 @@ signal blocked_by_tower(tower: Tower)
 
 var movement_component: MovementComponent
 var goal: Vector2i = Vector2i.ZERO
-@export var ignore_walls: bool = false
+@export var ignore_walls: bool = false ##ignore walls during pathfinding?
+
+# --- deviation state ---
+const DEVIATION_INTERVAL: float = 0.6 # how often to pick a new random offset (in seconds)
+const DEVIATION_MAGNITUDE: float = Island.CELL_SIZE * 0.3 # how far the unit can stray
+
+var _deviation_timer: float = 0.0
+var _current_deviation: Vector2 = Vector2.ZERO
 
 var blocking_tower: Tower:
 	set(nt):
@@ -21,37 +28,29 @@ var _current_waypoint_index: int:
 		_current_waypoint_index = ncwi
 		if len(_path) > _current_waypoint_index:
 			_current_waypoint = _path[_current_waypoint_index]
-		
-		# after advancing the waypoint, re-check our blocking status
 		_re_evaluate_blocking_state()
 
 var _current_waypoint: Vector2i
-
 var _path: Array[Vector2i] = []:
 	set(new_path):
 		_path = new_path
-		# use 'self.' to trigger the setter for the index
 		self._current_waypoint_index = 0
-		# immediately after getting a new path, check if we are blocked
 		_re_evaluate_blocking_state(true)
 
-#single, authoritative function for checking for blocking towers.
+# single, authoritative function for checking for blocking towers
 func _re_evaluate_blocking_state(check_local: bool = false) -> void:
-	if unit.incorporeal:
+	if unit.incorporeal or unit.phasing:
 		self.blocking_tower = null
 		return
 
 	var cells_to_check: Array[Vector2i] = []
-	# 1. check the tile the unit is currently on
 	if is_instance_valid(movement_component) and check_local:
 		cells_to_check.append(movement_component.cell_position)
-	# 2. check the next tile we are moving towards
 	if _current_waypoint_index < _path.size():
 		cells_to_check.append(_path[_current_waypoint_index])
 	
 	for cell: Vector2i in cells_to_check:
 		var unit_on_tile: Tower = References.island.get_tower_on_tile(cell)
-		
 		if is_instance_valid(unit_on_tile) and unit_on_tile.hostile != unit.hostile and unit_on_tile.blocking:
 			if self.blocking_tower != unit_on_tile:
 				self.blocking_tower = unit_on_tile
@@ -63,91 +62,83 @@ func _re_evaluate_blocking_state(check_local: bool = false) -> void:
 
 	self.blocking_tower = null
 
+# this function generates a new random offset and resets the timer
+func _update_deviation() -> void:
+	# reset the timer with a little randomness to desynchronize units
+	_deviation_timer = DEVIATION_INTERVAL + randf_range(-0.1, 0.1)
+	# generate a new random direction vector
+	_current_deviation = Vector2.from_angle(randf() * TAU) * DEVIATION_MAGNITUDE
+
 func _ready():
-	Navigation.field_cleared.connect(func():
-		update_path()
-	)
-	
+	Navigation.field_cleared.connect(update_path)
 	_STAGGER_CYCLE = 5
 	_stagger += randi_range(0, _STAGGER_CYCLE)
 	
 func update_path():
 	var path_data: Navigation.PathData = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
+	
+	# when the path is updated, we must also update our deviation to ensure responsiveness
+	_update_deviation()
+	
 	if path_data.status == Navigation.PathData.Status.BUILDING_PATH:
-		Navigation.request_path_promise(Navigation.PathPromise.new( #request a path for later
-			self,
-			movement_component.cell_position,
-			goal,
-			ignore_walls
-		))
-		unit.graphics.modulate = Color(0.0, 1.0, 1.0)
-		get_tree().create_timer(0.2).timeout.connect(func():
-			unit.graphics.modulate = Color(1.0, 1.0, 1.0)
-		)
-	else: #path built/ no path found
-		_path = path_data.path
-		unit.graphics.modulate = Color(1.0, 0.0, 1.0)
-		get_tree().create_timer(0.2).timeout.connect(func():
-			unit.graphics.modulate = Color(1.0, 1.0, 1.0)
-		)
-
-func receive_path_data(path_data: Navigation.PathData): #used by Navigation to fulfill promises
-	if path_data.status == Navigation.PathData.Status.BUILDING_PATH: #keep requesting path until we get back a good reply
 		Navigation.request_path_promise(Navigation.PathPromise.new(
-			self,
-			movement_component.cell_position,
-			goal,
-			ignore_walls
+			self, movement_component.cell_position, goal, ignore_walls
 		))
 	else:
-		_path = path_data.path
-		unit.graphics.modulate = Color(1.0, 0.0, 0.0)
-		get_tree().create_timer(0.2).timeout.connect(func():
-			unit.graphics.modulate = Color(1.0, 1.0, 1.0)
-		)
+		self._path = path_data.path
+
+func receive_path_data(path_data: Navigation.PathData):
+	_update_deviation() # also update deviation when a promise is fulfilled
+	if path_data.status == Navigation.PathData.Status.BUILDING_PATH:
+		Navigation.request_path_promise(Navigation.PathPromise.new(
+			self, movement_component.cell_position, goal, ignore_walls
+		))
+	else:
+		self._path = path_data.path
 	
 func _process(delta: float):
 	_stagger += 1
 	if _stagger % _STAGGER_CYCLE != 1:
 		return
-		
 	if movement_component == null:
 		return
+
+	# --- deviation timer logic ---
+	_deviation_timer -= delta
+	if _deviation_timer <= 0.0:
+		_update_deviation()
 	
 	# 1. ensure we have a path
 	if _path.is_empty():
 		update_path()
 		if _path.is_empty():
 			movement_component.target_direction = Vector2.ZERO
-			
 			_STAGGER_CYCLE = 2
 			return
 
 	_STAGGER_CYCLE = 5
-	# 2. check for a block *before* issuing any movement commands
+	
+	# 2. handle blocking state
 	if is_instance_valid(blocking_tower):
 		var current_cell_center: Vector2 = Island.cell_to_position(movement_component.cell_position)
 		var tower_position: Vector2 = blocking_tower.global_position
 		var direction_to_tower: Vector2 = (tower_position - current_cell_center).normalized()
-		
-		# the target is halfway towards the edge of the current cell, facing the tower
 		var target_pos: Vector2 = current_cell_center + direction_to_tower * (Island.CELL_SIZE * 0.1)
 		
-		# command the movement component to move to this intermediate point
+		# note: we do not apply deviation when blocked to ensure the unit stops neatly
 		movement_component.target_position = target_pos
 		return
 	
-	# 3. if not blocked, issue the command to move to the current waypoint
-	movement_component.target_position = Island.cell_to_position(_current_waypoint)
-	# 4. check for arrival at the waypoint to advance the path
+	# 3. if not blocked, issue the command to move to the deviated waypoint
+	var waypoint_pos: Vector2 = Island.cell_to_position(_current_waypoint)
+	movement_component.target_position = waypoint_pos + _current_deviation
+	
+	# 4. check for arrival at the (non-deviated) waypoint to advance the path
 	if movement_component.cell_position == goal:
 		return
-	
-	if (movement_component.position - Island.cell_to_position(_current_waypoint)).length_squared() < 50:
-		# use 'self.' to trigger the setter, which will re-evaluate blocking for the next tile
+	if (movement_component.position - waypoint_pos).length_squared() < 50:
 		self._current_waypoint_index += 1
 
-#TODO: implement temporal-based caches
 func get_position_in_future(t: float) -> Vector2:
 	if movement_component == null:
 		return unit.global_position

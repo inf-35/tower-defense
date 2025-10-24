@@ -5,9 +5,10 @@ signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready()
 signal died()
 #core behaviours
-@export var incorporeal: bool
-@export var hostile: bool
-@export var attack_only_when_blocked: bool
+@export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
+@export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
+@export var hostile: bool ##is this unit hostile to the player?
+@export var attack_only_when_blocked: bool ##does this unit attack only if blocked by a tower?
 
 @export_category("Presentation")
 @export var stat_displays : Array[StatDisplayInfo] = []
@@ -263,14 +264,22 @@ func take_hit(hit: HitData):
 	evt.data = hit
 
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
-	
-	var benchmark: float = health_component.health
-	health_component.health -= evt.data.damage
+	var damage: float = evt.data.damage
+	#shield phase
+	var absorbed_damage: float = 0.0
+	if evt.data.breaking:
+		absorbed_damage = min(damage, health_component.shield)
+		health_component.shield -= absorbed_damage
+		damage -= absorbed_damage
+	#health phase
+	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
+	if is_zero_approx(health_component.shield): #direct damage is not taken if there is a shield remaining
+		health_component.health -= evt.data.damage
 	var delta_health: float = benchmark - health_component.health #measure damage caused
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
-	hit_report.damage_caused = delta_health
-	if benchmark >= 0.01 and health_component.health < 0.01:
+	hit_report.damage_caused = delta_health + absorbed_damage #damage absorbed by the shield is also included
+	if benchmark >= 0.01 and is_zero_approx(health_component.health): #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
 	else:

@@ -18,6 +18,7 @@ delivery_method = 1
 range = 35.0
 cooldown = 0.75
 damage = 1.0
+breaking = true
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

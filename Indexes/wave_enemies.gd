@@ -13,15 +13,15 @@ enum WaveModifier {
 
 const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
 	Units.Type.BASIC:   {"cost": 10, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
-	Units.Type.BUFF:    {"cost": 20, "tags": [	&"SUPPORT"], "wave": 4},
+	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 4},
 	Units.Type.DRIFTER: {"cost": 30, "tags": [&"GRUNT", &"SIEGE"], "wave": 8},
 	Units.Type.ARCHER:  {"cost": 40, "tags": [&"RANGED", &"SIEGE", &"SQUISHY"], "wave": 12},
 }
 
 # --- director configuration ---
-const BASE_BUDGET: float = 50.0
-const BUDGET_PER_WAVE: float = 20.0
-const QUADRATIC_BUDGET_SCALING: float = 0.4
+const BASE_BUDGET: float = 40.0
+const BUDGET_PER_WAVE: float = 24.0
+const QUADRATIC_BUDGET_SCALING: float = 1.2
 
 # the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array[Array]:

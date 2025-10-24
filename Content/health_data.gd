@@ -14,3 +14,5 @@ class_name HealthData
 	set(new_value):
 		regen_percent = new_value
 		value_changed.emit(Attributes.id.REGEN_PERCENT)
+		
+@export var max_shield: float = 0.0

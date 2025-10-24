@@ -1,7 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://y3fmjqd4dpgt"]
+[gd_scene load_steps=9 format=3 uid="uid://y3fmjqd4dpgt"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ein27"]
-[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_fjids"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="3_c84km"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_p4o20"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_0fd6n"]
@@ -10,17 +9,10 @@
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="8_w5o8d"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
 
-[sub_resource type="Resource" id="Resource_v8yu7"]
-script = ExtResource("2_fjids")
-label = "CAP "
-special_modifier = 7
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
 [node name="Generator" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_ein27")
 type = 5
-stat_displays = Array[ExtResource("2_fjids")]([SubResource("Resource_v8yu7")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
