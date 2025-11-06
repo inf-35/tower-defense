@@ -15,24 +15,63 @@ enum Facing {
 	RIGHT,
 }
 
+enum State { ACTIVE, RUINED } ##overarching state machine of the tower
+var current_state: State = State.ACTIVE #NOTE: should not be directly modified
 var level: int = 0: #upgrade level of tower
 	set(new_level):
 		level = new_level
 		UI.update_unit_state.emit(self)
-
 var facing: Facing: #which direction the tower is facing
 	set(new_facing):
 		facing = new_facing
 		if graphics:
 			graphics.rotation = facing * PI * 0.5
-
 var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
 		tower_position = new_pos
 		movement_component.unit = self #evil circular dependency resolution
 		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
-		
 var size: Vector2i = Vector2i.ONE #this is inclusive of facing
+
+# --- new state transition functions ---
+
+# this function is called by 'sell()' or 'on_killed()'
+func enter_ruin_state(reason: RuinService.RuinReason) -> void:
+	if current_state == State.RUINED:
+		return
+		
+	current_state = State.RUINED
+	
+	# 1. register with the service
+	Player.ruin_service.register_ruin(self, reason)
+	
+	# 2. update visuals
+	disabled = true
+	
+	# 3. become non-blocking for pathfinding
+	self.blocking = false
+	References.island.update_navigation_grid()
+
+
+func enter_active_state() -> void:
+	if current_state == State.ACTIVE:
+		return
+	#restore visuals
+	disabled = false
+	#become blocking again
+	self.blocking = true
+	References.island.update_navigation_grid()
+	#reenable components
+	if is_instance_valid(attack_component): attack_component.set_process(true)
+	if is_instance_valid(range_component): range_component.set_process(true)
+
+# this function is called by the RuinService at the end of a wave
+func resurrect() -> void:
+	# 1. restore state
+	enter_active_state()
+	# 2. restore health
+	if is_instance_valid(health_component):
+		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
 
 func get_occupied_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
@@ -42,13 +81,16 @@ func get_occupied_cells() -> Array[Vector2i]:
 			
 	return cells
 
-func sell():
-	if hostile or incorporeal:
-		return
+# override the base Unit's death behavior
+func on_killed() -> void:
+	# instead of dying, towers enter the ruin state when killed
+	enter_ruin_state(RuinService.RuinReason.KILLED)
 
-	if not abstractive:
-		Player.flux += flux_value * 0.75 * health_component.health / get_stat(Attributes.id.MAX_HEALTH) #towers only release flux value when sold
-		died.emit()
+func sell():
+	if not abstractive and current_state == State.ACTIVE:
+		Player.flux += flux_value * 0.75
+		# selling a tower now also puts it into the ruin state
+		enter_ruin_state(RuinService.RuinReason.SOLD)
 
 func _create_hitbox():
 	var hitbox := Hitbox.new()

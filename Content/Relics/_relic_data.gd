@@ -16,7 +16,8 @@ enum TargetType {
 @export var specific_tower_type: Towers.Type
 # --- effect data ---
 # each relic contains a modifier prototype that defines its stat changes
-@export var modifier_prototype: ModifierDataPrototype
+@export var modifier_prototype: ModifierDataPrototype ##modifier that is applied to all satisfying towers (see specific_tower_type)
+@export var active_effect_scene: PackedScene ##for active global effects, scene is instantiated as child of the player->global modifier singleton
 # --- presentation data for ui ---
 @export var title: String
 @export_multiline var description: String

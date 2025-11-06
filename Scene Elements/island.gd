@@ -3,6 +3,7 @@ class_name Island
 
 @warning_ignore_start("unused_signal")
 signal terrain_changed
+signal tower_changed(tower_position: Vector2i) # this signal fire after adjacencies, navigation, etc. has been resolved
 signal expansion_applied
 signal navigation_grid_updated
 
@@ -72,6 +73,21 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
 	_update_adjacencies_around(cell)
 	update_navigation_grid()
+	
+	# --- apply terrain modifiers ---
+	# after the tower is created and has its components, check the terrain it's on
+	if is_instance_valid(tower.modifiers_component):
+		# get the terrain base at the tower's location
+		var terrain_base: Terrain.Base = self.terrain_base_grid.get(cell, Terrain.Base.EARTH)
+		# get the list of modifier prototypes associated with this terrain
+		var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
+		
+		for proto: ModifierDataPrototype in modifier_prototypes:
+			var new_modifier: Modifier = proto.generate_modifier()
+			# add the modifier as a PERMANENT modifier, as it's tied to the static world state
+			tower.modifiers_component.add_permanent_modifier(new_modifier)
+	
+	tower_changed.emit(cell)
 	return tower
 
 func update_navigation_grid() -> void:
@@ -118,6 +134,7 @@ func _on_tower_destroyed(tower: Tower):
 	#update capacity, caches, navigation
 	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
 	update_navigation_grid()
+	tower_changed.emit(cell)
 
 func _update_adjacencies_around(cell: Vector2i):
 	# ... (Function retained as is)

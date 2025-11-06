@@ -6,7 +6,7 @@
 script = ExtResource("1_760fe")
 params = {
 "base_capacity": 0.0,
-"terrain_conditional_capacity": [0, 5.0]
+"terrain_conditional_capacity": [1, 5.0]
 }
 effect_type = 2
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

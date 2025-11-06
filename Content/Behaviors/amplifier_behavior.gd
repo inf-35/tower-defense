@@ -4,7 +4,7 @@ class_name AmplifierBehavior
 
 # --- configuration ---
 # assign a ModifierDataPrototype resource in the inspector to define the buff this amplifier provides.
-@export var modifier_prototype: ModifierDataPrototype
+@export var modifier_prototype: ModifierDataPrototype ##modifier that will be applied to adjacent towers (per adjacent amplifier)
 
 # --- private state ---
 # this dictionary tracks the modifiers this specific amplifier has applied to other towers.

@@ -50,7 +50,7 @@ var disabled: bool:
 	set(nd):
 		disabled = nd
 		if graphics and graphics.material != null:
-			graphics.material.set_shader_parameter(&"overlay_color", Color(0,0,0,0.5) if disabled else Color(0,0,0,0))
+			graphics.material.set_shader_parameter(&"overlay_color", Color(0,0,0,0.7) if disabled else Color(0,0,0,0))
 
 func _ready():
 	name = name + " " + str(unit_id)
@@ -261,20 +261,14 @@ func take_hit(hit: HitData):
 		
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
-	evt.data = hit
+	evt.data = hit as HitData
 
 	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
 	var damage: float = evt.data.damage
 	#shield phase
 	var absorbed_damage: float = 0.0
-	if evt.data.breaking:
-		absorbed_damage = min(damage, health_component.shield)
-		health_component.shield -= absorbed_damage
-		damage -= absorbed_damage
-	#health phase
 	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
-	if is_zero_approx(health_component.shield): #direct damage is not taken if there is a shield remaining
-		health_component.health -= evt.data.damage
+	health_component.take_damage(damage, evt.data.breaking)
 	var delta_health: float = benchmark - health_component.health #measure damage caused
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
@@ -321,6 +315,12 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		hit.target.take_hit(hit) #cause target to take hit
 	else:
 		CombatManager.resolve_hit(hit, delivery_data)
+		
+# this is a new virtual function that deals with actual death
+# by default, it just emits the 'died' signal for immediate destruction.
+# towers will override this with their ruin logic.
+func on_killed() -> void:
+	died.emit()
 
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
 	return References.island.get_terrain_base(movement_component.cell_position)

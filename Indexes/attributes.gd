@@ -15,7 +15,9 @@ enum id { #trackable value
 	COOLDOWN,
 	RADIUS,
 	
-	NULL
+	NULL,
+	#NOTE: new effects are appended ad hoc to prevent disordering of exports
+	DAMAGE_TAKEN, ##damage_taken (as a proportion from 0.0 to 1.0) (health component)
 }
 
 enum Status { #diegetic statuses

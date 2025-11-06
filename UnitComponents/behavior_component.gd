@@ -76,7 +76,8 @@ func _is_attack_possible() -> bool:
 		
 	if unit.attack_only_when_blocked and not unit.blocked:
 		return false
-		
+	
+	#print(attack_component, " ", attack_component.attack_data)
 	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):
 		var target = range_component.get_target() as Unit
 		if target:

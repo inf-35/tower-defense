@@ -11,8 +11,8 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bsfdp"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/default_behavior.gd" id="9_n3sy1"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_ns662"]
-[ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="11_n0rgw"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_j01gd"]
+[ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="13_n0rgw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
 shader = ExtResource("6_n0rgw")
@@ -71,11 +71,11 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 script = ExtResource("9_n3sy1")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
 
-[node name="AttackComponent" type="Node" parent="."]
-script = ExtResource("10_ns662")
-attack_data = ExtResource("11_n0rgw")
-metadata/_custom_type_script = "uid://detgar3t50qgi"
-
 [node name="RangeComponent" type="Node" parent="."]
 script = ExtResource("12_j01gd")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("10_ns662")
+attack_data = ExtResource("13_n0rgw")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

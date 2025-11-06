@@ -23,6 +23,8 @@ func _ready():
 	# Connect to UI signal for when the player picks a tower from the build bar.
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	UI.tower_selected.connect(_on_build_tower_selected)
+	UI.update_flux.connect(func(_flux: float): _update_preview_visuals())
+	UI.update_capacity.connect(func(_used: float, _total: float): _update_preview_visuals())
 
 func _unhandled_input(event: InputEvent) -> void:
 	# This function now acts as a simple dispatcher, sending input
@@ -37,7 +39,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			
 	# Rotation can be handled universally if a preview is active
 	if current_state == State.PREVIEWING and event.is_action_pressed("rotate_preview"):
-		preview_tower_facing = (preview_tower_facing + 1) % 4
+		preview_tower_facing = (preview_tower_facing + 1) % Tower.Facing.size()
 		_update_preview_visuals()
 
 # --- State Transition Functions ---

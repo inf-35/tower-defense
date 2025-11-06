@@ -3,22 +3,22 @@ extends Node
 
 signal reward_process_complete
 # --- configuration ---
-@export var reward_pool: Array[Reward] = [
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON},
-		"Unlocks CANNON"
-	),
+var reward_pool: Array[Reward] = [
+	#Reward.new(
+		#Reward.Type.UNLOCK_TOWER,
+		#{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON},
+		#"Unlocks CANNON"
+	#),
 	Reward.new(
 		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.TOWER_SPEED_UP},
-		"Unlocks SPEEDUP RELIC"
+		{ID.Rewards.RELIC: Relics.ADJACENCY_BOOST},
+		"Unlocks ADJACENCY RELIC"
 	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
-		"Unlocks MINIGUN"
-	)
+	#Reward.new(
+		#Reward.Type.UNLOCK_TOWER,
+		#{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
+		#"Unlocks MINIGUN"
+	#)
 ]
 # --- state ---
 var is_choosing_reward: bool = false

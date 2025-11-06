@@ -62,8 +62,8 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
 	anomaly_rule.placement = PlacementRule.PlacementLogic.EDGE
 	anomaly_rule.initial_state[&"_anomaly_data"] = AnomalyData.new(
-			RewardService.reward_pool.pick_random().duplicate_deep(), 2
-		)
+		RewardService.reward_pool.pick_random().duplicate_deep(), 2
+	)
 	
 	initial_params.placement_rules.append(breach_rule)
 	initial_params.placement_rules.append(anomaly_rule)
@@ -207,6 +207,8 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
 		
 		var base: Terrain.Base = Terrain.Base.EARTH if randf() > params.ruins_chance else Terrain.Base.RUINS
+		if randf() > 0.5:
+			base = Terrain.Base.HIGHLAND
 		block_data[coord].terrain = base
 		
 	# --- Feature Placement Pipeline ---

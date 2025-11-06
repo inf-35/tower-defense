@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=16 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_i3qpa"]
 [ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/default_tower_behavior.gd" id="3_i3qpa"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_soln4"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_joj2e"]
@@ -12,11 +13,32 @@
 [ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="10_i3qpa"]
 [ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="11_uhk0q"]
 
+[sub_resource type="Resource" id="Resource_uhk0q"]
+script = ExtResource("2_i3qpa")
+attribute = 6
+label = "DMG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_yr17l"]
+script = ExtResource("2_i3qpa")
+attribute = 7
+label = "RNG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_qo260"]
+script = ExtResource("2_i3qpa")
+attribute = 8
+label = "RTE"
+suffix = " /s"
+special_modifier = 0
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
 [node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_lj076")
 type = 2
 turret = NodePath("Graphics/Turret")
+stat_displays = Array[ExtResource("2_i3qpa")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

@@ -2,7 +2,7 @@ extends Node #Towers
 #repository of towers, and their associated info
 
 enum Type {
-	VOID, #custom type for tower destruction
+	VOID, ##custom type for tower destruction
 	PLAYER_CORE,
 	TURRET,
 	FROST_TOWER,
@@ -13,7 +13,9 @@ enum Type {
 	AMPLIFIER,
 	BREACH,
 	ANOMALY,
-	MINIGUN
+	MINIGUN,
+	SHIELD,
+	SNIPER
 }
 
 enum Element {

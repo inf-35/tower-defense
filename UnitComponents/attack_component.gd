@@ -1,8 +1,8 @@
 extends UnitComponent
 class_name AttackComponent
 #polymorphic, stateless class that takes in AttackData and executes attacks
-@export var attack_data: AttackData
-@export var muzzle: Marker2D #where the bullets are coming from
+@export var attack_data: Data ##must be AttackData, but cannot be further specified due to strange engine bug
+@export var muzzle: Marker2D ##where the bullets are coming from
 var _modifiers_component: ModifiersComponent
 
 func _ready():

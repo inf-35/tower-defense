@@ -8,15 +8,15 @@ var _stagger: int = 0
 var _STAGGER_CYCLE: int = 3
 var _accumulated_delta: float = 0.0
 #stat cache system
-var stat_cache: Dictionary = {} #keys are Attributes.id
+var stat_cache: Dictionary[Attributes.id, Variant] = {} #keys are Attributes.id
 
 func initiate():
 	pass
 
 func _ready():
-	_stagger += randi_range(0, _STAGGER_CYCLE)
+	_stagger = randi_range(0, _STAGGER_CYCLE)
 
-func create_stat_cache(modifiers_component: ModifiersComponent, needed_stats: Array[Attributes.id] = []):
+func create_stat_cache(modifiers_component: ModifiersComponent, needed_stats: Array[Attributes.id] = []) -> void:
 	for attr: Attributes.id in needed_stats:
 		if modifiers_component.has_stat(attr):
 			stat_cache[attr] = modifiers_component.pull_stat(attr)

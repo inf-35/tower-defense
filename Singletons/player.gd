@@ -9,7 +9,7 @@ signal relics_changed()
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
-var flux: float = 20.0:
+var flux: float = 200.0:
 	set(value):
 		flux = value
 		flux_changed.emit(flux)
@@ -31,6 +31,11 @@ var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 		
 var active_relics: Array[RelicData]
 
+var _active_effects_container: Node
+
+#various services (which are children of this node)
+var ruin_service: RuinService
+
 func _ready():
 	#initial state setup
 	self.unlocked_towers = {
@@ -38,6 +43,7 @@ func _ready():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.AMPLIFIER: true,
+		Towers.Type.SHIELD: true,
 	}
 
 	#connect to UI player input signals
@@ -47,6 +53,15 @@ func _ready():
 	flux_changed.connect(UI.update_flux.emit)
 	capacity_changed.connect(UI.update_capacity.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
+	#setup global effects container
+	_active_effects_container = Node.new()
+	_active_effects_container.name = "ActiveGlobalEffects"
+	add_child(_active_effects_container)
+	
+	#create and setup services
+	ruin_service = RuinService.new()
+	add_child(ruin_service)
+	ruin_service.initialise()
 
 #capacity helper functions
 func add_to_used_capacity(amount: float):
@@ -77,15 +92,26 @@ func add_relic(relic: RelicData) -> void:
 	if not is_instance_valid(relic):
 		return
 	active_relics.append(relic)
+	
+	if relic.active_effect_scene:
+		# instantiate the logic node for the active relic
+		var effect_node: GlobalEffect = relic.active_effect_scene.instantiate()
+		# add it to our container so it becomes part of the scene tree
+		_active_effects_container.add_child(effect_node)
+		print("Added relic global effect: ", effect_node)
+		# initialize it with its own data
+		effect_node.initialise()
+
 	# announce that the global state has changed
 	relics_changed.emit()
+
 # this is the core query function used by ModifiersComponent
 func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 	var relevant_modifiers: Array[Modifier] = []
 	
 	for relic: RelicData in active_relics:
 		# check if the unit matches the relic's targeting rules
-		if _unit_matches_target(unit, relic):
+		if _unit_matches_target(unit, relic) and relic.modifier_prototype != null:
 			var new_modifier := relic.modifier_prototype.generate_modifier()
 			# brand it with a source ID for debugging, if needed
 			new_modifier.source_id = -1 # use a special ID for global mods

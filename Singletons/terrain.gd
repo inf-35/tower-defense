@@ -4,9 +4,10 @@ extends Node #terrain
 enum Base { #base terrain type
 	EARTH,
 	RUINS,
+	HIGHLAND,
 }
 
-class CellData:
+class CellData: #used to communicate info during runtime
 	var terrain: Base
 	var feature: Towers.Type
 	var initial_state: Dictionary
@@ -15,37 +16,23 @@ class CellData:
 		terrain = _terrain
 		feature = _feature
 		initial_state = _initial_state
+		
+#terrain database, as a global class, is in a nother script (Objects/Indexes/terrain_database.gd)
 
-class BaseStat: #defines stats for a terraintype
-	var color: Color #default base color
-	var navigable: bool #unaltered, is this terrain navigable
-	var constructable: bool #unaltered, is this terrain constructable upon.
-	
-	func _init(_color: Color, _navigable: bool, _constructable: bool):
-		color = _color
-		navigable = _navigable
-		constructable = _constructable
-	
-var terrain_base_stats: Dictionary[Base, BaseStat]= {
-	Base.EARTH : BaseStat.new(
-		Color(1,1,1,1),
-		true, true
-	),
-	Base.RUINS : BaseStat.new(
-		Color(2,2,2,2),
-		true, true
-	)
-}
+var terrain_database: TerrainDatabase = preload("res://Indexes/default_terrain.tres")
 
 func get_color(terrain_base: Base) -> Color:
 	var color: Color
 
-	color = terrain_base_stats[terrain_base].color
+	color = terrain_database.terrain_base_types[terrain_base].color
 
 	return color
 
 func is_navigable(terrain_base: Base) -> bool: #can this terrain be navigated upon?
-	return terrain_base_stats[terrain_base].navigable
+	return terrain_database.terrain_base_types[terrain_base].navigable
 
 func is_constructable(terrain_base: Base) -> bool: #can this terrain be constructed upon?
-	return terrain_base_stats[terrain_base].constructable
+	return terrain_database.terrain_base_types[terrain_base].constructable
+	
+func get_modifiers_for_base(terrain_base: Base) -> Array[ModifierDataPrototype]:
+	return terrain_database.terrain_base_types[terrain_base].modifiers
