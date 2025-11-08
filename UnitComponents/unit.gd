@@ -3,7 +3,7 @@ class_name Unit
 
 signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready()
-signal died()
+signal died() ##fires upon unit death NOTE: tree_exiting should be used for complete tower destruction
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -84,17 +84,7 @@ func _create_components() -> void:
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
 	
-	died.connect(func():
-		if not self is Tower: #towers have their own flux value system 
-			Player.flux += flux_value #reward player with flux
-		Targeting.clear_damage(self) #clear any damage that might be locked on to us
-		
-		for effect_prototype: EffectPrototype in effect_prototypes:
-			remove_effect(effect_prototype) #detach effects
-	
-		queue_free()
-	)
-	
+	died.connect(on_killed)
 	if graphics != null:
 		var unit_effects_shader_material: ShaderMaterial = ShaderMaterial.new()
 		unit_effects_shader_material.shader = preload("res://Shaders/unit_effects.gdshader")
@@ -316,11 +306,17 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 	else:
 		CombatManager.resolve_hit(hit, delivery_data)
 		
-# this is a new virtual function that deals with actual death
-# by default, it just emits the 'died' signal for immediate destruction.
+# this is a new virtual function that deals with actual death (connects to the died signal)
 # towers will override this with their ruin logic.
 func on_killed() -> void:
-	died.emit()
+	if not self is Tower: #towers have their own flux value system 
+		Player.flux += flux_value #reward player with flux
+	Targeting.clear_damage(self) #clear any damage that might be locked on to us
+	
+	for effect_prototype: EffectPrototype in effect_prototypes:
+		remove_effect(effect_prototype) #detach effects
+
+	queue_free()
 
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
 	return References.island.get_terrain_base(movement_component.cell_position)

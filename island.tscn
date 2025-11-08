@@ -28,6 +28,6 @@ process_mode = 3
 script = ExtResource("3_fgmf3")
 
 [node name="PathRenderer" type="Node2D" parent="."]
-z_index = -1
+z_index = 1
 script = ExtResource("6_gljqa")
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"

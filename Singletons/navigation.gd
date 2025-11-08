@@ -85,9 +85,6 @@ func _build_flow_field_async(goal: Vector2i, ignore_walls: bool) -> void:
 
 #this function computes a local field and returns it
 #this is CRITICAL for thread safety, as it no longer writes to a shared global variable
-#NOTE: this function reads goal and grid in an unsafe manner. 
-#the reason this code is acceptably safe is not because race conditions are impossible
-#but bc its resilient to stale data, and the write operations on grid are strictly controlled.
 func _build_flow_field(goal: Vector2i, ignore_walls: bool, p_grid: Dictionary[Vector2i, int]) -> Dictionary[Vector2i, Vector2i]:
 	var local_flow_field: Dictionary[Vector2i, Vector2i] = {}
 	if not p_grid.has(goal):

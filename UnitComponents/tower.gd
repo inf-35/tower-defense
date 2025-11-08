@@ -40,6 +40,10 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
 		return
 		
+	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
+		queue_free()
+		return
+		
 	current_state = State.RUINED
 	
 	# 1. register with the service
@@ -51,7 +55,6 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	# 3. become non-blocking for pathfinding
 	self.blocking = false
 	References.island.update_navigation_grid()
-
 
 func enter_active_state() -> void:
 	if current_state == State.ACTIVE:
@@ -73,23 +76,13 @@ func resurrect() -> void:
 	if is_instance_valid(health_component):
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
 
-func get_occupied_cells() -> Array[Vector2i]:
-	var cells: Array[Vector2i] = []
-	for x: int in size.x:
-		for y: int in size.y:
-			cells.append(tower_position + Vector2i(x,y))
-			
-	return cells
-
-# override the base Unit's death behavior
 func on_killed() -> void:
-	# instead of dying, towers enter the ruin state when killed
 	enter_ruin_state(RuinService.RuinReason.KILLED)
 
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
 		Player.flux += flux_value * 0.75
-		# selling a tower now also puts it into the ruin state
+		# selling a tower now also puts it into the ruin state (bypasses died.emit or killed)
 		enter_ruin_state(RuinService.RuinReason.SOLD)
 
 func _create_hitbox():
@@ -134,3 +127,11 @@ func _ready():
 		
 		on_event.emit(event)
 	)
+	
+func get_occupied_cells() -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for x: int in size.x:
+		for y: int in size.y:
+			cells.append(tower_position + Vector2i(x,y))
+			
+	return cells

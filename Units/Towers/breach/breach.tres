@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://dnuriafc2j7gw"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://dnuriafc2j7gw"]
 
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_nrtjb"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_utcy8"]
 [ext_resource type="PackedScene" uid="uid://ccf4np3sitvsx" path="res://Units/Towers/breach/breach.tscn" id="2_myhv2"]
 
@@ -8,7 +9,6 @@ script = ExtResource("1_utcy8")
 id = 9
 cost = 0.0
 required_capacity = 0.0
-max_level = 5
 element = 5
 tower_name = "Breach"
 tower_description = "Enemies spawn here."

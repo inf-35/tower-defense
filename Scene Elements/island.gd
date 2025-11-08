@@ -19,6 +19,8 @@ var _highlighted_choice_id: int = -1
 # --- constants ---
 const CELL_SIZE: int = 10
 const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1) ]
+#configuration
+const _DEBUG_SHOW_NAVCOST: bool = false
 
 func _ready():
 	#register self with services that need references
@@ -67,8 +69,8 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.tower_position = cell
 	tower.set_initial_behaviour_state(initial_state)
 	add_child(tower)
-	
-	tower.died.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
+	#NOTE: tower.died cannot be used here due to the ruins system
+	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
 	_update_adjacencies_around(cell)
@@ -92,11 +94,13 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 
 func update_navigation_grid() -> void:
 	Navigation.grid.clear()
+	print("UPDATE!")
 	for cell: Vector2i in terrain_base_grid:
 		var is_navigable: bool = Terrain.is_navigable(terrain_base_grid[cell])
 		var is_occupied: bool = tower_grid.has(cell)
 		if Terrain.is_navigable(terrain_base_grid[cell]):
 			if is_occupied:
+				print(Towers.Type.keys()[tower_grid[cell].type])
 				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
 			else:
 				Navigation.grid[cell] = 0
@@ -104,6 +108,7 @@ func update_navigation_grid() -> void:
 	Navigation.clear_field()
 	
 	navigation_grid_updated.emit()
+	queue_redraw()
 
 func update_shore_boundary() -> void: #used for expansion
 	# simplified logic to find all land tiles adjacent to nothing
@@ -148,11 +153,37 @@ func _update_adjacencies_around(cell: Vector2i):
 
 # --- updated drawing logic ---
 func _draw() -> void:
-	# 1. draw base terrain
+	# 1. draw terrain outlines
+	# --- 1. identify the unique set of vertices to draw on ---
+	var vertices_to_draw: Dictionary[Vector2i, bool] = {} # use a dictionary as a hash set for automatic deduplication
+
+	# iterate through every cell that is part of the terrain
 	for cell_pos: Vector2i in terrain_base_grid:
-		var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
-		var color := Terrain.get_color(terrain_base_grid[cell_pos])
-		draw_texture_rect(preload("res://Assets/grid_outline.svg"), rect.grow(-4.0), false, color)
+		# for each cell, we are interested in its four corner vertices.
+		# by adding all four to a dictionary, we ensure that shared vertices
+		# between adjacent cells are only stored once.
+		vertices_to_draw[cell_pos] = true                        # top-left corner
+		vertices_to_draw[cell_pos + Vector2i(1, 0)] = true       # top-right corner
+		vertices_to_draw[cell_pos + Vector2i(0, 1)] = true       # bottom-left corner
+		vertices_to_draw[cell_pos + Vector2i(1, 1)] = true       # bottom-right corner
+
+	# --- 2. load the texture resource once ---
+	var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
+	var cross_size: Vector2 = cross_texture.get_size()
+	var cross_half_size: Vector2 = cross_size / 2.0
+	var cross_color: Color = Color.WHITE # define a base color for the crosses
+
+	# --- 3. render one cross at each unique vertex ---
+	for vertex_pos: Vector2i in vertices_to_draw:
+		# calculate the world position of the vertex (the grid line intersection)
+		var world_pos: Vector2 = Vector2(vertex_pos * CELL_SIZE) - Vector2.ONE * CELL_SIZE * 0.5
+		
+		# calculate the rect needed to draw the texture *centered* on the vertex.
+		# we start at the world position and subtract half the texture's size.
+		var centered_rect := Rect2(world_pos, Vector2.ONE * CELL_SIZE)
+		
+		# draw the texture at the calculated position
+		draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, cross_color)
 	
 	# 2. draw previews on top
 	for choice_id: int in _preview_choices:
@@ -177,6 +208,12 @@ func _draw() -> void:
 				var center: Vector2 = Vector2(cell_pos * CELL_SIZE) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
 				var tower_color: Color = Color.CRIMSON if is_highlighted else Color.DARK_RED
 				draw_circle(center, CELL_SIZE * 0.4, tower_color)
+		
+	#3 debug:
+	if _DEBUG_SHOW_NAVCOST:
+		for cell: Vector2i in Navigation.grid:
+			var score: int = Navigation.grid[cell]
+			draw_rect(Rect2(cell * CELL_SIZE, Vector2.ONE * CELL_SIZE), Color(score * 0.05, score * 0.05, score * 0.05))
 
 #static data access functions
 func get_tower_on_tile(cell: Vector2i):
