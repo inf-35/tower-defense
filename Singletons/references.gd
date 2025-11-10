@@ -1,4 +1,6 @@
 extends Node
+#global logic signals
+signal references_ready()
 #scene tree globals
 @onready var root: Node = get_tree().get_root()
 
@@ -6,6 +8,8 @@ extends Node
 @onready var camera: Camera = island.get_node("Camera2D")
 @onready var tower_preview: TowerPreview = island.get_node("TowerPreview")
 @onready var projectiles: Node2D = island.get_node("Projectiles")
+
+const TOWER_GROUP: StringName = &"towers"
 
 var current_unit_id: int = -1
 var current_stat_id: int = -1
@@ -20,3 +24,4 @@ func assign_stat_id() -> int:
 	
 func _ready():
 	set_process(false)
+	references_ready.emit()

@@ -15,7 +15,6 @@ const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
 	Units.Type.BASIC:   {"cost": 10, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
 	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 4},
 	Units.Type.DRIFTER: {"cost": 30, "tags": [&"GRUNT", &"SIEGE"], "wave": 8},
-	Units.Type.ARCHER:  {"cost": 40, "tags": [&"RANGED", &"SIEGE", &"SQUISHY"], "wave": 12},
 }
 
 # --- director configuration ---

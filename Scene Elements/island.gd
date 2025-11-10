@@ -3,7 +3,8 @@ class_name Island
 
 @warning_ignore_start("unused_signal")
 signal terrain_changed
-signal tower_changed(tower_position: Vector2i) # this signal fire after adjacencies, navigation, etc. has been resolved
+signal tower_created(tower: Tower)
+signal tower_changed(tower_position: Vector2i) # this signal fires after adjacencies, navigation, etc. has been resolved
 signal expansion_applied
 signal navigation_grid_updated
 
@@ -68,6 +69,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.facing = tower_facing
 	tower.tower_position = cell
 	tower.set_initial_behaviour_state(initial_state)
+	tower.add_to_group(References.TOWER_GROUP)
 	add_child(tower)
 	#NOTE: tower.died cannot be used here due to the ruins system
 	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
@@ -89,18 +91,18 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 			# add the modifier as a PERMANENT modifier, as it's tied to the static world state
 			tower.modifiers_component.add_permanent_modifier(new_modifier)
 	
+	tower_created.emit(tower)
 	tower_changed.emit(cell)
 	return tower
 
 func update_navigation_grid() -> void:
 	Navigation.grid.clear()
-	print("UPDATE!")
+
 	for cell: Vector2i in terrain_base_grid:
 		var is_navigable: bool = Terrain.is_navigable(terrain_base_grid[cell])
 		var is_occupied: bool = tower_grid.has(cell)
 		if Terrain.is_navigable(terrain_base_grid[cell]):
 			if is_occupied:
-				print(Towers.Type.keys()[tower_grid[cell].type])
 				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
 			else:
 				Navigation.grid[cell] = 0
@@ -169,8 +171,6 @@ func _draw() -> void:
 
 	# --- 2. load the texture resource once ---
 	var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
-	var cross_size: Vector2 = cross_texture.get_size()
-	var cross_half_size: Vector2 = cross_size / 2.0
 	var cross_color: Color = Color.WHITE # define a base color for the crosses
 
 	# --- 3. render one cross at each unique vertex ---
@@ -185,7 +185,11 @@ func _draw() -> void:
 		# draw the texture at the calculated position
 		draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, cross_color)
 	
-	# 2. draw previews on top
+	# 2. draw icons
+	for cell_pos: Vector2i in terrain_base_grid:
+		draw_texture_rect(Terrain.get_icon(terrain_base_grid[cell_pos]), Rect2(cell_pos * CELL_SIZE, Vector2.ONE * CELL_SIZE).grow(-4.0), false)
+	
+	# 3. draw previews on top
 	for choice_id: int in _preview_choices:
 		var choice: ExpansionChoice = _preview_choices[choice_id]
 		var is_highlighted: bool = (choice_id == _highlighted_choice_id)
@@ -220,7 +224,7 @@ func get_tower_on_tile(cell: Vector2i):
 	return tower_grid.get(cell, null)
 
 func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]:
-	# ... (Function retained as is)
+	#NOTE: tower.get_adjacent_towers() should preferably be used instead
 	var output: Dictionary[Vector2i, Tower] = {}
 	for dir: Vector2i in DIRS:
 		if tower_grid.has(cell + dir):

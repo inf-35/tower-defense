@@ -53,13 +53,13 @@ class ReactionData:
 #of FROST should be equivalent to one stack of POISON in importance/severity
 var status_effects : Dictionary[Status, StatusEffectData] = {
 	Status.FROST: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.5, true, Color(0, 0, 1, 0.5)
+		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -1, 0.0
+		id.REGENERATION, -1, 0.0, true, Color(1,0,0,0.5)
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_PERCENT, -2, 0.0, true, Color(0, 1, 0, 0.5)
+		id.REGEN_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5)
 	),
 	Status.HEAT: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 1.0  #this effect does nothing by itself, but reacts with FROST 

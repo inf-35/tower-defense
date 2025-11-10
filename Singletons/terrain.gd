@@ -28,6 +28,9 @@ func get_color(terrain_base: Base) -> Color:
 
 	return color
 
+func get_icon(terrain_base: Base) -> Texture2D:
+	return terrain_database.terrain_base_types[terrain_base].texture
+
 func is_navigable(terrain_base: Base) -> bool: #can this terrain be navigated upon?
 	return terrain_database.terrain_base_types[terrain_base].navigable
 

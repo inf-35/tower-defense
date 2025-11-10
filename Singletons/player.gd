@@ -37,15 +37,6 @@ var _active_effects_container: Node
 var ruin_service: RuinService
 
 func _ready():
-	#initial state setup
-	self.unlocked_towers = {
-		Towers.Type.PALISADE: true,
-		Towers.Type.GENERATOR: true,
-		Towers.Type.TURRET: true,
-		Towers.Type.AMPLIFIER: true,
-		Towers.Type.SHIELD: true,
-	}
-
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -62,6 +53,22 @@ func _ready():
 	ruin_service = RuinService.new()
 	add_child(ruin_service)
 	ruin_service.initialise()
+	
+	References.references_ready.connect(_setup_state, CONNECT_ONE_SHOT)
+	
+func _setup_state():
+	#initial state setup
+	self.unlocked_towers = {
+		Towers.Type.PALISADE: true,
+		Towers.Type.GENERATOR: true,
+		Towers.Type.TURRET: true,
+		Towers.Type.AMPLIFIER: true,
+		Towers.Type.SHIELD: true,
+		Towers.Type.POISON: true,
+		Towers.Type.FROST_TOWER: true,
+	}
+	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.ADJACENCY_BOOST}))
+	
 
 #capacity helper functions
 func add_to_used_capacity(amount: float):

@@ -1,7 +1,7 @@
 extends Unit
 class_name Tower
 
-signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island hooks onto this
+signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island fires this for us
 
 @export var type: Towers.Type
 @export var blocking: bool = true ##does this tower block enemy units from passing through?
@@ -135,3 +135,6 @@ func get_occupied_cells() -> Array[Vector2i]:
 			cells.append(tower_position + Vector2i(x,y))
 			
 	return cells
+	
+func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
+	return References.island.get_adjacent_towers(self.tower_position)

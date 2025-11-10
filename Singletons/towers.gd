@@ -15,7 +15,8 @@ enum Type {
 	ANOMALY,
 	MINIGUN,
 	SHIELD,
-	SNIPER
+	SNIPER,
+	POISON
 }
 
 enum Element {

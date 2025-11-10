@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfapumsublhbo"
-path="res://.godot/imported/grid_outline.svg-f28e2a7052a3a202b35dc38b76832084.ctex"
+uid="uid://dcsiepjgtpgvm"
+path="res://.godot/imported/highland.svg-1cef62349ca1215ff955b967400a8bf5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Assets/grid_outline.svg"
-dest_files=["res://.godot/imported/grid_outline.svg-f28e2a7052a3a202b35dc38b76832084.ctex"]
+source_file="res://Assets/highland.svg"
+dest_files=["res://.godot/imported/highland.svg-1cef62349ca1215ff955b967400a8bf5.ctex"]
 
 [params]
 

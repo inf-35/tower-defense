@@ -4,21 +4,21 @@ extends Node
 signal reward_process_complete
 # --- configuration ---
 var reward_pool: Array[Reward] = [
-	#Reward.new(
-		#Reward.Type.UNLOCK_TOWER,
-		#{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON},
-		#"Unlocks CANNON"
-	#),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON},
+		"Unlocks CANNON"
+	),
 	Reward.new(
 		Reward.Type.ADD_RELIC,
 		{ID.Rewards.RELIC: Relics.ADJACENCY_BOOST},
 		"Unlocks ADJACENCY RELIC"
 	),
-	#Reward.new(
-		#Reward.Type.UNLOCK_TOWER,
-		#{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
-		#"Unlocks MINIGUN"
-	#)
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
+		"Unlocks MINIGUN"
+	)
 ]
 # --- state ---
 var is_choosing_reward: bool = false
@@ -77,6 +77,6 @@ func apply_reward(reward: Reward) -> void:
 				Player.unlock_tower(tower_type)
 
 		Reward.Type.ADD_RELIC:
-			var relic: RelicData = reward.params.get(ID.Rewards.RELIC)
-			if relic:
+			var relic = reward.params.get(ID.Rewards.RELIC)
+			if relic is RelicData:
 				Player.add_relic(relic)

@@ -12,5 +12,6 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [node name="AdjacencyBoostEffect" type="Node"]
 script = ExtResource("1_vdew1")
+host_tower_type = 2
 _modifier_prototype = SubResource("Resource_vdew1")
 metadata/_custom_type_script = "uid://b74ug56sj02f0"

@@ -42,8 +42,10 @@ func remove_permanent_modifier(mod: Modifier) -> void:
 # add a buff/debuff
 func add_modifier(mod: Modifier) -> void:
 	_modifiers.append(mod)
+	print(Attributes.id.keys()[mod.attribute], mod.additive, " ADDED!")
 	_effective_cache.erase(mod.attribute)
 	stat_changed.emit(mod.attribute)
+	print(Attributes.id.keys()[mod.attribute], " post-signal fired")
 	
 	if mod.source_id == null:
 		push_warning("modifier ", self, " has no source id!")
@@ -53,7 +55,7 @@ func add_modifier(mod: Modifier) -> void:
 			remove_modifier(mod)
 		)
 
-#change modifier
+#change modifier notification NOTE: mainly used for external modifier modification, simply notifies that there is a change
 func change_modifier(mod: Modifier) -> void:
 	_effective_cache.erase(mod.attribute)
 	stat_changed.emit(mod.attribute)
@@ -79,7 +81,6 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 		# apply the updated state
 		update_status(existing_status)
 		check_reactions_for_status(type)
-		_recalculate_overlay_color()
 		return
 
 	# if it's a new status, create and configure it
@@ -99,7 +100,6 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 		#gametimers automatically start
 	update_status(status)
 	check_reactions_for_status(type)
-	_recalculate_overlay_color()
 
 # update a status effect
 func update_status(status: StatusEffect) -> void:
@@ -121,6 +121,7 @@ func update_status(status: StatusEffect) -> void:
 		replace_modifier(old_modifier, new_modifier)
 	else:
 		add_modifier(new_modifier)
+		
 		
 	_recalculate_overlay_color()
 	
@@ -175,7 +176,6 @@ func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 func create_underlying_modifier(status: StatusEffect) -> Modifier:
 	# Look up the definition of this status type from our central Attributes store.
 	var status_data = Attributes.status_effects[status.type]
-
 	# Calculate the total effect based on the number of stacks.
 	var total_additive = status_data.additive_per_stack * status.stack
 	var total_multiplicative = pow(status_data.multiplicative_per_stack, status.stack)
@@ -241,7 +241,7 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		if modifier.override != null:
 			perm_override = modifier.override
 	
-	upgraded_value = (upgraded_value + perm_sum_add) * perm_product_mult if perm_override == null else perm_override
+	upgraded_value = upgraded_value * perm_product_mult + perm_sum_add if perm_override == null else perm_override
 
 	# --- STAGE 2: apply transient modifiers to the upgraded stat ---
 	var sum_add := 0.0
@@ -251,13 +251,16 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	for modifier: Modifier in _modifiers:
 		if modifier.attribute != attr:
 			continue
+			
+		#if attr == Attributes.id.REGEN_PERCENT:
+			#print(modifier, " found!")
 	
 		sum_add += modifier.additive
 		product_mult *= modifier.multiplicative
 		if modifier.override != null:
 			override = modifier.override
 	
-	var transient_value: float = (upgraded_value + sum_add) * product_mult if override == null else override
+	var transient_value: float = upgraded_value * product_mult + sum_add if override == null else override
 	
 	# --- STAGE 3: apply global (relic) modifiers ---
 	var final_value: float = transient_value # start with the result of stage 2
