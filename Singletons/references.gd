@@ -7,6 +7,7 @@ signal references_ready()
 @warning_ignore_start("unused_signal")
 signal unit_took_hit(unit: Unit, hit: HitData) 
 signal unit_died(unit: Unit)
+signal unit_changed_cell(unit: Unit, old_cell: Vector2i, new_cell: Vector2i)
 
 #scene tree globals
 @onready var root: Node = get_tree().get_root()

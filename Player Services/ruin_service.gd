@@ -6,6 +6,8 @@ enum RuinReason { KILLED, SOLD }
 
 # we track the tower node itself and the reason it was ruined
 var _ruined_towers: Dictionary[Tower, RuinReason] = {}
+# this dictionary acts as a fast lookup set for checking if a cell is ruined.
+var _ruined_cells: Dictionary[Vector2i, bool] = {}
 
 #initialise is the _ready substitute
 func initialise() -> void:
@@ -18,6 +20,9 @@ func register_ruin(tower: Tower, reason: RuinReason) -> void:
 		return
 	
 	_ruined_towers[tower] = reason
+	# when a tower is ruined, mark all of its occupied cells in the lookup table
+	for cell: Vector2i in tower.get_occupied_cells():
+		_ruined_cells[cell] = true
 
 # this function is the core of the system's logic
 func _on_wave_ended(_wave_number: int) -> void:
@@ -45,3 +50,8 @@ func _on_wave_ended(_wave_number: int) -> void:
 	
 	# clear the dictionary for the next wave
 	_ruined_towers.clear()
+	_ruined_cells.clear()
+
+#public API
+func is_cell_ruined(cell: Vector2i) -> bool:
+	return _ruined_cells.has(cell)

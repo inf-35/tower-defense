@@ -1,6 +1,6 @@
 extends Node
 
-const _DEBUG: bool = true
+const _DEBUG: bool = false
 
 class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
@@ -13,7 +13,7 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	var delivery_data : DeliveryData
 	var intercept_position : Vector2
 	var source_position: Vector2
-	var target_affiliation : bool
+	var target_affiliation : bool 
 	
 	func _init(_hit_data: HitData, _delivery_data: DeliveryData):
 		hit_data = _hit_data
@@ -84,7 +84,6 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 		source_position = hit_data.source.attack_component.muzzle.global_position\
 			if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	var intercept_position: Vector2 = delivery_data.intercept_position
-
 	Targeting.add_damage(hit_data.target, hit_data.expected_damage) #adds expected damage to target in targeting coordinator
 	
 	match delivery_data.delivery_method:
@@ -145,6 +144,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			query_params.collide_with_areas = true
 			query_params.collision_mask = Hitbox.get_mask(target.hostile)
 			
+			if _DEBUG: _visualize_shape_for_debug(shape, query_params.transform, 0.5)
+			
 			var potential_targets : Array[Dictionary] = space_state.intersect_shape(query_params)
 			if potential_targets.is_empty():
 				return #no potential targets
@@ -173,6 +174,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 		
 		DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT:
 			var intercept_time: float = (intercept_position - source_position).length() / delivery_data.projectile_speed
+			if is_zero_approx((intercept_position - source_position).length()):
+				intercept_time = 0.0
 			var resolver := ProjectileAbstractResolver.new(hit_data, delivery_data)
 			resolver.start(intercept_time)
 			

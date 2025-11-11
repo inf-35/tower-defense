@@ -70,7 +70,8 @@ func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us 
 	add_modifier(replacement) #this calls stat_changed
 
 # add a status effect with new precedence rules
-func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int) -> void:
+func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int = 0) -> void:
+	#NOTE: 0 by default refers to the player core
 	# if a status of this type already exists, refresh it
 	if _status_effects.has(type):
 		var existing_status: StatusEffect = _status_effects[type]

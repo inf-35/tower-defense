@@ -1,10 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://ms2w6jihumk"]
+[gd_scene load_steps=6 format=3 uid="uid://ms2w6jihumk"]
 
 [ext_resource type="Script" uid="uid://c2xp1qmu85wad" path="res://UI/_tooltip_panel.gd" id="1_c5s8d"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_t0qdu"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_fg2ep"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c5s8d"]
+bg_color = Color(0, 0, 0, 0.78431374)
+
+[sub_resource type="Theme" id="Theme_t0qdu"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_c5s8d")
+
 [node name="TooltipPanel" type="PanelContainer" node_paths=PackedStringArray("title_label", "description_label")]
+theme = SubResource("Theme_t0qdu")
 script = ExtResource("1_c5s8d")
 title_label = NodePath("MarginContainer/VBoxContainer/title")
 description_label = NodePath("MarginContainer/VBoxContainer/description")

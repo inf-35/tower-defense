@@ -14,7 +14,6 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "An active enemy spawn point. Will close after a set number of waves.",
 		"icon": null
 	},
-	
 	"REWARD": {
 		"title": "Anomaly",
 		"description": "A special Breach that will offer a choice of powerful rewards when its wave is cleared.",
@@ -43,7 +42,6 @@ func parse_text_for_bbcode(text: String) -> String:
 			# replace the placeholder with a formatted [url] tag.
 			# the URL content is the keyword itself, which the label will use for lookups.
 			var bbcode_link: String = "[color=yellow][url=%s]%s[/url][/color]" % [keyword, data.title]
-			print(bbcode_link)
 			parsed_text = parsed_text.replace(placeholder, bbcode_link)
 	
 	return parsed_text

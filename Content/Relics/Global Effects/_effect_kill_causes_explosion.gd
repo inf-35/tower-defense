@@ -2,8 +2,7 @@
 extends GlobalEffect
 class_name EffectKillExplosionEffect
 
-### EDITED SECTION START ###
-# --- configuration (designer-friendly) ---
+# --- configuration ---
 @export_category("Trigger")
 # the status effect that must be on the unit to trigger the explosion
 @export var trigger_status: Attributes.Status = Attributes.Status.POISON
@@ -20,7 +19,6 @@ func initialise() -> void:
 
 # this is the core of the relic's logic, triggered by the global signal
 func _on_unit_died(unit: Unit) -> void:
-	print("yepeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 	# --- 1. check prerequisites ---
 	if not is_instance_valid(unit) or not is_instance_valid(unit.modifiers_component):
 		return
@@ -44,7 +42,7 @@ func _on_unit_died(unit: Unit) -> void:
 	# create the HitData for the explosion from our configured prototype
 	var explosion_hit: HitData = aoe_hit_data_prototype.generate_hit_data()
 
-	explosion_hit.source = References.player_core # default source for global effects
+	explosion_hit.source = References.island.get_towers_by_type(Towers.Type.PLAYER_CORE)[0] #get the player core as source 
 	explosion_hit.target = null # this is a targetless AOE
 	
 	# the explosion should target other hostile units
@@ -59,4 +57,3 @@ func _on_unit_died(unit: Unit) -> void:
 	
 	# command the CombatManager to resolve this new hit
 	CombatManager.resolve_hit(explosion_hit, delivery_data)
-### EDITED SECTION END ###

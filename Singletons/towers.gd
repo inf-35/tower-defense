@@ -83,6 +83,7 @@ func get_tower_description(tower_type: Type) -> String:
 
 func create_tower(tower_type: Type) -> Tower:
 	var tower: Tower = get_tower_scene(tower_type).instantiate()
+	tower.type = tower_type
 	tower.flux_value = get_tower_cost(tower_type)
 	return tower
 

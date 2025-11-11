@@ -10,14 +10,29 @@ var reward_pool: Array[Reward] = [
 		"Unlocks CANNON"
 	),
 	Reward.new(
-		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.ADJACENCY_BOOST},
-		"Unlocks ADJACENCY RELIC"
-	),
-	Reward.new(
 		Reward.Type.UNLOCK_TOWER,
 		{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
 		"Unlocks MINIGUN"
+	),
+	Reward.new(
+		Reward.Type.ADD_RELIC,
+		{ID.Rewards.RELIC: Relics.STRENGTH_IN_NUMBERS},
+		"Uncovers STRENGTH IN NUMBERS"
+	),
+	Reward.new(
+		Reward.Type.ADD_RELIC,
+		{ID.Rewards.RELIC: Relics.POISON_INFLICTS_FROST},
+		"Uncovers CONSUMPTION"
+	),
+	Reward.new(
+		Reward.Type.ADD_RELIC,
+		{ID.Rewards.RELIC: Relics.POISON_KILL_EXPLOSION},
+		"Uncovers CONTAGION"
+	),
+	Reward.new(
+		Reward.Type.ADD_RELIC,
+		{ID.Rewards.RELIC: Relics.SCORCHED_EARTH},
+		"Uncovers SCORCHED EARTH"
 	)
 ]
 # --- state ---

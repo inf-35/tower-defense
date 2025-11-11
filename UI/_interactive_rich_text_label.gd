@@ -4,7 +4,7 @@ class_name InteractiveRichTextLabel
 
 var _tooltip_instance: PanelContainer
 
-func _ready() -> void:
+func _init() -> void:
 	# ensure bbcode is enabled
 	self.bbcode_enabled = true
 	

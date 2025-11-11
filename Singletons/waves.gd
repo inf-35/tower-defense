@@ -96,7 +96,7 @@ func _spawn_enemies_for_current_wave() -> void:
 		await Clock.await_game_time(enemy_stagger * 2)
 
 # the primary, high-frequency update method
-func _on_enemy_died(died_unit: Unit) -> void:
+func _on_enemy_died(_died_unit: Unit) -> void:
 	# do nothing if no combat wave is active (e.g., from a stray signal)
 	if current_combat_wave_number == 0:
 		return

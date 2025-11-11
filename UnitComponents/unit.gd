@@ -1,9 +1,11 @@
 extends Node2D
 class_name Unit
-
+@warning_ignore_start("unused_signal")
 signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready()
 signal died() ##fires upon unit death NOTE: tree_exiting should be used for complete tower destruction
+
+signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -83,11 +85,13 @@ func _create_components() -> void:
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
-	#connect the died signal to the on_killed method
-	#(which implements flux reward and ruins behaviour for units and towers respectively)
 	died.connect(func():
-		References.unit_died.emit(self) #clink local and global died signals
-		on_killed()
+		References.unit_died.emit(self) #link local and global died signals
+		on_killed() #connect the died signal to the on_killed method. for units this frees the instance
+		#(which implements flux reward and ruins behaviour for units and towers respectively)
+	)
+	changed_cell.connect(func(new_cell: Vector2i, old_cell: Vector2i):
+		References.unit_changed_cell.emit(self, new_cell, old_cell)
 	)
 	
 	if graphics != null:
@@ -113,6 +117,8 @@ func _prepare_components() -> void:
 	if movement_component != null:
 		movement_component.inject_components(graphics, modifiers_component)
 		position = movement_component.position
+		
+		movement_component.movement_to_cell.connect(changed_cell.emit)
 	
 	if health_component != null:
 		health_component.inject_components(modifiers_component)

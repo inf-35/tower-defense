@@ -67,7 +67,7 @@ func _setup_state():
 		Towers.Type.POISON: true,
 		Towers.Type.FROST_TOWER: true,
 	}
-	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.POISON_KILL_EXPLOSION}))
+	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.SCORCHED_EARTH}))
 	
 
 #capacity helper functions

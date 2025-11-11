@@ -23,7 +23,8 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 		UI.update_unit_health.emit(unit, max_health, health)
 		
 		if health < 0.01:
-			unit.on_killed()
+			unit.died.emit() #which links to on_killed
+
 var shield: float = health_data.max_shield ##not linked to a attribute, simple counter
 #NOTE: shield does not support fancy effects, like boosts to shield as it is not linked to the modifiers component system
 

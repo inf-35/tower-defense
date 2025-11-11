@@ -17,6 +17,9 @@ var shore_boundary_tiles: Array[Vector2i] = []
 var _preview_choices: Dictionary[int, ExpansionChoice] = {}
 var _highlighted_choice_id: int = -1
 
+#lookup caches
+var _towers_by_type: Dictionary[Towers.Type, Array] = {} ##Towers.Type -> Array[Tower]
+
 # --- constants ---
 const CELL_SIZE: int = 10
 const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1) ]
@@ -33,7 +36,7 @@ func _ready():
 	TerrainService.expand_island(self, starting_block)
 	
 	# 4. place the player's core tower
-	construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE)
+	construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE) #NOTE: this must come first (id = 0)
 	update_shore_boundary()
 	update_navigation_grid()
 	queue_redraw()
@@ -90,7 +93,12 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 			var new_modifier: Modifier = proto.generate_modifier()
 			# add the modifier as a PERMANENT modifier, as it's tied to the static world state
 			tower.modifiers_component.add_permanent_modifier(new_modifier)
-	
+			
+	#insert the new tower in the lookup table
+	if not _towers_by_type.has(tower.type):
+		_towers_by_type[tower.type] = []
+	_towers_by_type[tower.type].append(tower)
+
 	tower_created.emit(tower)
 	tower_changed.emit(cell)
 	return tower
@@ -131,6 +139,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 	if _highlighted_choice_id != choice_id:
 		_highlighted_choice_id = choice_id
 		queue_redraw()
+		
 #signal handlers
 func _on_tower_destroyed(tower: Tower):
 	var cell: Vector2i = tower.tower_position
@@ -141,6 +150,7 @@ func _on_tower_destroyed(tower: Tower):
 	#update capacity, caches, navigation
 	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
 	update_navigation_grid()
+	_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
 
 func _update_adjacencies_around(cell: Vector2i):
@@ -220,11 +230,14 @@ func _draw() -> void:
 			draw_rect(Rect2(cell * CELL_SIZE, Vector2.ONE * CELL_SIZE), Color(score * 0.05, score * 0.05, score * 0.05))
 
 #static data access functions
+func get_towers_by_type(type: Towers.Type) -> Array:
+	return _towers_by_type.get(type, [])
+
 func get_tower_on_tile(cell: Vector2i):
 	return tower_grid.get(cell, null)
 
 func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]:
-	#NOTE: tower.get_adjacent_towers() should preferably be used instead
+	#NOTE: tower.get_adjacent_towers() should preferably be used instead if the Tower reference is first known
 	var output: Dictionary[Vector2i, Tower] = {}
 	for dir: Vector2i in DIRS:
 		if tower_grid.has(cell + dir):

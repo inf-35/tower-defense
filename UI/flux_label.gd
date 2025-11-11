@@ -1,4 +1,4 @@
-extends Label
+extends InteractiveRichTextLabel
 class_name FluxLabel
 
 func _ready() -> void:
@@ -8,4 +8,5 @@ func _ready() -> void:
 		_update_flux(Player.flux)
 	
 func _update_flux(new_flux_value: float): 
-	text = "Flux: %s" % str(round(new_flux_value * 10) * 0.1) # Using string formatting
+	set_parsed_text("{FLUX}: %s" % str(round(new_flux_value * 10) * 0.1)) # Using string formatting
+	print(text)

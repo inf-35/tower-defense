@@ -105,13 +105,15 @@ offset_right = 360.0
 offset_bottom = 60.0
 theme_type_variation = &"vbox_5"
 
-[node name="FluxLabel" type="Label" parent="Margin/ui_space/Stats"]
+[node name="FluxLabel" type="RichTextLabel" parent="Margin/ui_space/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 1
 theme_type_variation = &"LabelInlineheader"
+bbcode_enabled = true
 text = "Flux Label"
+fit_content = true
 script = ExtResource("3_aw3sh")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="CapacityLabel" type="Label" parent="Margin/ui_space/Stats"]
 layout_mode = 2

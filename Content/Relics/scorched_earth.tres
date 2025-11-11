@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=3 format=3 uid="uid://duejj0uysntf"]
+
+[ext_resource type="PackedScene" uid="uid://u1nyyayu13md" path="res://Content/Relics/Global Effects/scorched_earth.tscn" id="1_5eqw3"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_00dvx"]
+
+[resource]
+script = ExtResource("2_00dvx")
+active_effect_scene = ExtResource("1_5eqw3")
+description = "Each stack of poison inflicted on a enemy also inflicts 0.5 stacks of frost."
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

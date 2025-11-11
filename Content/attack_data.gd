@@ -68,6 +68,3 @@ func generate_hit_data() -> HitData:
 	hit_data.vfx_on_spawn = vfx_on_spawn
 	
 	return hit_data
-
-func _init():
-	push_warning("Inspector tried generating a attack data!")
