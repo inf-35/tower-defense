@@ -24,8 +24,6 @@ func create_stat_cache(modifiers_component: ModifiersComponent, needed_stats: Ar
 	modifiers_component.stat_changed.connect(func(attr: Attributes.id):
 		if needed_stats.has(attr): #we already know we have the prereqs
 			stat_cache[attr] = modifiers_component.pull_stat(attr)
-			if attr == Attributes.id.REGEN_PERCENT:
-				print(unit, " Retrieving regen_percent... ", stat_cache[attr])
 	)
 	
 func get_stat(modifiers_component: ModifiersComponent, data: Data, attribute: Attributes.id) -> Variant:

@@ -1,0 +1,23 @@
+[gd_scene load_steps=7 format=3 uid="uid://d2l7oaxpcmmfm"]
+
+[ext_resource type="Script" uid="uid://4pimlx3e3pl2" path="res://Content/Relics/Global Effects/_effect_kill_causes_explosion.gd" id="1_vy8pv"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_fhqnb"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_j5ea1"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="4_ewpkj"]
+
+[sub_resource type="Resource" id="Resource_vy8pv"]
+script = ExtResource("4_ewpkj")
+cooldown = 1.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_0bur1"]
+script = ExtResource("3_j5ea1")
+delivery_method = 1
+radius = 40.0
+status_effects = Array[ExtResource("4_ewpkj")]([SubResource("Resource_vy8pv")])
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[node name="EffectKillCausesExplosion" type="Node"]
+script = ExtResource("1_vy8pv")
+aoe_hit_data_prototype = SubResource("Resource_0bur1")
+metadata/_custom_type_script = "uid://4pimlx3e3pl2"

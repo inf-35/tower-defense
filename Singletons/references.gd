@@ -1,6 +1,13 @@
 extends Node
-#global logic signals
+#local logic signals
 signal references_ready()
+
+#global logic signals
+#NOTE: these signals should only be used when there is a true need for a "global scope"
+@warning_ignore_start("unused_signal")
+signal unit_took_hit(unit: Unit, hit: HitData) 
+signal unit_died(unit: Unit)
+
 #scene tree globals
 @onready var root: Node = get_tree().get_root()
 
@@ -9,8 +16,12 @@ signal references_ready()
 @onready var tower_preview: TowerPreview = island.get_node("TowerPreview")
 @onready var projectiles: Node2D = island.get_node("Projectiles")
 
+#global constants
 const TOWER_GROUP: StringName = &"towers"
+const HOSTILE_AFFILIATION: bool = true
+const ALLIED_AFFILIATION: bool = false
 
+#unit id management
 var current_unit_id: int = -1
 var current_stat_id: int = -1
 

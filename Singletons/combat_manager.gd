@@ -1,5 +1,7 @@
 extends Node
 
+const _DEBUG: bool = true
+
 class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
 	const ERROR_TOLERANCE_SQUARED : float = ERROR_TOLERANCE ** 2 #length_squared optimisation
@@ -17,12 +19,18 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 		hit_data = _hit_data
 		delivery_data = _delivery_data
 		intercept_position = delivery_data.intercept_position
-		target_affiliation = hit_data.target.hostile
-		source_position = hit_data.source.attack_component.muzzle.global_position\
-			if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
+		target_affiliation = hit_data.target_affiliation
+		if is_instance_valid(hit_data.target):
+			target_affiliation = hit_data.target.hostile
+		
+		if delivery_data.use_source_position_override: #if we use a custom override source position
+			source_position = delivery_data.source_position #use the source position
+		else: #otherwise default to source's muzzle / overall position
+			source_position = hit_data.source.attack_component.muzzle.global_position\
+				if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	
 	func start(delay : float):
-		var source_to_target_normalized : Vector2 = (hit_data.target.global_position - source_position).normalized()
+		var source_to_target_normalized : Vector2 = (intercept_position - source_position).normalized()
 		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
 		Clock.await_game_time(delay).connect(func():
 			_on_timeout()
@@ -31,11 +39,12 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 	func _on_timeout():
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
 		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, intercept_position)
-		var target : Unit = hit_data.target
+		var target : Unit = hit_data.target #NOTE: this might be null
 
-		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage
+		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage 
 		if is_zero_approx(hit_data.radius): #this projectile has no aoe, so we just look for the primary target
 			if not is_instance_valid(target):
+				push_warning("CombatManager: zero-AOE hit attempted with no intended target. Discarding...")
 				return
 			if (target.position - intercept_position).length_squared() > ERROR_TOLERANCE_SQUARED:
 				return #we missed by over error tolerance
@@ -53,7 +62,7 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 		query_params.collision_mask = Hitbox.get_mask(target_affiliation)
 		
 		var hitboxes_in_aoe = space_state.intersect_shape(query_params)
-		#CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
+		if _DEBUG: CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
 		
 		for collision_data : Dictionary in hitboxes_in_aoe:
 			var hitbox_hit = collision_data.collider as Hitbox
@@ -61,21 +70,27 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 				continue
 				
 			var unit_hit : Unit = hitbox_hit.unit
-			var hit_copy = hit_data.duplicate()
+			var hit_copy = hit_data.duplicate() 
 			hit_copy.target = unit_hit
 			unit_hit.take_hit(hit_copy)
 
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
-	var target: Unit = hit_data.target
+	var target: Unit = hit_data.target #this will be null if the hit does not have a predestined target
 	var source: Unit = hit_data.source
-	var source_position: Vector2 = hit_data.source.attack_component.muzzle.global_position\
-		if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
+	var source_position: Vector2
+	if delivery_data.use_source_position_override: #if we use a custom override source position
+		source_position = delivery_data.source_position #use the source position
+	else: #otherwise default to source's muzzle / overall position
+		source_position = hit_data.source.attack_component.muzzle.global_position\
+			if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	var intercept_position: Vector2 = delivery_data.intercept_position
-	
+
 	Targeting.add_damage(hit_data.target, hit_data.expected_damage) #adds expected damage to target in targeting coordinator
 	
 	match delivery_data.delivery_method:
 		DeliveryData.DeliveryMethod.HITSCAN:
+			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
+			#TODO: implement visuals
 			target.take_hit(hit_data)
 			Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
 		

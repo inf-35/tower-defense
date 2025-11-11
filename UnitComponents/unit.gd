@@ -83,8 +83,13 @@ func _create_components() -> void:
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
+	#connect the died signal to the on_killed method
+	#(which implements flux reward and ruins behaviour for units and towers respectively)
+	died.connect(func():
+		References.unit_died.emit(self) #clink local and global died signals
+		on_killed()
+	)
 	
-	died.connect(on_killed)
 	if graphics != null:
 		var unit_effects_shader_material: ShaderMaterial = ShaderMaterial.new()
 		unit_effects_shader_material.shader = preload("res://Shaders/unit_effects.gdshader")
@@ -253,7 +258,8 @@ func take_hit(hit: HitData):
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
 
-	on_event.emit(evt) #trigger any post-hit-received effects, accordingly mutate evt.data
+	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
+	References.unit_took_hit.emit(self, hit) #trigger any global post-hit-received effects
 	var damage: float = evt.data.damage
 	#shield phase
 	var absorbed_damage: float = 0.0

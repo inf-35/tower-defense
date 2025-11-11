@@ -1,8 +1,10 @@
 extends Data
 class_name AttackData
 
+@export_group("Delivery")
 @export var delivery_method: DeliveryData.DeliveryMethod
 
+@export_group("Behaviour")
 @export var range: float = 20.0:
 	set(new_value):
 		range = new_value
@@ -11,6 +13,8 @@ class_name AttackData
 	set(new_value):
 		cooldown = new_value
 		value_changed.emit(Attributes.id.COOLDOWN)
+
+@export_group("Hit Characteristics")
 @export var radius: float = 0.0: ##range of AOE effect
 	set(new_value):
 		radius = new_value
@@ -24,15 +28,15 @@ class_name AttackData
 @export var status_effects: Array[StatusEffectPrototype] = []
 @export var modifiers: Array[ModifierDataPrototype] = []
 
-@export_category("Presentation")
+@export_group("Presentation")
 @export var vfx_on_spawn : VFXInfo #covers the projectile's lifetime, should consist of the projectile itself
 @export var vfx_on_impact : VFXInfo #effects that occur when the projectile dies
 
-@export_category("Projectile Properties")
+@export_group("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
 
-@export_category("Hit Properties")
+@export_group("Hit Properties")
 @export var cone_angle: float = 0.0 #for coneAOE in degrees
 #see unit.gd, deal_hit and take_hit, and HitData
 

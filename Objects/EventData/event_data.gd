@@ -2,7 +2,7 @@ class_name EventData
 #see child classes i.e. hit_data, etc.
 var recursion: int = 0 #counter to prevent infinite recursion loops, stops at recursion_limit (see Effect.RECURSION_LIMIT)
 
-func duplicate() -> EventData:
+func duplicate() -> EventData: ##deep duplicates to create an unrelated, unique eventdata
 	# 1. create a new instance of the *actual* subclass (e.g., HitData, CellData).
 	# get_script().new() is the canonical way to instantiate an object of the same class.
 	var new_instance: EventData = get_script().new()

@@ -12,7 +12,7 @@ var _status_effects: Dictionary[Attributes.Status, StatusEffect] = {}
 var _effective_cache: Dictionary[Attributes.id, float] = {}
 
 func _ready():
-	stat_changed.connect(func(stat): #couple stat changes with ui changes
+	stat_changed.connect(func(_stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
 	)
 	Player.relics_changed.connect(_on_global_modifiers_changed)
@@ -42,10 +42,8 @@ func remove_permanent_modifier(mod: Modifier) -> void:
 # add a buff/debuff
 func add_modifier(mod: Modifier) -> void:
 	_modifiers.append(mod)
-	print(Attributes.id.keys()[mod.attribute], mod.additive, " ADDED!")
 	_effective_cache.erase(mod.attribute)
 	stat_changed.emit(mod.attribute)
-	print(Attributes.id.keys()[mod.attribute], " post-signal fired")
 	
 	if mod.source_id == null:
 		push_warning("modifier ", self, " has no source id!")
@@ -283,3 +281,9 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
 
 	return final_value
+
+#data retrieval functions
+func has_status(status: Attributes.Status, threshold: float = 0.0) -> bool:
+	if not _status_effects.has(status):
+		return false
+	return _status_effects[status].stack > threshold

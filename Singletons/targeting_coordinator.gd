@@ -2,7 +2,7 @@ extends Node #TargetingCoordinator
 
 var damage_reservations: Dictionary[Unit, float] = {}
 #records expected damage dealt to enemy, prevents two towers "overkilling" a unit.
-func add_damage(unit: Variant, damage: float): 
+func add_damage(unit: Variant, damage: float): ##its ok to pass a null target into this function
 	if not is_instance_valid(unit):
 		return
 

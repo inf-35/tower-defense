@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="RelicData" load_steps=3 format=3 uid="uid://bil3yoyjehjfq"]
 
-[ext_resource type="PackedScene" uid="uid://dhfhor6uqc5j3" path="res://Content/Relics/Global Effects/adjacency_boost.tscn" id="1_fja5b"]
+[ext_resource type="PackedScene" uid="uid://dhfhor6uqc5j3" path="res://Content/Relics/Global Effects/strength_in_numbers.tscn" id="1_fja5b"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_p47uu"]
 
 [resource]

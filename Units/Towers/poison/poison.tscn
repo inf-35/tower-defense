@@ -36,7 +36,7 @@ metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 [node name="Poison" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_nm2o6")
-type = 13
+type = 14
 turret = NodePath("Graphics/Turret")
 stat_displays = Array[ExtResource("2_76a65")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
 behavior = NodePath("DefaultTowerBehavior")

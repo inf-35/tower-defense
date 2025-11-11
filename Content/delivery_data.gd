@@ -10,15 +10,17 @@ enum DeliveryMethod {
 	ENTITY,
 }
 
-var target: Unit #reference to the actual target of this projectile
-var intercept_position: Vector2 #predicted intercept position of described projectile
-var tower_rotation: float #initial rotation of the tower (or whatever is firing this projectile)
-var delivery_method: DeliveryMethod
+var target: Unit ##reference to the actual target of this projectile
+var use_source_position_override: bool = false ##if true, enables source_position override
+var source_position: Vector2 ##custom source position. if use_source_position_override is true, overrides source (from HitData)'s position
+var intercept_position: Vector2 ##predicted intercept position of described projectile
+var tower_rotation: float ##initial rotation of the tower (or whatever is firing this projectile)
+var delivery_method: DeliveryMethod ##delivery method. see CombatManager
 
 #for projectiles
-var projectile_speed: float #projectile speed across the 2d game plane
-var initial_vertical_velocity: float #used for pseudo-3d projectiles, initial vertical velocity
-var vertical_force: float #used for pseudo-3d projectiles, simulates gravity
+var projectile_speed: float ##projectile speed across the 2d game plane
+var initial_vertical_velocity: float ##used for pseudo-3d projectiles, initial vertical velocity
+var vertical_force: float ##used for pseudo-3d projectiles, simulates gravity
 
 #for coneAOE
-var cone_angle : float #angle of the cone in degrees
+var cone_angle : float ##angle of the fire cone in degrees

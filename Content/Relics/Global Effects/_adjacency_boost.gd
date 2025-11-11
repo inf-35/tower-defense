@@ -13,8 +13,7 @@ class_name AdjacencyBoostEffect
 
 # --- state ---
 # this now tracks the number of active stacks and the modifier instance
-# { Tower -> {STACKS: int, MODIFIER: Modifier} }
-var _buffed_towers: Dictionary[Tower, Dictionary] = {}
+var _buffed_towers: Dictionary[Tower, Dictionary] = {} ## { Tower -> {STACKS: int, MODIFIER: Modifier} }
 # constant keys
 const STACKS: StringName = &"stacks"
 const MODIFIER: StringName = &"modifier"
