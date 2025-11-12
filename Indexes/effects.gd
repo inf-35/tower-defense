@@ -8,4 +8,6 @@ enum Type {
 	
 	DEATH_ON_WAVE,
 	DEBUG_ON_HIT,
+	
+	CHAIN_LIGHTNING
 }

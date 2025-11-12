@@ -52,24 +52,8 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 			target.take_hit(hit_data)
 			return
 		#if we reach here, the projectile has some aoe
-		var space_state := References.island.get_world_2d().direct_space_state
-		var query_params := PhysicsShapeQueryParameters2D.new()
-		
-		circle_shape.radius = hit_data.radius
-		query_params.shape = circle_shape
-		query_params.collide_with_areas = true
-		query_params.transform = Transform2D(0, intercept_position)
-		query_params.collision_mask = Hitbox.get_mask(target_affiliation)
-		
-		var hitboxes_in_aoe = space_state.intersect_shape(query_params)
-		if _DEBUG: CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
-		
-		for collision_data : Dictionary in hitboxes_in_aoe:
-			var hitbox_hit = collision_data.collider as Hitbox
-			if not is_instance_valid(hitbox_hit):
-				continue
-				
-			var unit_hit : Unit = hitbox_hit.unit
+		var units: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, intercept_position, target_affiliation)
+		for unit_hit: Unit in units:
 			var hit_copy = hit_data.duplicate() 
 			hit_copy.target = unit_hit
 			unit_hit.take_hit(hit_copy)
@@ -200,3 +184,31 @@ func _visualize_shape_for_debug(shape: Shape2D, transform: Transform2D, duration
 	get_tree().create_timer(duration).timeout.connect(
 		func(): RenderingServer.canvas_item_clear(canvas)
 	)
+
+#helper functions
+static var common_query_circle_shape := CircleShape2D.new() #using a common circleshape prevents unneccessary object creation
+static func get_units_in_radius(radius: float, origin: Vector2, affiliation: bool, exclude_units: Array[Unit] = []) -> Array[Unit]:
+	var circle_shape := common_query_circle_shape
+	var space_state := References.island.get_world_2d().direct_space_state
+	var query_params := PhysicsShapeQueryParameters2D.new()
+	
+	circle_shape.radius = radius
+	query_params.shape = circle_shape
+	query_params.collide_with_areas = true
+	query_params.transform = Transform2D(0, origin)
+	query_params.collision_mask = Hitbox.get_mask(affiliation)
+	
+	var hitboxes_in_aoe = space_state.intersect_shape(query_params)
+	if _DEBUG: CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
+	
+	var output_array: Array[Unit]
+	for collision_data : Dictionary in hitboxes_in_aoe:
+		var hitbox = collision_data.collider as Hitbox
+		if not is_instance_valid(hitbox): #this filters out all non-hitbox detections
+			continue
+		
+		if exclude_units.has(hitbox.unit):
+			continue
+			
+		output_array.append(hitbox.unit)
+	return output_array

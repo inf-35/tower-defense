@@ -89,7 +89,7 @@ func _create_hitbox():
 	var hitbox := Hitbox.new()
 	var collision_shape := CollisionShape2D.new()
 	var shape_bound := RectangleShape2D.new()
-	shape_bound.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
+	shape_bound.size = size * Island.CELL_SIZE
 	
 	collision_shape.shape = shape_bound
 	hitbox.collision_mask = 0

@@ -16,7 +16,7 @@ func inject_components(modifiers_component: ModifiersComponent):
 func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 	if attack_data == null:
 		return
-		
+	
 	var delivery_data := DeliveryData.new()
 	delivery_data.delivery_method = attack_data.delivery_method
 	delivery_data.cone_angle = attack_data.cone_angle
@@ -31,12 +31,14 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 			delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
 		else:
 			delivery_data.intercept_position = target.global_position
-
-	var damage: float = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 	
 	var hit_data: HitData = attack_data.generate_hit_data() 
 	hit_data.source = unit
 	hit_data.target = target
+	hit_data.damage = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
+	hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
+	hit_data.expected_damage = hit_data.damage
+	
 
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id

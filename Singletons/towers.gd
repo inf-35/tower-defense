@@ -16,7 +16,9 @@ enum Type {
 	MINIGUN,
 	SHIELD,
 	SNIPER,
-	POISON
+	POISON,
+	PLANT,
+	LIGHTNING
 }
 
 enum Element {
@@ -24,7 +26,7 @@ enum Element {
 	FROST,
 	FIRE,
 	NATURE,
-	SPARK,
+	ENERGY,
 	ARCANE,
 	NEUTRAL,
 }

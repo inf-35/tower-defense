@@ -274,6 +274,8 @@ func take_hit(hit: HitData):
 	var delta_health: float = benchmark - health_component.health #measure damage caused
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
+	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
+	hit_report.target = self
 	hit_report.damage_caused = delta_health + absorbed_damage #damage absorbed by the shield is also included
 	if benchmark >= 0.01 and is_zero_approx(health_component.health): #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
@@ -311,7 +313,6 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 	
 	on_event.emit(evt) #trigger any pre-hit-received effects, such as damage buffs
 	#------ HANDOVER --------
-	hit.recursion += 1 #increase recursion layer by 1
 	if delivery_data == null: #fallback on guaranteed instant hit
 		push_warning("no targeting data!")
 		hit.target.take_hit(hit) #cause target to take hit

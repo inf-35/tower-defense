@@ -56,13 +56,13 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -1, 0.0, true, Color(1,0,0,0.5)
+		id.REGENERATION, -1, 0.0, true, Color(1,0,0,0.5) #-1 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5)
+		id.REGEN_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5) # -10% max hp every second
 	),
 	Status.HEAT: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 1.0  #this effect does nothing by itself, but reacts with FROST 
+		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST 
 	),
 }
 

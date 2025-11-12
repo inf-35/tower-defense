@@ -186,6 +186,7 @@ func create_underlying_modifier(status: StatusEffect) -> Modifier:
 		status_data.attribute,
 		total_multiplicative,
 		total_additive,
+		-1.0, #cooldown is permanent, as we handle expiration manually
 		null, # Status effects generally don't use override.
 		status.source_id #doesnt actually work rn
 	)

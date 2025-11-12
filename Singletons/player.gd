@@ -66,6 +66,8 @@ func _setup_state():
 		Towers.Type.SHIELD: true,
 		Towers.Type.POISON: true,
 		Towers.Type.FROST_TOWER: true,
+		Towers.Type.PLANT: true,
+		Towers.Type.LIGHTNING: true,
 	}
 	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.SCORCHED_EARTH}))
 	
