@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.402222"
+   height="50"
+   viewBox="0 0 13.864754 13.229167"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer4"
+     transform="translate(-303.95292,-78.349096)">
+    <g
+       id="g123"
+       transform="translate(138.00516,-79.037907)">
+      <g
+         id="g124"
+         transform="translate(2.039833,-8.7107382)">
+        <g
+           id="g152"
+           transform="matrix(0.68267325,0,0,0.68267325,38.907705,30.353016)"
+           style="stroke-width:1.46483">
+          <path
+             id="rect144"
+             style="font-variation-settings:'wght' 500;fill:#ff483a;fill-opacity:1;stroke-width:1.55027"
+             d="m 282.0179,2.2221254 v 2.2246013 l -5.51911,5.5191157 3.82252,3.8225286 v 5.617045 l 5.90682,3.65e-4 v -5.907178 l 3.53312,-3.533126 -1.83617,-1.836173 -3.7e-4,-5.9068131 z"
+             transform="rotate(45)" />
+          <path
+             id="path152"
+             style="font-variation-settings:'wght' 500;fill:#ffc9c1;fill-opacity:1;stroke-width:1.55027"
+             d="m 197.77148,204.06055 c -1.16788,1.02876 -2.80432,0.48014 -4.19882,0.61914 -0.99623,0 -1.99245,0 -2.98868,0 0,1.38802 0,2.77604 0,4.16406 -1.0307,1.03115 -2.06118,2.06252 -3.09179,3.09375 0.44104,0.26972 0.88198,1.23612 1.3231,1.04026 1.05342,-1.05152 2.10436,-2.10553 3.15932,-3.15549 1.24349,-4.1e-4 2.48698,-0.001 3.73047,-0.002 -0.0463,-1.03868 0.45532,-2.03569 1.29993,-2.63214 0.67346,-0.67405 1.34692,-1.3481 2.02038,-2.02215 -0.40954,-0.30766 -0.8483,-1.04999 -1.25391,-1.10547 z" />
+        </g>
+      </g>
+    </g>
+    <rect
+       style="font-variation-settings:'wght' 500;opacity:0;fill:#ff6d61;fill-opacity:1;stroke-width:1.05833"
+       id="rect175"
+       width="13.864768"
+       height="13.229167"
+       x="303.95291"
+       y="78.349098" />
+  </g>
+</svg>

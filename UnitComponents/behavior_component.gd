@@ -44,6 +44,9 @@ func initialise(host_unit: Unit):
 	unit.on_event.connect(func(event: GameEvent):
 		if event.event_type == GameEvent.EventType.WAVE_STARTED:
 			_cooldown = 0.0 #reset timer upon wave starting
+		
+		if event.event_type == GameEvent.EventType.HIT_RECEIVED:
+			_play_animation(&"hit")
 	)
 
 #behavior start function, called at the start of behavior
@@ -65,7 +68,8 @@ func get_display_data() -> Dictionary:
 # a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):
-		animation_player.play(anim_name, -1, custom_speed)
+		animation_player.play(anim_name, -1, custom_speed * Clock.speed_multiplier)
+
 #helper functions for child classes to use
 func _is_attack_possible() -> bool:
 	if attack_component == null or range_component == null:

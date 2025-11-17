@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_8e64g"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_h5q3w"]
-[ext_resource type="PackedScene" uid="uid://c184bi7kvtd4o" path="res://Units/Towers/palisade/palisade.tscn" id="2_8e64g"]
+[ext_resource type="PackedScene" uid="uid://uyqncqkt255h" path="res://Units/Towers/palisade/palisade.tscn" id="2_8e64g"]
 
 [resource]
 script = ExtResource("1_h5q3w")

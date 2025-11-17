@@ -64,6 +64,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		
 		var delivery_data := DeliveryData.new() 
 		delivery_data.delivery_method = DeliveryData.DeliveryMethod.HITSCAN
+		delivery_data.use_source_position_override = true
+		delivery_data.source_position = last_hit_target.global_position
 
 		host_tower.deal_hit(jump_hit_data, delivery_data)
 		

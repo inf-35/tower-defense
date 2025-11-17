@@ -20,7 +20,7 @@ const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
 # --- director configuration ---
 const BASE_BUDGET: float = 40.0
 const BUDGET_PER_WAVE: float = 24.0
-const QUADRATIC_BUDGET_SCALING: float = 1.2
+const QUADRATIC_BUDGET_SCALING: float = 1.8
 
 # the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array[Array]:

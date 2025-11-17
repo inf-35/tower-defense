@@ -165,35 +165,40 @@ func _update_adjacencies_around(cell: Vector2i):
 
 # --- updated drawing logic ---
 func _draw() -> void:
-	# 1. draw terrain outlines
-	# --- 1. identify the unique set of vertices to draw on ---
-	var vertices_to_draw: Dictionary[Vector2i, bool] = {} # use a dictionary as a hash set for automatic deduplication
-
-	# iterate through every cell that is part of the terrain
-	for cell_pos: Vector2i in terrain_base_grid:
-		# for each cell, we are interested in its four corner vertices.
-		# by adding all four to a dictionary, we ensure that shared vertices
-		# between adjacent cells are only stored once.
-		vertices_to_draw[cell_pos] = true                        # top-left corner
-		vertices_to_draw[cell_pos + Vector2i(1, 0)] = true       # top-right corner
-		vertices_to_draw[cell_pos + Vector2i(0, 1)] = true       # bottom-left corner
-		vertices_to_draw[cell_pos + Vector2i(1, 1)] = true       # bottom-right corner
-
-	# --- 2. load the texture resource once ---
 	var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
-	var cross_color: Color = Color.WHITE # define a base color for the crosses
-
-	# --- 3. render one cross at each unique vertex ---
-	for vertex_pos: Vector2i in vertices_to_draw:
-		# calculate the world position of the vertex (the grid line intersection)
-		var world_pos: Vector2 = Vector2(vertex_pos * CELL_SIZE) - Vector2.ONE * CELL_SIZE * 0.5
-		
-		# calculate the rect needed to draw the texture *centered* on the vertex.
-		# we start at the world position and subtract half the texture's size.
+	for cell_pos: Vector2i in terrain_base_grid:
+		var world_pos: Vector2 = Vector2(cell_pos * CELL_SIZE)
 		var centered_rect := Rect2(world_pos, Vector2.ONE * CELL_SIZE)
-		
-		# draw the texture at the calculated position
-		draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, cross_color)
+		draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, Color.WHITE)
+	## 1. draw terrain outlines
+	## --- 1. identify the unique set of vertices to draw on ---
+	#var vertices_to_draw: Dictionary[Vector2i, bool] = {} # use a dictionary as a hash set for automatic deduplication
+#
+	## iterate through every cell that is part of the terrain
+	#for cell_pos: Vector2i in terrain_base_grid:
+		## for each cell, we are interested in its four corner vertices.
+		## by adding all four to a dictionary, we ensure that shared vertices
+		## between adjacent cells are only stored once.
+		#vertices_to_draw[cell_pos] = true                        # top-left corner
+		#vertices_to_draw[cell_pos + Vector2i(1, 0)] = true       # top-right corner
+		#vertices_to_draw[cell_pos + Vector2i(0, 1)] = true       # bottom-left corner
+		#vertices_to_draw[cell_pos + Vector2i(1, 1)] = true       # bottom-right corner
+#
+	## --- 2. load the texture resource once ---
+	#var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
+	#var cross_color: Color = Color.WHITE # define a base color for the crosses
+#
+	## --- 3. render one cross at each unique vertex ---
+	#for vertex_pos: Vector2i in vertices_to_draw:
+		## calculate the world position of the vertex (the grid line intersection)
+		#var world_pos: Vector2 = Vector2(vertex_pos * CELL_SIZE) - Vector2.ONE * CELL_SIZE * 0.5
+		#
+		## calculate the rect needed to draw the texture *centered* on the vertex.
+		## we start at the world position and subtract half the texture's size.
+		#var centered_rect := Rect2(world_pos, Vector2.ONE * CELL_SIZE)
+		#
+		## draw the texture at the calculated position
+		#draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, cross_color)
 	
 	# 2. draw icons
 	for cell_pos: Vector2i in terrain_base_grid:

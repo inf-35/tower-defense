@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://ccf4np3sitvsx"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_wfd5r"]
+[ext_resource type="Texture2D" uid="uid://cvivi0v6mtted" path="res://Assets/breach.svg" id="4_xid0h"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bnfe5"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_i8ig8"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="8_nbca8"]
 [ext_resource type="Script" uid="uid://bf3ddv1v3h1o7" path="res://Content/Behaviors/breach_behavior.gd" id="9_fnp7j"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_br75j"]
 
@@ -24,9 +24,8 @@ movement_data = ExtResource("7_i8ig8")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(1, 0.372549, 0, 1)
 scale = Vector2(0.08, 0.08)
-texture = ExtResource("8_nbca8")
+texture = ExtResource("4_xid0h")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("10_br75j")

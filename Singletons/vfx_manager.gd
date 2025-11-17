@@ -90,7 +90,7 @@ func _cleanup_vfx(vfx : VFXInstance):
 	RenderingServer.free_rid(vfx.canvas_item)
 	_active_vfx.erase(vfx)
 
-# The play_vfx function can be simplified as all drawing is now in _draw_vfx.
+#public api
 func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF):
 	if not info: return
 

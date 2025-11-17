@@ -10,6 +10,6 @@ id = 12
 cost = 12.0
 element = 5
 tower_name = "Shield"
-tower_description = "Negates damage of nearby towers"
+tower_description = "Negates damage of adjacent towers"
 tower_scene = ExtResource("3_krrll")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

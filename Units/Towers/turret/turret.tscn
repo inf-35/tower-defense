@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=20 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_i3qpa"]
@@ -33,14 +33,132 @@ suffix = " /s"
 special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
-[node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[sub_resource type="Animation" id="Animation_i3qpa"]
+resource_name = "attack"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 2, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0, -18.5, -28.5, -0.03333334, -8, 0.037040994, 8.889837, 5.5, -0.1, 7, 0, 0, 1.5, -0.023874035, 1.6666667, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:scale:x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 3, 2, 2),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0, 0.8464957, -0.011067527, 0.025584051, 0, 0, 1.02, -0.022360925, -0.036280166, 0, 0, 1, -0.016571552, 0.010696113, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2005707, 0.3)
+}
+
+[sub_resource type="Animation" id="Animation_uhk0q"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:scale:x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics/TurretFrame/Turret:scale:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Graphics:position:x")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/4/type = "bezier"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Graphics:position:y")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_yr17l"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uhk0q"]
+_data = {
+&"RESET": SubResource("Animation_uhk0q"),
+&"attack": SubResource("Animation_i3qpa"),
+&"hit": SubResource("Animation_yr17l")
+}
+
+[node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_lj076")
 type = 2
-turret = NodePath("Graphics/Turret")
+turret = NodePath("Graphics/TurretFrame")
 stat_displays = Array[ExtResource("2_i3qpa")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
@@ -68,21 +186,28 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 [node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
 script = ExtResource("7_lkyt2")
 attack_data = ExtResource("8_rghec")
-muzzle = NodePath("../Graphics/Turret/Muzzle")
+muzzle = NodePath("../Graphics/TurretFrame/Turret/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.048, 0.048)
 texture = ExtResource("10_i3qpa")
 
-[node name="Turret" type="Sprite2D" parent="Graphics"]
+[node name="TurretFrame" type="Node2D" parent="Graphics"]
+
+[node name="Turret" type="Sprite2D" parent="Graphics/TurretFrame"]
 z_index = 1
 texture = ExtResource("11_uhk0q")
 offset = Vector2(28, 0)
 
-[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
-position = Vector2(51.0289, 0)
+[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame/Turret"]
+position = Vector2(62.5, 0)
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("9_hp3w6")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_uhk0q")
+}

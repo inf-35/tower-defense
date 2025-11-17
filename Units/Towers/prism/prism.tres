@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://daexcgktgb2rq"]
+
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_wxx4c"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_ay5mt"]
+[ext_resource type="PackedScene" uid="uid://ksfx36h6at77" path="res://Units/Towers/prism/prism.tscn" id="3_l8k4r"]
+
+[resource]
+script = ExtResource("2_ay5mt")
+id = 17
+cost = 5.0
+element = 5
+tower_name = "Prism"
+tower_description = "Two prisms placed unobstructed along the same axis generate lasers, damaging enemies continuously,"
+tower_scene = ExtResource("3_l8k4r")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

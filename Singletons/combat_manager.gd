@@ -116,21 +116,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			Targeting.add_damage(target, -hit_data.expected_damage)
 
 		DeliveryData.DeliveryMethod.CONE_AOE:
-			var space_state : PhysicsDirectSpaceState2D = source.get_world_2d().direct_space_state
-			var query_params := PhysicsShapeQueryParameters2D.new()
-			
-			# Broad-phase: Find all units within a circle defined by the attack range.
-			var shape := CircleShape2D.new()
-			shape.radius = hit_data.radius #TODO: FIX
-			
-			query_params.shape = shape
-			query_params.transform = Transform2D(0.0, source_position)
-			query_params.collide_with_areas = true
-			query_params.collision_mask = Hitbox.get_mask(target.hostile)
-			
-			if _DEBUG: _visualize_shape_for_debug(shape, query_params.transform, 0.5)
-			
-			var potential_targets : Array[Dictionary] = space_state.intersect_shape(query_params)
+			var potential_targets : Array[Unit] = get_units_in_radius(hit_data.radius, source_position, target.hostile)
 			if potential_targets.is_empty():
 				return #no potential targets
 			
@@ -138,12 +124,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 			var aim_direction : Vector2 = (intercept_position - source_position).normalized()
 			var cone_half_angle_rad : float = deg_to_rad(delivery_data.cone_angle * 0.5)
 			
-			for collider_data : Dictionary in potential_targets:
-				var hitbox = collider_data.collider as Hitbox
-				if not is_instance_valid(hitbox):
-					continue
-					
-				var unit : Unit = hitbox.unit
+			for unit: Unit in potential_targets:
 				var to_target_direction : Vector2 = (unit.global_position - source_position).normalized()
 				
 				# Use the dot product to check if the target is within the cone.
@@ -198,7 +179,7 @@ static func get_units_in_radius(radius: float, origin: Vector2, affiliation: boo
 	query_params.transform = Transform2D(0, origin)
 	query_params.collision_mask = Hitbox.get_mask(affiliation)
 	
-	var hitboxes_in_aoe = space_state.intersect_shape(query_params)
+	var hitboxes_in_aoe = space_state.intersect_shape(query_params, 2000)
 	if _DEBUG: CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
 	
 	var output_array: Array[Unit]

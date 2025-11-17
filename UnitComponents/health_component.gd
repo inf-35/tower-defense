@@ -1,7 +1,5 @@
 extends UnitComponent
 class_name HealthComponent
-
-signal died()
 signal health_changed(new_health: float)
 
 @export var health_data: HealthData = preload("res://Content/Health/tower_default.tres")

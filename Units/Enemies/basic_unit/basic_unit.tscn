@@ -57,6 +57,7 @@ texture = ExtResource("7_n0rgw")
 [node name="Hitbox" type="Area2D" parent="."]
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
+monitoring = false
 script = ExtResource("7_j01gd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]

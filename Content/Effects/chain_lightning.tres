@@ -4,6 +4,9 @@
 
 [resource]
 script = ExtResource("1_awoxa")
-max_jumps = 4
-jump_radius = 50.0
+params = {
+"damage_falloff_multiplier": 0.66,
+"jump_radius": 150.0,
+"max_jumps": 4
+}
 metadata/_custom_type_script = "uid://bqevvdjq5qm6s"

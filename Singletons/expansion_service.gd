@@ -177,6 +177,7 @@ func _clear_expansion_state(island: Island) -> void:
 
 # procedural generation logic
 func _generate_block(island: Island, block_size: int, params: GenerationParameters) -> Dictionary[Vector2i, Terrain.CellData]:
+	References.terrain_generating.emit(params) ##allow global effects to modify generationparameters first
 	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}
 	
 	var start_pos: Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()

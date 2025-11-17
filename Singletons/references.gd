@@ -9,6 +9,8 @@ signal unit_took_hit(unit: Unit, hit: HitData)
 signal unit_died(unit: Unit)
 signal unit_changed_cell(unit: Unit, old_cell: Vector2i, new_cell: Vector2i)
 
+signal terrain_generating(parameters: GenerationParameters) ##fires before terrain generation, allows modification of generationparameters
+
 #scene tree globals
 @onready var root: Node = get_tree().get_root()
 

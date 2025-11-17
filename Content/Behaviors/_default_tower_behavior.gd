@@ -11,6 +11,9 @@ var target_pos: Vector2
 func update(delta: float) -> void:
 	# use the base class's cooldown variable as our master timer
 	_cooldown += Clock.game_delta
+	
+	if not is_instance_valid(range_component):
+		return
 
 	# --- 1. Target Acquisition and Validation ---
 	# if our current target is invalid (dead or out of range), find a new one.
@@ -53,6 +56,7 @@ func _attempt_attack_with_override(target: Unit, intercept_override: Vector2) ->
 		return false
 		
 	attack_component.attack(target, intercept_override)
+	_play_animation(&"attack")
 	_cooldown = 0.0
 	unit.queue_redraw()
 	return true

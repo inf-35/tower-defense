@@ -16,6 +16,7 @@ func initialise() -> void:
 
 # the main public API for towers to register themselves as ruined
 func register_ruin(tower: Tower, reason: RuinReason) -> void:
+	print("Registered ruin")
 	if not is_instance_valid(tower) or _ruined_towers.has(tower):
 		return
 	

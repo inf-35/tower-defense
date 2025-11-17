@@ -122,9 +122,6 @@ func _prepare_components() -> void:
 	
 	if health_component != null:
 		health_component.inject_components(modifiers_component)
-		health_component.died.connect(func():
-			died.emit()
-		)
 	
 	if attack_component != null:
 		attack_component.inject_components(modifiers_component)
@@ -240,13 +237,11 @@ func get_unit_state() -> void:
 func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
 	if not is_instance_valid(behavior):
 		components_ready.connect(set_initial_behaviour_state.bind(behavior_packet), CONNECT_ONE_SHOT)
-		return
+		return #wait until everything's ready
 	
 	for attribute: StringName in behavior_packet:
-		print("Attempt set attribute ", attribute)
 		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
-			print("Attribute set! ", attribute, " ", behavior[attribute])
 		else:
 			push_error(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 	UI.update_unit_state.emit(self)

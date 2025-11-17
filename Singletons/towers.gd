@@ -18,7 +18,8 @@ enum Type {
 	SNIPER,
 	POISON,
 	PLANT,
-	LIGHTNING
+	LIGHTNING,
+	PRISM
 }
 
 enum Element {

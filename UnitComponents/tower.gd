@@ -39,7 +39,7 @@ var size: Vector2i = Vector2i.ONE #this is inclusive of facing
 func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
 		return
-		
+
 	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
 		queue_free()
 		return
@@ -59,6 +59,7 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 func enter_active_state() -> void:
 	if current_state == State.ACTIVE:
 		return
+	current_state = State.ACTIVE
 	#restore visuals
 	disabled = false
 	#become blocking again
@@ -75,6 +76,8 @@ func resurrect() -> void:
 	# 2. restore health
 	if is_instance_valid(health_component):
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
+	# 3. restart behaviours
+	behavior.start()
 
 func on_killed() -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
@@ -82,8 +85,8 @@ func on_killed() -> void:
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
 		Player.flux += flux_value * 0.75
-		# selling a tower now also puts it into the ruin state (bypasses died.emit or killed)
 		enter_ruin_state(RuinService.RuinReason.SOLD)
+		died.emit()
 
 func _create_hitbox():
 	var hitbox := Hitbox.new()

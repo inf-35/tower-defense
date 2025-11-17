@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0d3mgx2lecpu"]
+
+[ext_resource type="Script" uid="uid://cglhkkavm76aw" path="res://Units/Towers/prism/prism_laser.gd" id="1_3k5b6"]
+
+[node name="PrismLaser" type="Area2D" node_paths=PackedStringArray("collision_shape", "_damage_timer")]
+script = ExtResource("1_3k5b6")
+collision_shape = NodePath("CollisionShape2D")
+_damage_timer = NodePath("Timer")
+tick_rate = 0.5
+metadata/_custom_type_script = "uid://cglhkkavm76aw"
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

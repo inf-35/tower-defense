@@ -68,8 +68,9 @@ func _setup_state():
 		Towers.Type.FROST_TOWER: true,
 		Towers.Type.PLANT: true,
 		Towers.Type.LIGHTNING: true,
+		Towers.Type.PRISM: true,
 	}
-	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.SCORCHED_EARTH}))
+	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: preload("res://Content/Relics/increase_ruin_chance.tres")}))
 	
 
 #capacity helper functions

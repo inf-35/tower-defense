@@ -2,7 +2,7 @@ class_name VFXInfo
 extends Resource
 
 # The new enum to select the renderer.
-enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES }
+enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var vfx_type: VFXType = VFXType.TEXTURE
 
 # --- Properties for TEXTURE type ---
@@ -19,6 +19,10 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES }
 @export var size: Vector2 = Vector2(20, 20) # For RECTANGLE
 @export var filled: bool = true # For RECTANGLE, false creates an outline.
 @export var primitive_width: float = 2.0 # For outline width.
+
+@export_category("Line")
+@export var line_width: float = 3.0
+@export var line_length: float = 20.0
 
 # --- Universal Behavior Properties ---
 @export_category("Universal")
