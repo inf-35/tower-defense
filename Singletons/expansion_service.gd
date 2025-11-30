@@ -5,6 +5,31 @@ signal expansion_process_complete
 
 #configuration
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
+# --- procedural configuration ---
+# A helper class to define how a specific terrain type (Bonus Tile) spawns
+class TerrainGenRule extends Resource:
+	@export var terrain_type: Terrain.Base ##what type of terrain is being placed
+	@export var probability: float ##probability of a seed appearing at any given tile
+	@export var cluster_size_min: int = 1 ##minimum size of cluster
+	@export var cluster_size_max: int = 1 ##maximum size of cluster
+	@export var allowed_on: Array[Terrain.Base] = [] ## terrains which this one is allowed to substitute. if empty, can spawn on 'raw' ground (EARTH)
+	
+	func _init(_type: Terrain.Base = Terrain.Base.EARTH, _prob: float = 0.0, _c_min: int = 1, _c_max: int = 1):
+		terrain_type = _type
+		probability = _prob
+		cluster_size_min = _c_min
+		cluster_size_max = _c_max
+		
+class PlacementRule extends Resource:
+	@export var tower_type: Towers.Type ##tower type
+	@export var tower_initial_state: Dictionary = {} ##initial state of tower
+	
+	@export var min_seeds: int = 1 ##minimum number of seeds
+	@export var max_seeds: int = 1 ##maximum number of seeds
+	@export var seed_placement: PlacementLogic ##placement logic of seed
+	@export var cluster_size_min: int = 1 ##minimum cluster size
+	@export var cluster_size_max: int = 1 ##maximum cluster size
+
 # --- state machine ---
 enum State { IDLE, CHOOSING, CONFIRMING }
 var _current_state: State = State.IDLE
@@ -22,20 +47,32 @@ enum PlacementLogic {
 
 func _init():
 	STANDARD_EXPANSION_PARAMS = GenerationParameters.new()
-	STANDARD_EXPANSION_PARAMS.ruins_chance = 0.10
+	
+	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.RUINS, 0.15))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 2, 4))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
-	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
-	breach_rule.initial_state = {ID.TerrainGen.SEED_DURATION_WAVES: 2}
+	breach_rule.seed_placement = PlacementLogic.EDGE
+	breach_rule.tower_initial_state = {ID.TerrainGen.SEED_DURATION_WAVES: 2}
 	
 	var anomaly_rule := PlacementRule.new()
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
-	anomaly_rule.placement = PlacementRule.PlacementLogic.EDGE
-	anomaly_rule.initial_state = {}
+	anomaly_rule.seed_placement = PlacementLogic.EDGE
+	anomaly_rule.tower_initial_state = {}
+	
+	var forest_rule := PlacementRule.new()
+	forest_rule.tower_type = Towers.Type.FOREST
+	forest_rule.seed_placement = PlacementLogic.ANYWHERE
+	forest_rule.cluster_size_min = 1
+	forest_rule.cluster_size_max = 4
+	forest_rule.min_seeds = 1
+	forest_rule.max_seeds = 1
 	
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(breach_rule)
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(anomaly_rule)
+	STANDARD_EXPANSION_PARAMS.placement_rules.append(forest_rule)
 
 func _ready():
 	set_process(false)
@@ -51,20 +88,21 @@ func _ready():
 func generate_initial_island_block(island: Island, block_size: int) -> Dictionary:
 	# for the very first block, we create a custom ruleset in code
 	var initial_params := GenerationParameters.new()
-	initial_params.ruins_chance = 0.05 # lower chance of ruins at the start
+	var terrain_rules: Array[TerrainGenRule] = initial_params.terrain_gen_rules
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 3))
 	# rule 1: place one active breach
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
-	breach_rule.placement = PlacementRule.PlacementLogic.EDGE
-	breach_rule.initial_state = {"seed_duration_waves": 0} # 0 = active immediately
+	breach_rule.seed_placement = PlacementLogic.EDGE
+	breach_rule.tower_initial_state = {"seed_duration_waves": 0} # 0 = active immediately
 	
 	var anomaly_rule := PlacementRule.new()
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
-	anomaly_rule.placement = PlacementRule.PlacementLogic.EDGE
-	anomaly_rule.initial_state[&"_anomaly_data"] = AnomalyData.new(
+	anomaly_rule.seed_placement = PlacementLogic.EDGE
+	anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(
 		RewardService.reward_pool.pick_random().duplicate_deep(), 2
 	)
-	
+	#NOTE: no special terrain
 	initial_params.placement_rules.append(breach_rule)
 	initial_params.placement_rules.append(anomaly_rule)
 	
@@ -80,11 +118,12 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	var options: Array[ExpansionChoice] = []
 	for i: int in range(choice_count):
 		# generate the block data, which may now include a breach seed
-		var anomaly_rule: PlacementRule = STANDARD_EXPANSION_PARAMS.placement_rules[1]
-		anomaly_rule.initial_state[&"_anomaly_data"] = AnomalyData.new(
+		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+		var anomaly_rule: PlacementRule = expansion_params.placement_rules[1]
+		anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(
 			RewardService.reward_pool.pick_random().duplicate_deep(), 2
 		)
-		var block_data: Dictionary = _generate_block(island, block_size, STANDARD_EXPANSION_PARAMS)
+		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():
 			continue
 			
@@ -177,73 +216,107 @@ func _clear_expansion_state(island: Island) -> void:
 
 # procedural generation logic
 func _generate_block(island: Island, block_size: int, params: GenerationParameters) -> Dictionary[Vector2i, Terrain.CellData]:
-	References.terrain_generating.emit(params) ##allow global effects to modify generationparameters first
+	References.terrain_generating.emit(params) 
 	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}
 	
+	# 1. SHAPE GENERATION (BFS)
 	var start_pos: Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
 	var to_visit: Array[Vector2i] = [start_pos]
 	var visited: Dictionary[Vector2i, bool] = {}
 	var generated_coords: Array[Vector2i] = []
 
-	# simplified breadth-first search to find adjacent sea tiles (find tile-coordinates to expand)
 	while not to_visit.is_empty() and generated_coords.size() < block_size:
 		var cell: Vector2i = to_visit.pop_front()
 		if visited.has(cell):
 			continue
 		visited[cell] = true
 		
-		# only empty tiles can be converted to land
+		# Only expand into empty space
 		if island.terrain_base_grid.get(cell) == null:
 			generated_coords.append(cell)
 
 		for dir: Vector2i in island.DIRS:
-			var neighbor: Vector2i = cell + dir #NOTE: we also visit non-empty tiles. this allows more "smooth" expansion blobs
+			var neighbor: Vector2i = cell + dir 
 			if not visited.has(neighbor):
 				to_visit.append(neighbor)
 	
 	if generated_coords.is_empty():
 		return {}
-	# assign terrain base to the chosen coordinates
+
+	# 2. TERRAIN PAINTING (Bonus Tiles)
+	# First, fill everything with default EARTH
 	for coord: Vector2i in generated_coords:
 		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
+	
+	# Now apply procedural terrain rules (Ruins, Highlands, Gold Veins, etc.)
+	# We shuffle coords to prevent "top-left" bias
+	var coords_pool_for_terrain = generated_coords.duplicate()
+	coords_pool_for_terrain.shuffle()
+	
+	for rule: TerrainGenRule in params.terrain_gen_rules:
+		# Determine how many "seeds" of this terrain to plant
+		var target_count: int = int(generated_coords.size() * rule.probability) #pseudorandom
+		if target_count <= 0: continue
 		
-		var base: Terrain.Base = Terrain.Base.EARTH if randf() > params.ruins_chance else Terrain.Base.RUINS
-		if randf() > 0.5:
-			base = Terrain.Base.HIGHLAND
-		block_data[coord].terrain = base
-		
-	# --- Feature Placement Pipeline ---
-	# 2. create a mutable pool of available locations for feature placement
+		var placed_count: int = 0
+		for i in range(coords_pool_for_terrain.size()):
+			if placed_count >= target_count: break
+			
+			var center: Vector2i = coords_pool_for_terrain[i]
+			# Check requirements (e.g. only on Earth)
+			if not rule.allowed_on.is_empty():
+				if not block_data[center].terrain in rule.allowed_on:
+					continue
+			
+			# Grow the cluster
+			var cluster_size: int = randi_range(rule.cluster_size_min, rule.cluster_size_max)
+			var cluster_cells: Array[Vector2i] = _grow_blob_in_block(center, cluster_size, block_data)
+			
+			for cell: Vector2i in cluster_cells:
+				block_data[cell].terrain = rule.terrain_type
+			
+			placed_count += 1
+
+	# 3. FEATURE PLACEMENT (Towers / Groves)
 	var available_cells: Array[Vector2i] = generated_coords.duplicate()
-	# 3. iterate through the rules defined in the GenerationParameters
+	
 	for rule: PlacementRule in params.placement_rules:
-		# find all cells in the pool that are valid for this rule's placement logic
-		var candidate_cells: Array[Vector2i] = _get_candidate_cells(available_cells, island, rule.placement)
-		# place the feature 'count' times
-		for i: int in rule.count:
-			if candidate_cells.is_empty():
-				# if we run out of valid spots, break the inner loop and move to the next rule
-				break
+		# "rule.count" here is interpreted as "Number of instances" OR "Number of Clusters" depending on logic
+		var candidate_cells: Array[Vector2i] = _get_candidate_cells(available_cells, island, rule.seed_placement)
+		
+		var features_to_place: int = randi_range(rule.min_seeds, rule.max_seeds)
+		var placed_features: int = 0
+		while placed_features < features_to_place and not candidate_cells.is_empty():
+			var seed_cell: Vector2i = candidate_cells.pick_random()
 			
-			# pick a random valid cell
-			var chosen_cell: Vector2i = candidate_cells.pick_random()
+			# handle clustering
+			var cells_to_occupy: Array[Vector2i] = []
+			if rule.cluster_size_max > 1:
+				# Assume 'initial_state' might contain cluster config, or use defaults
+				var clump_size: int = randi_range(rule.cluster_size_min, rule.cluster_size_max)
+				cells_to_occupy = _grow_blob_in_block(seed_cell, clump_size, block_data, true) # true = check for empty feature
+			else:
+				cells_to_occupy = [seed_cell]
+				
+			# Place the features
+			for target_cell: Vector2i in cells_to_occupy:
+				block_data[target_cell].feature = rule.tower_type
+				block_data[target_cell].initial_state = rule.tower_initial_state.duplicate_deep()
+				
+				# Cleanup pools
+				available_cells.erase(target_cell)
+				if candidate_cells.has(target_cell): candidate_cells.erase(target_cell)
+			placed_features += 1
 			
-			# place the feature
-			block_data[chosen_cell].feature = rule.tower_type
-			block_data[chosen_cell].initial_state = rule.initial_state
-			
-			# CRITICAL: remove the chosen cell from all pools to prevent conflicts
-			candidate_cells.erase(chosen_cell)
-			available_cells.erase(chosen_cell)
 	return block_data
 	
 #helper function to find valid locations based on a placement rule
-func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic: PlacementRule.PlacementLogic) -> Array[Vector2i]:
+func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic: PlacementLogic) -> Array[Vector2i]:
 	match placement_logic:
-		PlacementRule.PlacementLogic.ANYWHERE:
-			return pool # all available cells are valid
+		PlacementLogic.ANYWHERE:
+			return pool.duplicate() # all available cells are valid
 			
-		PlacementRule.PlacementLogic.EDGE:
+		PlacementLogic.EDGE:
 			var edge_cells: Array[Vector2i] = []
 			for cell: Vector2i in pool:
 				var is_edge: bool = false
@@ -257,6 +330,37 @@ func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic
 			return edge_cells
 			
 	return [] # fallback
+	
+# helper to grow a blob (for terrain patches or groves)
+# center: start tile
+# size: how many tiles
+# block_data: context to check bounds
+# check_feature_empty: if true, only grows into tiles with no existing tower/feature
+func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, check_feature_empty: bool = false) -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	var open_list: Array[Vector2i] = [center]
+	var processed: Dictionary[Vector2i, bool] = {center: true}
+	#BFS
+	while result.size() < size and not open_list.is_empty():
+		var current = open_list.pop_front()
+		
+		# validation check
+		if not block_data.has(current): continue
+		if check_feature_empty and block_data[current].feature != Towers.Type.VOID: continue
+		
+		result.append(current)
+		
+		# add neighbors
+		var neighbors = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+		neighbors.shuffle() # Randomize shape
+		
+		for n: Vector2i in neighbors:
+			var next = current + n
+			if block_data.has(next) and not processed.has(next):
+				processed[next] = true
+				open_list.append(next)
+				
+	return result
 
 func _trigger_camera_overview(island: Island) -> void:
 	# 1. get references and handle invalid states

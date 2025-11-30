@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ns662"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_n0rgw"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_j01gd"]
-[ext_resource type="Texture2D" uid="uid://bgjoysbfjljt6" path="res://Assets/grunt.svg" id="7_n0rgw"]
+[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_n0rgw"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bsfdp"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="9_n3sy1"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_ns662"]
@@ -42,6 +42,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_phfvd")
+face_towards_movement = false
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
@@ -51,7 +52,7 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_j01gd")
-scale = Vector2(0.05, 0.05)
+scale = Vector2(0.10810186, 0.10810187)
 texture = ExtResource("7_n0rgw")
 
 [node name="Hitbox" type="Area2D" parent="."]

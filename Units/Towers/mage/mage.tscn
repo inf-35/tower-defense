@@ -1,0 +1,154 @@
+[gd_scene load_steps=21 format=3 uid="uid://uyeylgrvtiyj"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ngn05"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_4ads2"]
+[ext_resource type="Script" uid="uid://g5t7r5umsmw2" path="res://Content/Behaviors/mage_tower_behavior.gd" id="3_4yu0f"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_if2uy"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_vwio8"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_7cmip"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_bny6i"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_ckp3o"]
+[ext_resource type="Resource" uid="uid://ndg855khj2v6" path="res://Units/Towers/mage/mage_attack.tres" id="8_lxl5g"]
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="9_xdyc0"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_0imk1"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_vwio8"]
+
+[sub_resource type="Resource" id="Resource_uhk0q"]
+script = ExtResource("2_4ads2")
+attribute = 6
+label = "DMG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_yr17l"]
+script = ExtResource("2_4ads2")
+attribute = 7
+label = "RNG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_qo260"]
+script = ExtResource("2_4ads2")
+attribute = 8
+label = "RTE"
+suffix = " /s"
+special_modifier = 0
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_nf0er"]
+script = ExtResource("4_vwio8")
+attribute = 8
+multiplicative = 0.5
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Animation" id="Animation_uhk0q"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_i3qpa"]
+resource_name = "attack"
+length = 0.3
+
+[sub_resource type="Animation" id="Animation_yr17l"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uhk0q"]
+_data = {
+&"RESET": SubResource("Animation_uhk0q"),
+&"attack": SubResource("Animation_i3qpa"),
+&"hit": SubResource("Animation_yr17l")
+}
+
+[node name="Mage" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 1
+script = ExtResource("1_ngn05")
+type = 17
+stat_displays = Array[ExtResource("2_4ads2")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
+behavior = NodePath("MageBehavior")
+graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="MageBehavior" type="Node" parent="."]
+script = ExtResource("3_4yu0f")
+modifier_prototype = SubResource("Resource_nf0er")
+metadata/_custom_type_script = "uid://g5t7r5umsmw2"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("4_if2uy")
+movement_data = ExtResource("5_7cmip")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("6_bny6i")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("7_ckp3o")
+attack_data = ExtResource("8_lxl5g")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.048, 0.048)
+texture = ExtResource("9_xdyc0")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("10_0imk1")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("12_vwio8")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_uhk0q")
+}

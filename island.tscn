@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=10 format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -6,9 +6,14 @@
 [ext_resource type="Script" uid="uid://baq25cbcbk0eh" path="res://Scene Elements/tower_preview.gd" id="3_fgmf3"]
 [ext_resource type="Script" uid="uid://vbik6qfqhxwb" path="res://projectiles_display.gd" id="3_qurb2"]
 [ext_resource type="Script" uid="uid://bngvtmcvgq4vj" path="res://path_renderer.gd" id="6_gljqa"]
+[ext_resource type="Script" uid="uid://crec8t188v1g2" path="res://terrain_renderer.gd" id="7_b4opu"]
+[ext_resource type="Shader" uid="uid://5lkovhtioof2" path="res://Shaders/sketch_terrain.gdshader" id="8_c7iw8"]
+[ext_resource type="Shader" uid="uid://by08yeo185ck8" path="res://Shaders/watercolor_terrain.gdshader" id="9_8ervs"]
 
-[node name="Island" type="Node2D"]
+[node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
 script = ExtResource("1_0iamf")
+terrain_renderer = NodePath("TerrainRenderer")
+preview_renderer = NodePath("PreviewRenderer")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
@@ -31,3 +36,21 @@ script = ExtResource("3_fgmf3")
 z_index = 1
 script = ExtResource("6_gljqa")
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
+
+[node name="PreviewRenderer" type="Node2D" parent="."]
+z_as_relative = false
+script = ExtResource("7_b4opu")
+shader = ExtResource("8_c7iw8")
+max_gradient_depth = 3.0
+draw_background = false
+paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
+wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
+
+[node name="TerrainRenderer" type="Node2D" parent="."]
+z_index = -1
+z_as_relative = false
+script = ExtResource("7_b4opu")
+shader = ExtResource("9_8ervs")
+max_gradient_depth = 3.0
+paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
+wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)

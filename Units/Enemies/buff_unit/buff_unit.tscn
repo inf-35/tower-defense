@@ -6,13 +6,12 @@
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_4dwkj"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_875f4"]
 [ext_resource type="Resource" uid="uid://bwjciyf4j5ubp" path="res://Units/Enemies/buff_unit/buff_hp.tres" id="5_1ej4o"]
-[ext_resource type="Texture2D" uid="uid://cpnrcprjiku5q" path="res://Assets/buff.svg" id="7_4dwkj"]
+[ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="7_4dwkj"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_bu6ya"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_jiw1u"]
 
 [sub_resource type="Resource" id="Resource_86qj0"]
 script = ExtResource("4_4dwkj")
-mobile = true
 max_speed = 15.0
 acceleration = 200.0
 turn_speed = 1000.0
@@ -37,6 +36,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_22l1q")
+face_towards_movement = false
 movement_data = SubResource("Resource_86qj0")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
@@ -46,7 +46,8 @@ health_data = ExtResource("5_1ej4o")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.05, 0.05)
+position = Vector2(2.3841858e-07, -2.3841858e-07)
+scale = Vector2(0.1310606, 0.1310606)
 texture = ExtResource("7_4dwkj")
 
 [node name="Hitbox" type="Area2D" parent="."]

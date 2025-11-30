@@ -19,7 +19,10 @@ enum Type {
 	POISON,
 	PLANT,
 	LIGHTNING,
-	PRISM
+	PRISM,
+	MAGE,
+	
+	FOREST
 }
 
 enum Element {

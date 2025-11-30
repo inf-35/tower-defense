@@ -20,7 +20,7 @@ base_font = ExtResource("1_drjrk")
 variation_embolden = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2iung"]
-bg_color = Color(0, 0, 0, 0.19607843)
+bg_color = Color(0, 0, 0, 0.5803922)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5xyi0"]
 

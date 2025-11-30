@@ -50,7 +50,6 @@ func _on_grid_changed(_position: Vector2i = Vector2i.ZERO) -> void:
 
 # this function is rewritten to support many-to-many links without duplication
 func _rebuild_prism_network() -> void:
-	print("rebuild!")
 	if not _network_towers.has(NetworkType.PRISM):
 		_network_towers[NetworkType.PRISM] = []
 

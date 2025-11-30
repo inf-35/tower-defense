@@ -58,7 +58,7 @@ func start() -> void:
 func update(delta: float) -> void:
 	# this virtual function will be overridden by concrete behaviors
 	_cooldown += delta
-	_attempt_attack()
+	_attempt_simple_attack()
 
 # this virtual function is the new, generic entrypoint for the UI to query
 # custom data from a behavior. concrete behaviors should override this.
@@ -68,7 +68,7 @@ func get_display_data() -> Dictionary:
 # a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):
-		animation_player.play(anim_name, -1, custom_speed * Clock.speed_multiplier)
+		animation_player.play(anim_name, -1, custom_speed * Clock.speed_multiplier, custom_speed < 0.0)
 
 #helper functions for child classes to use
 func _is_attack_possible() -> bool:
@@ -89,7 +89,7 @@ func _is_attack_possible() -> bool:
 
 	return false
 
-func _attempt_attack() -> bool:
+func _attempt_simple_attack() -> bool:
 	if not _is_attack_possible():
 		return false
 		

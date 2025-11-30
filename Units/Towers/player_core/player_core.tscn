@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://1mt24rkpxr7f"]
+[gd_scene load_steps=13 format=3 uid="uid://1mt24rkpxr7f"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2li7g"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_vum4a"]
@@ -9,7 +9,10 @@
 [ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="5_cg3ju"]
 [ext_resource type="Resource" uid="uid://cqoa0ljfot6ra" path="res://Content/Effects/capacity_player_core.tres" id="5_ok6e0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_ok6e0"]
-[ext_resource type="Texture2D" uid="uid://c5ktn87da86ym" path="res://Assets/player_core.svg" id="8_cg3ju"]
+[ext_resource type="Texture2D" uid="uid://djssw4y7st7r3" path="res://Assets/keep.png" id="8_cg3ju"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ok6e0"]
+size = Vector2(20, 20)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
 radius = 11.045361
@@ -32,8 +35,13 @@ movement_data = ExtResource("3_yq3fw")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.096, 0.096)
+position = Vector2(0, -5.9604645e-08)
+scale = Vector2(0.06126645, 0.06126646)
 texture = ExtResource("8_cg3ju")
+
+[node name="reference" type="Sprite2D" parent="."]
+visible = false
+texture = SubResource("PlaceholderTexture2D_ok6e0")
 
 [node name="CoreHitbox" type="Area2D" parent="."]
 collision_layer = 0

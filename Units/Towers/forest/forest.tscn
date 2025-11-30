@@ -1,0 +1,45 @@
+[gd_scene load_steps=9 format=3 uid="uid://c2k2jhnis5ddh"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_pacpt"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_t117n"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_dsu77"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_sklve"]
+[ext_resource type="Texture2D" uid="uid://dwha3anjlqofr" path="res://Assets/trees.png" id="5_o5vsp"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_36tck"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_t117n"]
+
+[sub_resource type="Resource" id="Resource_shlxc"]
+script = ExtResource("2_t117n")
+attribute = 0
+label = "HP"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[node name="Forest" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 1
+script = ExtResource("1_pacpt")
+type = 10
+incorporeal = true
+stat_displays = Array[ExtResource("2_t117n")]([SubResource("Resource_shlxc")])
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_dsu77")
+movement_data = ExtResource("4_sklve")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+position = Vector2(-1.9073486e-06, -1.9073486e-06)
+scale = Vector2(0.07214769, 0.07214769)
+texture = ExtResource("5_o5vsp")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("6_36tck")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("7_t117n")
+metadata/_custom_type_script = "uid://b016qjmysn53e"

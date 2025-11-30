@@ -35,5 +35,6 @@ signal get_unit_state(unit: Unit)
 signal update_tower_types(unlocked_tower_types : Dictionary[Towers.Type, bool])
 signal update_flux(flux: float)
 signal update_capacity(used: float, total: float)
+signal update_health(health: float)
 #Handler/Sidebar -> Inspector
 signal update_inspector_bar(tower: Tower)

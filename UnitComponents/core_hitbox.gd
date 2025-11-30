@@ -13,6 +13,6 @@ func _ready():
 		if not area.unit.hostile:
 			return
 
-		Player.flux -= area.unit.health_component.health * 3
+		Player.hp -= 1
 		area.unit.died.emit()
 	)

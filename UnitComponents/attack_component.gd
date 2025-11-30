@@ -39,7 +39,6 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 	hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
 	hit_data.expected_damage = hit_data.damage
 	
-
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id
 

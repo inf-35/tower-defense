@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://dopp4qertjvnt"]
+
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_8ihty"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_f36vk"]
+[ext_resource type="PackedScene" uid="uid://c2k2jhnis5ddh" path="res://Units/Towers/forest/forest.tscn" id="3_enagb"]
+
+[resource]
+script = ExtResource("2_f36vk")
+id = 10
+cost = 0.0
+required_capacity = 0.0
+element = 3
+tower_name = "Forest"
+tower_description = "A thicket of trees"
+tower_scene = ExtResource("3_enagb")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -8,6 +8,10 @@ signal tower_changed(tower_position: Vector2i) # this signal fires after adjacen
 signal expansion_applied
 signal navigation_grid_updated
 
+# --- attachments ---
+@export var terrain_renderer: TerrainRenderer
+@export var preview_renderer: TerrainRenderer
+
 # --- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
@@ -40,6 +44,36 @@ func _ready():
 	update_shore_boundary()
 	update_navigation_grid()
 	queue_redraw()
+
+func _setup_preview_renderer() -> void:
+	preview_renderer.cell_size = CELL_SIZE
+	preview_renderer.max_gradient_depth = 3.0 # tighter gradient for previews
+	preview_renderer.draw_background = false # we just want the outline overlay
+	
+	# add to scene (z-index higher so it draws on top)
+	add_child(preview_renderer)
+	preview_renderer.z_index = 10 
+	
+	# manually override the material to use the sketch shader
+	# wait for the node to be ready or force setup
+	preview_renderer._setup_visuals()
+	
+	var sketch_mat := ShaderMaterial.new()
+	sketch_mat.shader = preload("res://shaders/sketch_terrain.gdshader")
+	
+	# re-use noise from main renderer if possible, or create new
+	var noise = FastNoiseLite.new()
+	noise.frequency = 0.02
+	var noise_tex = NoiseTexture2D.new()
+	noise_tex.noise = noise
+	noise_tex.seamless = true
+	
+	sketch_mat.set_shader_parameter("grid_data_texture", preview_renderer._grid_texture)
+	sketch_mat.set_shader_parameter("noise_texture", noise_tex)
+	sketch_mat.set_shader_parameter("outline_color", Color(0, 0, 0, 0.8))
+	sketch_mat.set_shader_parameter("fill_color", Color(1, 1, 1, 0.2))
+	
+	preview_renderer._terrain_rect.material = sketch_mat
 	
 # --- public api / request handlers ---
 # this is the main entry point for player actions like building or selling
@@ -110,7 +144,7 @@ func update_navigation_grid() -> void:
 		var is_navigable: bool = Terrain.is_navigable(terrain_base_grid[cell])
 		var is_occupied: bool = tower_grid.has(cell)
 		if Terrain.is_navigable(terrain_base_grid[cell]):
-			if is_occupied:
+			if is_occupied and tower_grid[cell].blocking:
 				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
 			else:
 				Navigation.grid[cell] = 0
@@ -133,12 +167,43 @@ func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	_preview_choices = choices_by_id
 	_highlighted_choice_id = -1 # reset highlight
 	queue_redraw()
+	
+	# by default, show ALL choices as a faint outline
+	var all_preview_cells: Array[Vector2i] = []
+	for choice in _preview_choices.values():
+		all_preview_cells.append_array(choice.block_data.keys())
+		
+	preview_renderer.reset_grid(all_preview_cells)
+	
+	# set to "passive" style
+	preview_renderer.set_color_param("outline_color", Color(0, 0, 0, 0.4)) # gray/faint
+	preview_renderer.set_color_param("fill_color", Color(1, 1, 1, 0.1))
 
 # called by ExpansionService to tell the island which choice to highlight
 func set_highlighted_choice(choice_id: int = -1) -> void:
-	if _highlighted_choice_id != choice_id:
-		_highlighted_choice_id = choice_id
-		queue_redraw()
+	if _highlighted_choice_id == choice_id:
+		return
+		
+	_highlighted_choice_id = choice_id
+	
+	if choice_id == -1:
+		# revert to showing all choices faintly
+		var all_cells: Array[Vector2i] = []
+		for choice in _preview_choices.values():
+			all_cells.append_array(choice.block_data.keys())
+		preview_renderer.reset_grid(all_cells)
+		preview_renderer.set_color_param("outline_color", Color(0.16, 0.16, 0.16, 0.4))
+		preview_renderer.set_color_param("fill_color", Color(1, 1, 1, 0.1))
+	
+	elif _preview_choices.has(choice_id):
+		# show ONLY the highlighted choice, with strong distinct style
+		var active_choice: ExpansionChoice = _preview_choices[choice_id]
+		var cells: Array[Vector2i] = []
+		cells.append_array(active_choice.block_data.keys())
+		
+		preview_renderer.reset_grid(cells)
+		preview_renderer.set_color_param("outline_color", Color(0.27, 0.27, 0.27, 0.576)) # solid black
+		preview_renderer.set_color_param("fill_color", Color(0.4, 0.8, 0.6, 0.0)) # slight green tint
 		
 #signal handlers
 func _on_tower_destroyed(tower: Tower):
@@ -162,77 +227,6 @@ func _update_adjacencies_around(cell: Vector2i):
 	for tower: Tower in adjacent_towers.values():
 		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
 		tower.adjacency_updated.emit(local_adjacencies)
-
-# --- updated drawing logic ---
-func _draw() -> void:
-	var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
-	for cell_pos: Vector2i in terrain_base_grid:
-		var world_pos: Vector2 = Vector2(cell_pos * CELL_SIZE)
-		var centered_rect := Rect2(world_pos, Vector2.ONE * CELL_SIZE)
-		draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, Color.WHITE)
-	## 1. draw terrain outlines
-	## --- 1. identify the unique set of vertices to draw on ---
-	#var vertices_to_draw: Dictionary[Vector2i, bool] = {} # use a dictionary as a hash set for automatic deduplication
-#
-	## iterate through every cell that is part of the terrain
-	#for cell_pos: Vector2i in terrain_base_grid:
-		## for each cell, we are interested in its four corner vertices.
-		## by adding all four to a dictionary, we ensure that shared vertices
-		## between adjacent cells are only stored once.
-		#vertices_to_draw[cell_pos] = true                        # top-left corner
-		#vertices_to_draw[cell_pos + Vector2i(1, 0)] = true       # top-right corner
-		#vertices_to_draw[cell_pos + Vector2i(0, 1)] = true       # bottom-left corner
-		#vertices_to_draw[cell_pos + Vector2i(1, 1)] = true       # bottom-right corner
-#
-	## --- 2. load the texture resource once ---
-	#var cross_texture: Texture2D = preload("res://Assets/grid_outline.svg")
-	#var cross_color: Color = Color.WHITE # define a base color for the crosses
-#
-	## --- 3. render one cross at each unique vertex ---
-	#for vertex_pos: Vector2i in vertices_to_draw:
-		## calculate the world position of the vertex (the grid line intersection)
-		#var world_pos: Vector2 = Vector2(vertex_pos * CELL_SIZE) - Vector2.ONE * CELL_SIZE * 0.5
-		#
-		## calculate the rect needed to draw the texture *centered* on the vertex.
-		## we start at the world position and subtract half the texture's size.
-		#var centered_rect := Rect2(world_pos, Vector2.ONE * CELL_SIZE)
-		#
-		## draw the texture at the calculated position
-		#draw_texture_rect(cross_texture, centered_rect.grow(-4.0), false, cross_color)
-	
-	# 2. draw icons
-	for cell_pos: Vector2i in terrain_base_grid:
-		draw_texture_rect(Terrain.get_icon(terrain_base_grid[cell_pos]), Rect2(cell_pos * CELL_SIZE, Vector2.ONE * CELL_SIZE).grow(-4.0), false)
-	
-	# 3. draw previews on top
-	for choice_id: int in _preview_choices:
-		var choice: ExpansionChoice = _preview_choices[choice_id]
-		var is_highlighted: bool = (choice_id == _highlighted_choice_id)
-		
-		for cell_pos: Vector2i in choice.block_data:
-			var cell_data: Terrain.CellData = choice.block_data[cell_pos]
-			var rect := Rect2(cell_pos * CELL_SIZE, Vector2(CELL_SIZE, CELL_SIZE))
-			
-			# determine color and draw the base preview
-			var base_color := Terrain.get_color(cell_data.terrain)
-			var preview_color := base_color.lightened(0.2) if is_highlighted else base_color
-			draw_rect(rect, preview_color)
-
-			# draw a highlight border if this choice is hovered
-			if is_highlighted:
-				draw_rect(rect, Color.WHITE, false, 2.0)
-
-			# draw tower previews (e.g., for breach seeds)
-			if cell_data.feature != Towers.Type.VOID:
-				var center: Vector2 = Vector2(cell_pos * CELL_SIZE) + Vector2(CELL_SIZE, CELL_SIZE) * 0.5
-				var tower_color: Color = Color.CRIMSON if is_highlighted else Color.DARK_RED
-				draw_circle(center, CELL_SIZE * 0.4, tower_color)
-		
-	#3 debug:
-	if _DEBUG_SHOW_NAVCOST:
-		for cell: Vector2i in Navigation.grid:
-			var score: int = Navigation.grid[cell]
-			draw_rect(Rect2(cell * CELL_SIZE, Vector2.ONE * CELL_SIZE), Color(score * 0.05, score * 0.05, score * 0.05))
 
 #static data access functions
 func get_towers_by_type(type: Towers.Type) -> Array:

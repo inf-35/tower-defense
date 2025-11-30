@@ -15,6 +15,46 @@ var reward_pool: Array[Reward] = [
 		"Unlocks MINIGUN"
 	),
 	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.AMPLIFIER},
+		"Unlocks AMPLIFIER"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.SHIELD},
+		"Unlocks SHIELD"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.POISON},
+		"Unlocks POISON"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.FROST_TOWER},
+		"Unlocks FROST"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.PLANT},
+		"Unlocks PLANT"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.LIGHTNING},
+		"Unlocks LIGHTNING"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.PRISM},
+		"Unlocks PRISM"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.MAGE},
+		"Unlocks MAGE"
+	),
+	Reward.new(
 		Reward.Type.ADD_RELIC,
 		{ID.Rewards.RELIC: Relics.STRENGTH_IN_NUMBERS},
 		"Uncovers STRENGTH IN NUMBERS"
@@ -33,7 +73,7 @@ var reward_pool: Array[Reward] = [
 		Reward.Type.ADD_RELIC,
 		{ID.Rewards.RELIC: Relics.SCORCHED_EARTH},
 		"Uncovers SCORCHED EARTH"
-	)
+	),
 ]
 # --- state ---
 var is_choosing_reward: bool = false

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://uyqncqkt255h"]
+[gd_scene load_steps=17 format=3 uid="uid://uyqncqkt255h"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_o21m0"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_p6aan"]
@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_kd25e"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_1h7xk"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_7y8qa"]
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="6_wty5f"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="7_ylobt"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_w22p4"]
 
 [sub_resource type="Resource" id="Resource_uhk0q"]
@@ -28,6 +28,9 @@ label = "RTE"
 suffix = " /s"
 special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]
+size = Vector2(10, 10)
 
 [sub_resource type="Animation" id="Animation_uhk0q"]
 length = 0.001
@@ -91,7 +94,7 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Palisade" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Palisade" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_o21m0")
 type = 6
@@ -102,8 +105,6 @@ animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
-range_component = NodePath("")
-attack_component = NodePath("")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="DefaultTowerBehavior" type="Node" parent="."]
@@ -119,9 +120,13 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 script = ExtResource("6_7y8qa")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
+[node name="refeerence" type="Sprite2D" parent="."]
+visible = false
+texture = SubResource("PlaceholderTexture2D_p6ncc")
+
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.048, 0.048)
-texture = ExtResource("6_wty5f")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_ylobt")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("12_w22p4")

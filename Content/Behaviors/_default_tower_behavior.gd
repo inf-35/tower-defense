@@ -1,67 +1,99 @@
 # default_tower_behavior.gd
 extends Behavior
 class_name DefaultTowerBehavior
+# --- state machine ---
+enum State { READY, WIND_UP}
+var _current_state: State = State.READY
+# --- state ---
+var _locked_target: Unit = null
+var _in_anticipation: bool = false ##whether the unit is in an anticipation state
 
-# --- internal state ---
-# the state machine has been removed. the behavior is now continuous.
-var _current_target: Unit = null
-var target_pos: Vector2
-
-# the main update loop, now a continuous tracking and firing cycle
-func update(delta: float) -> void:
-	# use the base class's cooldown variable as our master timer
-	_cooldown += Clock.game_delta
+func start() -> void:
+	if not is_instance_valid(animation_player):
+		return
 	
-	if not is_instance_valid(range_component):
+	animation_player.animation_started.connect(func(anim_name: StringName):
+		if anim_name == &"attack_windup":
+			_in_anticipation = true
+		elif anim_name == &"attack":
+			_in_anticipation = false
+	)
+	
+	Waves.wave_ended.connect(func():
+		await Clock.await_game_time(1.0)
+		if _in_anticipation:
+			_play_animation(&"attack_windup", -1.0)
+	)
+
+# this is the main update loop, called by the unit's _process function
+func update(_delta: float) -> void:
+	# ensure all required components are valid
+	if not is_instance_valid(attack_component) or not is_instance_valid(range_component):
 		return
 
-	# --- 1. Target Acquisition and Validation ---
-	# if our current target is invalid (dead or out of range), find a new one.
-	if not is_instance_valid(_current_target) or not range_component.is_target_valid(_current_target):
-		_current_target = range_component.get_target()
+	# tick down the state timer
+	_cooldown -= Clock.game_delta
+	# state transition logic
+	match _current_state:
+		State.READY:
+			# in the ready state, we are constantly searching for a target
+			var target: Unit = range_component.get_target()
+			if is_instance_valid(target):
+				# target found! transition to the wind-up state
+				_enter_state(State.WIND_UP, target)
+		State.WIND_UP:
+			# check if our locked target has become invalid
+			if not range_component.is_target_valid(_locked_target):
+				# abort the attack and go back to searching
+				_enter_state(State.READY)
+				return
+			# check if we are targeting a non-priority target and there are priority targets available
+			if Targeting.is_unit_overkilled(_locked_target) and range_component.are_priority_targets_available():
+				_enter_state(State.READY)
+				return
+			
+			# turn towards target
+			#TODO: optimisation: predict once, and have the target unit tell us if it renavigates
+			var predicted_target_pos: Vector2 = attack_component.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, _cooldown)
+			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
+			var target_angle: float = direction_to_target.angle()
+			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
+			var required_turn_speed: float = angle_diff / maxf(_cooldown, 0.05)
+			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
+			# if the wind-up timer finishes, execute the attack
+			if _cooldown <= 0.0:
+				_attack(_locked_target)
+				_cooldown = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN)
+				# transition back to the ready state
+				_enter_state(State.READY)
+
+# this function handles all state transitions and effects
+func _enter_state(new_state: State, target: Unit = null) -> void:
+	_current_state = new_state
 	
-	# if there are no valid targets at all, do nothing else this frame.
-	if not is_instance_valid(_current_target):
-		return
+	match _current_state:
+		State.READY:
+			_locked_target = null
 
-	# --- 2. Turret Rotation Logic ---
-	if is_instance_valid(turret):
-		var cooldown_left: float = max(attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN) - _cooldown, 0.0)
-		# we predict the intercept position once, which is cheap enough.
-		target_pos = attack_component.predict_intercept_position(unit, _current_target, attack_component.attack_data.projectile_speed, false, cooldown_left)
-		var direction_to_target: Vector2 = (target_pos - turret.global_position).normalized()
-		var target_angle: float = direction_to_target.angle()
-		
-		# --- Dynamic Turn Speed Calculation ---
-		# if we have time left on the cooldown, calculate the exact speed needed to arrive on time.
-		cooldown_left = max(cooldown_left, 0.05) #small minimum turning time
-		var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
-		var required_turn_speed: float = angle_diff / cooldown_left
-		_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
+		State.WIND_UP:
+			_locked_target = target
+			
+			# command the unit to play its anticipation animation
+			if not unit.animation_player.has_animation(&"attack_windup"):
+				return
+			var animation_length: float = unit.animation_player.get_animation(&"attack_windup").length
+			await Clock.create_game_timer(_cooldown - animation_length).timeout
+			_play_animation(&"attack_windup") #TODO: implement animation compress/stretching
 
-
-	# --- 3. Firing Logic ---
-	# the firing decision is now completely decoupled from aiming.
-	# it fires if the cooldown is ready and we have a valid target.
-	if _is_attack_possible():
-		# use the base class helper. it will get the latest target and reset the cooldown for us.
-		# we pass the already-predicted position to the attack function.
-		if _attempt_attack_with_override(_current_target, target_pos):
-			# after firing, immediately find the next target to start turning towards
-			_current_target = range_component.get_target()
-
-# new helper function in the base class for this pattern
-func _attempt_attack_with_override(target: Unit, intercept_override: Vector2) -> bool:
-	if not _is_attack_possible() or not is_instance_valid(target):
-		return false
-		
-	attack_component.attack(target, intercept_override)
+func _attack(target: Unit):
+	# snap towards target
+	var predicted_target_pos: Vector2 = attack_component.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, _cooldown)
+	var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
+	turret.rotation = direction_to_target.angle()
 	_play_animation(&"attack")
-	_cooldown = 0.0
-	unit.queue_redraw()
-	return true
+	attack_component.attack(_locked_target)
 
-# new helper for rotation logic
+#helper for rotation logic
 func _rotate_turret(target_angle: float, turn_step: float) -> void:
 	var angle_diff: float = angle_difference(turret.rotation, target_angle)
 	turret.rotation += clamp(angle_diff, -turn_step, turn_step)

@@ -68,6 +68,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData):
 		source_position = hit_data.source.attack_component.muzzle.global_position\
 			if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	var intercept_position: Vector2 = delivery_data.intercept_position
+	#NOTE: this expected damage is for the projectile-in-flight regime
+	#registered damage for the anticpiation regime must be deregistered before this
 	Targeting.add_damage(hit_data.target, hit_data.expected_damage) #adds expected damage to target in targeting coordinator
 	
 	match delivery_data.delivery_method:

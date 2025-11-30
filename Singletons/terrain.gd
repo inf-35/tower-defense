@@ -6,7 +6,6 @@ enum Base { #base terrain type
 	RUINS,
 	HIGHLAND,
 }
-
 class CellData: #used to communicate info during runtime
 	var terrain: Base
 	var feature: Towers.Type

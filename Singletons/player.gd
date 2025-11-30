@@ -3,6 +3,7 @@
 extends Node
 
 signal flux_changed(new_flux: float)
+signal hp_changed(new_health: float)
 signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
@@ -13,6 +14,11 @@ var flux: float = 200.0:
 	set(value):
 		flux = value
 		flux_changed.emit(flux)
+		
+var hp: float = 20.0:
+	set(value):
+		hp = value
+		hp_changed.emit(hp)
 
 var used_capacity: float = 0.0:
 	set(value):
@@ -43,6 +49,7 @@ func _ready():
 	#couple playerside logic signals with UI output signals
 	flux_changed.connect(UI.update_flux.emit)
 	capacity_changed.connect(UI.update_capacity.emit)
+	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	#setup global effects container
 	_active_effects_container = Node.new()
@@ -61,16 +68,11 @@ func _setup_state():
 	self.unlocked_towers = {
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
+		Towers.Type.CANNON: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.AMPLIFIER: true,
-		Towers.Type.SHIELD: true,
-		Towers.Type.POISON: true,
-		Towers.Type.FROST_TOWER: true,
-		Towers.Type.PLANT: true,
-		Towers.Type.LIGHTNING: true,
-		Towers.Type.PRISM: true,
 	}
-	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: preload("res://Content/Relics/increase_ruin_chance.tres")}))
+	flux = 20.0
+	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: preload("res://Content/Relics/increase_ruin_chance.tres")}))
 	
 
 #capacity helper functions

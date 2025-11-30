@@ -26,8 +26,8 @@ var speed_multiplier: float = BASE_SPEED:
 		# if the multiplier is 0, pause the entire scene tree.
 		get_tree().paused = is_zero_approx(speed_multiplier)
 # these are the values that game logic components will read each frame
-var game_delta: float = 0.0
-var physics_game_delta: float = 0.0
+var game_delta: float = 0.0 ##deltatime, adjusted for game speed
+var physics_game_delta: float = 0.0 ##physics dT, adjusted for game speed
 
 # --- private state ---
 var _active_timers: Array[GameTimer] = []
@@ -46,7 +46,7 @@ func _ready():
 # the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
 	game_delta = delta * speed_multiplier
-	
+
 	if Input.is_action_just_pressed("pause"):
 		if is_equal_approx(speed_multiplier, BASE_SPEED):
 			speed_multiplier = PAUSE_SPEED
