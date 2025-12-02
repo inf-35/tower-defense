@@ -1,83 +1,57 @@
-# archer_behavior.gd
 extends Behavior
 class_name ArcherBehavior
 
-# --- state machine ---
-enum State { IDLE, MOVING, ATTACKING }
-var _current_state: State = State.IDLE
+# --- state ---
+# the distance from the keep (grid 0,0) at which the unit switches to siege mode
+var siege_distance: float
 
-# --- internal state ---
-var _current_target: Unit = null
+func start() -> void:
+	siege_distance = unit.global_position.distance_squared_to(Island.cell_to_position(Vector2i.ZERO)) - Island.CELL_SIZE * 1.0 #start at the unit's spawn location and move in
+	_attempt_navigate_to_origin()
+	# ensure we start by moving towards the objective
+	_move_towards_keep()
 
-# this is the main update loop, now a state machine
 func update(delta: float) -> void:
-	# increment cooldown regardless of state
 	_cooldown += delta
-
-	# --- state machine logic ---
-	match _current_state:
-		State.IDLE, State.MOVING:
-			# --- transition condition: can we attack? ---
-			if _is_attack_possible():
-				_enter_state(State.ATTACKING)
-				return
-
-			# --- action: if not attacking, move ---
-			# the navigation and movement components handle the actual movement logic
-			# we just need to ensure the "move" animation is playing
-			if movement_component.velocity.length_squared() > 1:
-				if _current_state != State.MOVING:
-					_enter_state(State.MOVING)
-			else:
-				if _current_state != State.IDLE:
-					_enter_state(State.IDLE)
-
-		State.ATTACKING:
-			# when in the ATTACKING state, this behavior does nothing in the update loop.
-			# we are waiting for the animation to finish or for a method track to fire.
-			#see _enter_state for attack logic
-			pass
-
-func _enter_state(new_state: State) -> void:
-	if _current_state == new_state: return
 	
-	_current_state = new_state
-	# print("Archer entering state: ", State.keys()[_current_state]) # for debugging
-
-	match _current_state:
-		State.IDLE:
-			#_play_animation(&"idle")
-			# tell the movement component to stop
-			movement_component.speed_control = 1.0
-			pass
-
-		State.MOVING:
-			#_play_animation(&"move")
-			movement_component.speed_control = 1.0
-			pass
-		State.ATTACKING:
-			# --- Telegraph Logic ---
-			# stop moving
-			movement_component.speed_control = 0.1
-			# play the attack animation. the animation itself will handle the timing.
-			_play_animation(&"attack")
-			_current_target = range_component.get_target() as Unit
-
-# --- animation event handler ---
-# this function is called BY THE ANIMATIONPLAYER via a Call Method Track
-# at the precise frame the arrow should be released.
-func _fire_projectile() -> void:
-	# check if our target is still valid
-	if not is_instance_valid(_current_target):
-		# if the target died during the wind-up, transition back to idle
-		_enter_state(State.IDLE)
-		return
+	# 1. calculate distance to the keep (origin)
+	# we use the island helper to get the true world position of grid (0,0)
+	var origin_pos: Vector2 = Island.cell_to_position(Vector2i.ZERO)
+	var dist_sq_to_origin: float = unit.global_position.distance_squared_to(origin_pos)
+	var siege_sq: float = siege_distance ** 2
 	
-	# command the stateless attack component to execute the attack
-	attack_component.attack(_current_target)
-	_cooldown = 0.0 #reset cooldown
+	# 2. check for valid targets
+	# we check if the range component has found anything we can shoot at.
+	var has_target: bool = false
+	if is_instance_valid(range_component):
+		# get_target() returns a Unit or null
+		has_target = range_component.get_target() != null
+	
+	# 3. determine state (siege vs march)
+	# if we are close enough AND we have something to shoot, we hold position.
+	if dist_sq_to_origin <= siege_sq and has_target:
+		_hold_position()
+	else:
+		# otherwise (too far away, or sitting at the siege line with no targets), we push forward.
+		_move_towards_keep()
+		
+	# 4. execute attack
+	# this helper checks cooldowns and attacks the target if available
+	_attempt_simple_attack()
 
-# this function is called BY THE ANIMATIONPLAYER at the end of the attack animation
-func _on_attack_animation_finished() -> void:
-	# after the attack is complete, transition back to a default state
-	_enter_state(State.IDLE)
+func _move_towards_keep() -> void:
+	siege_distance -= 20.0 #decrease siege distance
+	if is_instance_valid(navigation_component):
+		# standard behavior: pathfind to the center of the map
+		navigation_component.goal = Vector2i.ZERO
+
+func _hold_position() -> void:
+	if is_instance_valid(navigation_component) and is_instance_valid(movement_component):
+		# 1. tell navigation we want to stay exactly where we are
+		# this prevents the pathfinder from trying to generate a path to (0,0)
+		navigation_component.goal = movement_component.cell_position
+		
+		# 2. force physics stop
+		# we manually zero the direction to prevent sliding if the navigation logic 
+		# ran before this script in the frame
+		movement_component.target_direction = Vector2.ZERO

@@ -8,7 +8,7 @@ var _lasers_by_partner: Dictionary[Tower, Node] = {}
 func start() -> void:
 	assert(unit is Tower)
 	TowerNetworkManager.register_tower(unit, TowerNetworkManager.NetworkType.PRISM, self)
-	unit.died.connect(_on_death)
+	unit.died.connect(_on_death, CONNECT_ONE_SHOT)
 	
 #called by TowerNetworkManager (we are the handler)
 func create_link(partner: Tower):

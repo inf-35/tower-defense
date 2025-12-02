@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://uyqncqkt255h"]
+[gd_scene load_steps=19 format=3 uid="uid://uyqncqkt255h"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_o21m0"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_p6aan"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_kd25e"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_1h7xk"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_7y8qa"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="7_p6ncc"]
 [ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="7_ylobt"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_w22p4"]
 
@@ -28,6 +29,14 @@ label = "RTE"
 suffix = " /s"
 special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_1dhlk"]
+script = ExtResource("7_p6ncc")
+max_health = 20.0
+regeneration = null
+regen_percent = null
+max_shield = null
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]
 size = Vector2(10, 10)
@@ -118,6 +127,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("6_7y8qa")
+health_data = SubResource("Resource_1dhlk")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="refeerence" type="Sprite2D" parent="."]

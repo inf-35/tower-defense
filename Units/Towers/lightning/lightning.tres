@@ -8,7 +8,8 @@
 script = ExtResource("2_hqu0w")
 id = 2
 size = Vector2i(2, 2)
-cost = 5.0
+cost = 30.0
+required_capacity = 2.0
 element = 4
 tower_name = "Lightning"
 tower_description = "Fires chain lightning, striking multiple enemies."

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bj1w2uyud17o2"]
+[gd_scene load_steps=13 format=3 uid="uid://bj1w2uyud17o2"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_2d728"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_gbgnt"]
@@ -9,20 +9,22 @@
 [ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="7_4dwkj"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_bu6ya"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_jiw1u"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_86qj0"]
 
 [sub_resource type="Resource" id="Resource_86qj0"]
 script = ExtResource("4_4dwkj")
-max_speed = 15.0
+max_speed = 12.0
 acceleration = 200.0
 turn_speed = 1000.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
-size = Vector2(80, 100)
+size = Vector2(60.000015, 82.500015)
 
-[node name="BuffUnit" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[node name="BuffUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
 script = ExtResource("1_2d728")
 hostile = true
+behavior = NodePath("DefaultBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -46,8 +48,8 @@ health_data = ExtResource("5_1ej4o")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-position = Vector2(2.3841858e-07, -2.3841858e-07)
-scale = Vector2(0.1310606, 0.1310606)
+position = Vector2(-1.1920929e-07, 1.1920929e-07)
+scale = Vector2(0.095833324, 0.095833324)
 texture = ExtResource("7_4dwkj")
 
 [node name="Hitbox" type="Area2D" parent="."]
@@ -56,9 +58,14 @@ collision_mask = 0
 script = ExtResource("7_bu6ya")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(1.19209e-06, 4.76837e-06)
+position = Vector2(0, -1.2499976)
+scale = Vector2(0.9999995, 0.9999995)
 shape = SubResource("RectangleShape2D_1ej4o")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("8_jiw1u")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="DefaultBehavior" type="Node" parent="."]
+script = ExtResource("10_86qj0")
+metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"

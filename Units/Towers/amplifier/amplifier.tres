@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1_y5gus")
 id = 8
-cost = 12.0
+cost = 15.0
 element = 5
 tower_name = "Amplifier"
-tower_description = "Enhances nearby towers"
+tower_description = "Adjacent towers gain 25% increase to firerate."
 tower_scene = ExtResource("2_12f5q")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

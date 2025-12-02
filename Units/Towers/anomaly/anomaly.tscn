@@ -20,6 +20,7 @@ description = "Maintain adjacent towers for waves to stabilise and claim its rew
 metadata/_custom_type_script = "uid://dwpna5u0ynf44"
 
 [node name="Anomaly" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]
+modulate = Color(1, 0, 0, 1)
 z_index = 1
 script = ExtResource("1_5uxnm")
 type = 10

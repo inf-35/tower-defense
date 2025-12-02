@@ -12,13 +12,14 @@
 [ext_resource type="Texture2D" uid="uid://xqdlxxt01vpm" path="res://Assets/railgun_base.svg" id="13_8mgd4"]
 [ext_resource type="Texture2D" uid="uid://bpvugaljod6nx" path="res://Assets/railgun_head.svg" id="14_10p4y"]
 
-[node name="Minigun" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Minigun" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_p8fod")
 type = 4
 turret = NodePath("Graphics/Turret")
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
@@ -63,3 +64,5 @@ position = Vector2(104.167, 0)
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("8_7vwtd")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

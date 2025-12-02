@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_dhi2e")
 id = 4
+cost = 15.0
 tower_name = "Cannon"
 tower_description = "Slow AOE damage-dealer"
 tower_scene = ExtResource("2_gll86")

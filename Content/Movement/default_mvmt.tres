@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_4amoh")
-max_speed = 30.0
+max_speed = 16.0
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"

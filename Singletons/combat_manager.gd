@@ -44,7 +44,6 @@ class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstra
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage 
 		if is_zero_approx(hit_data.radius): #this projectile has no aoe, so we just look for the primary target
 			if not is_instance_valid(target):
-				push_warning("CombatManager: zero-AOE hit attempted with no intended target. Discarding...")
 				return
 			if (target.position - intercept_position).length_squared() > ERROR_TOLERANCE_SQUARED:
 				return #we missed by over error tolerance

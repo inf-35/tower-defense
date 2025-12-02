@@ -86,8 +86,8 @@ func is_target_valid(target_unit) -> bool:
 	if not is_instance_valid(target_unit.movement_component) or not is_instance_valid(target_unit.health_component):
 		return false
 		
-	#if Targeting.is_unit_overkilled(target_unit):
-		#return false
+	if target_unit is Tower and target_unit.current_state == Tower.State.RUINED:
+		return false
 
 	if target_unit.incorporeal:
 		return false
@@ -116,6 +116,12 @@ func get_target() -> Unit:
 	if is_instance_valid(priority_target_override):
 		if _enemies_in_range.has(priority_target_override):
 			return priority_target_override
+			
+	#NOTE: when we are blocked, the blocking unit will be priority target override
+	#thus, if we reach here, the blocking unit is not in range,
+	#and we should not hit anything
+	if unit.attack_only_when_blocked:
+		return null
 	
 	# sort targets into two buckets: preferred and fallback
 	var primary_candidates: Array[Unit] = []

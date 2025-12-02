@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("2_kr28s")
 id = 12
-cost = 12.0
+cost = 20.0
 element = 5
 tower_name = "Shield"
-tower_description = "Negates damage of adjacent towers"
+tower_description = "Adjacent towers take 75% less damage."
 tower_scene = ExtResource("3_krrll")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

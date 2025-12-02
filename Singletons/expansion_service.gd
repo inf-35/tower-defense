@@ -49,8 +49,8 @@ func _init():
 	STANDARD_EXPANSION_PARAMS = GenerationParameters.new()
 	
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.RUINS, 0.15))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 2, 4))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.09))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.RUINS, 0.08))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -66,7 +66,7 @@ func _init():
 	forest_rule.tower_type = Towers.Type.FOREST
 	forest_rule.seed_placement = PlacementLogic.ANYWHERE
 	forest_rule.cluster_size_min = 1
-	forest_rule.cluster_size_max = 4
+	forest_rule.cluster_size_max = 6
 	forest_rule.min_seeds = 1
 	forest_rule.max_seeds = 1
 	
@@ -89,7 +89,7 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	# for the very first block, we create a custom ruleset in code
 	var initial_params := GenerationParameters.new()
 	var terrain_rules: Array[TerrainGenRule] = initial_params.terrain_gen_rules
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 3))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.15, 1, 1))
 	# rule 1: place one active breach
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -97,6 +97,7 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	breach_rule.tower_initial_state = {"seed_duration_waves": 0} # 0 = active immediately
 	
 	var anomaly_rule := PlacementRule.new()
+	anomaly_rule.tower_type = Towers.Type.ANOMALY
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
 	anomaly_rule.seed_placement = PlacementLogic.EDGE
 	anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(

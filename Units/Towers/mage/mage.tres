@@ -6,8 +6,8 @@
 
 [resource]
 script = ExtResource("2_cqlpt")
-id = 17
-cost = 5.0
+id = 18
+cost = 12.0
 element = 5
 tower_name = "Mage"
 tower_description = "Firing arcane bolts, mages penetrate shields and gain a buff for each other mage placed on the same diagonal axes."

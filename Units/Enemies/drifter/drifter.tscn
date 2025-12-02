@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://bhpgyu3tdyuh6"]
+[gd_scene load_steps=19 format=3 uid="uid://bhpgyu3tdyuh6"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_0kato"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_74j81"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_2jjyj"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_2gn4h"]
-[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ayagf"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_oxo2e"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_mt1ix"]
 [ext_resource type="Texture2D" uid="uid://ixg5alc62qx3" path="res://Assets/drifter.svg" id="6_2gn4h"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_ayagf"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_oxo2e"]
@@ -12,19 +13,34 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_2gn4h"]
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="10_ayagf"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_mt1ix"]
+[ext_resource type="Script" uid="uid://c8ywoutwp4wvt" path="res://UnitComponents/behavior_component.gd" id="13_mt1ix"]
+
+[sub_resource type="Resource" id="Resource_5dfik"]
+script = ExtResource("4_oxo2e")
+max_speed = 30.0
+acceleration = 200.0
+turn_speed = 100.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="Resource" id="Resource_oxo2e"]
+script = ExtResource("5_mt1ix")
+max_health = 3.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mt1ix"]
 shader = ExtResource("6_ayagf")
 shader_parameter/flash_intensity = 0.0
+shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
 size = Vector2(80, 80.00002)
 
-[node name="Drifter" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Drifter" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_0kato")
 hostile = true
 attack_only_when_blocked = true
+behavior = NodePath("Behavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -36,16 +52,16 @@ metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
 script = ExtResource("2_74j81")
-ignore_walls = true
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_2jjyj")
+movement_data = SubResource("Resource_5dfik")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_2gn4h")
-health_data = ExtResource("5_ayagf")
+health_data = SubResource("Resource_oxo2e")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
@@ -75,3 +91,7 @@ metadata/_custom_type_script = "uid://detgar3t50qgi"
 [node name="RangeComponent" type="Node" parent="."]
 script = ExtResource("11_mt1ix")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="Behavior" type="Node" parent="."]
+script = ExtResource("13_mt1ix")
+metadata/_custom_type_script = "uid://c8ywoutwp4wvt"

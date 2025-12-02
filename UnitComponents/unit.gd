@@ -52,7 +52,10 @@ var disabled: bool:
 	set(nd):
 		disabled = nd
 		if graphics and graphics.material != null:
-			graphics.material.set_shader_parameter(&"overlay_color", Color(0,0,0,0.7) if disabled else Color(0,0,0,0))
+			graphics.material.set_shader_parameter(&"overlay_color", Color(0.0, 0.0, 0.0, 1.0) if disabled else Color(0,0,0,0))
+			graphics.material.set_shader_parameter(&"transparency", 0.3 if disabled else 1.0)
+
+const _DEBUG_DRAW: bool = false
 
 func _ready():
 	name = name + " " + str(unit_id)
@@ -71,6 +74,9 @@ func _ready():
 func _process(_delta: float):
 	if not disabled and is_instance_valid(behavior):
 		behavior.update(Clock.game_delta)
+
+	if _DEBUG_DRAW:
+		queue_redraw()
 
 func _create_components() -> void:
 	if modifiers_component == null:
@@ -111,6 +117,8 @@ func _prepare_components() -> void:
 					movement_component.target_direction = Vector2.ZERO
 				blocked = true
 			else:
+				if is_instance_valid(range_component):
+					range_component.priority_target_override = null
 				blocked = false
 		)
 	
@@ -341,3 +349,29 @@ func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be u
 	if attack_component != null:
 		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
+
+func _draw() -> void:
+	# 1. VISUALIZE PATH (Blue Line)
+	if not _DEBUG_DRAW:
+		return
+
+	if is_instance_valid(navigation_component) and not navigation_component._path.is_empty():
+		if navigation_component._current_waypoint_index < navigation_component._path.size():
+			var next_tile = navigation_component._path[navigation_component._current_waypoint_index]
+			var next_pos = Island.cell_to_position(next_tile)
+			draw_line(Vector2.ZERO, to_local(next_pos), Color.BLUE, 2.0)
+
+	# 2. VISUALIZE TARGET (Red/Yellow Line)
+	if is_instance_valid(range_component):
+		var target = range_component.get_target()
+		if is_instance_valid(target):
+			var local_target = to_local(target.global_position)
+
+			# YELLOW = Priority Override (Blocking Tower)
+			# RED = Normal Target (Closest/Health/etc)
+			var color = Color.RED
+			if range_component.priority_target_override == target:
+				color = Color.YELLOW
+
+			draw_line(Vector2.ZERO, local_target, color, 3.0)
+			draw_circle(local_target, 5.0, color)

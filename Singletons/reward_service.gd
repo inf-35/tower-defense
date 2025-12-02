@@ -41,6 +41,11 @@ var reward_pool: Array[Reward] = [
 	),
 	Reward.new(
 		Reward.Type.UNLOCK_TOWER,
+		{ID.Rewards.TOWER_TYPE: Towers.Type.FLAMETHROWER},
+		"Unlocks FLAMETHROWER"
+	),
+	Reward.new(
+		Reward.Type.UNLOCK_TOWER,
 		{ID.Rewards.TOWER_TYPE: Towers.Type.LIGHTNING},
 		"Unlocks LIGHTNING"
 	),

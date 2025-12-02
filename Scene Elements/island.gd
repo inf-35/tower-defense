@@ -35,7 +35,7 @@ func _ready():
 	PowerService.register_island(self)
 	
 	# initial terrain generation
-	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 50)
+	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 100)
 	# 3. delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	

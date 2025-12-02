@@ -6,5 +6,6 @@
 [resource]
 script = ExtResource("2_tmuar")
 active_effect_scene = ExtResource("1_yca21")
+title = "Cold"
 description = "Each stack of poison inflicted on a enemy also inflicts 0.5 stacks of frost."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -6,14 +6,6 @@
 
 [resource]
 script = ExtResource("2_w218f")
-delivery_method = 0
-range = 10.0
-cooldown = 1.0
-radius = 0.0
-damage = 2.0
-status_effects = Array[ExtResource("3_h5pey")]([])
-modifiers = Array[ExtResource("1_qxe7x")]([])
-projectile_speed = 10.0
-vertical_force = -10.0
-cone_angle = 0.0
+range = 8.0
+damage = 3.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -79,7 +79,7 @@ func _enter_state(new_state: State, target: Unit = null) -> void:
 			_locked_target = target
 			
 			# command the unit to play its anticipation animation
-			if not unit.animation_player.has_animation(&"attack_windup"):
+			if (not is_instance_valid(animation_player)) or not animation_player.has_animation(&"attack_windup"):
 				return
 			var animation_length: float = unit.animation_player.get_animation(&"attack_windup").length
 			await Clock.create_game_timer(_cooldown - animation_length).timeout

@@ -8,19 +8,26 @@ class_name TerrainRenderer
 @export var show_debug_texture: bool = false
 @export var draw_background: bool = true
 
+@export var background_stain_color: Color
 @export var paint_color: Color
 @export var wash_color: Color
+@export var brush_textures: Array[Texture2D]
+
+# references
+var _brush_viewport: Viewport
 
 # visual components
 var _terrain_rect: ColorRect
 var _bg_rect: ColorRect
+var _bg_stain_rect: ColorRect
 var _decoration_container: Node2D ## container for stamped sprites
 
 var _grid_image: Image
 var _grid_texture: ImageTexture
 var _grid_data: Dictionary = {} # stores Vector2i -> bool (is_land)
-var _active_decorations: Dictionary = {} # stores Vector2i -> Sprite2D
-
+# visual state trackers
+var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} # stores Vector2i -> Sprite2D
+var _active_brush_strokes: Dictionary[Vector2i, Sprite2D]
 # bounds management
 # we track the top-left coordinate of the current image grid
 var _min_coord: Vector2i = Vector2i.ZERO
@@ -47,8 +54,12 @@ func _setup_visuals() -> void:
 	_grid_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_grid_texture = ImageTexture.create_from_image(_grid_image)
 	
-	_terrain_rect = ColorRect.new()
-	_terrain_rect.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_brush_viewport = SubViewport.new()
+	_brush_viewport.name = "BrushMaskViewport"
+	_brush_viewport.disable_3d = true
+	_brush_viewport.transparent_bg = true
+	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(_brush_viewport)
 	
 	if draw_background:
 		_bg_rect = ColorRect.new()
@@ -57,7 +68,21 @@ func _setup_visuals() -> void:
 		_bg_rect.size = Vector2(10000,10000)
 		_bg_rect.position = Vector2(-5000,-5000)
 		add_child(_bg_rect)
+
+	_bg_stain_rect = ColorRect.new()
+	_bg_stain_rect.name = "BackgroundStain"
+	_bg_stain_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	var bg_stain_mat = ShaderMaterial.new()
+	bg_stain_mat.shader = preload("res://Shaders/simple_mix_mask.gdshader")
+	bg_stain_mat.set_shader_parameter("mask_texture", _brush_viewport.get_texture())
+	bg_stain_mat.set_shader_parameter("tint_color", background_stain_color)
+	_bg_stain_rect.material = bg_stain_mat
+	add_child(_bg_stain_rect)
 		
+	_terrain_rect = ColorRect.new()
+	_terrain_rect.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	
 	var mat := ShaderMaterial.new()
 	mat.shader = shader
 	
@@ -81,9 +106,13 @@ func _setup_visuals() -> void:
 	
 	# placeholder paper (replace with load("res://...") if you have one)
 	var paper_img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
-	paper_img.fill(Color(0.95, 0.95, 0.92, 1.0))
+	paper_img.fill(Color(0.95, 0.95, 0.922, 1.0))
 	var paper_tex = ImageTexture.create_from_image(paper_img)
 	mat.set_shader_parameter("paper_texture", paper_tex)
+	
+	# pass the Viewport's texture to the shader
+	# NOTE: viewport textures are dynamic and update with viewport contents
+	mat.set_shader_parameter("brush_mask_texture", _brush_viewport.get_texture())
 	
 	_terrain_rect.material = mat
 	_terrain_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -91,6 +120,7 @@ func _setup_visuals() -> void:
 	
 	# decorations sit on top of the paint
 	_decoration_container = Node2D.new()
+	_decoration_container.name = "DecorationContainer"
 	_decoration_container.y_sort_enabled = false # usually terrain stamps are flat, but set true if using upright trees
 	add_child(_decoration_container)
 	
@@ -103,7 +133,6 @@ func _setup_visuals() -> void:
 func apply_terrain_changes(changes: Dictionary) -> void:
 	if changes.is_empty():
 		return
-	var needs_resize := false
 	var new_min := _min_coord
 	var new_max := _min_coord + _size_cells - Vector2i.ONE
 	
@@ -122,13 +151,15 @@ func apply_terrain_changes(changes: Dictionary) -> void:
 				new_min.y = min(new_min.y, cell.y)
 				new_max.x = max(new_max.x, cell.x)
 				new_max.y = max(new_max.y, cell.y)
+			
+			_spawn_brush_stroke(cell)
 		else:
 			_grid_data.erase(cell)
 			# if a tile is removed, its decoration must also go
 			if _active_decorations.has(cell):
 				_active_decorations[cell].queue_free()
 				_active_decorations.erase(cell)
-			# note: we don't shrink bounds automatically as it's expensive 
+			# NOTE: we don't shrink bounds automatically as it's expensive 
 			# and islands usually grow. shrinking is optional optimization.
 
 	# add padding to bounds for the gradient to fade out
@@ -143,6 +174,8 @@ func apply_terrain_changes(changes: Dictionary) -> void:
 	
 	# 2. recalculate distance field
 	_update_distance_field()
+	
+	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	
 # updates the stamped sprites on top of the blob
 func update_decoration(cell: Vector2i, type: Terrain.Base) -> void:
@@ -218,6 +251,37 @@ func set_color_param(param_name: String, value: Color) -> void:
 	(_terrain_rect.material as ShaderMaterial).set_shader_parameter(param_name, value)
 
 # --- internal logic ---
+func _spawn_brush_stroke(cell: Vector2i) -> void:
+	if _active_brush_strokes.has(cell):
+		return
+	
+	var brush_tex: Texture2D = brush_textures.pick_random()
+	var sprite: Sprite2D = Sprite2D.new()
+	sprite.texture = brush_tex
+	
+	# Calculate Position
+	# Important: Viewport coordinates are local to the viewport (0,0 is top left)
+	# The TerrainRect also draws from 0,0 locally.
+	# We need to map the global grid coordinates to this local space.
+	var cell_center: Vector2 = (Vector2(cell) * cell_size) + (Vector2.ONE * cell_size * 0.5)
+	
+	# Since the Viewport moves WITH the grid logic (via _update_rect_transform logic below),
+	# we can just set positions relative to the grid origin if we structure it right.
+	# HOWEVER, simplest way: The Viewport covers the exact same rect as _terrain_rect.
+	# so coordinates should be relative to _min_coord.
+	
+	var local_pos: Vector2 = cell_center - Vector2(_min_coord * cell_size)
+	
+	# store the sprite to update its position later if we shift the grid
+	sprite.position = local_pos
+	# randomisation
+	sprite.rotation = randf() * TAU
+	sprite.modulate = Color(1,1,1, randf_range(0.5, 1.0))
+	var s: float = (randf_range(0.5, 1.0) ** 2) * 0.2
+	sprite.scale = Vector2(s, s)
+	
+	_brush_viewport.add_child(sprite)
+	_active_brush_strokes[cell] = sprite
 
 func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	# safeguard against massive accidental sizes
@@ -239,6 +303,23 @@ func _update_rect_transform() -> void:
 	# place the rect in the world
 	_terrain_rect.position = Vector2(_min_coord * cell_size)
 	_terrain_rect.size = Vector2(_size_cells * cell_size)
+	
+	var MARGIN: float = _terrain_rect.size.x + 5.0
+	_bg_stain_rect.position = _terrain_rect.position - Vector2.ONE * MARGIN
+	_bg_stain_rect.size = _terrain_rect.size + Vector2.ONE * MARGIN * 2
+
+	#adjust brush viewport size
+	if _brush_viewport.size != Vector2i(_terrain_rect.size):
+		_brush_viewport.size = Vector2i(_terrain_rect.size)
+		
+	# when _min_coord changes, the "local" position of existing brushes shifts.
+	# we need to re-align existing brushes.
+	for cell: Vector2i in _active_brush_strokes:
+		var sprite: Sprite2D = _active_brush_strokes[cell]
+		var cell_center_world = (Vector2(cell) * cell_size) + (Vector2.ONE * cell_size * 0.5)
+		var local_pos = cell_center_world - _terrain_rect.position
+		sprite.position = local_pos
+	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	
 	# pass world info to shader
 	var mat = _terrain_rect.material as ShaderMaterial

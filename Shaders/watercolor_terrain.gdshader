@@ -2,6 +2,8 @@ shader_type canvas_item;
 render_mode blend_mix;
 
 // --- inputs ---
+uniform sampler2D brush_mask_texture : filter_linear;
+
 uniform sampler2D grid_data_texture : filter_linear;
 uniform sampler2D distortion_texture : repeat_enable, filter_linear;
 uniform sampler2D noise_texture : repeat_enable, filter_linear;
@@ -19,7 +21,7 @@ uniform vec4 wash_color : source_color = vec4(0.5, 0.8, 0.9, 0.6);
 // --- configuration ---
 uniform float distortion_strength : hint_range(0.0, 10.0) = 5.0; // strength in pixels
 uniform float distortion_scale : hint_range(0.001, 0.1) = 0.01; // scale relative to pixels
-uniform float noise_strength = 0.5;
+uniform float noise_strength = 1.0;
 uniform float cut_threshold : hint_range(0.0, 0.5) = 0.05;
 uniform float edge_softness : hint_range(0.0, 0.2) = 0.0;
 uniform float center_falloff : hint_range(0.1, 5.0) = 1.0;
@@ -33,7 +35,7 @@ void fragment() {
 	// 2. domain warping (world space)
 	// we sample noise using world coordinates so it tiles infinitely
 	vec2 noise_uv = world_pos * distortion_scale;
-	vec2 noise_val = texture(distortion_texture, noise_uv).rg;
+	vec2 noise_val = texture(distortion_texture, noise_uv + vec2(0.005,0.005) * TIME).rg;
 
 	// apply distortion to the UV we use to read the data texture.
 	// we convert the pixel-based distortion back to UV space (0-1) for the texture lookup.
@@ -57,7 +59,9 @@ void fragment() {
 	vec4 paper = texture(paper_texture, world_pos * 0.02); // 0.02 = 1/50 scale
 
 	vec4 final_color = mix(wash_color, paint_color, vibrancy);
-	final_color = mix(final_color, final_color * paper, 0.4);
-
-	COLOR = vec4(final_color.rgb, alpha * final_color.a);
+	final_color = mix(final_color, final_color * paper, 0.1);
+	
+	float brush_alpha = clamp(texture(brush_mask_texture, UV).a * 2.0, 0.5, 2.0);
+	//COLOR = vec4(final_color.rgb, alpha * final_color.a);
+	COLOR = vec4(final_color.rgb, brush_alpha * alpha * final_color.a);
 }

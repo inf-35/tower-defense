@@ -133,6 +133,8 @@ func _on_flow_field_built(goal: Vector2i, ignore_walls: bool, new_flow_field: Di
 	var key: int = generate_field_code(goal, ignore_walls)
 	#ensure the thread from the dictionary is the one we wait 
 	if _build_threads.has(key):
+		if _build_threads[key].is_started():
+			_build_threads[key].wait_to_finish()
 		_build_threads.erase(key) # remove from the list of running threads
 	
 	_flow_fields[key] = new_flow_field

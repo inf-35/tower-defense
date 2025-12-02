@@ -6,4 +6,6 @@
 [resource]
 script = ExtResource("2_p47uu")
 active_effect_scene = ExtResource("1_fja5b")
+title = "Strength in Numbers"
+description = "Basic turrets gain +20% increase in firerate per adjacent basic turret"
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

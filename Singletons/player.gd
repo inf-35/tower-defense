@@ -27,6 +27,7 @@ var used_capacity: float = 0.0:
 		
 var tower_capacity: float = 0.0:
 	set(value):
+		push_warning(">>?")
 		tower_capacity = value
 		capacity_changed.emit(used_capacity, tower_capacity)
 		
@@ -71,7 +72,7 @@ func _setup_state():
 		Towers.Type.CANNON: true,
 		Towers.Type.TURRET: true,
 	}
-	flux = 20.0
+	flux = 15.0
 	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: preload("res://Content/Relics/increase_ruin_chance.tres")}))
 	
 

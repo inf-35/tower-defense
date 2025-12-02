@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("2_ay5mt")
 id = 17
-cost = 5.0
+cost = 12.0
 element = 5
 tower_name = "Prism"
 tower_description = "Two prisms placed unobstructed along the same axis generate lasers, damaging enemies continuously,"

@@ -1,0 +1,86 @@
+[gd_scene load_steps=16 format=3 uid="uid://bn2b51cmejpc5"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_r3k45"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_8wtba"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_g7w6o"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_e7k44"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_bbnn2"]
+[ext_resource type="Resource" uid="uid://by3rh077dcq6w" path="res://Units/Enemies/troll/troll_hp.tres" id="6_cbyq1"]
+[ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="7_r5gip"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_yo6oh"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_inom0"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_3mlr7"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_h0p7f"]
+[ext_resource type="Resource" uid="uid://8kvyg31h86xw" path="res://Units/Enemies/troll/troll_attack.tres" id="12_bvdqm"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="13_bvdqm"]
+
+[sub_resource type="Resource" id="Resource_86qj0"]
+script = ExtResource("4_e7k44")
+max_speed = 12.0
+acceleration = 200.0
+turn_speed = 1000.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
+size = Vector2(100.00003, 111.25004)
+
+[node name="TrollUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+script = ExtResource("1_r3k45")
+hostile = true
+behavior = NodePath("DefaultBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_8wtba")
+ignore_walls = true
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_g7w6o")
+face_towards_movement = false
+movement_data = SubResource("Resource_86qj0")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_bbnn2")
+health_data = ExtResource("6_cbyq1")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+position = Vector2(0, -2)
+scale = Vector2(0.15397726, 0.15397726)
+texture = ExtResource("7_r5gip")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("8_yo6oh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -24.375)
+scale = Vector2(0.99999946, 0.99999946)
+shape = SubResource("RectangleShape2D_1ej4o")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_inom0")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="DefaultBehavior" type="Node" parent="."]
+script = ExtResource("10_3mlr7")
+metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("11_h0p7f")
+attack_data = ExtResource("12_bvdqm")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("13_bvdqm")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"

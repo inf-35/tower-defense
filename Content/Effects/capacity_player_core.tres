@@ -5,9 +5,8 @@
 [resource]
 script = ExtResource("1_on2je")
 params = {
-"base_capacity": 10.0,
+"base_capacity": 8.0,
 "terrain_conditional_capacity": []
 }
 effect_type = 2
-schedule = 2
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

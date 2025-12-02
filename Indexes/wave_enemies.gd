@@ -1,5 +1,22 @@
 class_name WaveEnemies
 
+const SCRIPTED_WAVES: Dictionary[int, Array] = {
+	# Example: Wave 1 is just 5 Basics (Tutorial)
+	1: [
+		[Units.Type.BASIC, 5]
+	],
+	2: [
+		[Units.Type.BASIC, 8],
+	],
+	3: [
+		[Units.Type.BASIC, 4],
+		[Units.Type.BUFF, 3],
+	],
+	4: [
+		[Units.Type.BASIC, 6],
+		[Units.Type.BUFF, 4],
+	],
+}
 # --- unit catalog ---
 # this is the master data definition for all spawnable units.
 # cost: the budget points required to spawn one unit.
@@ -12,10 +29,11 @@ enum WaveModifier {
 }
 
 const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
-	Units.Type.BASIC:   {"cost": 10, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
-	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 4},
-	Units.Type.DRIFTER: {"cost": 30, "tags": [&"GRUNT", &"SIEGE"], "wave": 6},
-	Units.Type.ARCHER: {"cost": 30, "tags": [&"SUPPORT"], "wave": 1},
+	Units.Type.BASIC:   {"cost": 15, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
+	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 2},
+	Units.Type.DRIFTER: {"cost": 30, "tags": [&"GRUNT", &"MELEE"], "wave": 4},
+	Units.Type.TROLL: {"cost": 60, "tags": [&"SUPPORT", &"SIEGE"], "wave": 6},
+	Units.Type.ARCHER: {"cost": 40, "tags": [&"SUPPORT"], "wave": 8},
 }
 
 # --- director configuration ---
@@ -25,6 +43,11 @@ const QUADRATIC_BUDGET_SCALING: float = 1.8
 
 # the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array[Array]:
+	if SCRIPTED_WAVES.has(wave):
+		var output: Array[Array]
+		output.assign(SCRIPTED_WAVES[wave])
+		return output
+
 	# 1. get the wave modifier from the central game director
 	var wave_type: Phases.WaveType = Phases.get_wave_type(wave)
 	var modifier: WaveModifier
@@ -50,6 +73,7 @@ static func get_enemies_for_wave(wave: int) -> Array[Array]:
 			budget *= 1.5 # larger budget
 			# only allow cheap grunt units
 			unit_pool = _get_units_by_tag(unit_pool, &"GRUNT")
+			unit_pool.append_array(_get_units_by_tag(unit_pool, &"SUPPORT"))
 			unit_pool = _get_units_by_max_cost(unit_pool, budget * 0.2)
 		WaveModifier.ELITE:
 			budget *= 0.7 # smaller budget, but units will be stronger
@@ -113,7 +137,7 @@ static func _compose_wave_from_budget(budget: float, pool: Array[Units.Type], mo
 
 # consolidates a list like [BASIC, BASIC, ARCHER] into [[BASIC, 2], [ARCHER, 1]]
 static func _consolidate_enemy_list(enemies: Array[Units.Type]) -> Array[Array]:
-	var counts: Dictionary = {}
+	var counts: Dictionary[Units.Type, int] = {}
 	for enemy_type: Units.Type in enemies:
 		counts[enemy_type] = counts.get(enemy_type, 0) + 1
 	

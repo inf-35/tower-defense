@@ -78,13 +78,19 @@ func resurrect() -> void:
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
 	# 3. restart behaviours
 	behavior.start()
+	# 4. reattach all effects
+	for effect_prototype: EffectPrototype in effect_prototypes:
+		apply_effect(effect_prototype) #detach all effects
 
 func on_killed() -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
+	
+	for effect_prototype: EffectPrototype in effect_prototypes:
+		remove_effect(effect_prototype) #detach all effects
 
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
-		Player.flux += flux_value * 0.75
+		Player.flux += flux_value #full refund!
 		enter_ruin_state(RuinService.RuinReason.SOLD)
 		died.emit()
 
@@ -131,6 +137,12 @@ func _ready():
 		on_event.emit(event)
 	)
 	
+	Phases.wave_ended.connect(func(_wave_number: int): #heal up at the end of every wave
+		if is_instance_valid(health_component):
+			health_component.health = health_component.max_health
+	)
+	
+
 func get_occupied_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for x: int in size.x:

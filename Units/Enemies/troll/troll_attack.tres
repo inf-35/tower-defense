@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=4 format=3 uid="uid://8kvyg31h86xw"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_8q043"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_sooba"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_b8i0i"]
+
+[resource]
+script = ExtResource("2_sooba")
+range = 8.0
+cooldown = 1.5
+damage = 5.0
+breaking = true
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -21,7 +21,8 @@ func start() -> void:
 	
 	# connect to the host tower's signal to know when its neighbors change.
 	var tower: Tower = unit as Tower
-	tower.adjacency_updated.connect(_on_adjacency_updated)
+	if not tower.adjacency_updated.is_connected(_on_adjacency_updated):
+		tower.adjacency_updated.connect(_on_adjacency_updated)
 	
 	# perform an initial check in case the tower is spawned next to existing towers.
 	# we need to wait a frame for the island to settle its adjacency calculations.

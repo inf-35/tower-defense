@@ -21,8 +21,8 @@ enum Type {
 	LIGHTNING,
 	PRISM,
 	MAGE,
-	
-	FOREST
+	FOREST,
+	FLAMETHROWER
 }
 
 enum Element {

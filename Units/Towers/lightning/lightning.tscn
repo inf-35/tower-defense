@@ -75,7 +75,7 @@ muzzle = NodePath("../Graphics/Turret/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.096, 0.096)
+scale = Vector2(0.083000004, 0.083000004)
 texture = ExtResource("10_t5o8f")
 
 [node name="Turret" type="Sprite2D" parent="Graphics"]

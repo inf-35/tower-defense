@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=15 format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -9,6 +9,11 @@
 [ext_resource type="Script" uid="uid://crec8t188v1g2" path="res://terrain_renderer.gd" id="7_b4opu"]
 [ext_resource type="Shader" uid="uid://5lkovhtioof2" path="res://Shaders/sketch_terrain.gdshader" id="8_c7iw8"]
 [ext_resource type="Shader" uid="uid://by08yeo185ck8" path="res://Shaders/watercolor_terrain.gdshader" id="9_8ervs"]
+[ext_resource type="Texture2D" uid="uid://ckta0r6pis0if" path="res://Assets/brushstroke_multiply.png" id="10_8ervs"]
+[ext_resource type="Texture2D" uid="uid://iiiypqalxn5y" path="res://Assets/brushstroke_multiply_01.png" id="11_1y0xo"]
+[ext_resource type="Texture2D" uid="uid://blqqd1ohrgsv1" path="res://Assets/brushstroke_multiply_02.png" id="12_kjlm2"]
+[ext_resource type="Texture2D" uid="uid://dy6knj1yfeag2" path="res://Assets/brushstroke_multiply_03.png" id="13_ad6l7"]
+[ext_resource type="Texture2D" uid="uid://cimvwfmb6t2bf" path="res://Assets/brushstroke_multiply_04.png" id="14_cj5nf"]
 
 [node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
 script = ExtResource("1_0iamf")
@@ -26,6 +31,7 @@ layer = 2
 [node name="UI" parent="." instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
+visible = false
 script = ExtResource("3_qurb2")
 
 [node name="TowerPreview" type="Node2D" parent="."]
@@ -52,5 +58,7 @@ z_as_relative = false
 script = ExtResource("7_b4opu")
 shader = ExtResource("9_8ervs")
 max_gradient_depth = 3.0
+background_stain_color = Color(1, 0.944, 0.84000003, 1)
 paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
-wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
+wash_color = Color(0.79083, 0.87, 0.7482, 0.13725491)
+brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])

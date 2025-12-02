@@ -6,11 +6,11 @@
 
 [resource]
 script = ExtResource("2_f36vk")
-id = 10
+id = 19
 cost = 0.0
 required_capacity = 0.0
 element = 3
 tower_name = "Forest"
-tower_description = "A thicket of trees"
+tower_description = "A thicket of trees."
 tower_scene = ExtResource("3_enagb")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -7,7 +7,6 @@
 [resource]
 script = ExtResource("2_lx1b8")
 id = 14
-cost = 5.0
 element = 3
 tower_name = "Poison"
 tower_description = "Shoots small, yet poison-dealing projectiles."
