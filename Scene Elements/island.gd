@@ -108,7 +108,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.set_initial_behaviour_state(initial_state)
 	tower.add_to_group(References.TOWER_GROUP)
 	add_child(tower)
-	#NOTE: tower.died cannot be used here due to the ruins system
+	tower.died.connect(update_navigation_grid) #as unit becoems non-blocking upon unit death
 	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
@@ -147,7 +147,7 @@ func update_navigation_grid() -> void:
 			if is_occupied and tower_grid[cell].blocking:
 				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
 			else:
-				Navigation.grid[cell] = 0
+				Navigation.grid[cell] = 1
 
 	Navigation.clear_field()
 	
@@ -168,6 +168,8 @@ func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	_highlighted_choice_id = -1 # reset highlight
 	queue_redraw()
 	
+	preview_renderer.clear_decorations() #clear previous tower previews
+	
 	# by default, show ALL choices as a faint outline
 	var all_preview_cells: Array[Vector2i] = []
 	for choice in _preview_choices.values():
@@ -185,8 +187,9 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		return
 		
 	_highlighted_choice_id = choice_id
+	preview_renderer.clear_decorations() #clear previous tower previews
 	
-	if choice_id == -1:
+	if choice_id == -1: #nothing is selected!
 		# revert to showing all choices faintly
 		var all_cells: Array[Vector2i] = []
 		for choice in _preview_choices.values():
@@ -194,6 +197,14 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		preview_renderer.reset_grid(all_cells)
 		preview_renderer.set_color_param("outline_color", Color(0.16, 0.16, 0.16, 0.4))
 		preview_renderer.set_color_param("fill_color", Color(1, 1, 1, 0.1))
+		
+		#stamp all features from all choices
+		for local_choice_id: int in _preview_choices:
+			var choice: ExpansionChoice = _preview_choices[local_choice_id]
+			for cell: Vector2i in choice.block_data:
+				var cell_data: Terrain.CellData = choice.block_data[cell]
+				if cell_data.feature != Towers.Type.VOID:
+					preview_renderer.set_preview_feature(cell, cell_data.feature)
 	
 	elif _preview_choices.has(choice_id):
 		# show ONLY the highlighted choice, with strong distinct style
@@ -205,6 +216,12 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		preview_renderer.set_color_param("outline_color", Color(0.27, 0.27, 0.27, 0.576)) # solid black
 		preview_renderer.set_color_param("fill_color", Color(0.4, 0.8, 0.6, 0.0)) # slight green tint
 		
+		for cell: Vector2i in active_choice.block_data:
+			var cell_data: Terrain.CellData = active_choice.block_data[cell]
+			
+			if cell_data.feature != Towers.Type.VOID:
+				preview_renderer.set_preview_feature(cell, cell_data.feature)
+	
 #signal handlers
 func _on_tower_destroyed(tower: Tower):
 	var cell: Vector2i = tower.tower_position

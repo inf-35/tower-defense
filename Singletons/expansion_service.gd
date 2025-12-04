@@ -159,6 +159,10 @@ func select_expansion(island: Island, choice_id: int) -> void:
 func get_preview_data_at_cell(cell: Vector2i) -> Terrain.CellData:
 	if _current_state == State.IDLE:
 		return null
+	# prioritise the choice currently selected
+	if _pending_choice_id != -1:
+		if _choices_by_id.has(_pending_choice_id) and _choices_by_id[_pending_choice_id].block_data.has(cell):
+			return _choices_by_id[_pending_choice_id].block_data[cell]
 	# iterate through the choices to find which one, if any, contains this cell
 	for choice: ExpansionChoice in _choices_by_id.values():
 		if choice.block_data.has(cell):

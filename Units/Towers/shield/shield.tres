@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://cwr024x6a14pi"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://cwr024x6a14pi"]
 
 [ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_eh8ci"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_kr28s"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_qim14"]
 [ext_resource type="PackedScene" uid="uid://dv6kdb6a6pltb" path="res://Units/Towers/shield/shield.tscn" id="3_krrll"]
 
 [resource]
 script = ExtResource("2_kr28s")
 id = 12
-cost = 20.0
+cost = 15.0
 element = 5
 tower_name = "Shield"
 tower_description = "Adjacent towers take 75% less damage."

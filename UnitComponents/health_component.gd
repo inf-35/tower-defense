@@ -2,7 +2,7 @@ extends UnitComponent
 class_name HealthComponent
 signal health_changed(new_health: float)
 
-@export var health_data: HealthData = preload("res://Content/Health/tower_default.tres")
+@export var health_data: HealthData = load("res://Content/Health/tower_default.tres")
 
 var _modifiers_component: ModifiersComponent
 

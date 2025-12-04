@@ -85,7 +85,7 @@ func _create_components() -> void:
 		modifiers_component = n_modifiers_component
 	if movement_component == null: #by default, add an immobile movement component
 		var n_movement_component: = MovementComponent.new()
-		n_movement_component.movement_data = preload("res://Content/Movement/immobile_mvmt.tres")
+		n_movement_component.movement_data = load("res://Content/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
 		movement_component = n_movement_component
 	

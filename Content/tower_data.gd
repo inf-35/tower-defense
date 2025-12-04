@@ -11,11 +11,12 @@ class_name TowerData
 @export var element: Towers.Element
 
 #navigation
-@export var navcost: int = 10
+@export var navcost: int = 100
 
 @export var tower_name: String
 @export_multiline var tower_description: String
 
 @export var icon: Texture2D = preload("res://Assets/palisade.svg")
+@export var preview: Texture2D = preload("res://Assets/ballista_whole.png")
 @export var tower_scene: PackedScene
 #...upgrades

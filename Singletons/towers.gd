@@ -83,6 +83,9 @@ func get_tower_scene(tower_type: Type) -> PackedScene:
 
 func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name
+	
+func get_tower_preview(tower_type: Type) -> Texture2D:
+	return tower_stats[tower_type].preview
 
 func get_tower_description(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_description

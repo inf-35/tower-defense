@@ -1,0 +1,74 @@
+[gd_scene load_steps=13 format=3 uid="uid://bl12mn0bm7utq"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_y0lj0"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_l3ud4"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_o0jft"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_wcil4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_xj78e"]
+[ext_resource type="Resource" uid="uid://n6i5h8a8hv0y" path="res://Units/Enemies/healer/healer_hp.tres" id="6_3u0om"]
+[ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="7_m1v1i"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_ub73x"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_cg248"]
+[ext_resource type="Script" uid="uid://dwx63ohv786ew" path="res://Units/Enemies/healer/healer_behavior.gd" id="10_8vdnj"]
+
+[sub_resource type="Resource" id="Resource_86qj0"]
+script = ExtResource("4_wcil4")
+max_speed = 16.0
+acceleration = 200.0
+turn_speed = 1000.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
+size = Vector2(60.000015, 82.500015)
+
+[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+script = ExtResource("1_y0lj0")
+hostile = true
+behavior = NodePath("HealerBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_l3ud4")
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_o0jft")
+face_towards_movement = false
+movement_data = SubResource("Resource_86qj0")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_xj78e")
+health_data = ExtResource("6_3u0om")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+position = Vector2(-1.1920929e-07, 1.1920929e-07)
+scale = Vector2(0.095833324, 0.095833324)
+texture = ExtResource("7_m1v1i")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("8_ub73x")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -1.2499976)
+scale = Vector2(0.9999995, 0.9999995)
+shape = SubResource("RectangleShape2D_1ej4o")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_cg248")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="HealerBehavior" type="Node" parent="."]
+script = ExtResource("10_8vdnj")
+heal_amount = 5.0
+heal_interval = 2.0
+heal_range = 25.0
+metadata/_custom_type_script = "uid://dwx63ohv786ew"

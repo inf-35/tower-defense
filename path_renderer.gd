@@ -32,9 +32,10 @@ func _ready() -> void:
 
 # this is the main trigger function
 func _on_navigation_grid_updated() -> void:
+	await get_tree().create_timer(0.2).timeout
 	# clear the old path data
 	_path_cache.clear()
-	
+
 	# get the current list of spawn points and the target
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
 	if spawn_points.is_empty():

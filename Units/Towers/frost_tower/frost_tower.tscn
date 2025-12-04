@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://b5w56jjx8pany"]
+[gd_scene load_steps=12 format=3 uid="uid://b5w56jjx8pany"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8tw53"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_6aoul"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_4vlia"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="6_vnb4f"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_5npwk"]
+[ext_resource type="Texture2D" uid="uid://dp45rs1pb7wf5" path="res://Assets/frost_tower_base.png" id="7_u0bn4"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_j0i6s"]
 [ext_resource type="Resource" uid="uid://b4ac8wgm70768" path="res://Units/Towers/frost_tower/frost_attack.tres" id="10_wqvsu"]
 
@@ -39,11 +40,14 @@ script = ExtResource("6_4vlia")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(0, 0, 1, 1)
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("6_vnb4f")
 
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+texture = ExtResource("7_u0bn4")
+
 [node name="Range" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_layer = 0
 

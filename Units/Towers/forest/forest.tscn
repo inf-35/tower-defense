@@ -33,7 +33,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 position = Vector2(-1.9073486e-06, -1.9073486e-06)
-scale = Vector2(0.07214769, 0.07214769)
+scale = Vector2(0.06, 0.06)
 texture = ExtResource("5_o5vsp")
 
 [node name="ModifiersComponent" type="Node" parent="."]

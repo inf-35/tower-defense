@@ -6,7 +6,7 @@ class_name ArcherBehavior
 var siege_distance: float
 
 func start() -> void:
-	siege_distance = unit.global_position.distance_squared_to(Island.cell_to_position(Vector2i.ZERO)) - Island.CELL_SIZE * 1.0 #start at the unit's spawn location and move in
+	siege_distance = unit.global_position.distance_squared_to(Island.cell_to_position(Vector2i.ZERO)) - Island.CELL_SIZE * 0.5 #start at the unit's spawn location and move in
 	_attempt_navigate_to_origin()
 	# ensure we start by moving towards the objective
 	_move_towards_keep()
@@ -40,7 +40,7 @@ func update(delta: float) -> void:
 	_attempt_simple_attack()
 
 func _move_towards_keep() -> void:
-	siege_distance -= 20.0 #decrease siege distance
+	siege_distance -= 10.0 #decrease siege distance
 	if is_instance_valid(navigation_component):
 		# standard behavior: pathfind to the center of the map
 		navigation_component.goal = Vector2i.ZERO

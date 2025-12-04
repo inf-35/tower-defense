@@ -1,48 +1,60 @@
 extends Panel
-#reward_ui
-@export var choice_container: Container
-var option_buttons: Array[Button]
 
-func _ready():
+# --- Config ---
+@export var card_list: VBoxContainer ## The container where cards are spawned
+@export var card_scene: PackedScene ## Must contain RewardOptionCard script
+
+var active_cards: Array[RewardOptionCard] = []
+
+func _ready() -> void:
 	visible = false
-	UI.display_reward_choices.connect(func(reward_choices: Array[Reward]):
-		present_options(reward_choices)
-	)
-	UI.hide_reward_choices.connect(hide_options)
 	
-func present_options(data: Array[Reward]):
-	_populate_buttons(data)
+	# Connect to UI Bus
+	UI.display_reward_choices.connect(_present_options)
+	UI.hide_reward_choices.connect(_hide_options)
+
+func _present_options(choices: Array[Reward]) -> void:
+	_clear_options()
+	
 	visible = true
 	
-func hide_options():
-	visible = false
-	
-func _populate_buttons(data: Array[Reward]):
-	for button: Node in option_buttons:
-		button.queue_free()
-	option_buttons.clear()
-	
-	for i: int in len(data):
-		var reward: Reward = data[i]
-		var btn := Button.new()
-		btn.text = str(i)
-		btn.name = "Btn_selection_%s" % str(i)
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		
-		if reward.type == Reward.Type.ADD_RELIC:
-			btn.self_modulate = Color(1,1,0.5)
-		btn.pressed.connect(_on_choice_pressed.bind(i))
-		btn.mouse_entered.connect(_on_choice_hovered.bind(i))
-		btn.mouse_exited.connect(_on_choice_unhovered.bind(i))
-		
-		choice_container.add_child(btn)
-		option_buttons.append(btn)
-		
-func _on_choice_pressed(choice_id: int):
-	UI.choice_selected.emit(choice_id)
+	for i: int in choices.size():
+		var reward_data: Reward = choices[i]
+		_instantiate_card(reward_data, i)
 
-func _on_choice_hovered(choice_id: int):
-	UI.choice_hovered.emit(choice_id)
+func _hide_options() -> void:
+	visible = false
+	_clear_options()
+
+func _instantiate_card(data: Reward, index: int) -> void:
+	if not card_scene:
+		push_error("RewardUI: No card_scene assigned!")
+		return
+		
+	var card_instance = card_scene.instantiate() as RewardOptionCard
+	if not card_instance:
+		push_error("RewardUI: Assigned scene is not a RewardOptionCard.")
+		return
+		
+	card_list.add_child(card_instance)
+	active_cards.append(card_instance)
 	
-func _on_choice_unhovered(choice_id: int):
-	UI.choice_unhovered.emit(choice_id)
+	# 1. Setup Data and Animation
+	card_instance.setup(data, index)
+	
+	# 2. Connect Signals
+	# We bind the index (choice_id) so the UI bus knows which reward was picked
+	card_instance.selected.connect(func():
+		UI.choice_selected.emit(index)
+	)
+	card_instance.hovered.connect(func():
+		UI.choice_hovered.emit(index)
+	)
+	card_instance.unhovered.connect(func():
+		UI.choice_unhovered.emit(index)
+	)
+
+func _clear_options() -> void:
+	for card in active_cards:
+		card.queue_free()
+	active_cards.clear()

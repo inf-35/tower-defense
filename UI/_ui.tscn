@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=18 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://df70wn2fe03ih" path="res://UI/flux_label.gd" id="3_aw3sh"]
 [ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector.tscn" id="3_rmtg4"]
 [ext_resource type="Script" uid="uid://bffvatofklaff" path="res://UI/reward_ui.gd" id="4_q3aj2"]
+[ext_resource type="PackedScene" uid="uid://5eohem1tdwbg" path="res://UI/reward_option_card.tscn" id="5_m8qfw"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_x42ai"]
 [ext_resource type="PackedScene" uid="uid://dti7nnkxq7kl0" path="res://UI/wave_timeline.tscn" id="6_4g3kg"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
 [ext_resource type="Script" uid="uid://bqtbpudkayswb" path="res://UI/capacity_label.gd" id="6_rvses"]
@@ -73,33 +75,48 @@ anchor_bottom = 0.6
 alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("choice_container")]
-visible = false
-layout_mode = 0
+[node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("card_list")]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -8.0
-offset_top = -8.0
-offset_right = -8.0
-offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_q3aj2")
-choice_container = NodePath("VBoxContainer")
+card_list = NodePath("CenterContainer/main_container/card_list")
+card_scene = ExtResource("5_m8qfw")
 
-[node name="VBoxContainer" type="HBoxContainer" parent="Margin/ui_space/Reward"]
+[node name="CenterContainer" type="CenterContainer" parent="Margin/ui_space/Reward"]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.35
-anchor_top = 0.35
-anchor_right = 0.65
-anchor_bottom = 0.65
-alignment = 1
-metadata/_edit_use_anchors_ = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Button" type="Button" parent="Margin/ui_space/Reward/VBoxContainer"]
+[node name="main_container" type="VBoxContainer" parent="Margin/ui_space/Reward/CenterContainer"]
+custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="title" type="RichTextLabel" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
+layout_mode = 2
+bbcode_enabled = true
+text = "eaeaeaes"
+fit_content = true
+horizontal_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="card_list" type="VBoxContainer" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"vbox_10"
+
+[node name="reroll" type="Button" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "reroll"
 
 [node name="Stats" type="Panel" parent="Margin/ui_space"]
 layout_mode = 1

@@ -211,3 +211,191 @@ func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bo
 
 func request_path_promise(path_promise: PathPromise):
 	_path_promises.append(path_promise)
+
+#extends Node
+#
+#signal field_cleared()
+#signal field_ready(goal: Vector2i, ignore_walls: bool)
+#
+#const DIRECTIONS: Array[Vector2i] = [
+	#Vector2i( 1,  0),
+	#Vector2i(-1,  0),
+	#Vector2i( 0,  1),
+	#Vector2i( 0, -1),
+#]
+#
+## Grid: Vector2i -> int (navcost)
+#var grid: Dictionary[Vector2i, int] = {}
+#
+## Flow fields: 64-bit field code -> Dictionary[Vector2i, Vector2i]
+#var _flow_fields: Dictionary[int, Dictionary] = {}
+#
+## Path caches: 64-bit field code -> Dictionary[Vector2i, Array[Vector2i]]
+#var _path_caches: Dictionary[int, Dictionary] = {}
+#
+## Promise array (kept for API compatibility)
+#var _path_promises: Array[PathPromise] = []
+#
+#func generate_field_code(goal: Vector2i, ignore_walls: bool) -> int:
+	#var combined_coords: int = (int(goal.y) << 32) | (goal.x & 0xFFFFFFFF)
+	#var shifted_hash: int = combined_coords << 1
+	#var wall_bit: int = int(ignore_walls)
+	#return shifted_hash | wall_bit
+#
+## Clears the current flow field; next find_path() rebuilds immediately
+#func clear_field() -> void:
+	#_flow_fields.clear()
+	#_path_caches.clear()
+	#field_cleared.emit()
+#
+#func clear_field_for_goal(goal: Vector2i, ignore_walls: bool) -> void:
+	#var key: int = generate_field_code(goal, ignore_walls)
+	#_flow_fields.erase(key)
+	#_path_caches.erase(key)
+#
+## Synchronous build function
+## This replaces the async/thread logic. It blocks execution until the field is built.
+#func _ensure_flow_field(goal: Vector2i, ignore_walls: bool) -> void:
+	#var key: int = generate_field_code(goal, ignore_walls)
+	#if _flow_fields.has(key):
+		#return
+	#
+	## Build immediately on main thread (BLOCKING CALL)
+	#var new_field = _build_flow_field(goal, ignore_walls)
+	#
+	#_flow_fields[key] = new_field
+	#_path_caches[key] = {}
+	#
+	#field_ready.emit(goal, ignore_walls)
+	#
+	## Fulfill promises (though unlikely to exist since find_path is now blocking)
+	#var promises_to_keep: Array[PathPromise] = []
+	#for promise: PathPromise in _path_promises:
+		#if promise.goal == goal and promise.ignore_walls == ignore_walls and is_instance_valid(promise.recipient):
+			#promise.recipient.receive_path_data(find_path(promise.position, promise.goal, promise.ignore_walls))
+		#else:
+			#promises_to_keep.append(promise)
+	#_path_promises = promises_to_keep
+#
+## The core algorithm (Dijkstra / Flow Field)
+#func _build_flow_field(goal: Vector2i, ignore_walls: bool) -> Dictionary:
+	#var local_flow_field: Dictionary = {}
+	#
+	#if not grid.has(goal):
+		#return local_flow_field
+	#
+	## Assuming PriorityQueue is a global class in your project (as per original code)
+	#var open_set := PriorityQueue.new([ [_heuristic(goal, goal), goal] ])
+	#var g_score: Dictionary = { goal: 0.0 }
+	#local_flow_field[goal] = Vector2i.ZERO
+#
+	#while open_set.size() > 0:
+		#var current_data = open_set.get_min()
+		#var current: Vector2i = current_data[1]
+		#open_set.pop()
+#
+		#for dir: Vector2i in DIRECTIONS:
+			#var neighbor: Vector2i = current + dir
+			#if not grid.has(neighbor):
+				#continue
+				#
+			#var move_cost: int
+			#var base_nav_cost: int = grid[neighbor]
+			#
+			#if ignore_walls:
+				#move_cost = 0
+			#else:
+				#move_cost = base_nav_cost
+#
+			#var tentative_g: float = g_score[current] + float(move_cost)
+			#
+			#if not g_score.has(neighbor) or tentative_g < g_score[neighbor]:
+				#g_score[neighbor] = tentative_g
+				#open_set.insert([
+					#tentative_g + _heuristic(neighbor, goal),
+					#neighbor
+				#])
+				#local_flow_field[neighbor] = -dir
+#
+	#return local_flow_field
+#
+#static func _heuristic(a: Vector2i, b: Vector2i) -> float:
+	#return (a - b).length_squared()
+#
+## --- Public API ---
+#
+#class PathData:
+	#var path: Array[Vector2i]
+	#var status: Status
+	#
+	#enum Status {
+		#FOUND_PATH,
+		#BUILDING_PATH, # Will not be returned in Single-Threaded mode
+		#NO_PATH,
+	#}
+	#
+	#func _init(_path: Array[Vector2i] = [], _status: PathData.Status = PathData.Status.FOUND_PATH):
+		#path = _path
+		#status = _status
+		#
+#class PathPromise:
+	#var recipient: Object 
+	#var position: Vector2i
+	#var goal: Vector2i
+	#var ignore_walls: bool
+	#
+	#func _init(_recipient: Object, _position: Vector2i, _goal: Vector2i = Vector2i.ZERO, _ignore_walls: bool = false):
+		#recipient = _recipient
+		#position = _position
+		#goal = _goal
+		#ignore_walls = _ignore_walls
+#
+#func find_path(start: Vector2i, goal: Vector2i = Vector2i.ZERO, ignore_walls: bool = false) -> PathData:
+	#var key: int = generate_field_code(goal, ignore_walls)
+	#
+	## 1. FORCE BUILD (Blocking)
+	#if not _flow_fields.has(key):
+		#_ensure_flow_field(goal, ignore_walls)
+#
+	## 2. Lookup
+	#if not _flow_fields.has(key):
+		#return PathData.new([], PathData.Status.NO_PATH)
+		#
+	#var current_flow_field: Dictionary = _flow_fields[key]
+	#var current_path_cache: Dictionary = _path_caches[key]
+#
+	#if not current_flow_field.has(start):
+		#return PathData.new([], PathData.Status.NO_PATH)
+	#
+	## 3. Cache Hit
+	#if current_path_cache.has(start):
+		#return PathData.new(current_path_cache[start], PathData.Status.FOUND_PATH)
+#
+	## 4. Reconstruction
+	#var path: Array[Vector2i] = []
+	#var current: Vector2i = start
+	#var safety: int = 0
+	#
+	#while current != goal:
+		#if not current_flow_field.has(current):
+			#return PathData.new([], PathData.Status.NO_PATH)
+			#
+		#if current_path_cache.has(current):
+			#path.append_array(current_path_cache[current])
+			#break
+		#
+		#var direction: Vector2i = current_flow_field[current]
+		#current += direction
+		#path.append(current)
+		#
+		#safety += 1
+		#if safety > 2000: # Anti-freeze safety
+			#push_warning("Navigation: Path too long or loop detected.")
+			#return PathData.new([], PathData.Status.NO_PATH)
+#
+	#current_path_cache[start] = path 
+	#return PathData.new(path, PathData.Status.FOUND_PATH)
+#
+#func request_path_promise(path_promise: PathPromise) -> void:
+	## In this version, find_path never returns BUILDING_PATH, so this is rarely used.
+	#_path_promises.append(path_promise)

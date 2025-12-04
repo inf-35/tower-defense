@@ -3,7 +3,6 @@ class_name TerrainRenderer
 
 # config
 @export var shader: Shader
-@export var cell_size: int = 10 # must match island cell_size
 @export var max_gradient_depth: float = 5.0
 @export var show_debug_texture: bool = false
 @export var draw_background: bool = true
@@ -12,6 +11,8 @@ class_name TerrainRenderer
 @export var paint_color: Color
 @export var wash_color: Color
 @export var brush_textures: Array[Texture2D]
+
+var cell_size: float = Island.CELL_SIZE
 
 # references
 var _brush_viewport: Viewport
@@ -204,6 +205,42 @@ func update_decoration(cell: Vector2i, type: Terrain.Base) -> void:
 	# slight transparency to blend with the watercolor
 	sprite.modulate.a = 1.0
 	
+	_decoration_container.add_child(sprite)
+	_active_decorations[cell] = sprite
+	
+# clears all current sprites (both terrain decorations and feature previews)
+func clear_decorations() -> void:
+	for cell: Vector2i in _active_decorations:
+		if is_instance_valid(_active_decorations[cell]):
+			_active_decorations[cell].queue_free()
+	_active_decorations.clear()
+
+# stamps a specific Tower Preview Sprite at a cell
+func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
+	# clean up any existing decoration at this cell
+	if _active_decorations.has(cell):
+		if is_instance_valid(_active_decorations[cell]):
+			_active_decorations[cell].queue_free()
+		_active_decorations.erase(cell)
+	
+	if tower_type == -1: # Towers.Type.VOID
+		return
+
+	# fetch the sprite from Towers static API
+	var icon: Texture2D = Towers.get_tower_preview(tower_type)
+	if icon == null:
+		return
+
+	# create the visual stamp
+	var sprite := Sprite2D.new()
+	sprite.scale = Vector2.ONE * 0.06
+	sprite.texture = icon
+	
+	# position: strictly centered on the tile (unlike organic terrain which jitters)
+	var center_pos = (Vector2(cell) * cell_size) + (Towers.get_tower_size(tower_type) * cell_size * 0.5)
+	sprite.position = center_pos
+
+	# add to the existing decoration container so it sits on top of the terrain/sketch
 	_decoration_container.add_child(sprite)
 	_active_decorations[cell] = sprite
 

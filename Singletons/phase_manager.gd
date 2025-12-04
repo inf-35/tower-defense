@@ -38,6 +38,8 @@ func _generate_wave_plan() -> void:
 	wave_plan = {}
 	for i: int in range(1, FINAL_WAVE + 1):
 		wave_plan[i] = WaveType.NORMAL
+		if i % Waves.WAVES_PER_EXPANSION_CHOICE + 1 == 0:
+			wave_plan[i] = WaveType.REWARD
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave_plan[i] = WaveType.EXPANSION
 		if i == 20:
@@ -109,7 +111,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 			)
 
 		ChoiceType.REWARD:
-			RewardService.generate_and_present_choices(3)
+			RewardService.generate_and_present_choices(3, Reward.Type.UNLOCK_TOWER)
 
 # responds to the player selecting an option on the UI
 func _on_player_made_choice(choice_id: int) -> void:

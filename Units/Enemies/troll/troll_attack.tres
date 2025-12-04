@@ -7,7 +7,6 @@
 [resource]
 script = ExtResource("2_sooba")
 range = 8.0
-cooldown = 1.5
 damage = 5.0
 breaking = true
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

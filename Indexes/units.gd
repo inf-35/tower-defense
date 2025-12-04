@@ -17,6 +17,8 @@ enum Type {
 	DRIFTER,
 	ARCHER,
 	TROLL,
+	WARRIOR,
+	HEALER,
 }
 
 static var unit_stats : Dictionary[Type, UnitStat] = {
@@ -44,6 +46,16 @@ static var unit_stats : Dictionary[Type, UnitStat] = {
 		preload("res://Units/Enemies/troll/troll.tscn"),
 		1.5,
 		4.0
+	),
+	Type.WARRIOR: UnitStat.new(
+		preload("res://Units/Enemies/warrior/warrior.tscn"),
+		0.8,
+		1.5,
+	),
+	Type.HEALER: UnitStat.new(
+		preload("res://Units/Enemies/healer/healer.tscn"),
+		1.2,
+		2.0,
 	)
 }
 

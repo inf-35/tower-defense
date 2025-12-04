@@ -88,14 +88,14 @@ var _current_reward_options_by_id: Dictionary[int, Reward] = {}
 func _ready():
 	set_process(false)
 # the main public API called by Phases.gd
-func generate_and_present_choices(choice_count: int) -> void:
+func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is Reward.Type filtered for, no filter if left null
 	if reward_pool.is_empty():
 		push_warning("RewardService: Reward pool is empty. Cannot generate choices.")
 		reward_process_complete.emit()
 		return
 
 	_current_reward_options_by_id.clear()
-	var available_rewards: Array[Reward] = reward_pool.duplicate()
+	var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate(true)
 	available_rewards.shuffle()
 	
 	for i: int in choice_count:
@@ -140,3 +140,7 @@ func apply_reward(reward: Reward) -> void:
 			var relic = reward.params.get(ID.Rewards.RELIC)
 			if relic is RelicData:
 				Player.add_relic(relic)
+				
+# returns a filtered list of rewards from the pool matching the specific type
+func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
+	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)

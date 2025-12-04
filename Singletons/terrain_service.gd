@@ -24,8 +24,6 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 	island.terrain_changed.emit()
 	island.terrain_renderer.apply_terrain_changes(terrain_changes)
 
-	
-
 # checks if a tower can be built on a specific cell
 func is_area_constructable(island: Island, tower_position: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
 	if general: #includes player-side construction checks

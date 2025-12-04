@@ -3,7 +3,7 @@ class_name WaveEnemies
 const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	# Example: Wave 1 is just 5 Basics (Tutorial)
 	1: [
-		[Units.Type.BASIC, 5]
+		[Units.Type.BASIC, 5],
 	],
 	2: [
 		[Units.Type.BASIC, 8],
@@ -13,8 +13,51 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BUFF, 3],
 	],
 	4: [
-		[Units.Type.BASIC, 6],
+		[Units.Type.BASIC, 5],
 		[Units.Type.BUFF, 4],
+	],
+	5 : [
+		[Units.Type.BASIC, 6],
+		[Units.Type.DRIFTER, 5],
+	],
+	6 : [
+		[Units.Type.BASIC, 6],
+		[Units.Type.BUFF, 3],
+		[Units.Type.HEALER, 1],
+		[Units.Type.DRIFTER, 2],
+	],
+	7 : [
+		[Units.Type.TROLL, 3],
+		[Units.Type.BASIC, 12],
+	],
+	8 : [
+		[Units.Type.TROLL, 3],
+		[Units.Type.BASIC, 8],
+		[Units.Type.BUFF, 2],
+		[Units.Type.HEALER, 2],
+		[Units.Type.DRIFTER, 3],
+	],
+	9 : [
+		[Units.Type.BASIC, 16],
+		[Units.Type.ARCHER, 4],
+	],
+	10 : [
+		[Units.Type.TROLL, 3],
+		[Units.Type.BASIC, 14],
+		[Units.Type.HEALER, 4],
+		[Units.Type.DRIFTER, 5],
+		[Units.Type.ARCHER, 4],
+		[Units.Type.BUFF, 4],
+	],
+	11 : [
+		[Units.Type.WARRIOR, 18],
+		[Units.Type.BUFF, 10],
+	],
+	12 : [
+		[Units.Type.DRIFTER, 5],
+		[Units.Type.WARRIOR, 18],
+		[Units.Type.HEALER, 4],
+		[Units.Type.BUFF, 10],
 	],
 }
 # --- unit catalog ---
