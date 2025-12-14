@@ -2,16 +2,12 @@
 extends EffectPrototype
 class_name ChainLightningEffect
 
-### EDITED SECTION START ###
 # --- configuration (designer-friendly, configured on the .tres resource) ---
-# all configuration is now centralized in the 'params' dictionary.
-# this aligns with the robust pattern of separating blueprint data from instance data.
 @export var params: Dictionary = {
 	"max_jumps": 3,
 	"jump_radius": 150.0,
 	"damage_falloff_multiplier": 0.66,
 }
-### EDITED SECTION END ###
 
 # this effect is reactive, so its internal state is minimal
 var state: Dictionary = {}

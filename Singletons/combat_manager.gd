@@ -1,6 +1,6 @@
 extends Node
 
-const _DEBUG: bool = false
+const _DEBUG: bool = true
 
 class ProjectileAbstractResolver: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.

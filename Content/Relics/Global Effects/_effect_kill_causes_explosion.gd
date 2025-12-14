@@ -18,7 +18,7 @@ func initialise() -> void:
 	References.unit_died.connect(_on_unit_died)
 
 # this is the core of the relic's logic, triggered by the global signal
-func _on_unit_died(unit: Unit) -> void:
+func _on_unit_died(unit: Unit, _hit_report_data) -> void:
 	# --- 1. check prerequisites ---
 	if not is_instance_valid(unit) or not is_instance_valid(unit.modifiers_component):
 		return

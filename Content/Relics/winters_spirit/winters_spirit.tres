@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://3gfb1ujydb5l"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_mvlrb"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_etxib"]
+
+[sub_resource type="Resource" id="Resource_rh4l4"]
+script = ExtResource("1_mvlrb")
+attribute = 6
+multiplicative = 1.1
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_hyisy"]
+script = ExtResource("1_mvlrb")
+attribute = 7
+multiplicative = 1.2
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[resource]
+script = ExtResource("2_etxib")
+target_type = 4
+specific_element = 2
+modifier_prototypes = Array[ExtResource("1_mvlrb")]([SubResource("Resource_rh4l4"), SubResource("Resource_hyisy")])
+title = "Winter's Spirit"
+description = "All frost towers gain +10% damage, +20% range."
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

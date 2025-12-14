@@ -1,9 +1,10 @@
 extends Node2D
 class_name Unit
 @warning_ignore_start("unused_signal")
+
 signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready()
-signal died() ##fires upon unit death NOTE: tree_exiting should be used for complete tower destruction
+signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto on_killed, which defines unit death behaviour. hit_report_data contains info of the hit that killed the enemy, if any
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 #core behaviours
@@ -91,9 +92,11 @@ func _create_components() -> void:
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
-	died.connect(func():
-		References.unit_died.emit(self) #link local and global died signals
-		on_killed() #connect the died signal to the on_killed method. for units this frees the instance
+	died.connect(func(hit_report_data: HitReportData):
+		#NOTE: the global unit_died signal must fire before execution of on_killed, since on_killed
+		#could destroy the instance, and we want the instance intact for any post-kill abilities
+		References.unit_died.emit(self, hit_report_data) #link local and global died signals
+		on_killed(hit_report_data) #connect the died signal to the on_killed method. for units this frees the instance
 		#(which implements flux reward and ruins behaviour for units and towers respectively)
 	)
 	changed_cell.connect(func(new_cell: Vector2i, old_cell: Vector2i):
@@ -169,10 +172,17 @@ func _setup_event_bus() -> void:
 	on_event.connect(func(event: GameEvent):
 		if disabled:
 			return
+		
+		if event.data.recursion > EffectInstance.GLOBAL_RECURSION_LIMIT:
+			return #prevent recursion
+			
 		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
 			var scheduled_effects: Array = effects[schedule_class] #multiplicative -> additive -> reactive
 			for effect_instance: EffectInstance in scheduled_effects:
 				effect_instance.handle_event_unfiltered(event)
+				
+		Player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
+		#TODO: implement scheduling
 	)
 
 func apply_effect(effect_prototype: EffectPrototype) -> void:
@@ -266,23 +276,30 @@ func take_hit(hit: HitData):
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
-
 	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
-	References.unit_took_hit.emit(self, hit) #trigger any global post-hit-received effects
+	References.unit_took_hit.emit(self, evt.data as HitData) #trigger any global post-hit-received effects, according mutate evt.data
+	
 	var damage: float = evt.data.damage
-	#shield phase
-	var absorbed_damage: float = 0.0
 	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
 	health_component.take_damage(damage, evt.data.breaking)
+	#measure what happened
 	var delta_health: float = benchmark - health_component.health #measure damage caused
+	var unit_dead: bool = is_zero_approx(health_component.health)
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
 	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
 	hit_report.target = self
-	hit_report.damage_caused = delta_health + absorbed_damage #damage absorbed by the shield is also included
-	if benchmark >= 0.01 and is_zero_approx(health_component.health): #TODO: separation of logic (decouple shader)
+	hit_report.source = hit.source
+	hit_report.damage_caused = delta_health
+	
+	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
+		
+		hit_report.flux_value = flux_value #submit base flux value to be modified
+		
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
+		
+		died.emit(hit_report) #NOTE: this is when the unit dies
 	else:
 		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, (self.global_position - source_position).angle())
 		
@@ -324,9 +341,9 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 # towers will override this with their ruin logic.
-func on_killed() -> void:
+func on_killed(hit_report_data: HitReportData) -> void:
 	if not self is Tower: #towers have their own flux value system 
-		Player.flux += flux_value #reward player with flux
+		Player.flux += hit_report_data.flux_value #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
 	for effect_prototype: EffectPrototype in effect_prototypes:

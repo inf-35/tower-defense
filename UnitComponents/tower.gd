@@ -82,7 +82,7 @@ func resurrect() -> void:
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		apply_effect(effect_prototype) #detach all effects
 
-func on_killed() -> void:
+func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
 	
 	for effect_prototype: EffectPrototype in effect_prototypes:

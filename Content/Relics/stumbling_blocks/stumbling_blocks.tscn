@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://oof5g31ldgdg"]
+
+[ext_resource type="Script" uid="uid://c6lrutd6k1p1l" path="res://Content/Relics/stumbling_blocks/ruined_ground_relic.gd" id="1_v34og"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_q5di1"]
+
+[sub_resource type="Resource" id="Resource_4xtpb"]
+script = ExtResource("2_q5di1")
+attribute = 3
+multiplicative = 0.5
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[node name="StumblingBlocks" type="Node"]
+script = ExtResource("1_v34og")
+modifier = SubResource("Resource_4xtpb")
+metadata/_custom_type_script = "uid://c6lrutd6k1p1l"

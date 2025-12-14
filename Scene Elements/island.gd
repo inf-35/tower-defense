@@ -3,8 +3,8 @@ class_name Island
 
 @warning_ignore_start("unused_signal")
 signal terrain_changed
-signal tower_created(tower: Tower)
-signal tower_changed(tower_position: Vector2i) # this signal fires after adjacencies, navigation, etc. has been resolved
+signal tower_created(tower: Tower) ##this signal fires when a tower is created.
+signal tower_changed(tower_position: Vector2i) ##fires when a tower is created, destroyed or moved. fires after tower_created
 signal expansion_applied
 signal navigation_grid_updated
 
@@ -108,7 +108,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.set_initial_behaviour_state(initial_state)
 	tower.add_to_group(References.TOWER_GROUP)
 	add_child(tower)
-	tower.died.connect(update_navigation_grid) #as unit becoems non-blocking upon unit death
+	tower.died.connect(func(_hit_report_data): update_navigation_grid()) #as unit becoems non-blocking upon unit death
 	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))

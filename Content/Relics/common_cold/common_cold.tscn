@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://od2ydia2vqkg"]
+
+[ext_resource type="Script" uid="uid://c1ydyvx8fvx8g" path="res://Content/Relics/common_cold/status_linkage_relic.gd" id="1_f5l1i"]
+
+[node name="CommonCold" type="Node"]
+script = ExtResource("1_f5l1i")
+input_status = 2
+conversion = 0.5
+metadata/_custom_type_script = "uid://c6lrutd6k1p1l"

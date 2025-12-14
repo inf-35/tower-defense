@@ -1,6 +1,6 @@
 # ruined_ground_slow_effect.gd
 extends GlobalEffect
-class_name RuinedGroundSlowEffect
+class_name RuinedGroundRelic
 
 # --- configuration (designer-friendly) ---
 @export_category("Effect")
