@@ -30,7 +30,6 @@ enum Element {
 	FROST,
 	FIRE,
 	NATURE,
-	ENERGY,
 	ARCANE,
 	NEUTRAL,
 }

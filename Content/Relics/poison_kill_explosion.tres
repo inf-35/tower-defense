@@ -5,6 +5,8 @@
 
 [resource]
 script = ExtResource("2_v80pp")
+target_type = 4
+specific_element = 2
 active_effect_scene = ExtResource("1_68elh")
 title = "Contagion"
 description = "Killing an enemy with at least 1 stack of poison creates an explosion, poisoning nearby enemies."

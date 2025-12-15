@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://c05yqit1y6qmc"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_nv3dj"]
+
+[resource]
+script = ExtResource("1_nv3dj")
+id_name = "flamethrower"
+description = "relic tower unlock"
+tower_type = 20
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

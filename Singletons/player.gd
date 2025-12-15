@@ -27,7 +27,6 @@ var used_capacity: float = 0.0:
 		
 var tower_capacity: float = 0.0:
 	set(value):
-		push_warning(">>?")
 		tower_capacity = value
 		capacity_changed.emit(used_capacity, tower_capacity)
 		
@@ -52,6 +51,7 @@ func _ready():
 	capacity_changed.connect(UI.update_capacity.emit)
 	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
+	relics_changed.connect(UI.update_relics.emit)
 	#setup global effects container
 	_active_effects_container = Node.new()
 	_active_effects_container.name = "ActiveGlobalEffects"
@@ -124,11 +124,12 @@ func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 	
 	for relic: RelicData in active_relics:
 		# check if the unit matches the relic's targeting rules
-		if _unit_matches_target(unit, relic) and relic.modifier_prototype != null:
-			var new_modifier := relic.modifier_prototype.generate_modifier()
-			# brand it with a source ID for debugging, if needed
-			new_modifier.source_id = -1 # use a special ID for global mods
-			relevant_modifiers.append(new_modifier)
+		if _unit_matches_target(unit, relic) and not relic.modifier_prototype.is_empty():
+			for modifier_prototype: ModifierDataPrototype in relic.modifier_prototype:
+				var new_modifier := modifier_prototype.generate_modifier()
+				# brand it with a source ID for debugging, if needed
+				new_modifier.source_id = -1 # use a special ID for global mods
+				relevant_modifiers.append(new_modifier)
 			
 	return relevant_modifiers
 # internal helper for checking targeting rules
@@ -140,6 +141,8 @@ func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:
 			return not (unit is Tower) # a simple proxy for being an enemy
 		RelicData.TargetType.SPECIFIC_TOWER_TYPE:
 			return unit is Tower and unit.type == relic.specific_tower_type
+		RelicData.TargetType.SPECIFIC_ELEMENT:
+			return unit is Tower and Towers.get_tower_element(unit.type) == relic.specific_element
 		RelicData.TargetType.PLAYER:
 			# this would apply to player-specific stats like starting flux, etc.
 			# not implemented in ModifiersComponent yet, but the structure supports it

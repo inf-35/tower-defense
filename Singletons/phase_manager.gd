@@ -38,7 +38,7 @@ func _generate_wave_plan() -> void:
 	wave_plan = {}
 	for i: int in range(1, FINAL_WAVE + 1):
 		wave_plan[i] = WaveType.NORMAL
-		if i % Waves.WAVES_PER_EXPANSION_CHOICE + 1 == 0:
+		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 1:
 			wave_plan[i] = WaveType.REWARD
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave_plan[i] = WaveType.EXPANSION

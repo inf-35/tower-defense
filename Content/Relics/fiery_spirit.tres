@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://dqysdj44mxex3"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_sc7ek"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_pp0nw"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_tngca"]
+
+[sub_resource type="Resource" id="Resource_sc7ek"]
+script = ExtResource("2_pp0nw")
+attribute = 6
+multiplicative = 1.1
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_pp0nw"]
+script = ExtResource("2_pp0nw")
+attribute = 8
+multiplicative = 0.909
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[resource]
+script = ExtResource("3_tngca")
+target_type = 4
+specific_element = 2
+modifier_prototype = Array[ExtResource("2_pp0nw")]([SubResource("Resource_sc7ek"), SubResource("Resource_pp0nw")])
+title = "Fiery Spirit"
+description = "All flame towers gain a +10% damage, +10% fire rate"
+icon = ExtResource("1_sc7ek")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

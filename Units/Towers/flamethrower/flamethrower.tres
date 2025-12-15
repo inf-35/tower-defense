@@ -1,12 +1,13 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://bwvr22kj6oks3"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://bwvr22kj6oks3"]
 
 [ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_7km1u"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_mh00c"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_qomp6"]
 [ext_resource type="PackedScene" uid="uid://cvu53345b86ej" path="res://Units/Towers/flamethrower/flamethrower.tscn" id="3_na035"]
 
 [resource]
 script = ExtResource("2_mh00c")
-id = 2
+id = 20
 cost = 15.0
 element = 2
 tower_name = "Flamethrower"

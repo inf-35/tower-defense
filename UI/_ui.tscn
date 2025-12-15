@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=19 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bqtbpudkayswb" path="res://UI/capacity_label.gd" id="6_rvses"]
 [ext_resource type="Script" uid="uid://c0ntmjdx54rgi" path="res://UI/health_label.gd" id="7_hpkop"]
 [ext_resource type="Script" uid="uid://cauusuod0mrq8" path="res://UI/time_control_buttons.gd" id="9_doea8"]
+[ext_resource type="Script" uid="uid://cusv1l6vww08n" path="res://UI/relic_display.gd" id="10_aasu8"]
 [ext_resource type="Texture2D" uid="uid://jx5cr78dqj13" path="res://Assets/pause.svg" id="10_gdbfk"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="11_gdbfk"]
 [ext_resource type="Texture2D" uid="uid://b762tk55ay2gk" path="res://Assets/1x.svg" id="11_hpkop"]
@@ -103,7 +104,7 @@ theme_type_variation = &"vbox_20"
 [node name="title" type="RichTextLabel" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
 layout_mode = 2
 bbcode_enabled = true
-text = "eaeaeaes"
+text = "Choose a tower"
 fit_content = true
 horizontal_alignment = 1
 script = ExtResource("5_x42ai")
@@ -111,7 +112,7 @@ metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="card_list" type="VBoxContainer" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
 layout_mode = 2
-theme_type_variation = &"vbox_10"
+theme_type_variation = &"vbox_20"
 
 [node name="reroll" type="Button" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
 layout_mode = 2
@@ -121,13 +122,16 @@ text = "reroll"
 [node name="Stats" type="Panel" parent="Margin/ui_space"]
 layout_mode = 1
 offset_right = 360.0
-offset_bottom = 100.0
+offset_bottom = 150.0
 mouse_filter = 2
 
 [node name="Stats" type="VBoxContainer" parent="Margin/ui_space/Stats"]
-layout_mode = 0
-offset_right = 360.0
-offset_bottom = 60.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_type_variation = &"vbox_5"
 
 [node name="FluxLabel" type="RichTextLabel" parent="Margin/ui_space/Stats/Stats"]
@@ -155,6 +159,11 @@ size_flags_vertical = 1
 theme_type_variation = &"LabelInlineheader"
 text = "Capacity Label"
 script = ExtResource("7_hpkop")
+
+[node name="GridContainer" type="GridContainer" parent="Margin/ui_space/Stats/Stats"]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("10_aasu8")
 
 [node name="TimeControls" type="VBoxContainer" parent="Margin/ui_space"]
 custom_minimum_size = Vector2(300, 150)

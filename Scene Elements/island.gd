@@ -39,8 +39,9 @@ func _ready():
 	# 3. delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
-	# 4. place the player's core tower
-	construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE) #NOTE: this must come first (id = 0)
+	# place the player's core tower
+	var keep: Tower = construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE) #NOTE: this must come first (id = 0)
+	References.keep = keep
 	update_shore_boundary()
 	update_navigation_grid()
 	queue_redraw()

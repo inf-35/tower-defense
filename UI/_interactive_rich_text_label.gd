@@ -2,7 +2,7 @@
 extends RichTextLabel
 class_name InteractiveRichTextLabel
 
-var _tooltip_instance: PanelContainer
+var _tooltip_instance: TooltipPanel
 
 func _init() -> void:
 	# ensure bbcode is enabled
@@ -22,13 +22,29 @@ func _on_meta_hover_started(meta: Variant) -> void:
 	var keyword: String = str(meta)
 	var keyword_data: Dictionary = KeywordService.get_keyword_data(keyword)
 	
-	# create the tooltip and keep a reference to it
-	_tooltip_instance = KeywordService.TOOLTIP_PANEL.instantiate()
-	add_child(_tooltip_instance)
-
 	if keyword_data:
-		_tooltip_instance.show_tooltip(keyword_data)
+		if _tooltip_instance: _tooltip_instance.close()
+		_tooltip_instance = KeywordService.TOOLTIP_PANEL.instantiate()
+		
+		# determine if *this* label is currently sitting inside another tooltip
+		var parent_tooltip: TooltipPanel = _find_parent_tooltip()
+		print("added tooltip,  ", parent_tooltip)
 
-func _on_meta_hover_ended(meta: Variant) -> void:
+		add_child(_tooltip_instance)
+		
+		_tooltip_instance.show_tooltip(keyword_data, parent_tooltip)
+
+func _on_meta_hover_ended(_meta: Variant) -> void:
+	# INSTEAD of freeing immediately, we tell the tooltip the mouse left the link
 	if is_instance_valid(_tooltip_instance):
-		_tooltip_instance.free()
+		_tooltip_instance.on_link_mouse_exited()
+		# we release our reference, the tooltip now manages its own lifecycle
+
+# helper to check hierarchy up the tree
+func _find_parent_tooltip() -> TooltipPanel:
+	var candidate = get_parent()
+	while candidate:
+		if candidate is TooltipPanel:
+			return candidate
+		candidate = candidate.get_parent()
+	return null

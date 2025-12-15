@@ -33,11 +33,11 @@ func _ready() -> void:
 func setup(reward: Reward, index: int) -> void:
 	_reward_data = reward
 	
-	# 1. Apply Data
+	# apply Data
 	_apply_visuals(reward)
 	
-	# 2. Configure Animation Stagger
-	# We access the AnimatableUI script properties on the targets
+	# configure animation stagger
+	# access the AnimatableUI script properties on the targets
 	var delay_base = index * 0.1
 	
 	if is_instance_valid(_icon_target) and "entrance_delay" in _icon_target:
@@ -46,40 +46,34 @@ func setup(reward: Reward, index: int) -> void:
 		_icon_target.animate_entrance()
 		
 	if is_instance_valid(_panel_target) and "entrance_delay" in _panel_target:
-		_panel_target.entrance_delay = delay_base + 0.05 # Slight offset for fluid feel
+		_panel_target.entrance_delay = delay_base + 0.05 # slight offset for fluid feel
 		_panel_target.auto_play_entrance = true
 		_panel_target.animate_entrance()
 
 func _apply_visuals(reward: Reward) -> void:
-	# --- Title & Icon Logic ---
 	var title_text: String = "Unknown Reward"
-	var desc_text: String = reward.description # Use the text provided by RewardService
+	var desc_text: String = reward.description
 	var icon_tex: Texture2D = null
 	
 	match reward.type:
 		Reward.Type.UNLOCK_TOWER:
 			var type: Towers.Type = reward.params.get(ID.Rewards.TOWER_TYPE, Towers.Type.VOID)
-			# Fetch tower preview/icon
+			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_preview(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
 			desc_text = Towers.get_tower_description(type)
 			
 		Reward.Type.ADD_RELIC:
-			var relic = reward.params.get(ID.Rewards.RELIC)
-			if relic and "icon" in relic:
-				icon_tex = relic.icon
-			if relic and "title" in relic:
-				title_text = "New Relic: [color=#66ccff]%s[/color]" % relic.title
-			else:
-				title_text = "New Relic"
+			var relic: RelicData = reward.params.get(ID.Rewards.RELIC)
+			icon_tex = relic.icon
+			title_text = "New Relic: [color=#66ccff]%s[/color]" % relic.title
+			desc_text = relic.description
 				
 		Reward.Type.ADD_FLUX:
 			var amount = reward.params.get(ID.Rewards.FLUX_AMOUNT, 0)
 			title_text = "Resource Cache"
-			# Assuming you have a general asset loader or preload
-			# icon_tex = preload("res://Assets/Icons/flux_icon.png") 
-			
-	# --- Apply to Controls ---
+			##TODO: icon?
+
 	if icon:
 		icon.texture = icon_tex
 	
@@ -89,15 +83,14 @@ func _apply_visuals(reward: Reward) -> void:
 	if description:
 		description.set_parsed_text(desc_text)
 
-# --- Input Handling ---
+# --- input handling ---
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			selected.emit()
 
-# We manually trigger the hover animations on the children wrappers
-# This ensures the card feels like one cohesive unit
+# manually trigger the hover animations on the children wrappers
 func _on_mouse_entered() -> void:
 	hovered.emit()
 	if is_instance_valid(_icon_target) and _icon_target.has_method("_on_mouse_entered"):

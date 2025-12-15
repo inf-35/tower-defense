@@ -15,6 +15,7 @@ signal terrain_generating(parameters: GenerationParameters) ##fires before terra
 @onready var root: Node = get_tree().get_root()
 
 @onready var island: Island = root.get_node("Island")
+@onready var keep: Node
 @onready var camera: Camera = island.get_node("Camera2D")
 @onready var tower_preview: TowerPreview = island.get_node("TowerPreview")
 @onready var projectiles: Node2D = island.get_node("Projectiles")

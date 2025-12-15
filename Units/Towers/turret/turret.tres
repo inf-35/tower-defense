@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://ck5p8qw63gfhx"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://ck5p8qw63gfhx"]
 
 [ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_bxren"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_x6lxw"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_32gg8"]
 [ext_resource type="PackedScene" uid="uid://cjv7g5iwxihva" path="res://Units/Towers/turret/turret.tscn" id="2_bxren"]
 
 [resource]
@@ -9,7 +10,8 @@ script = ExtResource("1_x6lxw")
 id = 2
 cost = 7.0
 tower_name = "Turret"
-tower_description = "Single-target all-rounder. Costs 5.0 {FLUX}"
+tower_description = "Single-target all-rounder. Costs 5.0 {FLUX}
+{T_TURRET}"
 icon = ExtResource("1_bxren")
 tower_scene = ExtResource("2_bxren")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

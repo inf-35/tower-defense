@@ -2,100 +2,67 @@
 extends Node
 
 signal reward_process_complete
+
 # --- configuration ---
-var reward_pool: Array[Reward] = [
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.CANNON},
-		"Unlocks CANNON"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.MINIGUN},
-		"Unlocks MINIGUN"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.AMPLIFIER},
-		"Unlocks AMPLIFIER"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.SHIELD},
-		"Unlocks SHIELD"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.POISON},
-		"Unlocks POISON"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.FROST_TOWER},
-		"Unlocks FROST"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.PLANT},
-		"Unlocks PLANT"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.FLAMETHROWER},
-		"Unlocks FLAMETHROWER"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.LIGHTNING},
-		"Unlocks LIGHTNING"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.PRISM},
-		"Unlocks PRISM"
-	),
-	Reward.new(
-		Reward.Type.UNLOCK_TOWER,
-		{ID.Rewards.TOWER_TYPE: Towers.Type.MAGE},
-		"Unlocks MAGE"
-	),
-	Reward.new(
-		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.STRENGTH_IN_NUMBERS},
-		"Uncovers STRENGTH IN NUMBERS"
-	),
-	Reward.new(
-		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.POISON_INFLICTS_FROST},
-		"Uncovers CONSUMPTION"
-	),
-	Reward.new(
-		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.POISON_KILL_EXPLOSION},
-		"Uncovers CONTAGION"
-	),
-	Reward.new(
-		Reward.Type.ADD_RELIC,
-		{ID.Rewards.RELIC: Relics.SCORCHED_EARTH},
-		"Uncovers SCORCHED EARTH"
-	),
-]
+const REWARD_DIRECTORY: String = "res://Content/Rewards/"
+
+# populated automatically at startup
+var reward_pool: Array[Reward] = []
+
 # --- state ---
 var is_choosing_reward: bool = false
-# this now stores the choices presented to the player, indexed by an integer ID
 var _current_reward_options_by_id: Dictionary[int, Reward] = {}
 
 func _ready():
+	_load_all_rewards()
 	set_process(false)
-# the main public API called by Phases.gd
-func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is Reward.Type filtered for, no filter if left null
+
+# --- loading logic ---
+
+func _load_all_rewards() -> void:
+	reward_pool.clear()
+	print("RewardService: Loading rewards from ", REWARD_DIRECTORY)
+	_scan_directory_recursive(REWARD_DIRECTORY)
+	print("RewardService: Loaded ", reward_pool.size(), " rewards.")
+
+func _scan_directory_recursive(path: String) -> void:
+	var dir := DirAccess.open(path)
+	if not dir:
+		push_error("RewardService: Failed to open directory: " + path)
+		return
+
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	
+	while file_name != "":
+		if dir.current_is_dir():
+			if not file_name.begins_with("."): #ignore . and ..
+				# recursively scan subdirectories
+				_scan_directory_recursive(path + file_name + "/")
+		elif (file_name.ends_with(".tres") or file_name.ends_with(".res")):
+			var full_path: String = path + file_name
+			var resource: Resource = load(full_path)
+			
+			if resource is RewardPrototype:
+				# convert the Resource into the runtime instance and add to pool
+				reward_pool.append(resource.generate_reward())
+			else:
+				pass
+				
+		file_name = dir.get_next()
+	
+	dir.list_dir_end()
+
+# --- public api ---
+
+func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is the Reward.Type being selected for
 	if reward_pool.is_empty():
 		push_warning("RewardService: Reward pool is empty. Cannot generate choices.")
 		reward_process_complete.emit()
 		return
 
 	_current_reward_options_by_id.clear()
-	var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate(true)
+	var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate()
 	available_rewards.shuffle()
 	
 	for i: int in choice_count:
@@ -107,9 +74,10 @@ func generate_and_present_choices(choice_count: int, filter = null) -> void: ##w
 	
 	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
 
-# this function now accepts an integer ID, called by PhaseManager
+func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
+	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
+
 func select_reward(choice_id: int) -> void:
-	# look up the reward data using the provided ID
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
 		reward_process_complete.emit()
@@ -118,13 +86,12 @@ func select_reward(choice_id: int) -> void:
 	var chosen_reward: Reward = _current_reward_options_by_id[choice_id]
 	apply_reward(chosen_reward)
 	
-	_current_reward_options_by_id.clear() # clear the state after a choice is made
+	_current_reward_options_by_id.clear() 
 	is_choosing_reward = false
 	
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
 	
-# internal logic for executing the reward's effect
 func apply_reward(reward: Reward) -> void:
 	match reward.type:
 		Reward.Type.ADD_FLUX:
@@ -140,7 +107,3 @@ func apply_reward(reward: Reward) -> void:
 			var relic = reward.params.get(ID.Rewards.RELIC)
 			if relic is RelicData:
 				Player.add_relic(relic)
-				
-# returns a filtered list of rewards from the pool matching the specific type
-func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
-	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)

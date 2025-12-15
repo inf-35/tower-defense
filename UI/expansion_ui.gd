@@ -104,8 +104,11 @@ func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 				if show_anomaly_contents and cell_data.initial_state.has(&"_anomaly_data"):
 					var anomaly_data: AnomalyData = cell_data.initial_state[&"_anomaly_data"]
 					if anomaly_data.reward != null:
-						
-						anomaly_desc += " (%s)" % anomaly_data.reward.title
+						if anomaly_data.reward.type == Reward.Type.UNLOCK_TOWER:
+							anomaly_desc += " (%s)" % Towers.get_tower_description(anomaly_data.reward.params[ID.Rewards.TOWER_TYPE])
+						elif anomaly_data.reward.type == Reward.Type.ADD_RELIC:
+							anomaly_desc += " (%s)" % anomaly_data.reward.params[ID.Rewards.RELIC].title
+							
 				distinct_anomaly_list.append(anomaly_desc)
 			else:
 				# all other towers are consolidated

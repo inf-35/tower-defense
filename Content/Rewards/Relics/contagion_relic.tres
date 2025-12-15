@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://bp514kbx88mhb"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_2s358"]
+[ext_resource type="Resource" uid="uid://c6yg0foquyg5" path="res://Content/Relics/poison_kill_explosion.tres" id="1_vw5f8"]
+
+[resource]
+script = ExtResource("1_2s358")
+id_name = "contagion"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_vw5f8")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
