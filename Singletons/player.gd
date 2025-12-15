@@ -8,6 +8,9 @@ signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
 
+signal on_event(unit: Unit, event_data: GameEvent) ##global event signal bus, collects events from all allied units
+#and relevant towers 
+
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
 var flux: float = 200.0:
@@ -41,8 +44,11 @@ var _active_effects_container: Node
 
 #various services (which are children of this node)
 var ruin_service: RuinService
+var global_event_service
 
 func _ready():
+	#setup event bus
+	on_event.connect(_on_global_event)
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -71,10 +77,13 @@ func _setup_state():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.CANNON: true,
 		Towers.Type.TURRET: true,
+		Towers.Type.POISON: true,
 	}
-	flux = 15.0
-	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: preload("res://Content/Relics/increase_ruin_chance.tres")}))
+	flux = 30.0
+	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.CONTAGION}))
 	
+func _on_global_event(unit: Unit, game_event: GameEvent) -> void:
+	pass
 
 #capacity helper functions
 func add_to_used_capacity(amount: float):
@@ -124,13 +133,13 @@ func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 	
 	for relic: RelicData in active_relics:
 		# check if the unit matches the relic's targeting rules
-		if _unit_matches_target(unit, relic) and not relic.modifier_prototype.is_empty():
-			for modifier_prototype: ModifierDataPrototype in relic.modifier_prototype:
-				var new_modifier := modifier_prototype.generate_modifier()
+		if _unit_matches_target(unit, relic) and not relic.modifier_prototypes.is_empty():
+			for modifier_prototype: ModifierDataPrototype in relic.modifier_prototypes:
+				var new_modifier : Modifier = modifier_prototype.generate_modifier()
 				# brand it with a source ID for debugging, if needed
 				new_modifier.source_id = -1 # use a special ID for global mods
 				relevant_modifiers.append(new_modifier)
-			
+
 	return relevant_modifiers
 # internal helper for checking targeting rules
 func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:

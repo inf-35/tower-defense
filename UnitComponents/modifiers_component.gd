@@ -146,7 +146,7 @@ func _recalculate_overlay_color() -> void:
 # checks all reactions that involve the newly updated status type to see if any have been triggered.
 func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 	for reaction: Attributes.ReactionData in Attributes.reactions:
-		# there's no way this update could have triggered it. Skip the check entirely.
+		# there's no way this update could have triggered it. skip the check entirely.
 		if not reaction.requisites.has(updated_status_type):
 			continue
 
@@ -164,7 +164,7 @@ func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 				if possible_reaction_stack < reaction_stack:
 					reaction_stack = possible_reaction_stack
 		
-		# If, after checking all requisites, the flag is still true, the reaction triggers.
+		# if, after checking all requisites, the flag is still true, the reaction triggers.
 		if all_requisites_met:
 			reaction.effect.call(unit)
 			#consume effect

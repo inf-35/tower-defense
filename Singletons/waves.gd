@@ -81,7 +81,7 @@ func _spawn_enemies_for_current_wave() -> void:
 
 			var unit: Unit = Units.create_unit(unit_type)
 			unit.add_to_group(ENEMY_GROUP)
-			unit.died.connect(_on_enemy_died.bind(unit), CONNECT_ONE_SHOT)
+			unit.died.connect(func(_hit_report_data): _on_enemy_died(unit), CONNECT_ONE_SHOT)
 			References.island.add_child(unit)
 			
 			var spawn_cell: Vector2i = spawn_points[spawn_point_index]

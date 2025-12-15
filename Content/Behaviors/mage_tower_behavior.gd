@@ -22,7 +22,7 @@ func start() -> void:
 	mage_changed.emit()
 	# ensure we are removed from the group upon death to trigger updates for others
 	unit.died.connect(
-		func(): 
+		func(_hit_report_data): 
 			unit.remove_from_group(MAGE_TOWER_GROUP)
 			mage_changed.emit()
 	)

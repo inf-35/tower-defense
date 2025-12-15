@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b27tboa0s5hcl"]
+
+[ext_resource type="Script" uid="uid://b74ug56sj02f0" path="res://Content/Relics/Global Effects/_adjacency_boost.gd" id="1_qiy5b"]
+
+[node name="WildernessRelic" type="Node"]
+script = ExtResource("1_qiy5b")
+host_tower_type = 15
+metadata/_custom_type_script = "uid://b74ug56sj02f0"

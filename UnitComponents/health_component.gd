@@ -20,8 +20,7 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 		health_changed.emit(health)
 		UI.update_unit_health.emit(unit, max_health, health)
 		
-		if health < 0.01:
-			unit.died.emit() #which links to on_killed
+		#NOTE: unit.died is now executed on unit.take_hit (after it calls take_damage)
 
 var shield: float = health_data.max_shield ##not linked to a attribute, simple counter
 #NOTE: shield does not support fancy effects, like boosts to shield as it is not linked to the modifiers component system
@@ -64,6 +63,7 @@ func inject_components(modifiers_component: ModifiersComponent):
 func take_damage(input_damage: float, breaking: bool = false):
 	var absorbed_damage: float = 0 #damage absorbed by shield
 	var damage: float = input_damage * get_stat(_modifiers_component, health_data, Attributes.id.DAMAGE_TAKEN)
+	#shield phase
 	if breaking:
 		absorbed_damage = min(damage, shield)
 		shield -= absorbed_damage

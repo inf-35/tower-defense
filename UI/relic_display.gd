@@ -54,7 +54,7 @@ func _on_icon_hovered(icon_node: Control, relic: RelicData) -> void:
 	}
 	
 	# 2. Instantiate the standardized tooltip panel
-	# We use the factory scene from KeywordService to ensure consistency across the game
+	# We use the factory scene from KeywordService to ensure consistency s the game
 	var tooltip_instance: TooltipPanel = KeywordService.TOOLTIP_PANEL.instantiate()
 	
 	# 3. Add to the Scene Root (Top Level)

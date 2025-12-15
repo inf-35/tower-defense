@@ -1,5 +1,5 @@
 extends Node
-
+#attributes singleton
 enum id { #trackable value
 	#health component
 	MAX_HEALTH,

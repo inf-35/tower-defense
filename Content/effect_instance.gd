@@ -19,7 +19,7 @@ var duration: float = -1.0 #negative = permanent
 var params: Dictionary = {} #for input parameters
 var state: Dictionary = {} #for internal state variables
 
-const GLOBAL_RECURSION_LIMIT: int = 0 #limit for effect recursion; see Unit effect parsing
+const GLOBAL_RECURSION_LIMIT: int = 2 #limit for effect recursion; see Unit effect parsing
 
 var host: Unit #to which unit does this effect apply onto
 

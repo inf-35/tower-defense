@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=4 format=3 uid="uid://c80vp855pe6oq"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_6oyvi"]
+[ext_resource type="PackedScene" uid="uid://byv5edai2puhe" path="res://Content/Relics/money_market/money_market.tscn" id="1_fv8q0"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_fv8q0"]
+
+[resource]
+script = ExtResource("2_fv8q0")
+active_effect_scene = ExtResource("1_fv8q0")
+title = "Money Market"
+description = "Earn 10% of your current gold at the end of every wave, up to 50 per wave."
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"
