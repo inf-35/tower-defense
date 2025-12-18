@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://p4o1hdeutp1j"]
+
+[ext_resource type="Resource" uid="uid://cdgwf65nwokpo" path="res://Content/Relics/common_cold/common_cold.tres" id="1_01twd"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_aoevb"]
+
+[resource]
+script = ExtResource("2_aoevb")
+id_name = "common_cold"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_01twd")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -65,10 +65,24 @@ func generate_and_present_choices(choice_count: int, filter = null) -> void: ##w
 	var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate()
 	available_rewards.shuffle()
 	
-	for i: int in choice_count:
+	var chosen_rewards: int = 0
+	var i: int = 0
+	while chosen_rewards < choice_count:
 		if available_rewards.size() - 1 < i:
 			break
-		_current_reward_options_by_id[i] = available_rewards[i]
+		
+		var current_reward: Reward = available_rewards[i]
+		#reject towers and relics already held by the player
+		if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.params[ID.Rewards.TOWER_TYPE]):
+			i += 1
+			continue
+		elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.params[ID.Rewards.RELIC]):
+			i += 1
+			continue
+
+		_current_reward_options_by_id[chosen_rewards] = available_rewards[i]
+		chosen_rewards += 1
+		i += 1
 		
 	is_choosing_reward = true
 	
@@ -78,6 +92,7 @@ func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
 
 func select_reward(choice_id: int) -> void:
+	print(choice_id)
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
 		reward_process_complete.emit()
@@ -91,7 +106,6 @@ func select_reward(choice_id: int) -> void:
 	
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
-	
 func apply_reward(reward: Reward) -> void:
 	match reward.type:
 		Reward.Type.ADD_FLUX:

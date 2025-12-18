@@ -60,7 +60,7 @@ static var unit_stats : Dictionary[Type, UnitStat] = {
 }
 
 static func get_unit_flux(unit: Type) -> float:
-	return unit_stats[unit].flux_value
+	return unit_stats[unit].flux_value * 1.5
 
 static func get_unit_scene(unit: Type) -> PackedScene:
 	return unit_stats[unit].unit_scene

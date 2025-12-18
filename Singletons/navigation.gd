@@ -3,6 +3,8 @@ extends Node
 signal field_cleared()
 signal field_ready(goal: Vector2i, ignore_walls: bool)
 
+const BASE_COST: int = 1 ##base cost for empty/clear tiles
+
 const DIRECTIONS: Array[Vector2i] = [
 	Vector2i( 1,  0),
 	Vector2i(-1,  0),

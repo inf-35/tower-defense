@@ -1,0 +1,69 @@
+[gd_scene load_steps=12 format=3 uid="uid://clq5akjbo7s7q"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_7vk8b"]
+[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/_default_tower_behavior.gd" id="2_hnf8u"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_d40xg"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_8nmin"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_cuvit"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_xvi8q"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_orbrr"]
+[ext_resource type="Resource" uid="uid://bi7clc5rwhhg5" path="res://Units/Towers/mortar/mortar_attack.tres" id="8_5p5fl"]
+[ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="9_goxye"]
+[ext_resource type="Texture2D" uid="uid://d3pulwmy5uqta" path="res://Assets/cannon_turret.png" id="10_d02bj"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_wg8jx"]
+
+[node name="Mortar" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 1
+script = ExtResource("1_7vk8b")
+type = 22
+turret = NodePath("Graphics/Turret")
+behavior = NodePath("DefaultTowerBehavior")
+graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="DefaultTowerBehavior" type="Node" parent="."]
+script = ExtResource("2_hnf8u")
+metadata/_custom_type_script = "uid://cs61b35p7jme8"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_d40xg")
+movement_data = ExtResource("4_8nmin")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_cuvit")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("6_xvi8q")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+script = ExtResource("7_orbrr")
+attack_data = ExtResource("8_5p5fl")
+muzzle = NodePath("../Graphics/Turret/Muzzle")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.142, 0.142)
+texture = ExtResource("9_goxye")
+
+[node name="Turret" type="Sprite2D" parent="Graphics"]
+z_index = 1
+texture = ExtResource("10_d02bj")
+offset = Vector2(0, -20)
+
+[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
+position = Vector2(70.42253, 0)
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("11_wg8jx")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

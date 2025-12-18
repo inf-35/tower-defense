@@ -60,7 +60,7 @@ texture = ExtResource("10_0yqpy")
 offset = Vector2(0, -20)
 
 [node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
-position = Vector2(104.167, 0)
+position = Vector2(56.60377, 0)
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("14_nh6s4")

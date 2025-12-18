@@ -1,7 +1,7 @@
 #a store for stringname identifiers
 class_name ID
 
-class UnitState:
+class UnitState: ##for ui/attribute resolution
 	const WAVES_LEFT_IN_PHASE: StringName = &"waves_left_in_phase" #for breach, anomaly, and all wave/phase-based towers
 	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves"
 	const AMPLIFIER_MODIFIER: StringName = &"modifier" #for amplifier

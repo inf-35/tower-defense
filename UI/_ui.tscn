@@ -160,9 +160,11 @@ theme_type_variation = &"LabelInlineheader"
 text = "Capacity Label"
 script = ExtResource("7_hpkop")
 
-[node name="GridContainer" type="GridContainer" parent="Margin/ui_space/Stats/Stats"]
+[node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats/Stats"]
+clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
+columns = 6
 script = ExtResource("10_aasu8")
 
 [node name="TimeControls" type="VBoxContainer" parent="Margin/ui_space"]

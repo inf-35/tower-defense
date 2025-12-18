@@ -5,6 +5,9 @@ class_name HitReportData #stores information about a hit's effect; is generated 
 var source: Unit ##source of the hit's damage
 var target: Unit ##eventual target of the hit
 var damage_caused: float = 0.0 ##how much damage did the target receive
+var overkill: float = 0.0 ##how much more damage did the target receive than was necessary
 var death_caused: bool = false ##did the target die?
 #potential death effects
 var flux_value: float = 0.0 ##if target killed by hit, how much flux does it drop?
+
+static var blank_hit_report: HitReportData = HitReportData.new() ##for deaths with no "fault" or "hit"

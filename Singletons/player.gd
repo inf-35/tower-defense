@@ -8,7 +8,7 @@ signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
 
-signal on_event(unit: Unit, event_data: GameEvent) ##global event signal bus, collects events from all allied units
+signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
 #and relevant towers 
 
 #inclusion in Player is merited by their clear player-side nature.
@@ -44,11 +44,13 @@ var _active_effects_container: Node
 
 #various services (which are children of this node)
 var ruin_service: RuinService
-var global_event_service
+var global_event_service: GlobalEventService
 
 func _ready():
 	#setup event bus
-	on_event.connect(_on_global_event)
+	global_event_service = GlobalEventService.new()
+	add_child(global_event_service)
+	global_event_service.initialise_event_bus(on_event)
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -75,16 +77,11 @@ func _setup_state():
 	self.unlocked_towers = {
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
-		Towers.Type.CANNON: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.POISON: true,
 	}
-	flux = 30.0
-	RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.CONTAGION}))
+	flux = 20.0
+	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.AMBUSH}))
 	
-func _on_global_event(unit: Unit, game_event: GameEvent) -> void:
-	pass
-
 #capacity helper functions
 func add_to_used_capacity(amount: float):
 	self.used_capacity += amount
@@ -115,9 +112,12 @@ func add_relic(relic: RelicData) -> void:
 		return
 	active_relics.append(relic)
 	
+	if relic.global_effect:
+		global_event_service.register_effect(relic.global_effect)
+	
 	if relic.active_effect_scene:
 		# instantiate the logic node for the active relic
-		var effect_node: GlobalEffect = relic.active_effect_scene.instantiate()
+		var effect_node: Node = relic.active_effect_scene.instantiate()
 		# add it to our container so it becomes part of the scene tree
 		_active_effects_container.add_child(effect_node)
 		print("Added relic global effect: ", effect_node)
@@ -141,6 +141,7 @@ func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 				relevant_modifiers.append(new_modifier)
 
 	return relevant_modifiers
+
 # internal helper for checking targeting rules
 func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:
 	match relic.target_type:
@@ -158,6 +159,7 @@ func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:
 			return false 
 			
 	return false
+	
 # MODIFIED: Tower placement request now focuses only on player-side checks.
 # it asks the Island to handle the actual placement validation and construction.
 func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: Tower.Facing):

@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id="Resource_rh4l4"]
 script = ExtResource("1_mvlrb")
 attribute = 6
-multiplicative = 1.1
+multiplicative = 1.2
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -20,8 +20,8 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 [resource]
 script = ExtResource("2_etxib")
 target_type = 4
-specific_element = 2
+specific_element = 1
 modifier_prototypes = Array[ExtResource("1_mvlrb")]([SubResource("Resource_rh4l4"), SubResource("Resource_hyisy")])
 title = "Winter's Spirit"
-description = "All frost towers gain +10% damage, +20% range."
+description = "All frost towers gain +20% damage, +40% range."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

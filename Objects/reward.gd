@@ -15,7 +15,7 @@ enum Type {
 	#examples
 	ID.Rewards.FLUX_AMOUNT : 0.0,
 	ID.Rewards.TOWER_TYPE : Towers.Type.TURRET,
-	ID.Rewards.RELIC : Relics.TOWER_SPEED_UP,
+	ID.Rewards.RELIC : Relics.COMMON_COLD,
 }
 
 @export var title: String = "dappled things" #used for terrain expansion previews and such

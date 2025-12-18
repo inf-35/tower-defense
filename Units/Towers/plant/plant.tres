@@ -1,16 +1,16 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://14ryroruquth"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://14ryroruquth"]
 
 [ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_sxd4d"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_huqpa"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_vwkbd"]
 [ext_resource type="PackedScene" uid="uid://bskb6vypbmgoc" path="res://Units/Towers/plant/plant.tscn" id="3_huqpa"]
 
 [resource]
 script = ExtResource("2_vwkbd")
-id = 2
-cost = 5.0
+id = 15
 element = 3
 tower_name = "Plant"
-tower_description = "Weak turret that gains a +20% damage boost each wave (does not compound)."
+tower_description = "Weak turret that gains a +10% damage boost each wave (does not compound)."
 icon = ExtResource("1_sxd4d")
 tower_scene = ExtResource("3_huqpa")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

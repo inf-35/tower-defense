@@ -134,7 +134,6 @@ func _recalculate_overlay_color() -> void:
 	
 	# find the dominant status effect to display visually
 	for status_type: Attributes.Status in _status_effects:
-		var status: StatusEffect = _status_effects[status_type]
 		var status_color: Color = Attributes.status_effects[status_type].overlay_color
 		# prioritize the overlay with the highest alpha (intensity)
 		if status_color.a > best_overlay.a:

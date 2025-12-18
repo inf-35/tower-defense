@@ -19,7 +19,7 @@ func start() -> void:
 			_in_anticipation = false
 	)
 	
-	Waves.wave_ended.connect(func():
+	Waves.wave_ended.connect(func(_wave_number: int):
 		await Clock.await_game_time(1.0)
 		if _in_anticipation:
 			_play_animation(&"attack_windup", -1.0)
@@ -31,8 +31,7 @@ func update(_delta: float) -> void:
 	if not is_instance_valid(attack_component) or not is_instance_valid(range_component):
 		return
 
-	# tick down the state timer
-	_cooldown -= Clock.game_delta
+	var attack_cooldown: float = attack_component.current_cooldown
 	# state transition logic
 	match _current_state:
 		State.READY:
@@ -54,16 +53,15 @@ func update(_delta: float) -> void:
 			
 			# turn towards target
 			#TODO: optimisation: predict once, and have the target unit tell us if it renavigates
-			var predicted_target_pos: Vector2 = attack_component.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, _cooldown)
+			var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_cooldown)
 			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
 			var target_angle: float = direction_to_target.angle()
 			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
-			var required_turn_speed: float = angle_diff / maxf(_cooldown, 0.05)
+			var required_turn_speed: float = angle_diff / maxf(attack_cooldown, 0.05)
 			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
 			# if the wind-up timer finishes, execute the attack
-			if _cooldown <= 0.0:
+			if _is_attack_possible():
 				_attack(_locked_target)
-				_cooldown = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN)
 				# transition back to the ready state
 				_enter_state(State.READY)
 
@@ -82,12 +80,12 @@ func _enter_state(new_state: State, target: Unit = null) -> void:
 			if (not is_instance_valid(animation_player)) or not animation_player.has_animation(&"attack_windup"):
 				return
 			var animation_length: float = unit.animation_player.get_animation(&"attack_windup").length
-			await Clock.create_game_timer(_cooldown - animation_length).timeout
+			await Clock.create_game_timer(attack_component.current_cooldown - animation_length).timeout
 			_play_animation(&"attack_windup") #TODO: implement animation compress/stretching
 
-func _attack(target: Unit):
+func _attack(_target: Unit):
 	# snap towards target
-	var predicted_target_pos: Vector2 = attack_component.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, _cooldown)
+	var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_component.current_cooldown)
 	var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
 	turret.rotation = direction_to_target.angle()
 	_play_animation(&"attack")

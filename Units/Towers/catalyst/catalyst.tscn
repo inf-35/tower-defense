@@ -1,10 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://c4bc4p3qhtgma"]
+[gd_scene load_steps=7 format=3 uid="uid://c4bc4p3qhtgma"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ri254"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_6lgoe"]
-[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="2_orgrd"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_j4le6"]
-[ext_resource type="Resource" uid="uid://oix80pe5es6j" path="res://Content/Effects/catalyst_dipole.tres" id="3_orgrd"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_yv6db"]
 [ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="5_llpeb"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_2tsvx"]
@@ -17,7 +15,6 @@ graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
-intrinsic_effects = Array[ExtResource("2_orgrd")]([ExtResource("3_orgrd")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="MovementComponent" type="Node" parent="."]

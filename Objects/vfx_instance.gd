@@ -10,4 +10,5 @@ var velocity: Vector2
 var rotation: float = 0.0 # In radians
 
 var age: float = 0.0      # Current time since creation.
-var lifetime: float = 0.0
+var lifetime: float = 0.00
+var delete: bool = false #mark this vfx instance for deletion

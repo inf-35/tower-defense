@@ -2,7 +2,7 @@ extends GridContainer
 class_name RelicDisplay
 
 # --- configuration ---
-@export var icon_size: Vector2 = Vector2(48, 48)
+@export var icon_size: Vector2 = Vector2(30, 30)
 @export var icon_stretch_mode: TextureRect.StretchMode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _ready() -> void:
@@ -22,7 +22,7 @@ func _refresh_display() -> void:
 		_create_relic_icon(relic)
 
 func _create_relic_icon(relic: RelicData) -> void:
-	# We use a simple TextureRect for the visual representation.
+	# use a simple TextureRect for the visual representation
 	var icon_node := TextureRect.new()
 
 	icon_node.texture = relic.icon

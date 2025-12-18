@@ -7,7 +7,7 @@ var cooldown: float = 1.0 #negative = permanent
 var source_id: int #TODO: actually make this work
 #runtime variables
 var timer: Clock.GameTimer # a direct reference to the timer node that controls this status's lifecycle
-var _modifier: Modifier #the modifier underlying this status effect
+@warning_ignore("unused_private_class_variable") var _modifier: Modifier #the modifier underlying this status effect
 
 func _init(_status: Attributes.Status, _stack: float, _cooldown: float, _source_id: int):
 	type = _status

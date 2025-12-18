@@ -15,7 +15,7 @@ var _growth_modifier: Modifier = null
 # this function is called by the unit's initialize() method
 func start() -> void:
 	# connect to the global signal that announces a new wave cycle
-	Phases.wave_cycle_started.connect(_on_wave_cycle_started)
+	Phases.wave_cycle_started.connect(_on_wave_cycle_started, CONNECT_ONE_SHOT)
 	# apply the initial state (which is no bonus damage)
 	_apply_damage_modifier()
 

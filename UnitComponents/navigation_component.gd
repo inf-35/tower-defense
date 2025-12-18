@@ -76,9 +76,10 @@ func _check_for_obstructions() -> void:
 	# also check the cell we are standing on (Anti-Stuck / Built-On-Top)
 	var current_cell: Vector2i = movement_component.cell_position
 	
-	# look up the map
-	var tower_ahead = References.island.get_tower_on_tile(next_cell)
-	var tower_here = References.island.get_tower_on_tile(current_cell)
+	# look up the map NOTE: if the corresponding cell has a base navcost, we immmediately assume it is not a valid blocker
+	var tower_ahead = References.island.get_tower_on_tile(next_cell) if Navigation.grid[next_cell] != Navigation.BASE_COST else null
+	var tower_here = References.island.get_tower_on_tile(current_cell) if Navigation.grid[current_cell] != Navigation.BASE_COST else null
+	
 	
 	# prioritize blocking the tower ahead, fallback to the tower we are inside
 	var candidate = tower_ahead if is_valid_blocker(tower_ahead) else (tower_here if is_valid_blocker(tower_here) else null)

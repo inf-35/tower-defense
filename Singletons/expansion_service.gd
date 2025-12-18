@@ -122,7 +122,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
 		var anomaly_rule: PlacementRule = expansion_params.placement_rules[1]
 		anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(
-			RewardService.get_rewards_by_type(Reward.Type.ADD_RELIC).pick_random().duplicate_deep(), 2
+			RewardService.get_rewards_by_type(Reward.Type.ADD_RELIC).pick_random().duplicate_deep(), 1
 		)
 		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():
@@ -393,7 +393,7 @@ func _trigger_camera_overview(island: Island) -> void:
 	camera.override_camera(target_position, target_zoom, 0.75)
 	
 # new helper to calculate bounds and focus on a single choice
-func _trigger_camera_focus_on_choice(island: Island, choice_id: int) -> void:
+func _trigger_camera_focus_on_choice(_island: Island, choice_id: int) -> void:
 	var camera: Camera = References.camera
 	if not is_instance_valid(camera) or not _choices_by_id.has(choice_id):
 		return

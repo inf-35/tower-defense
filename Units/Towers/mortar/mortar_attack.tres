@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=6 format=3 uid="uid://bi7clc5rwhhg5"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_db7bl"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_500ne"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_5pfg2"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_8w58d"]
+
+[sub_resource type="Resource" id="Resource_e3651"]
+script = ExtResource("4_8w58d")
+vfx_type = 1
+radius = 3.0
+rotation_mode = 1
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
+[resource]
+script = ExtResource("2_500ne")
+delivery_method = 1
+range = 60.0
+cooldown = 2.0
+radius = 15.0
+damage = 2.0
+breaking = true
+vfx_on_spawn = SubResource("Resource_e3651")
+projectile_speed = 80.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

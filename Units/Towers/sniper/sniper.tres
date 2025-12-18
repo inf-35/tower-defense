@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://c8xgatg2auady"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://c8xgatg2auady"]
 
 [ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_a0x77"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_k7tn8"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_nkhsf"]
 [ext_resource type="PackedScene" uid="uid://dmsjkp8x4gsni" path="res://Units/Towers/sniper/sniper.tscn" id="3_oejro"]
 
 [resource]
 script = ExtResource("2_k7tn8")
 id = 13
+size = Vector2i(2, 2)
+cost = 25.0
+required_capacity = 2.0
 tower_name = "Sniper"
 tower_description = "Long-range, single-target high damage dealer"
 icon = ExtResource("1_a0x77")

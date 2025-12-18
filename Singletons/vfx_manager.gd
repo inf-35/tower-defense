@@ -20,11 +20,12 @@ func _process(_d: float):
 	for vfx : VFXInstance in _active_vfx:
 		# Update lifetime
 		vfx.age += delta
-		if vfx.age >= vfx.lifetime:
+		if vfx.age >= vfx.lifetime or vfx.delete:
 			vfx_to_remove.append(vfx)
 			continue
 			
 		# Update position and rotation
+
 		vfx.position += vfx.velocity * delta
 		match vfx.vfx_info.rotation_mode:
 			VFXInfo.RotationMode.FACE_VELOCITY:
@@ -58,8 +59,9 @@ func _draw_vfx():
 				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
 				RenderingServer.canvas_item_set_modulate(canvas_item_rid, current_color)
 				
-				var frame = int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
+				var frame := int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
 				var fx : int = frame % info.h_frames
+				@warning_ignore_start("integer_division")
 				var fy : int = frame / info.h_frames
 				var region : Rect2 = Rect2(fx * (info.texture.get_width() / info.h_frames), fy * (info.texture.get_height() / info.v_frames), info.texture.get_width() / info.h_frames, info.texture.get_height() / info.v_frames)
 				RenderingServer.canvas_item_add_texture_rect_region(canvas_item_rid, Rect2(Vector2.ZERO, region.size), info.texture.get_rid(), region)
@@ -71,8 +73,8 @@ func _draw_vfx():
 				RenderingServer.canvas_item_add_circle(canvas_item_rid, Vector2.ZERO, radius, current_color)
 
 			VFXInfo.VFXType.RECTANGLE:
-				var size = info.size * current_scale_val
-				var rect = Rect2(-size / 2.0, size)
+				var size : Vector2 = info.size * current_scale_val
+				var rect := Rect2(-size / 2.0, size)
 				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
 				if info.filled:
 					RenderingServer.canvas_item_add_rect(canvas_item_rid, rect, current_color)
@@ -91,10 +93,10 @@ func _cleanup_vfx(vfx : VFXInstance):
 	_active_vfx.erase(vfx)
 
 #public api
-func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF):
+func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF) -> VFXInstance:
 	if not info: return
 
-	var vfx = VFXInstance.new()
+	var vfx := VFXInstance.new()
 	vfx.vfx_info = info
 	vfx.position = position
 	vfx.velocity = velocity
@@ -109,3 +111,4 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	RenderingServer.canvas_item_set_z_index(vfx.canvas_item, vfx.vfx_info.graphical_layer)
 	#attach our orphan canvas item to the world canvas
 	_active_vfx.append(vfx)
+	return vfx

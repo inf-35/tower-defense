@@ -1,27 +1,22 @@
 extends Object
 class_name EffectInstance #used for cause-and-effect structures -> this is the mere instance, to see actual data
 #see EffectPrototype and its subclasses.
-#i.e. things like thorns
 
-var effect_prototype: EffectPrototype #effect prototype we're based off.
+var effect_prototype: EffectPrototype ##effect prototype we're based off.
 
-var source_id: int #id of who spawned this
-var effect_type: Effects.Type #id of this type of effect
+var source_id: int ##id of who spawned this
+var effect_type: Effects.Type ##id of this type of effect
 var event_hooks: Array[GameEvent.EventType]
-var duration: float = -1.0 #negative = permanent
+var duration: float = -1.0 ##negative = permanent
 
-#var stack: int = 1: #how many "stacks" of the same effect do we have
-	#set(new_stack):
-		#stack = new_stack
-		#if stack <= 0:
-			#free()
+var state: RefCounted ##strategy delegate class that stores state information
+#NOTE: all queryable information about the information should be stored within state
+#or within effectprototype
 
-var params: Dictionary = {} #for input parameters
-var state: Dictionary = {} #for internal state variables
+const GLOBAL_RECURSION_LIMIT: int = 2 ##limit for effect recursion; see Unit effect parsing
 
-const GLOBAL_RECURSION_LIMIT: int = 2 #limit for effect recursion; see Unit effect parsing
-
-var host: Unit #to which unit does this effect apply onto
+var host: Unit ##to which unit does this effect apply onto
+var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect
 
 func _init():
 	pass
@@ -37,12 +32,15 @@ func attach_to(_host: Unit) -> void:
 	if is_instance_valid(host) and not host.disabled: #reject if host is disabled
 		effect_prototype.attach_handler.call(self)
 
+func attach_global() -> void: ##for attaching as a global effect
+	effect_prototype.attach_handler.call(self)
+
 func handle_event_unfiltered(event: GameEvent) -> void: #called by Unit in setup_event_bus
-	if not is_instance_valid(host): #reject if host is dead
-		return
+	if not global:
+		if not is_instance_valid(host): #reject if host is dead
+			return
+		
+		if host.disabled: #reject if host is disabled
+			return
 	
-	if host.disabled: #reject if host is disabled
-		return
-	
-	#for i in stack:
 	effect_prototype.event_handler.call(self, event)

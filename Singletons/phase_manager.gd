@@ -12,7 +12,7 @@ signal wave_ended(wave_number: int) #combat wave ended
 var current_wave_number: int = 0
 
 enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
-enum ChoiceType { EXPANSION, REWARD }
+enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
 var current_phase: GamePhase = GamePhase.IDLE
 var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
@@ -44,8 +44,8 @@ func _generate_wave_plan() -> void:
 			wave_plan[i] = WaveType.EXPANSION
 		if i == 20:
 			wave_plan[i] = WaveType.BOSS
-		if i in [7, 13, 19]:
-			wave_plan[i] = WaveType.SURGE
+		#if i in [7, 13, 19]:
+			#wave_plan[i] = WaveType.SURGE
 	
 	UI.update_wave_schedule.emit() # this signal is fine for a static UI display
 
@@ -66,7 +66,8 @@ func _prepare_for_next_wave_cycle() -> void:
 	# queue choices based on the plan.
 	match upcoming_wave_type:
 		WaveType.REWARD:
-			add_choice_to_queue(ChoiceType.REWARD)
+			add_choice_to_queue(ChoiceType.REWARD_TOWER)
+			#add_choice_to_queue(ChoiceType.REWARD_RELIC)
 		WaveType.EXPANSION:
 			add_choice_to_queue(ChoiceType.EXPANSION)
 
@@ -75,6 +76,10 @@ func _prepare_for_next_wave_cycle() -> void:
 		_start_choice_phase(next_choice)
 	else:
 		_start_building_phase()
+	
+func add_choice_to_queue(type: ChoiceType) -> void:
+	choice_queue.append(type)
+	_report("added " + str(ChoiceType.keys()[type]) + " to choice queue.")
 
 # Main state progression logic
 func _advance_phase():
@@ -110,8 +115,11 @@ func _start_choice_phase(type: ChoiceType) -> void:
 				Waves.EXPANSION_CHOICES_COUNT
 			)
 
-		ChoiceType.REWARD:
-			RewardService.generate_and_present_choices(3, Reward.Type.UNLOCK_TOWER)
+		ChoiceType.REWARD_TOWER:
+			RewardService.generate_and_present_choices(3)
+			
+		ChoiceType.REWARD_RELIC:
+			RewardService.generate_and_present_choices(3, Reward.Type.ADD_RELIC)
 
 # responds to the player selecting an option on the UI
 func _on_player_made_choice(choice_id: int) -> void:
@@ -127,22 +135,23 @@ func _on_player_made_choice(choice_id: int) -> void:
 			ExpansionService.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			ExpansionService.select_expansion(References.island, choice_id)
 
-		ChoiceType.REWARD:
+		ChoiceType.REWARD_TOWER, ChoiceType.REWARD_RELIC:
 			# likewise
 			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			RewardService.select_reward(choice_id)
-
-func add_choice_to_queue(type: ChoiceType) -> void:
-	choice_queue.append(type)
-	_report("added " + str(ChoiceType.keys()[type]) + " to choice queue.")
 
 # this is now called by the ExpansionService's signal when it is done
 func _on_choice_applied() -> void:
 	if current_phase != GamePhase.CHOICE:
 		return
+	
 	_report("a choice has been successfully applied by its handler.")
 	# the service is responsible for hiding its own UI, so we don't need to do it here
-	_advance_phase()
+	if not choice_queue.is_empty():
+		var next_choice: ChoiceType = choice_queue.pop_front()
+		_start_choice_phase(next_choice)
+	else:
+		_advance_phase()
 
 # --- Building Phase Logic ---
 func _start_building_phase() -> void:
@@ -172,7 +181,7 @@ func _start_combat_wave() -> void:
 		current_phase = GamePhase.IDLE
 		_advance_phase()
 
-func _on_combat_wave_ended() -> void:
+func _on_combat_wave_ended(_wave_number: int) -> void:
 	if current_phase != GamePhase.COMBAT_WAVE:
 		return
 	_report("combat wave " + str(current_wave_number) + " reported as ended by Waves.gd.")

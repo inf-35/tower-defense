@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_nv3dj")
-id_name = "flamethrower"
+id_name = "firewall"
 description = "relic tower unlock"
-tower_type = 20
+tower_type = 23
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -1,12 +1,25 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=4 format=3 uid="uid://clyv4pfesggb3"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://clyv4pfesggb3"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_i1wg1"]
-[ext_resource type="PackedScene" uid="uid://oof5g31ldgdg" path="res://Content/Relics/stumbling_blocks/stumbling_blocks.tscn" id="1_wrs5o"]
+[ext_resource type="Script" uid="uid://c6lrutd6k1p1l" path="res://Content/Relics/stumbling_blocks/ruined_ground_relic.gd" id="2_bkglv"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_wrs5o"]
+
+[sub_resource type="Resource" id="Resource_iv7fa"]
+script = ExtResource("1_i1wg1")
+attribute = 3
+multiplicative = 0.5
+override = null
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_p0ayh"]
+script = ExtResource("2_bkglv")
+modifier_prototype = SubResource("Resource_iv7fa")
+schedule = 0
+metadata/_custom_type_script = "uid://c6lrutd6k1p1l"
 
 [resource]
 script = ExtResource("2_wrs5o")
-active_effect_scene = ExtResource("1_wrs5o")
+global_effect = SubResource("Resource_p0ayh")
 title = "Stumbling Blocks"
 description = "Rubble slows down enemies by another 50%."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

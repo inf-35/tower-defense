@@ -37,7 +37,7 @@ func _enter_state(new_state: State) -> void:
 
 		State.CLOSING:
 			# command the unit to play a closing animation and then destroy itself
-			unit.died.emit() #killing ourselves triggers the deregistering mechanism
+			unit.died.emit(HitReportData.blank_hit_report) #killing ourselves triggers the deregistering mechanism
 
 func _on_wave_cycle_started(_wave_number: int) -> void:
 	_waves_left_in_state -= 1

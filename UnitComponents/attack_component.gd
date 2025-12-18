@@ -5,8 +5,13 @@ class_name AttackComponent
 @export var muzzle: Marker2D ##where the bullets are coming from
 var _modifiers_component: ModifiersComponent
 
+var current_cooldown: float = 0.0 ##centralised value for cooldown to next attack, starts at cooldown and ticks towards zero
+
 func _ready():
-	set_process(false)
+	set_process(true)
+
+func _process(_delta: float):
+	current_cooldown -= Clock.game_delta
 
 func inject_components(modifiers_component: ModifiersComponent):
 	_modifiers_component = modifiers_component
@@ -16,7 +21,9 @@ func inject_components(modifiers_component: ModifiersComponent):
 func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 	if attack_data == null:
 		return
-	
+		
+	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN) #reset cooldown
+	#NOTE: this must be before the actual attack execution
 	var delivery_data := DeliveryData.new()
 	delivery_data.delivery_method = attack_data.delivery_method
 	delivery_data.cone_angle = attack_data.cone_angle
@@ -28,6 +35,7 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 		if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 		or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
 			delivery_data.projectile_speed = attack_data.projectile_speed
+			delivery_data.projectile_lifetime = attack_data.projectile_lifetime
 			delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
 		else:
 			delivery_data.intercept_position = target.global_position
@@ -37,6 +45,10 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 	hit_data.target = target
 	hit_data.damage = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 	hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
+	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.CONE_AOE:
+		hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RANGE)
+		##range is used inplace of radius in cone aoe towers (i.e. flamethrower, frost)
+	hit_data.target_affiliation = target.hostile
 	hit_data.expected_damage = hit_data.damage
 	
 	for modifier: Modifier in hit_data.modifiers:

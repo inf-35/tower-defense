@@ -93,14 +93,26 @@ func _create_components() -> void:
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
 	died.connect(func(hit_report_data: HitReportData):
+		hit_report_data.flux_value = flux_value #submit base flux value to be modified
 		#NOTE: the global unit_died signal must fire before execution of on_killed, since on_killed
 		#could destroy the instance, and we want the instance intact for any post-kill abilities
-		References.unit_died.emit(self, hit_report_data) #link local and global died signals
+		var evt := GameEvent.new()
+		evt.event_type = GameEvent.EventType.DIED
+		evt.data = hit_report_data
+		on_event.emit(evt) #this also fires the global died signal
+
 		on_killed(hit_report_data) #connect the died signal to the on_killed method. for units this frees the instance
 		#(which implements flux reward and ruins behaviour for units and towers respectively)
 	)
 	changed_cell.connect(func(new_cell: Vector2i, old_cell: Vector2i):
-		References.unit_changed_cell.emit(self, new_cell, old_cell)
+		var changed_cell_data := ChangedCellData.new()
+		changed_cell_data.new_cell = new_cell
+		changed_cell_data.original_cell = old_cell
+		
+		var evt := GameEvent.new()
+		evt.event_type = GameEvent.EventType.CHANGED_CELL
+		evt.data = changed_cell_data
+		on_event.emit(evt)
 	)
 	
 	if graphics != null:
@@ -144,46 +156,36 @@ func _prepare_components() -> void:
 		if "unit" in child:
 			child.unit = self
 
-func _attach_intrinsic_effects() -> void:
-	Waves.wave_started.connect(func(wave: int):
-		var wave_data := WaveData.new()
-		wave_data.wave = wave
+func _setup_event_bus() -> void:
+	Player.on_event.connect(func(_unit: Unit, event: GameEvent): #propagate wave events from global to local scope
+		if not (event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED):
+			return
 		
-		var evt := GameEvent.new()
-		evt.event_type = GameEvent.EventType.WAVE_STARTED
-		evt.data = wave_data
-		
-		on_event.emit(evt)
+		on_event.emit(event)
 	)
 	
-	#Player.before_compute_tower_capacity.connect(func():
-		##allows towers to affect tower capacity
-		#var evt := GameEvent.new()
-		#evt.event_type = GameEvent.EventType.PRE_TOWER_CAPACITY_COMPUTE
-		#evt.data = EventData.new()
-		#
-		#on_event.emit(evt)
-	#)
-	
-	for effect_prototype: EffectPrototype in intrinsic_effects:
-		apply_effect(effect_prototype)
-
-func _setup_event_bus() -> void:
-	on_event.connect(func(event: GameEvent):
+	on_event.connect(func(event: GameEvent): #setup main event bus
 		if disabled:
 			return
 		
 		if event.data.recursion > EffectInstance.GLOBAL_RECURSION_LIMIT:
 			return #prevent recursion
 			
+		event.unit = self
+		#execute local effects
 		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
 			var scheduled_effects: Array = effects[schedule_class] #multiplicative -> additive -> reactive
 			for effect_instance: EffectInstance in scheduled_effects:
 				effect_instance.handle_event_unfiltered(event)
-				
+		#exectue global effects
+		if event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
+			return
 		Player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
-		#TODO: implement scheduling
 	)
+
+func _attach_intrinsic_effects() -> void:
+	for effect_prototype: EffectPrototype in intrinsic_effects:
+		apply_effect(effect_prototype)
 
 func apply_effect(effect_prototype: EffectPrototype) -> void:
 	effect_prototypes.append(effect_prototype)
@@ -220,7 +222,7 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 
 	effect_prototypes.erase(effect_prototype)
 
-func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant:
+func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant: ##access properties of intrinsic effects, mainly for UI
 	if not effects_by_type.has(effect_type):
 		return null
 		
@@ -228,15 +230,15 @@ func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: S
 	if instances.is_empty():
 		return null
 		
-	#For intrinsic effects, we usually only care about the first one.
+	# for intrinsic effects, we usually only care about the first one.
 	var first_instance: EffectInstance = instances[0]
-	# Using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
-	if first_instance.params.has(attribute_name): #first check params
-		return first_instance.params.get(attribute_name, null)
-	else: #fallback to checking state
-		return first_instance.state.get(attribute_name, null)
+	# using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
+	if first_instance.effect_prototype.get(attribute_name): #first check effect prototype parameters
+		return first_instance.effect_prototype.get(attribute_name)
+	else: #fallback to checking effect instance state
+		return first_instance.state.get(attribute_name)
 
-func get_behavior_attribute(attribute_name: StringName) -> Variant:
+func get_behavior_attribute(attribute_name: StringName) -> Variant: ##accesses properties for units, mainly for UI
 	if not is_instance_valid(behavior):
 		return null
 	
@@ -248,11 +250,11 @@ func get_behavior_attribute(attribute_name: StringName) -> Variant:
 		
 	return null
 	
-func get_unit_state() -> void:
+func get_unit_state() -> void: ##used to refresh data about units, mainly for UI
 	if is_instance_valid(health_component):
 		UI.update_unit_health.emit(self, health_component.max_health, health_component.health)
 
-func set_initial_behaviour_state(behavior_packet: Dictionary): #used for environmental features with custom states (see terrain_expansion.gd)
+func set_initial_behaviour_state(behavior_packet: Dictionary): ##preconfigure units before instantiation, used for environmental features with custom states (see terrain_expansion.gd)
 	if not is_instance_valid(behavior):
 		components_ready.connect(set_initial_behaviour_state.bind(behavior_packet), CONNECT_ONE_SHOT)
 		return #wait until everything's ready
@@ -277,7 +279,6 @@ func take_hit(hit: HitData):
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
 	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
-	References.unit_took_hit.emit(self, evt.data as HitData) #trigger any global post-hit-received effects, according mutate evt.data
 	
 	var damage: float = evt.data.damage
 	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
@@ -289,13 +290,13 @@ func take_hit(hit: HitData):
 	var hit_report := HitReportData.new()
 	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
 	hit_report.target = self
-	hit_report.source = hit.source
+	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
 	
 	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
 		
-		hit_report.flux_value = flux_value #submit base flux value to be modified
+		
 		
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
 		
@@ -340,7 +341,6 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		CombatManager.resolve_hit(hit, delivery_data)
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
-# towers will override this with their ruin logic.
 func on_killed(hit_report_data: HitReportData) -> void:
 	if not self is Tower: #towers have their own flux value system 
 		Player.flux += hit_report_data.flux_value #reward player with flux
@@ -368,7 +368,6 @@ func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be u
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
 
 func _draw() -> void:
-	# 1. VISUALIZE PATH (Blue Line)
 	if not _DEBUG_DRAW:
 		return
 

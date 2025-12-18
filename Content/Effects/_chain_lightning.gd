@@ -1,78 +1,98 @@
-# chain_lightning_effect.gd
 extends EffectPrototype
 class_name ChainLightningEffect
 
-# --- configuration (designer-friendly, configured on the .tres resource) ---
-@export var params: Dictionary = {
-	"max_jumps": 3,
-	"jump_radius": 150.0,
-	"damage_falloff_multiplier": 0.66,
-}
-
-# this effect is reactive, so its internal state is minimal
-var state: Dictionary = {}
+@export var max_jumps: int = 3
+@export var jump_radius: float = 150.0
+@export var damage_falloff_multiplier: float = 0.66
 
 func _init() -> void:
-	# this effect needs to listen for when its host successfully deals a hit
-	self.event_hooks = [GameEvent.EventType.HIT_DEALT]
+	# listen for when the host deals a hit
+	event_hooks = [GameEvent.EventType.HIT_DEALT]
 
-# this is the main handler, called by the unit's event bus
+func create_instance() -> EffectInstance:
+	var instance := EffectInstance.new()
+	apply_generics(instance)
+	# no persistent state required for chain lightning, so we don't assign instance.state
+	return instance
+
+func _handle_attach(_instance: EffectInstance) -> void:
+	# reactive effect; no setup required
+	pass
+
+func _handle_detach(_instance: EffectInstance) -> void:
+	# reactive effect; no cleanup required
+	pass
+
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
-	# --- 1. check prerequisites ---
 	if event.event_type != GameEvent.EventType.HIT_DEALT:
 		return
 	
-	var hit_report: HitReportData = event.data as HitReportData
+	var hit_report := event.data as HitReportData
+	# prevent infinite recursion loops by checking if this hit is already a child hit
 	if not is_instance_valid(hit_report.target) or hit_report.recursion > 0:
 		return
 
-	# --- 2. get data from the instance ---
-	var host_tower: Tower = instance.host as Tower
+	# cast host to Tower to access attack components
+	var host_tower := instance.host as Tower
 	if not is_instance_valid(host_tower) or not is_instance_valid(host_tower.attack_component):
 		return
 
-	var p_max_jumps: int = instance.params.get("max_jumps", 3)
-	var p_jump_radius: float = instance.params.get("jump_radius", 150.0)
-	var p_falloff: float = instance.params.get("damage_falloff_multiplier", 0.66)
+	_execute_chain_lightning(host_tower, hit_report)
 
-	# --- 3. start the chain lightning sequence ---
-	var primary_target: Unit = hit_report.target
+func _execute_chain_lightning(host: Tower, initial_report: HitReportData) -> void:
+	var primary_target: Unit = initial_report.target
 	var already_hit: Array[Unit] = [primary_target]
 	var last_hit_target: Unit = primary_target
-	var current_damage: float = host_tower.attack_component.get_stat(
-		host_tower.modifiers_component, host_tower.attack_component.attack_data, Attributes.id.DAMAGE
+	
+	# calculate base damage from the tower's stats
+	var current_damage: float = host.attack_component.get_stat(
+		host.modifiers_component, 
+		host.attack_component.attack_data, 
+		Attributes.id.DAMAGE
 	)
 
-	for i: int in range(p_max_jumps):
-		var next_target: Unit = _find_next_jump_target(last_hit_target, p_jump_radius, already_hit)
+	for i: int in range(max_jumps):
+		# find a new target near the last one hit
+		var next_target: Unit = _find_next_jump_target(last_hit_target, jump_radius, already_hit)
 		
 		if not is_instance_valid(next_target):
 			break
 			
-		current_damage *= p_falloff
+		current_damage *= damage_falloff_multiplier
 		
-		var jump_hit_data: HitData = host_tower.attack_component.attack_data.generate_hit_data()
-		jump_hit_data.source = host_tower
+		# construct the new hit data
+		var jump_hit_data: HitData = host.attack_component.attack_data.generate_hit_data()
+		jump_hit_data.source = host
 		jump_hit_data.target = next_target
 		jump_hit_data.damage = current_damage
 		jump_hit_data.target_affiliation = primary_target.hostile
-		jump_hit_data.recursion = hit_report.recursion + 1
+		jump_hit_data.recursion = initial_report.recursion + 1
 		
+		# use hitscan delivery to apply damage instantly from the position of the last enemy
 		var delivery_data := DeliveryData.new() 
 		delivery_data.delivery_method = DeliveryData.DeliveryMethod.HITSCAN
 		delivery_data.use_source_position_override = true
 		delivery_data.source_position = last_hit_target.global_position
 
-		host_tower.deal_hit(jump_hit_data, delivery_data)
+		host.deal_hit(jump_hit_data, delivery_data)
 		
+		# update state for next loop iteration
 		already_hit.append(next_target)
 		last_hit_target = next_target
 
-# this helper now accepts the jump radius as a parameter
-func _find_next_jump_target(from_target: Unit, jump_radius: float, excluded_targets: Array[Unit]) -> Unit:
-	var potential_targets: Array[Unit] = CombatManager.get_units_in_radius(jump_radius, from_target.global_position, from_target.hostile, excluded_targets)
+func _find_next_jump_target(from_target: Unit, radius: float, excluded_targets: Array[Unit]) -> Unit:
+	# query combat manager for valid targets nearby
+	var potential_targets: Array[Unit] = CombatManager.get_units_in_radius(
+		radius, 
+		from_target.global_position, 
+		from_target.hostile, 
+		excluded_targets
+	)
+	
 	var closest_dist_sq: float = INF
 	var closest_target: Unit = null
+	
+	# simple nearest-neighbor search
 	for potential_target: Unit in potential_targets:
 		var dist_sq: float = from_target.global_position.distance_squared_to(potential_target.global_position)
 		if dist_sq < closest_dist_sq:

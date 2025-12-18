@@ -6,14 +6,14 @@
 [sub_resource type="Resource" id="Resource_rh4l4"]
 script = ExtResource("1_0ctvc")
 attribute = 6
-multiplicative = 1.1
+multiplicative = 1.2
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_hyisy"]
 script = ExtResource("1_0ctvc")
 attribute = 8
-multiplicative = 0.909
+multiplicative = 0.833
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -23,5 +23,5 @@ target_type = 4
 specific_element = 2
 modifier_prototypes = Array[ExtResource("1_0ctvc")]([SubResource("Resource_rh4l4"), SubResource("Resource_hyisy")])
 title = "Fiery Spirit"
-description = "All flame towers gain a +10% damage, +10% fire rate boost"
+description = "All flame towers gain a +20% damage, +20% fire rate boost"
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

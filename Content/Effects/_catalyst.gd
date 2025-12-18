@@ -1,4 +1,4 @@
-extends EffectPrototype
+#DEPRECATED
 class_name CatalystEffect
 
 @export var params: Dictionary = {

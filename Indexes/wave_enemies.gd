@@ -22,7 +22,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	6 : [
 		[Units.Type.BASIC, 6],
-		[Units.Type.BUFF, 3],
+		[Units.Type.BUFF, 2],
 		[Units.Type.HEALER, 1],
 		[Units.Type.DRIFTER, 2],
 	],
@@ -59,6 +59,31 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.HEALER, 4],
 		[Units.Type.BUFF, 10],
 	],
+	13 : [
+		[Units.Type.DRIFTER, 5],
+		[Units.Type.WARRIOR, 18],
+		[Units.Type.TROLL, 4],
+		[Units.Type.HEALER, 4],
+		[Units.Type.BUFF, 10],
+	],
+	14 : [
+		[Units.Type.TROLL, 10],
+		[Units.Type.HEALER, 4],
+	],
+	15 : [
+		[Units.Type.WARRIOR, 30],
+		[Units.Type.BUFF, 25],
+		[Units.Type.HEALER, 8],
+		[Units.Type.ARCHER, 6],
+	],
+	16 : [
+		[Units.Type.TROLL, 6],
+		[Units.Type.WARRIOR, 24],
+		[Units.Type.HEALER, 6],
+		[Units.Type.DRIFTER, 20],
+		[Units.Type.ARCHER, 5],
+		[Units.Type.BUFF, 10],
+	]
 }
 # --- unit catalog ---
 # this is the master data definition for all spawnable units.

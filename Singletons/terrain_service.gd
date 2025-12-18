@@ -25,7 +25,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 	island.terrain_renderer.apply_terrain_changes(terrain_changes)
 
 # checks if a tower can be built on a specific cell
-func is_area_constructable(island: Island, tower_position: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
+func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_position: Vector2i, tower_type: Towers.Type, general: bool = false) -> bool:
 	if general: #includes player-side construction checks
 		if not Player.unlocked_towers.get(tower_type, false):
 			return false
@@ -38,6 +38,8 @@ func is_area_constructable(island: Island, tower_position: Vector2i, tower_type:
 				return false
 				
 	var size: Vector2i = Towers.get_tower_size(tower_type)
+	if int(tower_facing) % 2 != 0:
+		size = Vector2i(size.y, size.x)
 	for x: int in size.x:
 		for y: int in size.y:
 			var cell: Vector2i = Vector2i(x,y) + tower_position	

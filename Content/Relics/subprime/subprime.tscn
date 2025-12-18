@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://d31gq7m2bdfds"]
-
-[ext_resource type="Script" uid="uid://blhhsrfq8l8fj" path="res://Content/Relics/subprime/subprime_relic.gd" id="1_cosrg"]
-
-[node name="Subprime" type="Node"]
-script = ExtResource("1_cosrg")
-maximum_bonus = 5.0
-metadata/_custom_type_script = "uid://blhhsrfq8l8fj"

@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://upq4fqmf2uw8"]
-
-[ext_resource type="Script" uid="uid://biw68uk1popem" path="res://Content/Relics/Global Effects/_poison_inflicts_frost.gd" id="1_tj4tq"]
-
-[node name="PoisonInflictsFrostEffect" type="Node"]
-script = ExtResource("1_tj4tq")
-metadata/_custom_type_script = "uid://biw68uk1popem"

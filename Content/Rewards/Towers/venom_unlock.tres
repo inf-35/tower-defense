@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://bp6r7gbfm7t3p"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_2y2uu"]
+
+[resource]
+script = ExtResource("1_2y2uu")
+id_name = "venom"
+description = "relic tower unlock"
+tower_type = 21
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

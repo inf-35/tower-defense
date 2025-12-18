@@ -15,7 +15,7 @@
 size = Vector2(20, 20)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
-radius = 11.045361
+radius = 7.0
 
 [node name="PlayerCore" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "movement_component")]
 z_index = 1

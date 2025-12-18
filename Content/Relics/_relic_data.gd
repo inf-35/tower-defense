@@ -16,9 +16,10 @@ enum TargetType {
 # used only if target_type is SPECIFIC_TOWER_TYPE
 @export var specific_tower_type: Towers.Type
 @export var specific_element: Towers.Element
-# --- effect data ---
+# --- effect data ---p
 # each relic contains a modifier prototype that defines its stat changes
 @export var modifier_prototypes: Array[ModifierDataPrototype] ##modifiers that are applied to all satisfying towers (see specific_tower_type)
+@export var global_effect: EffectPrototype
 @export var active_effect_scene: PackedScene ##for active global effects, scene is instantiated as child of the player->global modifier singleton
 # --- presentation data for ui ---
 @export var title: String

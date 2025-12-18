@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://byv5edai2puhe"]
-
-[ext_resource type="Script" uid="uid://bx75y7j76chrr" path="res://Content/Relics/money_market/interest_relic.gd" id="1_8845y"]
-
-[node name="MoneyMarket" type="Node"]
-script = ExtResource("1_8845y")
-interest = 0.1
-cap = 50.0
-metadata/_custom_type_script = "uid://bx75y7j76chrr"

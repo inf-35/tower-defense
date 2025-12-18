@@ -53,7 +53,7 @@ func pop(array: Array = heap) -> void: #doesnt actually return value, retrieve b
 	array.remove_at(array.size() - 1)
 	shift_down(0) #bubble down new root
 
-func get_min(array: Array = heap) -> Variant: return heap[0] #get root
+func get_min() -> Variant: return heap[0] #get root
 
 func leaf() -> int: return size() - 1
 

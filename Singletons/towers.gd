@@ -22,7 +22,10 @@ enum Type {
 	PRISM,
 	MAGE,
 	FOREST,
-	FLAMETHROWER
+	FLAMETHROWER,
+	VENOM,
+	MORTAR,
+	FIREWALL
 }
 
 enum Element {

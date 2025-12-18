@@ -2,7 +2,7 @@
 extends Node #"Service" type singleton, mainly called by Phases
 
 signal wave_started(wave_number_int: int)
-signal wave_ended
+signal wave_ended(wave_number_int: int)
 
 # --- state ---
 var current_combat_wave_number: int = 0
@@ -25,12 +25,35 @@ const ENEMY_GROUP: StringName = &"active_enemies"
 var _reconciliation_timer: Timer
 
 func _ready() -> void:
+	wave_started.connect(func(wave: int):
+		var wave_data := WaveData.new()
+		wave_data.wave = wave
+		
+		var evt := GameEvent.new()
+		evt.event_type = GameEvent.EventType.WAVE_STARTED
+		evt.data = wave_data
+		
+		Player.on_event.emit(null, evt)
+	)
+	
+	wave_ended.connect(func(wave: int):
+		var wave_data := WaveData.new()
+		wave_data.wave = wave
+		
+		var evt := GameEvent.new()
+		evt.event_type = GameEvent.EventType.WAVE_ENDED
+		evt.data = wave_data
+		
+		Player.on_event.emit(null, evt)
+	)
+	
 	_reconciliation_timer = Timer.new()
 	add_child(_reconciliation_timer)
 	_reconciliation_timer.one_shot = false
 	_reconciliation_timer.autostart = true
 	_reconciliation_timer.start(3.0)
 	_reconciliation_timer.timeout.connect(_reconcile_enemy_count)
+
 
 # main function called by Phases.gd to start a combat wave
 func start_combat_wave(wave_num_to_spawn: int) -> void:
@@ -139,5 +162,5 @@ func _end_combat_wave() -> void:
 	for enemy: Node in get_tree().get_nodes_in_group(ENEMY_GROUP):
 		enemy.queue_free()
 		
-	wave_ended.emit()
+	wave_ended.emit(current_combat_wave_number)
 	current_combat_wave_number = 0

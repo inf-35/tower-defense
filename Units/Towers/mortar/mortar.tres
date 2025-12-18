@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://fsas6ethkjl2"]
+
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_e38eq"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_n1ccw"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_hsyy1"]
+[ext_resource type="PackedScene" uid="uid://clq5akjbo7s7q" path="res://Units/Towers/mortar/mortar.tscn" id="4_flo2w"]
+
+[resource]
+script = ExtResource("3_hsyy1")
+id = 22
+size = Vector2i(2, 2)
+cost = 20.0
+tower_name = "Mortar"
+tower_description = "Slow yet far-reaching AOE damage-dealer"
+tower_scene = ExtResource("4_flo2w")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

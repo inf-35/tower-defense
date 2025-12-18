@@ -39,7 +39,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			
 	# Rotation can be handled universally if a preview is active
 	if current_state == State.PREVIEWING and event.is_action_pressed("rotate_preview"):
-		preview_tower_facing = (preview_tower_facing + 1) % Tower.Facing.size()
+		preview_tower_facing = (preview_tower_facing + 1) % Tower.Facing.size() as Tower.Facing
 		_update_preview_visuals()
 
 # --- State Transition Functions ---
@@ -146,7 +146,7 @@ func _update_preview_visuals():
 	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
 	preview_tower_position = Island.position_to_cell(mouse_pos)
 
-	preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_position, preview_tower_type, true)
+	preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_facing, preview_tower_position, preview_tower_type, true)
 
 	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 	

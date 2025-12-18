@@ -16,7 +16,7 @@ var animation_player: AnimationPlayer
 var graphics: Node2D
 var turret: Node2D
 #generic "timer" variable
-var _cooldown: float = 0.0
+var _cooldown: float = 0.0 ##NOTE: this is not the attack cooldown, which can be found in AttackComponent
 
 # this function is called by the unit to give the behavior all the tools it needs
 func initialise(host_unit: Unit):
@@ -55,7 +55,7 @@ func start() -> void:
 	_attempt_navigate_to_origin()
 
 # this is the main update loop, called by the unit's _process function
-func update(delta: float) -> void:
+func update(delta: float) -> void: #delta is already game delta
 	# this virtual function will be overridden by concrete behaviors
 	_cooldown += delta
 	_attempt_simple_attack()
@@ -82,7 +82,7 @@ func _is_attack_possible() -> bool:
 		return false
 	
 	#print(attack_component, " ", attack_component.attack_data)
-	if _cooldown >= attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN):
+	if attack_component.current_cooldown <= 0.0:
 		var target = range_component.get_target() as Unit
 		if target:
 			return true
@@ -97,7 +97,6 @@ func _attempt_simple_attack() -> bool:
 	if target:
 		#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
 		attack_component.attack(target)
-		_cooldown = 0.0
 		unit.queue_redraw()
 		return true
 		

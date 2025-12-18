@@ -92,7 +92,7 @@ func sell():
 	if not abstractive and current_state == State.ACTIVE:
 		Player.flux += flux_value #full refund!
 		enter_ruin_state(RuinService.RuinReason.SOLD)
-		died.emit()
+		died.emit(HitReportData.blank_hit_report)
 
 func _create_hitbox():
 	var hitbox := Hitbox.new()
@@ -142,7 +142,15 @@ func _ready():
 			health_component.health = health_component.max_health
 	)
 	
-
+	var build_data := BuildTowerData.new()
+	build_data.tower = self
+	var evt := GameEvent.new()
+	evt.event_type = GameEvent.EventType.TOWER_BUILT
+	evt.data = build_data
+	
+	if not abstractive:
+		Player.on_event.emit(null, evt) #fire global event (that we just got built)
+	
 func get_occupied_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for x: int in size.x:
@@ -153,3 +161,8 @@ func get_occupied_cells() -> Array[Vector2i]:
 	
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 	return References.island.get_adjacent_towers(self.tower_position)
+
+func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for a specific tile occupied by this tower
+	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour
+		return behavior.get_navcost_for_cell(_cell)
+	return Towers.get_tower_navcost(self.type)

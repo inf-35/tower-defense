@@ -1,12 +1,17 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=4 format=3 uid="uid://ckd6yqabrxie2"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://ckd6yqabrxie2"]
 
-[ext_resource type="PackedScene" uid="uid://d31gq7m2bdfds" path="res://Content/Relics/subprime/subprime.tscn" id="1_07pg8"]
+[ext_resource type="Script" uid="uid://blhhsrfq8l8fj" path="res://Content/Relics/subprime/subprime_relic.gd" id="1_07pg8"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_tp7qc"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_07pg8"]
 
+[sub_resource type="Resource" id="Resource_gv3lq"]
+script = ExtResource("1_07pg8")
+schedule = 0
+metadata/_custom_type_script = "uid://blhhsrfq8l8fj"
+
 [resource]
 script = ExtResource("2_07pg8")
-active_effect_scene = ExtResource("1_07pg8")
+global_effect = SubResource("Resource_gv3lq")
 title = "Subprime"
 description = "Earn more gold the closer enemies die to your keep, up to 100% more."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

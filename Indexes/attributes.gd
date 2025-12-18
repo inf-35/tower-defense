@@ -25,6 +25,9 @@ enum Status { #diegetic statuses
 	BURN,
 	POISON,
 	HEAT,
+	CURSED,
+	BLEED,
+	STUN
 }
 
 class StatusEffectData:
@@ -64,6 +67,12 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 	Status.HEAT: StatusEffectData.new(
 		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST 
 	),
+	Status.CURSED: StatusEffectData.new(
+		id.DAMAGE_TAKEN, 0.0, 1.2, true, Color(0.446, 0.002, 0.768, 0.5)
+	),
+	Status.STUN: StatusEffectData.new(
+		id.MAX_SPEED, 0.0, 0.0, false, Color(1, 1, 0.5) #completely stops enemies
+	)
 }
 
 var reactions: Array[ReactionData] = [

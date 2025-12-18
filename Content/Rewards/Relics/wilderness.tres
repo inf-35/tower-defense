@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://cswn1yoa4e8w8"]
+
+[ext_resource type="Resource" uid="uid://ddu0kih5o36wt" path="res://Content/Relics/wilderness/wilderness.tres" id="1_f7wol"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_wusxj"]
+
+[resource]
+script = ExtResource("2_wusxj")
+id_name = "wilderness"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_f7wol")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

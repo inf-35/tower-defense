@@ -21,10 +21,10 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_ofi8n")
 delivery_method = 3
-range = 35.0
-cooldown = 2.0
-radius = 10.0
-damage = 0.2
+range = 12.0
+cooldown = 0.5
+radius = 12.0
+damage = 0.5
 status_effects = Array[ExtResource("3_m5a7n")]([SubResource("Resource_x7527")])
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0

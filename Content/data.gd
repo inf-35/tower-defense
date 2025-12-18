@@ -1,7 +1,7 @@
 extends Resource
 class_name Data
 
-signal value_changed(attribute: Attributes.id)
+@warning_ignore("unused_signal") signal value_changed(attribute: Attributes.id)
 
 static func get_stringname(attribute: Attributes.id) -> StringName: #converts attributes.id to stringname NOTE: this is to easily access variables in Data objects
 	return StringName(str(Attributes.id.keys()[attribute]).to_lower()) #ie from DAMAGE_TAKEN -> damage_taken (which is the stringname used to access damage_taken in HealthData)

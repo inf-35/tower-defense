@@ -36,7 +36,7 @@ func _ready():
 	
 	# initial terrain generation
 	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 100)
-	# 3. delegate application of the block to the TerrainService
+	# delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
 	# place the player's core tower
@@ -88,7 +88,7 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 		tower_grid[cell].level += 1
 		return true
 	
-	if TerrainService.is_area_constructable(self, cell, tower_type):
+	if TerrainService.is_area_constructable(self, facing, cell, tower_type):
 		construct_tower_at(cell, tower_type, facing)
 		return true
 		
@@ -98,11 +98,12 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, initial_state: Dictionary = {}) -> Tower:
 	print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
-	var tower_size: Vector2i = Vector2i(Vector2(Towers.get_tower_size(tower_type)).rotated(tower_facing * 0.5 * PI))
-	
-	tower.size = tower_size
-	for x: int in tower_size.x:
-		for y: int in tower_size.y:
+	var rotated_size: Vector2i = Towers.get_tower_size(tower_type)
+	if (tower_facing as int) % 2 != 0:
+		rotated_size = Vector2i(rotated_size.y, rotated_size.x)
+	tower.size = rotated_size
+	for x: int in tower.size.x:
+		for y: int in tower.size.y:
 			tower_grid[cell + Vector2i(x,y)] = tower
 	tower.facing = tower_facing
 	tower.tower_position = cell
@@ -146,9 +147,9 @@ func update_navigation_grid() -> void:
 		var is_occupied: bool = tower_grid.has(cell)
 		if Terrain.is_navigable(terrain_base_grid[cell]):
 			if is_occupied and tower_grid[cell].blocking:
-				Navigation.grid[cell] = Towers.get_tower_navcost(tower_grid[cell].type)
+				Navigation.grid[cell] = tower_grid[cell].get_navcost_for_cell(cell)
 			else:
-				Navigation.grid[cell] = 1
+				Navigation.grid[cell] = Navigation.BASE_COST
 
 	Navigation.clear_field()
 	

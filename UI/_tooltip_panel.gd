@@ -77,8 +77,6 @@ func _movement_logic():
 	
 	self.global_position = final_pos
 
-# --- Public API ---
-
 func show_tooltip(data: Dictionary, parent: TooltipPanel = null) -> void:
 	# hierarchy management
 	parent_tooltip = parent
@@ -102,13 +100,9 @@ func on_link_mouse_exited() -> void:
 		close()
 	else:
 		# if solid, give the user a split second to move mouse from text to the panel
-		print(self, " grace!", Time.get_ticks_msec())
 		_grace_timer.start()
 
-# --- Internal Logic ---
-
 func _on_solidify_timeout() -> void:
-	print(self, " solidifed", Time.get_ticks_msec())
 	is_solidified = true
 	# visual feedback could go here (e.g. slight border color change)
 
@@ -136,7 +130,6 @@ func register_child(child: TooltipPanel) -> void:
 	active_child_tooltip = child
 
 func close() -> void:
-	push_warning(self, " closed! ", Time.get_ticks_msec())
 	# recursive cleanup: close children first
 	if is_instance_valid(active_child_tooltip):
 		active_child_tooltip.close()

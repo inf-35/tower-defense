@@ -106,10 +106,6 @@ func _perform_heal_pulse() -> bool:
 func _spawn_heal_vfx(target: Unit) -> void:
 	# Simple flash effect using the existing shader setup on units
 	if is_instance_valid(target.graphics) and target.graphics.material is ShaderMaterial:
-		var mat = target.graphics.material as ShaderMaterial
-		# Flash green (assuming overlay_color is used for status, we hijack it briefly or add a parameter)
-		# Since we can't easily change the shader logic, we can spawn a simple particle or label.
-		
 		# Fallback: Simple tween scale bounce
 		var tween = create_tween()
 		tween.tween_property(target, "scale", Vector2(1.2, 1.2), 0.1)

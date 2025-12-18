@@ -8,5 +8,4 @@ params = {
 "hooks": [Vector2i(0, 1), Vector2i(0, -1)]
 }
 effect_type = 3
-schedule = 2
 metadata/_custom_type_script = "uid://dfxogp1ohj6rw"

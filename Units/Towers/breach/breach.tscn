@@ -1,17 +1,25 @@
-[gd_scene load_steps=7 format=3 uid="uid://ccf4np3sitvsx"]
+[gd_scene load_steps=9 format=3 uid="uid://ccf4np3sitvsx"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_wfd5r"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_llxgu"]
 [ext_resource type="Texture2D" uid="uid://qvs5b3q3htcn" path="res://Assets/enemy_camp.png" id="4_xid0h"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bnfe5"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_i8ig8"]
 [ext_resource type="Script" uid="uid://bf3ddv1v3h1o7" path="res://Content/Behaviors/breach_behavior.gd" id="9_fnp7j"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_br75j"]
 
+[sub_resource type="Resource" id="Resource_shlxc"]
+script = ExtResource("2_llxgu")
+suffix = " waves"
+special_modifier = 8
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
 [node name="Breach" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]
 z_index = 1
 script = ExtResource("1_wfd5r")
 type = 9
 blocking = false
+stat_displays = Array[ExtResource("2_llxgu")]([SubResource("Resource_shlxc")])
 behavior = NodePath("BreachBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

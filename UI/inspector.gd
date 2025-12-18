@@ -129,7 +129,7 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 			var waves_left_to_reward: int = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 			var reward: Reward = tower.get_behavior_attribute(ID.UnitState.REWARD_PREVIEW)
 			
-			value = reward.description + " in " + str(waves_left_to_reward) + " waves."
+			value = reward.params[ID.Rewards.RELIC].title + " in " + str(waves_left_to_reward) + " waves."
 
 	# Get the value from the tower's components if not overridden
 	if not override:

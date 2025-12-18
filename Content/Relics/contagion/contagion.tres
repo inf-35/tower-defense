@@ -1,12 +1,36 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=4 format=3 uid="uid://djnmsx27kjjyi"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=9 format=3 uid="uid://djnmsx27kjjyi"]
 
-[ext_resource type="PackedScene" uid="uid://dwkxne60117fh" path="res://Content/Relics/contagion/contagion.tscn" id="1_wxykr"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_qnr0w"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_qp08h"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_2aaqs"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_x1i2k"]
+[ext_resource type="Script" uid="uid://b3pxsdqsg7fgg" path="res://Content/Relics/contagion/status_inflict_causes_hit.gd" id="4_1xrdm"]
+
+[sub_resource type="Resource" id="Resource_6ewx0"]
+script = ExtResource("3_x1i2k")
+type = 2
+cooldown = 1.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_mww4f"]
+script = ExtResource("2_qnr0w")
+delivery_method = 3
+radius = 20.0
+status_effects = Array[ExtResource("3_x1i2k")]([SubResource("Resource_6ewx0")])
+cone_angle = 360.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[sub_resource type="Resource" id="Resource_cyxyu"]
+script = ExtResource("4_1xrdm")
+qualifying_status = 2
+qualifying_threshold = 2.0
+trigger_status = 2
+attack_data = SubResource("Resource_mww4f")
+metadata/_custom_type_script = "uid://b3pxsdqsg7fgg"
 
 [resource]
 script = ExtResource("3_2aaqs")
-active_effect_scene = ExtResource("1_wxykr")
+global_effect = SubResource("Resource_cyxyu")
 title = "Contagion"
 description = "Enemies with two or more stacks of poison infect nearby enemies with 1 stack of poison when hit."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

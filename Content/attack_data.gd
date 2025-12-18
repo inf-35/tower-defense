@@ -1,7 +1,6 @@
 extends Data
 class_name AttackData
 
-@export_group("Delivery")
 @export var delivery_method: DeliveryData.DeliveryMethod
 
 @export_group("Behaviour")
@@ -35,9 +34,10 @@ class_name AttackData
 @export_group("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
+@export var projectile_lifetime: float = 0.0
 
 @export_group("Hit Properties")
-@export var cone_angle: float = 0.0 #for coneAOE in degrees
+@export var cone_angle: float = 0.0 ##for coneAOE in degrees, note: 0.0 means full-cone implicitly
 #see unit.gd, deal_hit and take_hit, and HitData
 
 func generate_modifiers() -> Array[Modifier]: #transform Array[ModifierDataPrototype] -> Array[Modifier]
@@ -50,6 +50,7 @@ func generate_modifiers() -> Array[Modifier]: #transform Array[ModifierDataProto
 func format_status_effects() -> Dictionary[Attributes.Status, Vector2]: #see HitData for requirements
 	var output: Dictionary[Attributes.Status, Vector2] = {}
 	for status_effect: StatusEffectPrototype in status_effects:
+		if not status_effect: continue
 		var vector: Vector2 = Vector2(status_effect.stack, status_effect.cooldown)
 		output[status_effect.type] = vector
 	

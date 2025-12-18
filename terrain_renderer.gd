@@ -367,8 +367,6 @@ func _update_distance_field() -> void:
 	# standard bfs logic, but offset by _min_coord
 	_grid_image.fill(Color.BLACK) # clear image
 	
-	var dist_map := {} # local coords -> distance
-	var queue: Array[Vector2i] = []
 	
 	# initialize bfs seeds (land tiles)
 	# we do multi-source bfs from land outwards? 

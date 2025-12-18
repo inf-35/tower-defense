@@ -68,7 +68,6 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="HealerBehavior" type="Node" parent="."]
 script = ExtResource("10_8vdnj")
-heal_amount = 5.0
-heal_interval = 2.0
-heal_range = 25.0
+heal_amount = 3.0
+heal_range = 15.0
 metadata/_custom_type_script = "uid://dwx63ohv786ew"

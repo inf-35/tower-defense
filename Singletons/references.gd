@@ -5,10 +5,6 @@ signal references_ready()
 #global logic signals
 #NOTE: these signals should only be used when there is a true need for a "global scope"
 @warning_ignore_start("unused_signal")
-signal unit_took_hit(unit: Unit, hit: HitData) 
-signal unit_died(unit: Unit, hit_report_data: HitReportData) ##hit_report_data contains info of the hit that killed the unit
-signal unit_changed_cell(unit: Unit, old_cell: Vector2i, new_cell: Vector2i)
-
 signal terrain_generating(parameters: GenerationParameters) ##fires before terrain generation, allows modification of generationparameters
 
 #scene tree globals

@@ -1,9 +1,8 @@
-[gd_scene load_steps=17 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene load_steps=16 format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_anqll"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_n3sy1"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_phfvd"]
-[ext_resource type="Resource" uid="uid://cluoqipn8n73o" path="res://Content/Movement/default_mvmt.tres" id="4_j01gd"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_urfjf"]
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ns662"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_n0rgw"]
@@ -22,7 +21,7 @@ shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
-size = Vector2(60, 60)
+size = Vector2(70, 70.00002)
 
 [node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_anqll")
@@ -45,7 +44,6 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_phfvd")
 face_towards_movement = false
-movement_data = ExtResource("4_j01gd")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
@@ -65,7 +63,7 @@ monitoring = false
 script = ExtResource("7_j01gd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(-1.78814e-06, -8.9407e-07)
+scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_n0rgw")
 
 [node name="ModifiersComponent" type="Node" parent="."]

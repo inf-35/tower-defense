@@ -72,16 +72,20 @@ func take_damage(input_damage: float, breaking: bool = false):
 	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
 		health -= damage
 
-func _ready():
-	pass
-	#_STAGGER_CYCLE = 5
-	#_stagger = randi_range(0, _STAGGER_CYCLE)
+#func _ready():
+	#pass
+	##_STAGGER_CYCLE = 5
+	##_stagger = randi_range(0, _STAGGER_CYCLE)
 	
 func _process(delta : float) -> void:
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
 	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
-	if regeneration == 0 and regen_percent == 0:
+	if is_zero_approx(regeneration) and is_zero_approx(regen_percent):
 		return
-		
+
 	health += regeneration * delta + regen_percent * max_health * delta
+	
+	if is_zero_approx(health): #we die due to a status effect
+		unit.died.emit(HitReportData.blank_hit_report)
+	
 	_accumulated_delta = 0.0

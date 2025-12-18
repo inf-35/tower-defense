@@ -1,45 +1,72 @@
-# ruined_ground_slow_effect.gd
-extends GlobalEffect
-class_name RuinedGroundRelic
+extends EffectPrototype
+class_name RuinedGroundEffect
 
-# --- configuration (designer-friendly) ---
-@export_category("Effect")
-# attribute to modify
-@export var modifier: ModifierDataPrototype
-# --- state ---
-# this dictionary tracks which units this relic is currently slowing
-# and the specific modifier instance it applied to them.
-var _slowed_units: Dictionary[Unit, Modifier] = {}
+@export var modifier_prototype: ModifierDataPrototype
 
-func initialise() -> void:
-	# connect to the new global signal for unit movement
-	References.unit_changed_cell.connect(_on_unit_cell_changed)
+# track which unit has which specific modifier instance so we can remove it later
+class RuinedGroundState extends RefCounted:
+	var slowed_units: Dictionary[Unit, Modifier] = {}
 
-# this is the core of the relic's logic
-func _on_unit_cell_changed(unit: Unit, old_cell: Vector2i, new_cell: Vector2i) -> void:
-	# this effect only applies to hostile units
-	if not is_instance_valid(unit) or not unit.hostile:
+func _init() -> void:
+	# We listen for cell changes (movement) and death (cleanup)
+	event_hooks = [GameEvent.EventType.CHANGED_CELL, GameEvent.EventType.DIED]
+	global = true
+
+func create_instance() -> EffectInstance:
+	var instance := EffectInstance.new()
+	apply_generics(instance)
+	instance.state = RuinedGroundState.new()
+	return instance
+
+func _handle_attach(_instance: EffectInstance) -> void:
+	# waiting for movement is sufficient
+	pass
+
+func _handle_detach(instance: EffectInstance) -> void:
+	var state := instance.state as RuinedGroundState
+	
+	# clean up: remove effect from everyone if the relic is lost/sold
+	for unit: Unit in state.slowed_units:
+		if is_instance_valid(unit) and is_instance_valid(unit.modifiers_component):
+			var mod: Modifier = state.slowed_units[unit]
+			unit.modifiers_component.remove_modifier(mod)
+
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
+	var state := instance.state as RuinedGroundState
+	var unit: Unit = event.unit
+
+	# cleanup handler
+	if event.event_type == GameEvent.EventType.DIED:
+		if state.slowed_units.has(unit):
+			state.slowed_units.erase(unit)
 		return
 
-	var is_on_ruin: bool = Player.ruin_service.is_cell_ruined(new_cell)
-	var was_on_ruin: bool = Player.ruin_service.is_cell_ruined(old_cell)
-	var is_currently_slowed: bool = _slowed_units.has(unit)
+	# movement handler
+	if event.event_type == GameEvent.EventType.CHANGED_CELL:
+		# validation
+		if not is_instance_valid(unit):
+			return
+			
+		var data := event.data as ChangedCellData
+		_evaluate_unit_position(state, unit, data.new_cell)
 
-	# --- case 1: unit has moved onto a ruined tile and isn't slowed yet ---
+func _evaluate_unit_position(state: RuinedGroundState, unit: Unit, cell: Vector2i) -> void:
+	var is_on_ruin: bool = Player.ruin_service.is_cell_ruined(cell)
+	var is_currently_slowed: bool = state.slowed_units.has(unit)
+	
+	# entered ruins (apply)
 	if is_on_ruin and not is_currently_slowed:
 		if is_instance_valid(unit.modifiers_component):
-			# apply the status effect directly. we use add_status which is better
-			# for stackable effects like this than a raw modifier.
-			var modifier_instance: Modifier = modifier.generate_modifier()
-			modifier_instance.cooldown = -1.0 #we handle modifier removal manually
-			unit.modifiers_component.add_modifier(modifier_instance)
-			_slowed_units[unit] = modifier_instance # mark this unit as affected
-	
-	# --- case 2: unit has moved off a ruined tile and was being slowed by us ---
-	elif not is_on_ruin and was_on_ruin and is_currently_slowed:
-		if is_instance_valid(unit.modifiers_component):
-			# remove the stacks we added.
-			# we add a negative amount to counteract the original application.
-			unit.modifiers_component.remove_modifier(_slowed_units[unit])
-			_slowed_units.erase(unit) # unmark this unit
+			var mod: Modifier = modifier_prototype.generate_modifier()
+			mod.cooldown = -1.0 # permanent until manually removed
 			
+			unit.modifiers_component.add_modifier(mod)
+			state.slowed_units[unit] = mod
+			
+	# left ruins (remove)
+	elif not is_on_ruin and is_currently_slowed:
+		if is_instance_valid(unit.modifiers_component):
+			var mod: Modifier = state.slowed_units[unit]
+			unit.modifiers_component.remove_modifier(mod)
+		
+		state.slowed_units.erase(unit)

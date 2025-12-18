@@ -52,7 +52,7 @@ func _enter_state(new_state: State) -> void:
 			# 4. after a delay, remove the anomaly from the map
 			await get_tree().create_timer(0.2).timeout
 			if is_instance_valid(unit):
-				unit.died.emit() # this triggers cleanup in the Island script
+				unit.died.emit(HitReportData.blank_hit_report) # this triggers cleanup in the Island script
 
 # checks if the adjacency condition is met
 func _is_charge_condition_met(adjacencies: Dictionary[Vector2i, Tower]) -> bool:
