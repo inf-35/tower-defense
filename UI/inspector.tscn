@@ -51,8 +51,9 @@ clip_contents = true
 layout_mode = 2
 
 [node name="AspectRatioSolid" type="AspectRatioContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2"]
-custom_minimum_size = Vector2(128, 128)
+custom_minimum_size = Vector2(120, 120)
 layout_mode = 2
+size_flags_vertical = 3
 script = ExtResource("2_6mo1h")
 metadata/_custom_type_script = "uid://bxcpffjdkujg"
 
@@ -130,7 +131,7 @@ columns = 3
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_stretch_ratio = 0.5
-theme_type_variation = &"LabelDescriptive"
+theme = ExtResource("1_2ber5")
 bbcode_enabled = true
 text = "Inflicts flame to multiple enemies in a large cone."
 fit_content = true

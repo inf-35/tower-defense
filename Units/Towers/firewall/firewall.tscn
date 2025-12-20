@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_u4q0k"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_8swcr"]
 [ext_resource type="Resource" uid="uid://c1714d1rsmu04" path="res://Units/Towers/firewall/firewall_attack.tres" id="9_vqe15"]
-[ext_resource type="Texture2D" uid="uid://20f68cmnp0js" path="res://Assets/red_tower_base.png" id="10_3c56i"]
+[ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="10_tds48"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_a5hl3"]
 
 [sub_resource type="Resource" id="Resource_uhk0q"]
@@ -104,11 +104,10 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Firewall" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Firewall" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 1
 script = ExtResource("1_mpu13")
 type = 23
-turret = NodePath("")
 stat_displays = Array[ExtResource("2_b88dd")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
 behavior = NodePath("FirewallBehavior")
 graphics = NodePath("Graphics")
@@ -148,8 +147,8 @@ visible = false
 texture = SubResource("PlaceholderTexture2D_i3qpa")
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.18, 0.06)
-texture = ExtResource("10_3c56i")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10_tds48")
 
 [node name="Muzzle" type="Marker2D" parent="Graphics"]
 position = Vector2(0.47718075, 1.6484104)

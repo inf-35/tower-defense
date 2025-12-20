@@ -1,26 +1,22 @@
-[gd_resource type="Theme" load_steps=23 format=3 uid="uid://d1gcsqycnxqwm"]
+[gd_resource type="Theme" load_steps=22 format=3 uid="uid://d1gcsqycnxqwm"]
 
+[ext_resource type="FontFile" uid="uid://b1g536c04mk3e" path="res://Fonts/Skranji-Regular.ttf" id="1_2iung"]
 [ext_resource type="FontFile" uid="uid://3ljny8osnibh" path="res://Fonts/PlusJakartaSans-VariableFont_wght.ttf" id="1_drjrk"]
-[ext_resource type="FontFile" uid="uid://cj6nbn7qhv5gi" path="res://Fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf" id="2_xj1xw"]
+[ext_resource type="Texture2D" uid="uid://c1ldl0vioykic" path="res://Assets/styled_panel.png" id="3_2iung"]
+[ext_resource type="Texture2D" uid="uid://otljac52ne78" path="res://Assets/fancy_banner.png" id="4_5xyi0"]
 
-[sub_resource type="FontVariation" id="FontVariation_drjrk"]
-base_font = ExtResource("1_drjrk")
-variation_embolden = 0.8
-
-[sub_resource type="FontVariation" id="FontVariation_xj1xw"]
-base_font = ExtResource("2_xj1xw")
-variation_embolden = 0.5
-
-[sub_resource type="FontVariation" id="FontVariation_2iung"]
-base_font = ExtResource("1_drjrk")
-variation_embolden = 1.0
-
-[sub_resource type="FontVariation" id="FontVariation_5xyi0"]
-base_font = ExtResource("1_drjrk")
-variation_embolden = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2iung"]
-bg_color = Color(0, 0, 0, 0.5803922)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5xyi0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("3_2iung")
+texture_margin_left = 45.0
+texture_margin_top = 45.0
+texture_margin_right = 45.0
+texture_margin_bottom = 45.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5xyi0"]
 
@@ -44,6 +40,20 @@ bg_color = Color(0, 0, 0, 0.5803922)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5vdr8"]
 
+[sub_resource type="FontVariation" id="FontVariation_drjrk"]
+base_font = ExtResource("1_drjrk")
+variation_embolden = 0.8
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1iw5r"]
+content_margin_left = 20.0
+content_margin_top = 25.0
+content_margin_right = 20.0
+content_margin_bottom = 60.0
+texture = ExtResource("4_5xyi0")
+texture_margin_left = 25.0
+texture_margin_right = 20.0
+axis_stretch_horizontal = 1
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2iung"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5xyi0"]
@@ -51,31 +61,26 @@ bg_color = Color(0.435294, 0.921569, 0.435294, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj1xw"]
 
-[sub_resource type="FontVariation" id="FontVariation_1iw5r"]
-variation_embolden = 0.8
-
 [resource]
 default_font = SubResource("FontVariation_drjrk")
 default_font_size = 20
 HBoxContainer/constants/separation = 0
+Label/colors/font_color = Color(0.53333336, 0.50980395, 0.44705883, 1)
 Label/font_sizes/font_size = 20
-Label/fonts/font = SubResource("FontVariation_drjrk")
+Label/fonts/font = ExtResource("1_2iung")
 LabelDescriptive/base_type = &"Label"
-LabelDescriptive/fonts/font = SubResource("FontVariation_xj1xw")
 LabelHeader/base_type = &"Label"
 LabelHeader/font_sizes/font_size = 25
-LabelHeader/fonts/font = SubResource("FontVariation_2iung")
 LabelInlineheader/base_type = &"Label"
 LabelInlineheader/font_sizes/font_size = 20
-LabelInlineheader/fonts/font = SubResource("FontVariation_5xyi0")
 MarginContainer/constants/margin_bottom = 0
 MarginContainer/constants/margin_left = 0
 MarginContainer/constants/margin_right = 0
 MarginContainer/constants/margin_top = 0
 MarginMajor/base_type = &"MarginContainer"
 MarginMajor/constants/margin_bottom = 20
-MarginMajor/constants/margin_left = 20
-MarginMajor/constants/margin_right = 20
+MarginMajor/constants/margin_left = 35
+MarginMajor/constants/margin_right = 35
 MarginMajor/constants/margin_top = 20
 MarginMinor/base_type = &"MarginContainer"
 MarginMinor/constants/margin_bottom = 10
@@ -87,7 +92,10 @@ MarginSuper/constants/margin_bottom = 40
 MarginSuper/constants/margin_left = 40
 MarginSuper/constants/margin_right = 40
 MarginSuper/constants/margin_top = 40
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_2iung")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_5xyi0")
+RichTextLabel/colors/default_color = Color(0.4862745, 0.4627451, 0.39607844, 1)
+RichTextLabel/fonts/bold_font = ExtResource("1_2iung")
+RichTextLabel/fonts/normal_font = ExtResource("1_2iung")
 VBoxContainer/constants/separation = 0
 button_empty/base_type = &"Button"
 button_empty/styles/disabled = SubResource("StyleBoxEmpty_5xyi0")
@@ -101,6 +109,8 @@ button_empty/styles/normal = SubResource("StyleBoxEmpty_u5het")
 button_empty/styles/normal_mirrored = SubResource("StyleBoxEmpty_by400")
 button_empty/styles/pressed = SubResource("StyleBoxEmpty_xldbc")
 button_empty/styles/pressed_mirrored = SubResource("StyleBoxEmpty_5vdr8")
+fancy_banner/base_type = &"PanelContainer"
+fancy_banner/styles/panel = SubResource("StyleBoxTexture_1iw5r")
 hbox_10/base_type = &"HBoxContainer"
 hbox_10/constants/separation = 10
 hbox_20/base_type = &"HBoxContainer"
@@ -116,12 +126,10 @@ text_s10/base_type = &"Label"
 text_s10/constants/line_spacing = 0
 text_s10/constants/paragraph_spacing = 0
 text_s10/font_sizes/font_size = 10
-text_s10/fonts/font = SubResource("FontVariation_1iw5r")
 text_s15/base_type = &"Label"
 text_s15/constants/line_spacing = 0
 text_s15/constants/paragraph_spacing = 0
 text_s15/font_sizes/font_size = 15
-text_s15/fonts/font = SubResource("FontVariation_drjrk")
 vbox_10/base_type = &"VBoxContainer"
 vbox_10/constants/separation = 10
 vbox_20/base_type = &"VBoxContainer"

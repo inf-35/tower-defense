@@ -54,7 +54,7 @@ window/vsync/vsync_mode=0
 [gui]
 
 theme/custom="uid://d1gcsqycnxqwm"
-theme/custom_font="uid://3ljny8osnibh"
+theme/custom_font="uid://b1g536c04mk3e"
 
 [input]
 
@@ -112,6 +112,11 @@ rendering/size/resizable=true
 2d_physics/layer_1="enemies"
 2d_physics/layer_2="allies"
 2d_physics/layer_3="interactables"
+
+[physics]
+
+common/physics_ticks_per_second=30
+2d/solver/solver_iterations=8
 
 [rendering]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=17 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
@@ -10,8 +10,6 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_x42ai"]
 [ext_resource type="PackedScene" uid="uid://dti7nnkxq7kl0" path="res://UI/wave_timeline.tscn" id="6_4g3kg"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
-[ext_resource type="Script" uid="uid://bqtbpudkayswb" path="res://UI/capacity_label.gd" id="6_rvses"]
-[ext_resource type="Script" uid="uid://c0ntmjdx54rgi" path="res://UI/health_label.gd" id="7_hpkop"]
 [ext_resource type="Script" uid="uid://cauusuod0mrq8" path="res://UI/time_control_buttons.gd" id="9_doea8"]
 [ext_resource type="Script" uid="uid://cusv1l6vww08n" path="res://UI/relic_display.gd" id="10_aasu8"]
 [ext_resource type="Texture2D" uid="uid://jx5cr78dqj13" path="res://Assets/pause.svg" id="10_gdbfk"]
@@ -30,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1_v6kvy")
-theme_type_variation = &"MarginMajor"
+theme_type_variation = &"MarginMinor"
 
 [node name="ui_space" type="Control" parent="Margin"]
 layout_mode = 2
@@ -77,6 +75,7 @@ alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("card_list")]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -119,46 +118,31 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "reroll"
 
-[node name="Stats" type="Panel" parent="Margin/ui_space"]
+[node name="Stats" type="Control" parent="Margin/ui_space"]
 layout_mode = 1
+anchors_preset = 0
 offset_right = 360.0
 offset_bottom = 150.0
 mouse_filter = 2
 
 [node name="Stats" type="VBoxContainer" parent="Margin/ui_space/Stats"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 150.0
 theme_type_variation = &"vbox_5"
 
-[node name="FluxLabel" type="RichTextLabel" parent="Margin/ui_space/Stats/Stats"]
+[node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/Stats/Stats"]
+layout_mode = 2
+theme_type_variation = &"fancy_banner"
+
+[node name="stats_label" type="RichTextLabel" parent="Margin/ui_space/Stats/Stats/PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"LabelInlineheader"
 bbcode_enabled = true
 text = "Flux Label"
 fit_content = true
 script = ExtResource("3_aw3sh")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
-
-[node name="CapacityLabel" type="Label" parent="Margin/ui_space/Stats/Stats"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 1
-theme_type_variation = &"LabelInlineheader"
-text = "Capacity Label"
-script = ExtResource("6_rvses")
-
-[node name="HealthLabel" type="Label" parent="Margin/ui_space/Stats/Stats"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 1
-theme_type_variation = &"LabelInlineheader"
-text = "Capacity Label"
-script = ExtResource("7_hpkop")
 
 [node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats/Stats"]
 clip_contents = true
@@ -228,6 +212,7 @@ metadata/_custom_type_script = "uid://dmty142sb38lp"
 [node name="Inspector" parent="Margin/ui_space" instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 offset_left = -300.0
-offset_top = -150.0
+offset_top = -190.0
 offset_right = 300.0
+offset_bottom = -40.0
 size_flags_vertical = 8

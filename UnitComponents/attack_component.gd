@@ -24,37 +24,58 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 		
 	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN) #reset cooldown
 	#NOTE: this must be before the actual attack execution
-	var delivery_data := DeliveryData.new()
-	delivery_data.delivery_method = attack_data.delivery_method
-	delivery_data.cone_angle = attack_data.cone_angle
-	delivery_data.target = target
+	var delivery_data: DeliveryData = generate_delivery_data()
 	if intercept_override != Vector2.ZERO:
-		delivery_data.projectile_speed = attack_data.projectile_speed
 		delivery_data.intercept_position = intercept_override
 	else:
 		if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 		or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
-			delivery_data.projectile_speed = attack_data.projectile_speed
-			delivery_data.projectile_lifetime = attack_data.projectile_lifetime
 			delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
 		else:
 			delivery_data.intercept_position = target.global_position
 	
-	var hit_data: HitData = attack_data.generate_hit_data() 
-	hit_data.source = unit
+	delivery_data.target = target
+	
+	var hit_data: HitData = generate_hit_data(delivery_data)
 	hit_data.target = target
+	hit_data.target_affiliation = target.hostile
+	
+	unit.deal_hit(hit_data, delivery_data)
+
+func generate_delivery_data() -> DeliveryData: ##generates a unit-specific targetless, overrideless deliverydata
+	var delivery_data := DeliveryData.new()
+	delivery_data.delivery_method = attack_data.delivery_method
+	delivery_data.cone_angle = attack_data.cone_angle
+	delivery_data.projectile_speed = attack_data.projectile_speed
+	
+	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
+	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
+		delivery_data.projectile_lifetime = attack_data.projectile_lifetime
+		delivery_data.pierce = attack_data.pierce
+		delivery_data.stop_on_walls = attack_data.stop_on_walls
+
+	return delivery_data
+	
+func generate_hit_data(delivery_data: DeliveryData = null) -> HitData: ##generates a unit-specific targetless, overrideless hitdata
+	var hit_data := HitData.new()
 	hit_data.damage = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 	hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
-	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.CONE_AOE:
+	if delivery_data and delivery_data.delivery_method == DeliveryData.DeliveryMethod.CONE_AOE:
 		hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RANGE)
-		##range is used inplace of radius in cone aoe towers (i.e. flamethrower, frost)
-	hit_data.target_affiliation = target.hostile
-	hit_data.expected_damage = hit_data.damage
-	
+		#range is used inplace of radius in cone aoe towers (i.e. flamethrower, frost)
+
+	hit_data.breaking = attack_data.breaking
+	hit_data.modifiers = attack_data.generate_modifiers()
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id
-
-	unit.deal_hit(hit_data, delivery_data)
+	hit_data.status_effects = attack_data.format_status_effects()
+	
+	hit_data.vfx_on_impact = attack_data.vfx_on_impact
+	hit_data.vfx_on_spawn = attack_data.vfx_on_spawn
+	
+	hit_data.source = unit
+	
+	return hit_data
 
 #used for projectile-based attacks with non-zero traverse times
 const MAXIMUM_ACCEPTABLE_INACCURACY: float = 1.0

@@ -38,14 +38,12 @@ func _trigger_ambush_explosion(source_tower: Tower) -> void:
 		return
 	push_warning("!")
 	# generate the hit payload from the designer-configured resource
-	var hit_data: HitData = attack_data.generate_hit_data()
+	var hit_data: HitData = attack_data.generate_generic_hit_data()
 	hit_data.source = source_tower
 	hit_data.target_affiliation = not source_tower.hostile
 	
 	#instant centered aoe
-	var delivery_data := DeliveryData.new()
-	delivery_data.delivery_method = attack_data.delivery_method
-	delivery_data.cone_angle = attack_data.cone_angle
+	var delivery_data: DeliveryData = attack_data.generate_generic_delivery_data()
 	delivery_data.use_source_position_override = true
 	delivery_data.source_position = source_tower.global_position
 	delivery_data.intercept_position = source_tower.global_position # explode exactly where the tower was built

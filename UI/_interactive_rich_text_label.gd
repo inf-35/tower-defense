@@ -28,7 +28,6 @@ func _on_meta_hover_started(meta: Variant) -> void:
 		
 		# determine if *this* label is currently sitting inside another tooltip
 		var parent_tooltip: TooltipPanel = _find_parent_tooltip()
-		print("added tooltip,  ", parent_tooltip)
 
 		add_child(_tooltip_instance)
 		

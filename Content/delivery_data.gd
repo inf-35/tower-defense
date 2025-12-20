@@ -26,6 +26,8 @@ var vertical_force: float ##used for pseudo-3d projectiles, simulates gravity
 
 #extension: for simulated projectiles
 var projectile_lifetime: float = 0.0 ##lifetime of the projectile, after which the projectile will despawn
+var pierce: int = 0 ##how many enemies can this projectile pass through? (-1 = infinite)
+var stop_on_walls: bool = false ##does the projectile stop at walls?
 
 #for coneAOE
 var cone_angle : float ##angle of the fire cone in degrees

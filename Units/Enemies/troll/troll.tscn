@@ -24,11 +24,12 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
 size = Vector2(100.00003, 111.25004)
 
-[node name="TrollUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="TrollUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_r3k45")
 hostile = true
 behavior = NodePath("DefaultBehavior")
 graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")

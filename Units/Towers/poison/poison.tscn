@@ -9,8 +9,8 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_n8088"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_fywk1"]
 [ext_resource type="Resource" uid="uid://cjq7a443me1lx" path="res://Units/Towers/poison/poison_attack.tres" id="9_rofbp"]
-[ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="10_b2wjq"]
-[ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="11_qmw8s"]
+[ext_resource type="Texture2D" uid="uid://sv2v7deixlsu" path="res://Assets/green_tower_base.png" id="10_70v42"]
+[ext_resource type="Texture2D" uid="uid://b5lrvn5go6w2v" path="res://Assets/poison_turret.png" id="11_mi3sl"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_e3h2a"]
 
 [sub_resource type="Resource" id="Resource_uhk0q"]
@@ -73,12 +73,12 @@ muzzle = NodePath("../Graphics/Turret/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.048, 0.048)
-texture = ExtResource("10_b2wjq")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10_70v42")
 
 [node name="Turret" type="Sprite2D" parent="Graphics"]
 z_index = 1
-texture = ExtResource("11_qmw8s")
+texture = ExtResource("11_mi3sl")
 offset = Vector2(28, 0)
 
 [node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]

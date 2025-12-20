@@ -29,7 +29,7 @@ func _create_prism_laser(prism_b: Tower) -> void:
 	References.island.add_child.call_deferred(laser)
 	
 	# configure the laser's damage from the prism's attack data
-	laser.hit_data_prototype = prism_a.attack_component.attack_data.generate_hit_data()
+	laser.hit_data_prototype = prism_a.attack_component.generate_hit_data()
 	laser.cooldown = prism_a.attack_component.attack_data.cooldown
 	#TODO: make it such that the stats are the average of both towers
 	

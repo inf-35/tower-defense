@@ -7,7 +7,10 @@ var target_affiliation: bool ##affiliation of target (true for hostile, false fo
 #NOTE: this is mainly for targetless hits with no predestined receiver. it will be overwritten
 #if target exists (with the primary target's affiliation)
 
-var damage: float = 0.0
+var damage: float = 0.0:
+	set(nd):
+		damage = nd
+		expected_damage = damage #link expected damage and damage
 var radius: float = 0.0 ##AOE effect range of the hit
 var breaking: bool = false ##can this hit damage shields?
 var modifiers: Array[Modifier] = []

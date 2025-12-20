@@ -1,12 +1,23 @@
 # keyword_service.gd (Autoload Singleton)
 extends Node
 
+var ICON_SIZE: int = 25
 # master dictionary for static keywords
 const KEYWORDS: Dictionary[String, Dictionary] = {
 	"FLUX": {
-		"title": "Flux",
+		"title": "",
 		"description": "The primary currency used for building and upgrading towers.",
-		"icon": null,
+		"icon": preload("res://Assets/gold_icon.png"),
+	},
+	"PLAYER_HP": {
+		"title": "",
+		"description": "Player Health",
+		"icon": preload("res://Assets/hp_icon.png"),
+	},
+	"CAPACITY" : {
+		"title": "",
+		"description": "Player Capacity",
+		"icon": preload("res://Assets/capacity_icon.png"),
 	},
 	"BREACH": {
 		"title": "Breach",
@@ -74,11 +85,25 @@ func parse_text_for_bbcode(text: String) -> String:
 		# verify data exists before linking
 		var data: Dictionary = get_keyword_data(keyword)
 		if not data.is_empty():
-			# generate the interactive link
-			var bbcode_link: String = "[color=yellow][url=%s]%s[/url][/color]" % [keyword, data.title]
+			# build the inner content (image + title)
+			var inner_content: String = ""
+			
+			if data.has("icon") and data.icon != null:
+				var tex: Texture2D = data.icon
+				# ensure resource exists and has a path for BBCode to find it
+				if tex.resource_path != "":
+					# add image tag followed by a space
+					inner_content += "[img=%sx%s]%s[/img]" % [ICON_SIZE, ICON_SIZE, tex.resource_path]
+			
+			# add the text title
+			inner_content += data.title
+			
+			#wrap the combined content in the URL and Color tags
+			var bbcode_link: String = "[color=blue][url=%s]%s[/url][/color]" % [keyword, inner_content]
+			#replaced text with parsed text
 			parsed_text = parsed_text.replace(full_placeholder, bbcode_link)
 		else:
-			# cleanup broken tags if data missing
+			#cleanup broken tags
 			parsed_text = parsed_text.replace(full_placeholder, keyword)
 			
 	return parsed_text

@@ -24,11 +24,12 @@ func start() -> void:
 	unit.died.connect(
 		func(_hit_report_data): 
 			unit.remove_from_group(MAGE_TOWER_GROUP)
-			mage_changed.emit()
+			mage_changed.emit(),
+		CONNECT_ONE_SHOT
 	)
 
 	# 2. connect to the grid change signal to know when to update our buff
-	mage_changed.connect(_recalculate_buff)
+	mage_changed.connect(_recalculate_buff, CONNECT_ONE_SHOT)
 	
 	# 3. perform an initial calculation
 	_recalculate_buff()

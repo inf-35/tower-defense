@@ -57,7 +57,7 @@ func update(_delta: float) -> void:
 			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
 			var target_angle: float = direction_to_target.angle()
 			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
-			var required_turn_speed: float = angle_diff / maxf(attack_cooldown, 0.05)
+			var required_turn_speed: float = angle_diff / maxf(attack_cooldown, 0.01)
 			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
 			# if the wind-up timer finishes, execute the attack
 			if _is_attack_possible():

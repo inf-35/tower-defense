@@ -34,7 +34,11 @@ class_name AttackData
 @export_group("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
-@export var projectile_lifetime: float = 0.0
+@export var projectile_lifetime: float = -1.0 ##lifetime of projectile before despawning (negative = infinite)
+
+@export_group("Projectile Simulated")
+@export var pierce: int = 1 ##how many times does this projectile pierce through enemies? (-1 = infinite)
+@export var stop_on_walls: bool = true ##does this projectile stop on walls?
 
 @export_group("Hit Properties")
 @export var cone_angle: float = 0.0 ##for coneAOE in degrees, note: 0.0 means full-cone implicitly
@@ -56,7 +60,7 @@ func format_status_effects() -> Dictionary[Attributes.Status, Vector2]: #see Hit
 	
 	return output
 
-func generate_hit_data() -> HitData:
+func generate_generic_hit_data() -> HitData: ##generates a generic (unitless) hitdata as opposed to attack_component. ...
 	var hit_data := HitData.new()
 	hit_data.damage = damage
 	hit_data.expected_damage = damage
@@ -69,3 +73,18 @@ func generate_hit_data() -> HitData:
 	hit_data.vfx_on_spawn = vfx_on_spawn
 	
 	return hit_data
+
+func generate_generic_delivery_data() -> DeliveryData: ##generates a generic (unitless) deliverydata as opposed to attack_component. ...
+	var delivery_data := DeliveryData.new()
+	delivery_data.delivery_method = delivery_method
+	delivery_data.cone_angle = cone_angle
+	delivery_data.projectile_speed = projectile_speed
+	
+	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
+	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
+		delivery_data.projectile_lifetime = projectile_lifetime
+		delivery_data.pierce = pierce
+		delivery_data.stop_on_walls = stop_on_walls
+		#delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
+
+	return delivery_data

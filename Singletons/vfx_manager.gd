@@ -20,12 +20,13 @@ func _process(_d: float):
 	for vfx : VFXInstance in _active_vfx:
 		# Update lifetime
 		vfx.age += delta
-		if vfx.age >= vfx.lifetime or vfx.delete:
+		if vfx.age >= vfx.lifetime and vfx.lifetime > 0.0:
+			vfx.delete = true
+		if vfx.delete:
 			vfx_to_remove.append(vfx)
 			continue
 			
 		# Update position and rotation
-
 		vfx.position += vfx.velocity * delta
 		match vfx.vfx_info.rotation_mode:
 			VFXInfo.RotationMode.FACE_VELOCITY:
@@ -101,8 +102,9 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	vfx.position = position
 	vfx.velocity = velocity
 	
-	if lifetime == INF:
+	if lifetime == INF: #NOTE: INF means to use info.lifetime
 		vfx.lifetime = info.lifetime
+	#to get a truly infinite-span projectile, use negative values (VFXInfo.INFINITE_LIFETIME)
 	else:
 		vfx.lifetime = lifetime
 	

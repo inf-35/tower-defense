@@ -63,7 +63,7 @@ func _execute_reaction(trigger_hit: HitData, center_unit: Unit) -> void:
 		return
 
 	# create the reaction hit
-	var secondary_hit: HitData = attack_data.generate_hit_data()
+	var secondary_hit: HitData = attack_data.generate_generic_hit_data()
 	
 	# inherit recursion depth to prevent infinite loops
 	secondary_hit.recursion = trigger_hit.recursion + 1
@@ -74,10 +74,9 @@ func _execute_reaction(trigger_hit: HitData, center_unit: Unit) -> void:
 	secondary_hit.target_affiliation = trigger_hit.target_affiliation
 	
 	# configure delivery to happen instantly at the unit's location
-	var delivery_data := DeliveryData.new()
+	var delivery_data: DeliveryData = attack_data.generate_generic_delivery_data()
 	delivery_data.use_source_position_override = true
 	delivery_data.source_position = center_unit.global_position 
-	delivery_data.delivery_method = DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT
 	delivery_data.intercept_position = center_unit.global_position
 	
 	CombatManager.resolve_hit(secondary_hit, delivery_data)

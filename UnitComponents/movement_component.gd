@@ -14,8 +14,10 @@ const _ERROR_SQUARED: float = 2.0 ** 2  #allowable error for units from target p
 var position: Vector2:
 	set(new_position):
 		position = new_position
-		cell_position = Island.position_to_cell(position)
 		unit.position = position
+		
+		if _stagger % 8 == 0:
+			cell_position = Island.position_to_cell(position)
 
 var direction: Vector2
 var cell_position: Vector2i:
@@ -47,12 +49,15 @@ func _ready():
 	_STAGGER_CYCLE = 3
 	_stagger = randi_range(0, _STAGGER_CYCLE)
 	position = position #trigger setter functions, esp. cell
+	cell_position = Island.position_to_cell(position)
 	unit.position = position
 
 func _physics_process(_delta: float) -> void:
+	_stagger += 1
+	
 	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
 	var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
-		
+	
 	if movement_data == null:
 		return  # no data → do nothing
 

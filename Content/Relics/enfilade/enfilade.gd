@@ -19,11 +19,9 @@ func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
 func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
-	print("ALLAn")
 	if event.event_type != GameEvent.EventType.TOWER_BUILT:
 		return
 	#check if mid-battle
-	print(Phases.GamePhase.keys()[Phases.current_phase])
 	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
 		return
 	#get data

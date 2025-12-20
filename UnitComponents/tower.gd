@@ -95,7 +95,7 @@ func sell():
 		died.emit(HitReportData.blank_hit_report)
 
 func _create_hitbox():
-	var hitbox := Hitbox.new()
+	hitbox = Hitbox.new()
 	var collision_shape := CollisionShape2D.new()
 	var shape_bound := RectangleShape2D.new()
 	shape_bound.size = size * Island.CELL_SIZE
@@ -104,6 +104,7 @@ func _create_hitbox():
 	hitbox.collision_mask = 0
 	hitbox.collision_layer = Hitbox.get_mask(hostile)
 	hitbox.unit = self
+
 	
 	hitbox.add_child(collision_shape)
 	add_child(hitbox)

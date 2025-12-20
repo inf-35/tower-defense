@@ -38,25 +38,7 @@ func inject_components(modifiers_component: ModifiersComponent):
 		
 		_modifiers_component.register_data(health_data)
 		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION, Attributes.id.REGEN_PERCENT])
-	
-	if not unit.get_node_or_null("Hitbox"):
-		var hitbox := Hitbox.new() #generate range area
-		hitbox.name = "Hitbox"
-		hitbox.unit = unit
-		unit.add_child.call_deferred(hitbox)
-		
-		var shape := RectangleShape2D.new()
-		shape.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
-		
-		var collision := CollisionShape2D.new()
-		collision.shape = shape
-		hitbox.add_child.call_deferred(collision)
-		#set detection bitmasks
-		hitbox.collision_layer = 0b0000_0001 if unit.hostile else 0b0000_0010
-		hitbox.collision_mask = 0
-		hitbox.monitoring = false
-		hitbox.monitorable = true
-	
+
 	shield = health_data.max_shield
 	UI.update_unit_health.emit(unit, max_health, health)
 

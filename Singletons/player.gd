@@ -78,6 +78,7 @@ func _setup_state():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
+		Towers.Type.SNOWBALL: true,
 	}
 	flux = 20.0
 	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.AMBUSH}))

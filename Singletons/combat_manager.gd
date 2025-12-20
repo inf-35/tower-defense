@@ -1,6 +1,6 @@
 extends Node #CombatManager
 
-const _DEBUG: bool = true
+const _DEBUG: bool = false
 
 class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
@@ -29,9 +29,16 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 			source_position = hit_data.source.attack_component.muzzle.global_position\
 				if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 	
-	func start(delay : float):
+	func start():
 		var source_to_target_normalized : Vector2 = (intercept_position - source_position).normalized()
-		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, delivery_data.projectile_speed * source_to_target_normalized, delay)
+		var starting_velocity: Vector2 = delivery_data.projectile_speed * source_to_target_normalized
+		var delay: float = (intercept_position - source_position).length() / delivery_data.projectile_speed
+		
+		if delivery_data.use_initial_velocity_override: #we probably have no intercept position
+			starting_velocity = delivery_data.initial_velocity
+			delay = delivery_data.projectile_lifetime
+		
+		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, starting_velocity, delay)
 		Clock.await_game_time(delay).connect(func():
 			_on_timeout()
 		)
@@ -58,7 +65,7 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 			unit_hit.take_hit(hit_copy)
 			
 class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate for ProjectileSimulated (see resolve_hit)
-	const base_homing: float = 1.0
+	const base_homing: float = 1.0 # sleight of hand to reduce misses
 	
 	var hit_data: HitData
 	var delivery_data: DeliveryData
@@ -68,7 +75,12 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 	var projectile_velocity: Vector2
 	var projectile_age: float
 	
+	var _current_pierces_left: int = 0
+	var _exclude_colliders: Array[RID] = [] #tracks what we've already hit to prevent double collision
+	
 	var vfx_instance: VFXInstance
+	#cached objects
+	var _raycast_query: PhysicsRayQueryParameters2D
 	
 	func _init(_hit_data: HitData, _delivery_data: DeliveryData):
 		hit_data = _hit_data
@@ -83,6 +95,11 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				if is_instance_valid(hit_data.source.attack_component.muzzle) else hit_data.source.global_position
 		projectile_position = source_position
 		
+		_raycast_query = PhysicsRayQueryParameters2D.new()
+		_raycast_query.collide_with_areas = true
+		_raycast_query.collide_with_bodies = false
+		_raycast_query.hit_from_inside = true
+		
 		CombatManager.simulated_projectiles.append(self)
 		
 	func start():
@@ -92,49 +109,140 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		else:
 			initial_velocity = delivery_data.initial_velocity
 		projectile_velocity = initial_velocity
-		vfx_instance =  VFXManager.play_vfx(hit_data.vfx_on_spawn, projectile_position, Vector2.ZERO) #we manage lifetime and velocity by ourselves
+		
+		_current_pierces_left = delivery_data.pierce
+		_exclude_colliders.append(hit_data.source.hitbox.get_rid())
+		 #we manage lifetime and velocity by ourselves
+		vfx_instance =  VFXManager.play_vfx(hit_data.vfx_on_spawn, projectile_position, Vector2.ZERO, VFXInfo.INFINITE_LIFETIME)
 		
 	func tick(delta: float):
 		projectile_age += delta
 		
-		var target: Unit = CombatManager.get_unit_along_ray(projectile_position, projectile_position + projectile_velocity * delta, target_affiliation)
-		if target: #hit something!
-			print(target)
-			_on_destruct(target)
-		
 		if is_instance_valid(hit_data.target): #slightly home towards intended target
 			var desired_velocity: Vector2 = hit_data.target.global_position - projectile_position
 			projectile_velocity = projectile_velocity.lerp(desired_velocity, base_homing * delta).normalized() * projectile_velocity.length()
-		
-		projectile_position += projectile_velocity * delta
-		
-		vfx_instance.position = projectile_position
-		
-		if projectile_age > delivery_data.projectile_lifetime:
+		#physics and collision loop (handle multiple collisions/frame)
+		var remaining_delta: float = delta
+		var safety_break: int = 0
+		while remaining_delta > 0.0 and safety_break < 10:
+			safety_break += 1
+			
+			var start_pos := projectile_position
+			var move_vec := projectile_velocity * remaining_delta
+			var end_pos := start_pos + move_vec
+			
+			vfx_instance.position = projectile_position #vfx update
+			
+			# perform custom raycast
+			var result = _perform_raycast(start_pos, end_pos)
+			
+			if result.is_empty(): #move to end
+				projectile_position = end_pos
+				break
+			else:
+				# hit something!
+				var hit_pos := result.position as Vector2
+				var collider := result.collider as Hitbox
+				# advance projectile to hit point
+				projectile_position = hit_pos
+				# calculate fraction of delta consumed
+				var dist_traveled: float = start_pos.distance_to(hit_pos)
+				var dist_total: float = move_vec.length()
+				var fraction: float = dist_traveled / dist_total if dist_total > 0.0 else 0.0
+				remaining_delta -= (remaining_delta * fraction)
+				# process the collision
+				var stop_processing: bool = _handle_collision(collider, hit_pos)
+				if stop_processing:
+					return # projectile destroyed
+				# if continuing (pierce), we must exclude this collider and nudge forward
+				_exclude_colliders.append(result.rid)
+
+		if projectile_age > delivery_data.projectile_lifetime and delivery_data.projectile_lifetime > 0.0: #timeout
 			_on_destruct()
 
+	func _perform_raycast(from: Vector2, to: Vector2) -> Dictionary:
+		var space_state = References.island.get_world_2d().direct_space_state
+		var query := _raycast_query
+		
+		query.from = from
+		query.to = to
+	
+		var enemy_mask: int = Hitbox.get_mask(target_affiliation)
+		query.collision_mask = enemy_mask
+		
+		if delivery_data.stop_on_walls:
+			var wall_mask = Hitbox.get_mask(not target_affiliation)
+			query.collision_mask = enemy_mask | wall_mask #combine two masks
+			
+		query.exclude = _exclude_colliders
+	
+		if _DEBUG: CombatManager._visualize_line_for_debug(from, to, 2.0, Color.RED)
+		return space_state.intersect_ray(query)
+		
+	# returns TRUE if projectile should be destroyed
+	func _handle_collision(hitbox: Hitbox, impact_pos: Vector2) -> bool:
+		if not is_instance_valid(hitbox) or not is_instance_valid(hitbox.unit):
+			return false # Hit something weird, ignore
+			
+		var unit: Unit  = hitbox.unit as Unit
+		var stop_on_walls = delivery_data.stop_on_walls
+		
+		if not is_instance_valid(unit): #we hit something that isnt a unit's hitbox?
+			push_warning("Invalid hitbox?")
+			return false
+	
+		# allied/neutral structure/wall NOTE: if we do not stop on structures we shouldnt even detect them
+		if unit is Tower: 
+			if unit == hit_data.source:
+				return false #ignore self
+				
+			if stop_on_walls:
+				_apply_impact_vfx(impact_pos)
+				_on_destruct(null) # wall hit = Death
+				return true
+			else:
+				return false #pass through walls
+	
+		if unit.hostile == target_affiliation: # enemy
+			_apply_hit_to_unit(unit, impact_pos)
+			
+			if _current_pierces_left > 0:
+				_current_pierces_left -= 1
+				return false # continue flying
+			elif _current_pierces_left == -1:
+				return false # infinite pierce
+			else:
+				_on_destruct(unit) # out of pierce charges
+				return true
+		return false #hit something allied that is not a structure (ignore)
+	
+	func _apply_hit_to_unit(unit: Unit, impact_pos: Vector2):
+		_apply_impact_vfx(impact_pos)
+		
+		var hit_copy: HitData = hit_data.duplicate() as HitData #prevent mutation of original hitdata
+		hit_copy.target = unit 
+
+		if is_zero_approx(hit_data.radius):
+			unit.take_hit(hit_copy)
+		else:
+			# trigger AOE at this point
+			var units_in_aoe: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_pos, target_affiliation)
+			for hit_unit: Unit in units_in_aoe:
+				var aoe_hit: HitData = hit_data.duplicate() as HitData
+				aoe_hit.target = hit_unit
+				hit_unit.take_hit(aoe_hit)
+
+	func _apply_impact_vfx(pos: Vector2):
+		VFXManager.play_vfx(hit_data.vfx_on_impact, pos)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, pos)
+	
 	func _on_destruct(target: Unit = null):
 		CombatManager.simulated_projectiles.erase(self)
 		
-		var impact_position: Vector2 = projectile_position + projectile_velocity * 0.5 * Clock.game_delta
-		vfx_instance.delete = true #mark the corresponding vfx instance for destruction
-		VFXManager.play_vfx(hit_data.vfx_on_impact, impact_position)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, impact_position)
-		
-		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage from intended target
-		
-		if not is_instance_valid(target): #no actual target (timeout), dont do anything
-			return
-	
-		if is_zero_approx(hit_data.radius): #this projectile has no aoe, so we just damage the hit target
-			target.take_hit(hit_data)
-			return
-		#if we reach here, the projectile has some aoe
-		var units: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_position, target_affiliation)
-		for unit_hit: Unit in units:
-			var hit_copy = hit_data.duplicate()
-			hit_copy.target = unit_hit
-			unit_hit.take_hit(hit_copy)
+		if is_instance_valid(vfx_instance):
+			vfx_instance.delete = true
+			
+		Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
 			
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 	var target: Unit = hit_data.target #this will be null if the hit does not have a predestined target
@@ -217,15 +325,12 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 				hit_copy.target = unit
 				unit.take_hit(hit_copy)
 		
-			# Clean up the initial damage estimate for the primary target.
+			# clean up the initial damage estimate for the primary target.
 			Targeting.add_damage(target, -hit_data.expected_damage)
 		
 		DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT:
-			var intercept_time: float = (intercept_position - source_position).length() / delivery_data.projectile_speed
-			if is_zero_approx((intercept_position - source_position).length()):
-				intercept_time = 0.0
 			var resolver := ProjectileAbstractResolver.new(hit_data, delivery_data)
-			resolver.start(intercept_time)
+			resolver.start()
 		
 		DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
 			var resolver := ProjectileSimulatedResolver.new(hit_data, delivery_data)

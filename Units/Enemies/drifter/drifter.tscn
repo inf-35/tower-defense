@@ -36,12 +36,13 @@ shader_parameter/overlay_color = Color(0, 0, 1, 0)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
 size = Vector2(80, 80.00002)
 
-[node name="Drifter" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Drifter" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 script = ExtResource("1_0kato")
 hostile = true
 attack_only_when_blocked = true
 behavior = NodePath("Behavior")
 graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")

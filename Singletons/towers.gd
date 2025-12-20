@@ -25,7 +25,8 @@ enum Type {
 	FLAMETHROWER,
 	VENOM,
 	MORTAR,
-	FIREWALL
+	FIREWALL,
+	SNOWBALL,
 }
 
 enum Element {

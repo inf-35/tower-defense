@@ -1,6 +1,7 @@
 class_name VFXInfo
 extends Resource
 
+const INFINITE_LIFETIME: float = -1.0 ##use for vfx which have unbounded lifetimes
 # The new enum to select the renderer.
 enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var vfx_type: VFXType = VFXType.TEXTURE

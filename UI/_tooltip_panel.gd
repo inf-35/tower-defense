@@ -2,7 +2,7 @@ extends PanelContainer
 class_name TooltipPanel
 
 # --- configuration ---
-const SOLIDIFY_TIME: float = 0.5
+const SOLIDIFY_TIME: float = 0.8
 const GRACE_TIME: float = 0.3 # time allowed to move mouse from link to panel
 const MOUSE_OFFSET: Vector2 = Vector2(20, 20)
 
@@ -21,6 +21,7 @@ var is_solidified: bool = false:
 			print("solidity: ", is_solidified, " at ", Time.get_ticks_msec())
 var is_mouse_inside_panel: bool = false
 var is_mouse_on_link: bool = true # assumed true when created
+var is_closing: bool = false ##whether this tooltip panel is closing
 
 # --- hierarchy ---
 var parent_tooltip: TooltipPanel = null
@@ -101,6 +102,7 @@ func on_link_mouse_exited() -> void:
 	else:
 		# if solid, give the user a split second to move mouse from text to the panel
 		_grace_timer.start()
+		push_warning(self, " grace timer start!")
 
 func _on_solidify_timeout() -> void:
 	is_solidified = true
@@ -108,7 +110,7 @@ func _on_solidify_timeout() -> void:
 
 func _on_grace_timeout() -> void:
 	# if the grace period ended and the mouse isn't inside the panel, close it.
-	if (not is_mouse_inside_panel) and (not is_mouse_on_link) :
+	if (not is_mouse_inside_panel) and (not is_mouse_on_link) and (not _is_mouse_inside_descendants()):
 		close()
 
 func _on_panel_mouse_entered() -> void:
@@ -122,6 +124,20 @@ func _on_panel_mouse_exited() -> void:
 	if _grace_timer.is_inside_tree():
 		_grace_timer.start()
 
+func _is_mouse_inside_descendants() -> bool: ##check if the mouse is inside any of our descendants
+	var mouse_inside: bool = false
+	var descendant: TooltipPanel = active_child_tooltip
+	while true:
+		if not is_instance_valid(descendant):
+			break
+			
+		if descendant.is_mouse_inside_panel or descendant.is_mouse_on_link:
+			mouse_inside = true
+			break
+			
+		descendant = descendant.active_child_tooltip
+	return mouse_inside
+
 # hierarchy helpers
 func register_child(child: TooltipPanel) -> void:
 	# if we already had a child open, close it (only one nested tip at a time)
@@ -130,8 +146,14 @@ func register_child(child: TooltipPanel) -> void:
 	active_child_tooltip = child
 
 func close() -> void:
+	if is_closing: #reject if we are already closing
+		return
+	is_closing = true
 	# recursive cleanup: close children first
 	if is_instance_valid(active_child_tooltip):
 		active_child_tooltip.close()
+	# recursive cleanup: propagate upwards
+	if is_instance_valid(parent_tooltip) and not (parent_tooltip.is_mouse_inside_panel or parent_tooltip.is_mouse_on_link):
+		parent_tooltip._grace_timer.start()
 	
 	queue_free()

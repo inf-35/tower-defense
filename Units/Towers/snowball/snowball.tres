@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://cledbfomsigv"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_cob1y"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_fn38c"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_tm8p4"]
+[ext_resource type="PackedScene" uid="uid://c7chrtlkjrrxn" path="res://Units/Towers/snowball/snowball.tscn" id="4_eo045"]
+
+[resource]
+script = ExtResource("3_tm8p4")
+id = 24
+element = 1
+tower_name = "Snowball"
+tower_description = "Long-range, single-target high damage dealer"
+icon = ExtResource("1_cob1y")
+tower_scene = ExtResource("4_eo045")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

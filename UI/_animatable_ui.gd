@@ -63,7 +63,8 @@ func _ready() -> void:
 
 func _update_content_pivot() -> void:
 	if not content: return
-	content.size = size
+	content.set_deferred(&"size", size)
+	#content.size = size
 	# Center pivot is crucial for both Scaling (Hover) and Rotation (Idle)
 	content.pivot_offset = size / 2.0
 

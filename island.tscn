@@ -60,7 +60,7 @@ shader = ExtResource("9_8ervs")
 max_gradient_depth = 3.0
 background_stain_color = Color(1, 0.944, 0.84000003, 1)
 paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
-wash_color = Color(0.79083, 0.87, 0.7482, 0.13725491)
+wash_color = Color(0.79083, 0.87, 0.7482, 0.19607843)
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
 
 [node name="NavigationDebugger" type="Node2D" parent="."]

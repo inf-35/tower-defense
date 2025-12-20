@@ -21,11 +21,12 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
 size = Vector2(60.000015, 82.500015)
 
-[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component")]
 script = ExtResource("1_y0lj0")
 hostile = true
 behavior = NodePath("HealerBehavior")
 graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")

@@ -113,9 +113,9 @@ func _spawn_enemies_for_current_wave() -> void:
 			
 			# increment the spawned counter only after the unit is created
 			_enemies_spawned += 1
-			await Clock.await_game_time(enemy_stagger * 0.6)
+			#await Clock.await_game_time(enemy_stagger * 0.6)
 		
-		await Clock.await_game_time(enemy_stagger * 0.8)
+		#await Clock.await_game_time(enemy_stagger * 0.8)
 
 # the primary, high-frequency update method
 func _on_enemy_died(_died_unit: Unit) -> void:

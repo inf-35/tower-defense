@@ -61,21 +61,19 @@ func _execute_chain_lightning(host: Tower, initial_report: HitReportData) -> voi
 		current_damage *= damage_falloff_multiplier
 		
 		# construct the new hit data
-		var jump_hit_data: HitData = host.attack_component.attack_data.generate_hit_data()
+		var jump_hit_data: HitData = host.attack_component.generate_hit_data()
 		jump_hit_data.source = host
 		jump_hit_data.target = next_target
-		jump_hit_data.damage = current_damage
 		jump_hit_data.target_affiliation = primary_target.hostile
+		jump_hit_data.damage = current_damage #override damage
 		jump_hit_data.recursion = initial_report.recursion + 1
 		
 		# use hitscan delivery to apply damage instantly from the position of the last enemy
-		var delivery_data := DeliveryData.new() 
-		delivery_data.delivery_method = DeliveryData.DeliveryMethod.HITSCAN
+		var delivery_data: DeliveryData = host.attack_component.attack_data.generate_delivery_data()
 		delivery_data.use_source_position_override = true
 		delivery_data.source_position = last_hit_target.global_position
 
 		host.deal_hit(jump_hit_data, delivery_data)
-		
 		# update state for next loop iteration
 		already_hit.append(next_target)
 		last_hit_target = next_target

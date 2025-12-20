@@ -19,6 +19,7 @@ signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit mo
 @export_category("Components")
 @export var behavior: Behavior
 @export var graphics: Sprite2D
+@export var hitbox: Hitbox
 @export var animation_player: AnimationPlayer
 @export var modifiers_component: ModifiersComponent #used by most things
 @export var health_component: HealthComponent
@@ -89,6 +90,24 @@ func _create_components() -> void:
 		n_movement_component.movement_data = load("res://Content/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
 		movement_component = n_movement_component
+		
+	if not is_instance_valid(hitbox):
+		hitbox = Hitbox.new() #generate range area
+		hitbox.name = "Hitbox"
+		hitbox.unit = self
+		add_child.call_deferred(hitbox)
+		
+		var shape := RectangleShape2D.new()
+		shape.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
+		
+		var collision := CollisionShape2D.new()
+		collision.shape = shape
+		hitbox.add_child.call_deferred(collision)
+		#set detection bitmasks
+		hitbox.collision_layer = Hitbox.get_mask(hostile)
+		hitbox.collision_mask = 0
+		hitbox.monitoring = false
+		hitbox.monitorable = true
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
