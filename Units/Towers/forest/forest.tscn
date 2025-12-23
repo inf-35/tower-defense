@@ -15,7 +15,7 @@ label = "HP"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [node name="Forest" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_pacpt")
 type = 10
 incorporeal = true

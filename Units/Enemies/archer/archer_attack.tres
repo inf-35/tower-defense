@@ -14,7 +14,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_5clgo")
 delivery_method = 1
-range = 60.0
+range = 35.0
 damage = 1.0
 vfx_on_spawn = SubResource("Resource_h2rdk")
 projectile_speed = 100.0

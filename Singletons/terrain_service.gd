@@ -32,6 +32,12 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 		
 		if Player.flux < Towers.get_tower_cost(tower_type):
 			return false
+		
+		var limit: int = Player.get_tower_limit(tower_type)
+		if limit != -1:
+			var current_count: int = island.get_towers_by_type(tower_type).size()
+			if current_count >= limit:
+				return false
 			
 		if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(tower_position) == Terrain.Base.RUINS): #TODO: fix this for non-1x1 generators
 			if Player.used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity: #and make this non-hardcoded

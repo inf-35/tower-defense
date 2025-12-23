@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://bq7gxyeslc6om"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_fmb7o"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_okvp2"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_ao5vp"]
+[ext_resource type="PackedScene" uid="uid://dsd8wiupnn31w" path="res://Units/Towers/sunbeam/sunbeam.tscn" id="4_4286i"]
+
+[resource]
+script = ExtResource("3_ao5vp")
+id = 25
+cost = 20.0
+element = 2
+tower_name = "Sunbeam"
+tower_description = "Tracks enemies over a wide area and fires lasers upon them, inflicting weak but long-lasting burn."
+icon = ExtResource("1_fmb7o")
+tower_scene = ExtResource("4_4286i")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -17,7 +17,7 @@ override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [node name="Amplifier" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_tb8yo")
 type = 8
 behavior = NodePath("AmplifierBehavior")

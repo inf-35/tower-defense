@@ -16,6 +16,10 @@ func start() -> void:
 	# healers move towards the objective like normal units
 	_attempt_navigate_to_origin()
 
+func detach():
+	if is_instance_valid(_heal_area):
+		_heal_area.free()
+
 func update(_delta: float) -> void:
 	# update the cooldown timer
 	_cooldown += Clock.game_delta
@@ -136,7 +140,7 @@ func _spawn_pulse_vfx() -> void:
 	tween.tween_property(pulse, "modulate:a", 0.0, 0.5)
 	tween.tween_callback(pulse.queue_free).set_delay(0.5)
 
-# Override get_display_data to allow UI to show heal stats
+# override get_display_data to allow UI to show heal stats
 func get_display_data() -> Dictionary:
 	return {
 		&"heal_amount": heal_amount,

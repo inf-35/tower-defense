@@ -106,7 +106,7 @@ _data = {
 }
 
 [node name="Flamethrower" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_ifoj3")
 type = 2
 turret = NodePath("Graphics/TurretFrame")

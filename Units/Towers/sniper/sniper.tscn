@@ -34,7 +34,7 @@ special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [node name="Sniper" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_nqgd0")
 type = 13
 turret = NodePath("Graphics/Turret")

@@ -19,6 +19,14 @@ enum Type {
 	TROLL,
 	WARRIOR,
 	HEALER,
+	SPRINTER,
+	PROTECTOR,
+	FLESHBLOB,
+	FLESHLET,
+	PHANTOM,
+	EFFIGY,
+	SUMMONER,
+	ZOMBIE
 }
 
 static var unit_stats : Dictionary[Type, UnitStat] = {
@@ -56,7 +64,32 @@ static var unit_stats : Dictionary[Type, UnitStat] = {
 		preload("res://Units/Enemies/healer/healer.tscn"),
 		1.2,
 		2.0,
-	)
+	),
+	Type.SPRINTER: UnitStat.new(
+		preload("res://Units/Enemies/sprinter/sprinter.tscn"),
+		1.2,
+		1.5
+	),
+	Type.FLESHBLOB: UnitStat.new(
+		preload("res://Units/Enemies/fleshblob/fleshblob.tscn"),
+		1.2,
+		1.5
+	),
+	Type.FLESHLET: UnitStat.new(
+		preload("res://Units/Enemies/fleshlet/fleshlet.tscn"),
+		0.0,
+		0.5,
+	),
+	Type.PHANTOM: UnitStat.new(
+		preload("res://Units/Enemies/phantom/phantom.tscn"),
+		0.0,
+		0.5,
+	),
+	Type.SUMMONER: UnitStat.new(
+		preload("res://Units/Enemies/summoner/summoner.tscn"),
+		0.0,
+		0.5,
+	),
 }
 
 static func get_unit_flux(unit: Type) -> float:

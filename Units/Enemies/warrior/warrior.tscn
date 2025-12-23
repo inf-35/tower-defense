@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_lcmr6"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_lj1uh"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_balvs"]
-[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_er4ta"]
+[ext_resource type="Texture2D" uid="uid://p30x2gd2skej" path="res://Assets/warrior.png" id="7_lj1uh"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_bi07s"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_oxxsx"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_0d56v"]
@@ -28,7 +28,7 @@ shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
-size = Vector2(60, 60)
+size = Vector2(70, 85)
 
 [sub_resource type="Resource" id="Resource_pineb"]
 script = ExtResource("14_mb2by")
@@ -68,7 +68,7 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_j01gd")
 scale = Vector2(0.10810186, 0.10810187)
-texture = ExtResource("7_er4ta")
+texture = ExtResource("7_lj1uh")
 
 [node name="Hitbox" type="Area2D" parent="."]
 scale = Vector2(0.1, 0.1)
@@ -77,7 +77,8 @@ monitoring = false
 script = ExtResource("8_bi07s")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(-3.8146973e-06, 1.9073486e-06)
+position = Vector2(0, -2.4999983)
+scale = Vector2(0.9999998, 0.9999998)
 shape = SubResource("RectangleShape2D_n0rgw")
 
 [node name="ModifiersComponent" type="Node" parent="."]

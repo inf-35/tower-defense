@@ -6,7 +6,7 @@ class_name ArcherBehavior
 var siege_distance: float
 
 func start() -> void:
-	siege_distance = unit.global_position.distance_squared_to(Island.cell_to_position(Vector2i.ZERO)) - Island.CELL_SIZE * 0.5 #start at the unit's spawn location and move in
+	siege_distance = unit.global_position.distance_squared_to(Island.cell_to_position(Vector2i.ZERO)) - Island.CELL_SIZE #start at the unit's spawn location and move in
 	_attempt_navigate_to_origin()
 	# ensure we start by moving towards the objective
 	_move_towards_keep()

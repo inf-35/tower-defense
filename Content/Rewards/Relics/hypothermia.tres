@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://olyx74tpldoy"]
+
+[ext_resource type="Resource" uid="uid://cia08bmtkwtuh" path="res://Content/Relics/hypothermia/hypothermia.tres" id="1_r3jpj"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_nxiwp"]
+
+[resource]
+script = ExtResource("2_nxiwp")
+id_name = "hypothermia"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_r3jpj")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

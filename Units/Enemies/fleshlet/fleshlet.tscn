@@ -1,0 +1,101 @@
+[gd_scene load_steps=19 format=3 uid="uid://wqqym3asl720"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_6h20e"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_vpq3m"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_6hphw"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_7lcu3"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_vpq3m"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_g2fs7"]
+[ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_jxwcv"]
+[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_7lenw"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_6dclp"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_rliym"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_hws38"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_hm20u"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_22mrk"]
+[ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="13_r8f5p"]
+
+[sub_resource type="Resource" id="Resource_6hphw"]
+script = ExtResource("4_vpq3m")
+max_speed = 20.0
+acceleration = 200.0
+turn_speed = 100.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="Resource" id="Resource_i4qok"]
+script = ExtResource("5_g2fs7")
+max_health = 1.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
+shader = ExtResource("6_jxwcv")
+shader_parameter/flash_intensity = 0.0
+shader_parameter/transparency = 1.0
+shader_parameter/overlay_color = Color(0, 0, 1, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
+size = Vector2(36.25002, 37.500023)
+
+[node name="Fleshlet" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+script = ExtResource("1_6h20e")
+hostile = true
+attack_only_when_blocked = true
+behavior = NodePath("DefaultBehavior")
+graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_vpq3m")
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_6hphw")
+face_towards_movement = false
+movement_data = SubResource("Resource_6hphw")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_7lcu3")
+health_data = SubResource("Resource_i4qok")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_j01gd")
+position = Vector2(-5.9604645e-08, 1.7881393e-07)
+scale = Vector2(0.072569445, 0.07256945)
+texture = ExtResource("7_7lenw")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+monitoring = false
+script = ExtResource("8_6dclp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(1.1920929e-07, -1.1920929e-07)
+scale = Vector2(0.99999917, 0.99999917)
+shape = SubResource("RectangleShape2D_n0rgw")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_rliym")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="DefaultBehavior" type="Node" parent="."]
+script = ExtResource("10_hws38")
+metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("11_hm20u")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("12_22mrk")
+attack_data = ExtResource("13_r8f5p")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

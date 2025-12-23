@@ -9,7 +9,7 @@ enum Type {
 	CANNON,
 	GENERATOR,
 	PALISADE,
-	CATALYST,
+	CATALYST, ##deprecated
 	AMPLIFIER,
 	BREACH,
 	ANOMALY,
@@ -27,6 +27,7 @@ enum Type {
 	MORTAR,
 	FIREWALL,
 	SNOWBALL,
+	SUNBEAM
 }
 
 enum Element {

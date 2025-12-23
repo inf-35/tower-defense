@@ -14,6 +14,14 @@ class_name HealthData
 	set(new_value):
 		regen_percent = new_value
 		value_changed.emit(Attributes.id.REGEN_PERCENT)
+
 @export_category("Auxillary")
-@export var damage_taken: float = 1.0 ##damage taken (in terms of proportion, 0 -> invincibility)
+@export var damage_taken: float = 1.0: ##damage taken (in terms of proportion, 0 -> invincibility)
+	set(new_value):
+		damage_taken = new_value
+		value_changed.emit(Attributes.id.DAMAGE_TAKEN)
+@export var flat_damage_taken: float = 0.0: ##additionally taken flat damage per hit
+	set(new_value):
+		flat_damage_taken = new_value
+		value_changed.emit(Attributes.id.FLAT_DAMAGE_TAKEN)
 @export var max_shield: float = 0.0

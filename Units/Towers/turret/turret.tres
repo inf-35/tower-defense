@@ -8,8 +8,7 @@
 [resource]
 script = ExtResource("1_x6lxw")
 id = 2
-cost = 0.0
-required_capacity = 0.0
+cost = 7.0
 tower_name = "Turret"
 tower_description = "Single-target all-rounder. Costs 5.0 {FLUX}
 {T_TURRET}"

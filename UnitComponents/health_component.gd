@@ -44,7 +44,8 @@ func inject_components(modifiers_component: ModifiersComponent):
 
 func take_damage(input_damage: float, breaking: bool = false):
 	var absorbed_damage: float = 0 #damage absorbed by shield
-	var damage: float = input_damage * get_stat(_modifiers_component, health_data, Attributes.id.DAMAGE_TAKEN)
+	var damage: float = input_damage * get_stat(_modifiers_component, health_data, Attributes.id.DAMAGE_TAKEN) as float
+	damage += get_stat(_modifiers_component, health_data, Attributes.id.FLAT_DAMAGE_TAKEN) as float
 	#shield phase
 	if breaking:
 		absorbed_damage = min(damage, shield)

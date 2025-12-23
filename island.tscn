@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://b3n6ehcpq3nug" path="res://Scene Elements/nav_debugger.gd" id="15_ad6l7"]
 
 [node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
+y_sort_enabled = true
 script = ExtResource("1_0iamf")
 terrain_renderer = NodePath("TerrainRenderer")
 preview_renderer = NodePath("PreviewRenderer")
@@ -32,19 +33,21 @@ layer = 2
 [node name="UI" parent="." instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
+z_index = 300
 script = ExtResource("3_qurb2")
 
 [node name="TowerPreview" type="Node2D" parent="."]
 process_mode = 3
+z_index = 250
 script = ExtResource("3_fgmf3")
 
 [node name="PathRenderer" type="Node2D" parent="."]
-z_index = 1
+z_index = 200
 script = ExtResource("6_gljqa")
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 
 [node name="PreviewRenderer" type="Node2D" parent="."]
-z_as_relative = false
+z_index = 250
 script = ExtResource("7_b4opu")
 shader = ExtResource("8_c7iw8")
 max_gradient_depth = 3.0
@@ -53,8 +56,6 @@ paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
 wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
 
 [node name="TerrainRenderer" type="Node2D" parent="."]
-z_index = -1
-z_as_relative = false
 script = ExtResource("7_b4opu")
 shader = ExtResource("9_8ervs")
 max_gradient_depth = 3.0

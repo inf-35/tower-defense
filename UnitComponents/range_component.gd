@@ -32,7 +32,11 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 	
 	area = Area2D.new() # generate range area
 	area.name = "Range"
-	unit.add_child.call_deferred(area)
+	# set detection bitmasks
+	area.collision_layer = 0
+	area.collision_mask = Hitbox.get_mask(not unit.hostile)
+	area.monitoring = true
+	area.monitorable = false
 	
 	var shape := CircleShape2D.new()
 	shape.radius = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.RANGE)
@@ -41,12 +45,8 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 	collision.shape = shape
 	area.add_child.call_deferred(collision)
 	
-	# set detection bitmasks
-	area.collision_layer = 0
-	area.collision_mask = 0b0000_0010 if unit.hostile else 0b0000_0001
-	area.monitoring = true
-	area.monitorable = false
-	
+	unit.add_child.call_deferred(area)
+
 	modifiers_component.stat_changed.connect(func(attr: Attributes.id): # change radius of detection area to fit range
 		if not attr == Attributes.id.RANGE:
 			return
@@ -145,6 +145,53 @@ func get_target() -> Unit:
 		return _find_best_candidate(overkilled_candidates)
 	
 	return null
+
+func get_targets(count: int) -> Array[Unit]:
+	if _enemies_in_range.is_empty():
+		return []
+
+	var valid_candidates: Array[Unit] = []
+	var overkilled_candidates: Array[Unit] = []
+	
+	for enemy in _enemies_in_range:
+		if not is_target_valid(enemy):
+			continue
+			
+		if Targeting.is_unit_overkilled(enemy):
+			overkilled_candidates.append(enemy)
+		else:
+			valid_candidates.append(enemy)
+	
+	if valid_candidates.size() < count:
+		var needed: int = count - valid_candidates.size()
+		# append up to 'needed' amount from overkilled
+		valid_candidates.append_array(overkilled_candidates.slice(0, needed))
+	
+	if valid_candidates.is_empty():
+		return []
+
+	if targeting_mode == TargetingMode.SCATTER:
+		valid_candidates.shuffle()
+		return valid_candidates.slice(0, count)
+
+	valid_candidates.sort_custom(func(a: Unit, b: Unit):
+		match targeting_mode:
+			TargetingMode.CLOSEST:
+				var dist_a = (a.position - unit.position).length_squared()
+				var dist_b = (b.position - unit.position).length_squared()
+				return dist_a < dist_b
+			TargetingMode.MOST_HEALTH:
+				return a.health_component.health > b.health_component.health
+			TargetingMode.FASTEST:
+				# Assuming speed exists in movement component stats
+				var speed_a = a.get_stat(Attributes.id.MAX_SPEED)
+				var speed_b = b.get_stat(Attributes.id.MAX_SPEED)
+				return speed_a > speed_b
+		return false
+	)
+	
+	# return top n
+	return valid_candidates.slice(0, count)
 
 # helper function to reduce code repetition.
 # iterates the list once and applies the comparison logic based on the current mode.

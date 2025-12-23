@@ -48,6 +48,9 @@ func initialise(host_unit: Unit):
 		if event.event_type == GameEvent.EventType.HIT_RECEIVED:
 			_play_animation(&"hit")
 	)
+# function called when the unit wants to detach this behavior (i.e. upon death)
+func detach():
+	pass
 
 #behavior start function, called at the start of behavior
 func start() -> void:

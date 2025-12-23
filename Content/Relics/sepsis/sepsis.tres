@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://dxodj5es1nf4c"]
+
+[ext_resource type="Script" uid="uid://cccy0vq60whro" path="res://Content/Relics/sepsis/sepsis_effect.gd" id="1_f6sm4"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_w17i5"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_hou0f"]
+
+[sub_resource type="Resource" id="Resource_3khoc"]
+script = ExtResource("1_f6sm4")
+metadata/_custom_type_script = "uid://cccy0vq60whro"
+
+[resource]
+script = ExtResource("3_hou0f")
+global_effect = SubResource("Resource_3khoc")
+title = "Sepsis"
+description = "All poison effects on already bleeding enemies last 50% longer.
+"
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -9,6 +9,7 @@ var current_cooldown: float = 0.0 ##centralised value for cooldown to next attac
 
 func _ready():
 	set_process(true)
+	current_cooldown += randf_range(0.0, 1.0)
 
 func _process(_delta: float):
 	current_cooldown -= Clock.game_delta

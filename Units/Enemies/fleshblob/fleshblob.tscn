@@ -1,0 +1,113 @@
+[gd_scene load_steps=23 format=3 uid="uid://c3kljuov5fl5a"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_eod68"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3vs5n"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="2_mf86y"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_qps0p"]
+[ext_resource type="Script" uid="uid://c58dwrqwq4s7u" path="res://Units/Enemies/fleshblob/spawn_on_death.gd" id="3_3vs5n"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_mf86y"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_3vs5n"]
+[ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_4vldp"]
+[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_xp7ki"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_3vs5n"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_lsypl"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_5wnea"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_l66b7"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_i0nks"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_824j6"]
+[ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="13_31yvq"]
+
+[sub_resource type="Resource" id="Resource_4vldp"]
+script = ExtResource("2_3vs5n")
+attribute = 0
+label = "HP"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_xp7ki"]
+script = ExtResource("2_3vs5n")
+attribute = 3
+label = "SPEED"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_0pxj5"]
+script = ExtResource("3_3vs5n")
+spawn_unit_type = 10
+spread_radius = 8.0
+metadata/_custom_type_script = "uid://c58dwrqwq4s7u"
+
+[sub_resource type="Resource" id="Resource_lsypl"]
+script = ExtResource("8_3vs5n")
+max_health = 5.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
+shader = ExtResource("6_4vldp")
+shader_parameter/flash_intensity = 0.0
+shader_parameter/transparency = 1.0
+shader_parameter/overlay_color = Color(0, 0, 1, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
+size = Vector2(70, 70.00002)
+
+[node name="Fleshblob" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+script = ExtResource("1_eod68")
+hostile = true
+attack_only_when_blocked = true
+stat_displays = Array[ExtResource("2_3vs5n")]([SubResource("Resource_4vldp"), SubResource("Resource_xp7ki")])
+behavior = NodePath("DefaultBehavior")
+graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+intrinsic_effects = Array[ExtResource("2_mf86y")]([SubResource("Resource_0pxj5")])
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="."]
+script = ExtResource("2_qps0p")
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_mf86y")
+face_towards_movement = false
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_3vs5n")
+health_data = SubResource("Resource_lsypl")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_j01gd")
+scale = Vector2(0.10810186, 0.10810187)
+texture = ExtResource("7_xp7ki")
+
+[node name="Hitbox" type="Area2D" parent="."]
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+monitoring = false
+script = ExtResource("8_lsypl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+scale = Vector2(0.9999994, 0.9999994)
+shape = SubResource("RectangleShape2D_n0rgw")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_5wnea")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="DefaultBehavior" type="Node" parent="."]
+script = ExtResource("10_l66b7")
+metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("11_i0nks")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("12_824j6")
+attack_data = ExtResource("13_31yvq")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://bi4dtk5t2reuq"]
+
+[ext_resource type="Resource" uid="uid://dnnoi478ixu4y" path="res://Content/Relics/broken_mirror/broken_mirror.tres" id="1_bxsop"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_jewe7"]
+
+[resource]
+script = ExtResource("2_jewe7")
+id_name = "broken_mirror"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_bxsop")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

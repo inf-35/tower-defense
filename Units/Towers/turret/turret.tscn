@@ -154,7 +154,7 @@ _data = {
 }
 
 [node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_lj076")
 type = 2
 turret = NodePath("Graphics/TurretFrame")
@@ -201,6 +201,7 @@ scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_i3qpa")
 
 [node name="TurretFrame" type="Node2D" parent="Graphics"]
+z_index = 1
 
 [node name="Base" type="Sprite2D" parent="Graphics/TurretFrame"]
 texture = ExtResource("11_uhk0q")

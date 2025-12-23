@@ -38,6 +38,8 @@ var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 		unlocked_towers = value
 		unlocked_towers_changed.emit(unlocked_towers)
 		
+var _tower_limits: Dictionary[Towers.Type, int] = {} ##stores placement limits of various towers, by default -1, which is infinite
+		
 var active_relics: Array[RelicData]
 
 var _active_effects_container: Node
@@ -78,7 +80,7 @@ func _setup_state():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.SNOWBALL: true,
+		#Towers.Type.SUNBEAM: true,
 	}
 	flux = 20.0
 	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.AMBUSH}))
@@ -106,6 +108,14 @@ func unlock_tower(tower_type : Towers.Type, unlock : bool = true):
 	
 func is_tower_unlocked(tower_type : Towers.Type) -> bool:
 	return unlocked_towers.get(tower_type, false)
+	
+func add_to_tower_limit(type: Towers.Type, amount: int) -> void:
+	var current: int = _tower_limits.get(type, 0)
+	_tower_limits[type] = current + amount
+	#TODO: implement UI updates
+
+func get_tower_limit(type: Towers.Type) -> int:
+	return _tower_limits.get(type, -1)
 	
 #relic entry point (to add new relics)
 func add_relic(relic: RelicData) -> void:

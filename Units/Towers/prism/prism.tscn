@@ -95,7 +95,7 @@ _data = {
 }
 
 [node name="Prism" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_w167e")
 type = 17
 stat_displays = Array[ExtResource("2_3cbd0")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])

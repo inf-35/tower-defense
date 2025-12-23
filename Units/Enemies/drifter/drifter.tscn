@@ -6,10 +6,10 @@
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_2gn4h"]
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_oxo2e"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_mt1ix"]
-[ext_resource type="Texture2D" uid="uid://ixg5alc62qx3" path="res://Assets/drifter.svg" id="6_2gn4h"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_ayagf"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_oxo2e"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_5dfik"]
+[ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="8_oxo2e"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_2gn4h"]
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="10_ayagf"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_mt1ix"]
@@ -34,9 +34,10 @@ shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_anqll"]
-size = Vector2(80, 80.00002)
+size = Vector2(80.00003, 75.00003)
 
 [node name="Drifter" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
 script = ExtResource("1_0kato")
 hostile = true
 attack_only_when_blocked = true
@@ -57,6 +58,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_2jjyj")
+face_towards_movement = false
 movement_data = SubResource("Resource_5dfik")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
@@ -67,8 +69,9 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_mt1ix")
-scale = Vector2(0.05, 0.05)
-texture = ExtResource("6_2gn4h")
+position = Vector2(-0.11199999, -2.3999999)
+scale = Vector2(0.096, 0.096)
+texture = ExtResource("8_oxo2e")
 
 [node name="Hitbox" type="Area2D" parent="."]
 scale = Vector2(0.1, 0.1)
@@ -76,8 +79,8 @@ collision_mask = 0
 script = ExtResource("7_oxo2e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(4.887578e-06, 1.788139e-06)
-scale = Vector2(0.9999995, 0.9999995)
+position = Vector2(-1.1199923, -26.500002)
+scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_anqll")
 
 [node name="ModifiersComponent" type="Node" parent="."]

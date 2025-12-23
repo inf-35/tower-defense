@@ -103,7 +103,7 @@ _data = {
 }
 
 [node name="Mage" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_ngn05")
 type = 18
 stat_displays = Array[ExtResource("2_4ads2")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])

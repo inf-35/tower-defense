@@ -34,7 +34,7 @@ special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [node name="Snowball" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_yhqet")
 type = 13
 turret = NodePath("Graphics/Turret")
@@ -65,10 +65,9 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 script = ExtResource("7_5efsi")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+[node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("8_s4vh2")
 attack_data = ExtResource("9_18pqd")
-muzzle = NodePath("")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]

@@ -1,9 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://dfaw7qc5m52dy"]
+[gd_scene load_steps=18 format=3 uid="uid://dfaw7qc5m52dy"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_7fnq5"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_3nlnt"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_76mx4"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_24hok"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_p55ow"]
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_cntf5"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_2p8sv"]
 [ext_resource type="Texture2D" uid="uid://cnrv2tyylnxyv" path="res://Assets/archer.png" id="7_rdnp1"]
@@ -13,6 +14,13 @@
 [ext_resource type="Resource" uid="uid://1m4t2038xrpo" path="res://Units/Enemies/archer/archer_attack.tres" id="11_jlbxp"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_0hl68"]
 [ext_resource type="Script" uid="uid://e35uu0p4erew" path="res://Content/Behaviors/archer_behavior.gd" id="13_756tu"]
+
+[sub_resource type="Resource" id="Resource_vxs4v"]
+script = ExtResource("4_p55ow")
+max_speed = 12.0
+acceleration = 200.0
+turn_speed = 100.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mt1ix"]
 shader = ExtResource("6_2p8sv")
@@ -24,6 +32,7 @@ shader_parameter/overlay_color = Color(0, 0, 1, 0)
 size = Vector2(80, 80.00002)
 
 [node name="Archer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
 script = ExtResource("1_7fnq5")
 hostile = true
 behavior = NodePath("ArcherBehavior")
@@ -45,6 +54,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_76mx4")
 face_towards_movement = false
+movement_data = SubResource("Resource_vxs4v")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]

@@ -101,21 +101,25 @@ func _spawn_enemies_for_current_wave() -> void:
 			# if a new wave has started while we were spawning, abort
 			if current_combat_wave_number == 0:
 				return
-
-			var unit: Unit = Units.create_unit(unit_type)
-			unit.add_to_group(ENEMY_GROUP)
-			unit.died.connect(func(_hit_report_data): _on_enemy_died(unit), CONNECT_ONE_SHOT)
-			References.island.add_child(unit)
 			
 			var spawn_cell: Vector2i = spawn_points[spawn_point_index]
 			spawn_point_index = (spawn_point_index + 1) % spawn_points.size()
-			unit.movement_component.position = Island.cell_to_position(spawn_cell)
-			
-			# increment the spawned counter only after the unit is created
-			_enemies_spawned += 1
-			#await Clock.await_game_time(enemy_stagger * 0.6)
+			spawn_enemy(unit_type, Island.cell_to_position(spawn_cell))
+	
+			await Clock.await_game_time(enemy_stagger * 0.6)
 		
-		#await Clock.await_game_time(enemy_stagger * 0.8)
+		await Clock.await_game_time(enemy_stagger * 0.8)
+		
+func spawn_enemy(unit_type: Units.Type, position: Vector2) -> Unit:
+	var unit: Unit = Units.create_unit(unit_type)
+	unit.add_to_group(ENEMY_GROUP)
+	unit.died.connect(func(_hit_report_data): _on_enemy_died(unit), CONNECT_ONE_SHOT)
+	References.island.add_child.call_deferred(unit)
+	unit.movement_component.set_deferred(&"position", position)
+	
+	# increment the spawned counter only after the unit is created
+	_enemies_spawned += 1
+	return unit
 
 # the primary, high-frequency update method
 func _on_enemy_died(_died_unit: Unit) -> void:
@@ -126,7 +130,7 @@ func _on_enemy_died(_died_unit: Unit) -> void:
 	_enemies_killed += 1
 	
 	# check if the wave is over
-	if _enemies_killed >= _total_enemies_planned:
+	if _enemies_killed >= _enemies_spawned and _enemies_killed >= _total_enemies_planned:
 		_end_combat_wave()
 
 # the secondary, low-frequency reconciliation method

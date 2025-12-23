@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
 
 [node name="Generator" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
-z_index = 1
+z_index = 100
 script = ExtResource("1_ein27")
 type = 5
 graphics = NodePath("Graphics")

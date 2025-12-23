@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://bflqsihdy6l4j"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_nff3q"]
+
+[resource]
+script = ExtResource("1_nff3q")
+id_name = "sunbeam"
+description = "relic tower unlock"
+tower_type = 25
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

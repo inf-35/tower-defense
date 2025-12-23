@@ -12,6 +12,7 @@ signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit mo
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
 @export var hostile: bool ##is this unit hostile to the player?
 @export var attack_only_when_blocked: bool ##does this unit attack only if blocked by a tower?
+@export var _DEBUG_DRAW: bool = false
 
 @export_category("Presentation")
 @export var stat_displays : Array[StatDisplayInfo] = []
@@ -56,8 +57,6 @@ var disabled: bool:
 		if graphics and graphics.material != null:
 			graphics.material.set_shader_parameter(&"overlay_color", Color(0.0, 0.0, 0.0, 1.0) if disabled else Color(0,0,0,0))
 			graphics.material.set_shader_parameter(&"transparency", 0.3 if disabled else 1.0)
-
-const _DEBUG_DRAW: bool = false
 
 func _ready():
 	name = name + " " + str(unit_id)
@@ -314,9 +313,7 @@ func take_hit(hit: HitData):
 	
 	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
-		
-		
-		
+
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
 		
 		died.emit(hit_report) #NOTE: this is when the unit dies
@@ -361,10 +358,10 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	if not self is Tower: #towers have their own flux value system 
-		Player.flux += hit_report_data.flux_value #reward player with flux
+	Player.flux += hit_report_data.flux_value #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
+	behavior.detach() #disable behavior
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		remove_effect(effect_prototype) #detach effects
 
@@ -394,7 +391,7 @@ func _draw() -> void:
 		if navigation_component._current_waypoint_index < navigation_component._path.size():
 			var next_tile = navigation_component._path[navigation_component._current_waypoint_index]
 			var next_pos = Island.cell_to_position(next_tile)
-			draw_line(Vector2.ZERO, to_local(next_pos), Color.BLUE, 2.0)
+			draw_line(Vector2.ZERO, to_local(next_pos), Color(0, 0, 1, 0.5), 2.0)
 
 	# 2. VISUALIZE TARGET (Red/Yellow Line)
 	if is_instance_valid(range_component):
@@ -404,9 +401,9 @@ func _draw() -> void:
 
 			# YELLOW = Priority Override (Blocking Tower)
 			# RED = Normal Target (Closest/Health/etc)
-			var color = Color.RED
+			var color = Color(1,0,0,0.5)
 			if range_component.priority_target_override == target:
-				color = Color.YELLOW
+				color = Color(1,1,0,0.5)
 
 			draw_line(Vector2.ZERO, local_target, color, 3.0)
 			draw_circle(local_target, 5.0, color)

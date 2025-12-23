@@ -80,7 +80,6 @@ func _check_for_obstructions() -> void:
 	var tower_ahead = References.island.get_tower_on_tile(next_cell) if Navigation.grid[next_cell] != Navigation.BASE_COST else null
 	var tower_here = References.island.get_tower_on_tile(current_cell) if Navigation.grid[current_cell] != Navigation.BASE_COST else null
 	
-	
 	# prioritize blocking the tower ahead, fallback to the tower we are inside
 	var candidate = tower_ahead if is_valid_blocker(tower_ahead) else (tower_here if is_valid_blocker(tower_here) else null)
 	
@@ -97,7 +96,7 @@ func _handle_blocked_state() -> void:
 	# visual adjustment: nudge slightly towards the wall so it looks like they are hitting it
 	var tower_pos = blocking_tower.global_position
 	var my_pos = unit.global_position
-	var nudge = (tower_pos - my_pos).normalized() * 0.1
+	var nudge = (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.5
 	movement_component.velocity += nudge 
 
 func _handle_moving_state() -> void:
