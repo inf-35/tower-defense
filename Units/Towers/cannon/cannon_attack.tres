@@ -1,15 +1,17 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=6 format=3 uid="uid://cr2yw0v4l47xc"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://cr2yw0v4l47xc"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_t80r1"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5rt8p"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_rxcdb"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_7d5v8"]
+[ext_resource type="Texture2D" uid="uid://cn1d0lf5ntkd1" path="res://Assets/cannonball.png" id="5_rrkv3"]
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_7d5v8")
-vfx_type = 1
+texture = ExtResource("5_rrkv3")
 radius = 3.0
-rotation_mode = 1
+scale = 0.1
+rotation_mode = 2
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]

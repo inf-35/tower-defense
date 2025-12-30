@@ -15,7 +15,7 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 [sub_resource type="Resource" id="Resource_meiml"]
 script = ExtResource("2_dd3kw")
 delivery_method = 3
-range = 70.0
+range = 40.0
 radius = 70.0
 status_effects = Array[ExtResource("3_lj7yh")]([SubResource("Resource_26g71")])
 cone_angle = 360.0
@@ -30,5 +30,5 @@ metadata/_custom_type_script = "uid://ce5bynwct2hta"
 script = ExtResource("2_a12k8")
 global_effect = SubResource("Resource_erbbk")
 title = "Ambush"
-description = "When a tower is placed mid-battle, enemies within 7 tiles' distance are stunned for 5 seconds."
+description = "When a tower is placed mid-battle, enemies within 4 tiles' distance are stunned for 5 seconds."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

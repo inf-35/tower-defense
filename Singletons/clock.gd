@@ -43,7 +43,14 @@ func _ready():
 			GameSpeed.FAST_FORWARD:
 				#speed_multiplier = FAST_FORWARD_SPEED
 				speed_multiplier *= 2
+		
+		print("Clock: current gamespeed is ", speed_multiplier)
 	)
+
+func start():
+	speed_multiplier = BASE_SPEED
+	game_delta = 0.0
+	physics_game_delta = 0.0
 
 # the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:

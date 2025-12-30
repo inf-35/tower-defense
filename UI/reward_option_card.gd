@@ -57,20 +57,20 @@ func _apply_visuals(reward: Reward) -> void:
 	
 	match reward.type:
 		Reward.Type.UNLOCK_TOWER:
-			var type: Towers.Type = reward.params.get(ID.Rewards.TOWER_TYPE, Towers.Type.VOID)
+			var type: Towers.Type = reward.tower_type
 			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_preview(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
 			desc_text = Towers.get_tower_description(type)
 			
 		Reward.Type.ADD_RELIC:
-			var relic: RelicData = reward.params.get(ID.Rewards.RELIC)
+			var relic: RelicData = reward.relic
 			icon_tex = relic.icon
 			title_text = "New Relic: [color=#66ccff]%s[/color]" % relic.title
 			desc_text = relic.description
 				
 		Reward.Type.ADD_FLUX:
-			var amount = reward.params.get(ID.Rewards.FLUX_AMOUNT, 0)
+			var amount: float = reward.flux_amount
 			title_text = "Resource Cache"
 			##TODO: icon?
 

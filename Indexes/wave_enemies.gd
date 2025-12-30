@@ -6,75 +6,78 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 5],
 	],
 	2: [
-		[Units.Type.BASIC, 10],
+		[Units.Type.BASIC, 8],
 	],
 	3: [
 		[Units.Type.BASIC, 4],
-		[Units.Type.BUFF, 3],
+		[Units.Type.BUFF, 2],
 	],
 	4: [
 		[Units.Type.BASIC, 5],
 		[Units.Type.BUFF, 4],
 	],
 	5 : [
-		[Units.Type.BASIC, 6],
-		[Units.Type.DRIFTER, 5],
+		[Units.Type.BASIC, 4],
+		[Units.Type.DRIFTER, 6],
 	],
 	6 : [
-		[Units.Type.BASIC, 6],
-		[Units.Type.BUFF, 2],
-		[Units.Type.HEALER, 1],
-		[Units.Type.DRIFTER, 2],
+		[Units.Type.BASIC, 4],
+		[Units.Type.HEALER, 2],
+		[Units.Type.BASIC, 4],
+		[Units.Type.HEALER, 2],
+		[Units.Type.BASIC, 4],
 	],
 	7 : [
 		[Units.Type.TROLL, 3],
-		[Units.Type.BASIC, 12],
+		[Units.Type.BASIC, 11],
 	],
 	8 : [
 		[Units.Type.TROLL, 3],
-		[Units.Type.BASIC, 8],
 		[Units.Type.BUFF, 2],
+		[Units.Type.BASIC, 8],
 		[Units.Type.HEALER, 2],
 		[Units.Type.DRIFTER, 3],
 	],
 	9 : [
-		[Units.Type.BASIC, 16],
-		[Units.Type.BUFF, 3],
-		[Units.Type.ARCHER, 4],
+		[Units.Type.BASIC, 20],
+		[Units.Type.BUFF, 4],
+		[Units.Type.ARCHER, 6],
 	],
 	10 : [
 		[Units.Type.TROLL, 3],
-		[Units.Type.BASIC, 14],
-		[Units.Type.HEALER, 4],
-		[Units.Type.DRIFTER, 5],
+		[Units.Type.BASIC, 10],
+		[Units.Type.HEALER, 3],
+		[Units.Type.DRIFTER, 4],
 		[Units.Type.ARCHER, 4],
 		[Units.Type.BUFF, 4],
 	],
 	11 : [
-		[Units.Type.WARRIOR, 18],
-		[Units.Type.BUFF, 10],
+		[Units.Type.BUFF, 8],
+		[Units.Type.HEALER, 3],
+		[Units.Type.WARRIOR, 16],
 	],
 	12 : [
 		[Units.Type.DRIFTER, 5],
-		[Units.Type.WARRIOR, 18],
+		[Units.Type.WARRIOR, 16],
 		[Units.Type.TROLL, 3],
 		[Units.Type.HEALER, 4],
-		[Units.Type.BUFF, 10],
+		[Units.Type.BUFF, 6],
 	],
 	13 : [
-		[Units.Type.SUMMONER, 10],
-		[Units.Type.HEALER, 5],
-		[Units.Type.SUMMONER, 10],
+		[Units.Type.SUMMONER, 5],
+		[Units.Type.HEALER, 3],
+		[Units.Type.SUMMONER, 5],
+		
 	],
 	14 : [
-		[Units.Type.TROLL, 10],
+		[Units.Type.TROLL, 9],
 		[Units.Type.HEALER, 4],
 	],
 	15 : [
-		[Units.Type.WARRIOR, 30],
-		[Units.Type.BUFF, 25],
-		[Units.Type.HEALER, 8],
-		[Units.Type.ARCHER, 6],
+		[Units.Type.WARRIOR, 20],
+		[Units.Type.BUFF, 20],
+		[Units.Type.HEALER, 5],
+		[Units.Type.ARCHER, 5],
 	],
 	16 : [
 		[Units.Type.TROLL, 6],
@@ -121,15 +124,15 @@ static func get_enemies_for_wave(wave: int) -> Array[Array]:
 		return output
 
 	# 1. get the wave modifier from the central game director
-	var wave_type: Phases.WaveType = Phases.get_wave_type(wave)
+	var wave_type: Phases.CombatVariant = Phases.get_combat_variant(wave)
 	var modifier: WaveModifier
 	
 	match wave_type:
-		Phases.WaveType.NORMAL:
+		Phases.CombatVariant.NORMAL:
 			modifier = WaveModifier.MIXED_ARMS
-		Phases.WaveType.BOSS:
+		Phases.CombatVariant.BOSS:
 			modifier = WaveModifier.ELITE
-		Phases.WaveType.SURGE:
+		Phases.CombatVariant.SURGE:
 			modifier = WaveModifier.SIEGE
 	
 	# 2. calculate the base budget for this wave

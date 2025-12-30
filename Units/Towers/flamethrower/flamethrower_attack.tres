@@ -8,7 +8,7 @@
 [sub_resource type="Resource" id="Resource_na5my"]
 script = ExtResource("3_iru8c")
 type = 1
-cooldown = 5.0
+cooldown = 4.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_e3651"]
@@ -22,7 +22,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 script = ExtResource("2_7bwaa")
 delivery_method = 3
 range = 10.0
-cooldown = 0.1
+cooldown = 0.2
 damage = 0.1
 status_effects = Array[ExtResource("3_iru8c")]([SubResource("Resource_na5my")])
 vfx_on_spawn = SubResource("Resource_e3651")

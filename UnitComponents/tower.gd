@@ -10,9 +10,9 @@ signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island f
 
 enum Facing {
 	UP,
-	LEFT,
-	DOWN,
 	RIGHT,
+	DOWN,
+	LEFT,
 }
 
 enum State { ACTIVE, RUINED } ##overarching state machine of the tower
@@ -28,10 +28,34 @@ var facing: Facing: #which direction the tower is facing
 			graphics.rotation = facing * PI * 0.5
 var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
+		#if new_pos == tower_position:
+			#return
+
 		tower_position = new_pos
 		movement_component.unit = self #evil circular dependency resolution
 		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
-var size: Vector2i = Vector2i.ONE #this is inclusive of facing
+		
+		# --- apply terrain modifiers ---
+		# after the tower is created and has its components, check the terrain it's on
+		# clear pre-existing terrain modifiers
+		for terrain_modifier: Modifier in _terrain_modifiers:
+			modifiers_component.remove_modifier(terrain_modifier)
+		_terrain_modifiers.clear()
+		
+		if is_instance_valid(modifiers_component):
+			# get the terrain base at the tower's location
+			var terrain_base: Terrain.Base = References.island.terrain_base_grid.get(tower_position, Terrain.Base.EARTH)
+			# get the list of modifier prototypes associated with this terrain
+			var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
+			
+			for proto: ModifierDataPrototype in modifier_prototypes:
+				var new_modifier: Modifier = proto.generate_modifier()
+				# add the modifier as a PERMANENT modifier, as it's tied to the static world state
+				modifiers_component.add_modifier(new_modifier)
+				_terrain_modifiers.append(new_modifier)
+
+var _terrain_modifiers: Array[Modifier] = [] ## modifiers for terrain effects (i.e. high ground)
+var size: Vector2i = Vector2i.ONE ## this is inclusive of facing
 
 # --- new state transition functions ---
 
@@ -159,8 +183,29 @@ func get_occupied_cells() -> Array[Vector2i]:
 			cells.append(tower_position + Vector2i(x,y))
 			
 	return cells
+
+func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid grid coordinates immediately adjacent to this tower
+	var neighbors: Array[Vector2i] = []
+	var start: Vector2i = tower_position
+	var width: int = size.x
+	var height: int = size.y
+
+	for x: int in width: #top and bottom edges
+		# cell immediately above
+		neighbors.append(Vector2i(start.x + x, start.y - 1))
+		# cell immediately below
+		neighbors.append(Vector2i(start.x + x, start.y + height))
+
+	for y: int in height: #left and right edges
+		#cell immediately to the left
+		neighbors.append(Vector2i(start.x - 1, start.y + y))
+		#cell immediately to the right
+		neighbors.append(Vector2i(start.x + width, start.y + y))
+
+	return neighbors
 	
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
+	#TODO: reconfigure this to use the more robust get_adjacent_cells
 	return References.island.get_adjacent_towers(self.tower_position)
 
 func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for a specific tile occupied by this tower

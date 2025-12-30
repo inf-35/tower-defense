@@ -1,16 +1,19 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3 uid="uid://cyoynq2rsxj6c"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cyoynq2rsxj6c"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_6qowr"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_8k2lh"]
 [ext_resource type="PackedScene" uid="uid://b5w56jjx8pany" path="res://Units/Towers/frost_tower/frost_tower.tscn" id="2_6qowr"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_icbvn"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_2t0kx"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_32snr"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_crc3g"]
 
 [resource]
 script = ExtResource("1_6qowr")
-id = 2
+id = 3
 cost = 8.0
-required_capacity = 1.0
-max_level = 5
 element = 1
 tower_name = "Frost Tower"
-tower_description = "Slows down enemies"
+tower_description = "Inflicts mild frost to nearby enemies."
 tower_scene = ExtResource("2_6qowr")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

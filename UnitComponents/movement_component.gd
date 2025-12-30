@@ -6,7 +6,7 @@ signal movement_to_cell(origin: Vector2i, destination: Vector2i)
 var _modifiers_component: ModifiersComponent
 
 @export var face_towards_movement: bool = true
-@export var movement_data: MovementData = preload("res://Content/Movement/default_mvmt.tres")
+@export var movement_data: MovementData = load("res://Content/Movement/default_mvmt.tres")
 
 @export var jiggle_enabled: bool = true
 @export var jiggle_speed: float = 12.0 ## how fast the cycle runs

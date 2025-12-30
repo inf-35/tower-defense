@@ -3,11 +3,11 @@ class_name AnimatableUI
 
 # --- Configuration ---
 @export_group("References")
-@export var content: Control ## The actual visual element to animate. Must be a child of this node.
+@export var content: Control ## actual visual element to animate (must be a child of this node)
 
 @export_group("Entrance Animation")
 @export var auto_play_entrance: bool = false
-@export var slide_offset: Vector2 = Vector2(0, 50) ## Start position offset (relative to 0,0)
+@export var slide_offset: Vector2 = Vector2(0, 50) ## start position offset (relative to 0,0)
 @export var entrance_duration: float = 0.4
 @export var entrance_delay: float = 0.0
 
@@ -18,9 +18,9 @@ class_name AnimatableUI
 
 @export_group("Idle Animation")
 @export var idle_sway_enabled: bool = false
-@export var idle_sway_angle: float = 2.0 ## Max rotation degrees (sways between -angle and +angle)
-@export var idle_sway_duration: float = 4.0 ## Time for a full cycle (Left -> Right -> Left)
-@export var idle_random_phase: bool = true ## Randomizes start time slightly to desync multiple items
+@export var idle_sway_angle: float = 2.0 ## max rotation degrees (sways between -angle and +angle)
+@export var idle_sway_duration: float = 4.0 ## time for a full cycle (left -> right -> left)
+@export var idle_random_phase: bool = true ## randomizes start time slightly to desync multiple items
 
 @export_group("Tween Settings")
 @export var transition_type: Tween.TransitionType = Tween.TRANS_CUBIC
@@ -28,10 +28,10 @@ class_name AnimatableUI
 
 # --- State ---
 var _current_tween: Tween
-var _idle_tween: Tween # Track idle separately so entrance/hover don't kill it
+var _idle_tween: Tween # track idle separately so entrance/hover don't kill it
 
 func _ready() -> void:
-	# 1. Validation and Setup
+	# validation and setup
 	if not content:
 		if get_child_count() > 0 and get_child(0) is Control:
 			content = get_child(0)
@@ -39,32 +39,27 @@ func _ready() -> void:
 			push_warning("AnimatableUI: No content node assigned or found.")
 			return
 
-	# 2. Setup Pivot for correct scaling/rotation
+	# setup pivot for correct scaling/rotation
 	call_deferred("_update_content_pivot")
 	
-	# 3. Connect signals
+	# connect signals
 	content.mouse_entered.connect(_on_mouse_entered)
 	content.mouse_exited.connect(_on_mouse_exited)
 	resized.connect(_on_resized)
 
-	# 4. Animations
+	# animations
 	if auto_play_entrance:
-		# Start invisible and offset
+		# start invisible and offset
 		content.modulate.a = 0.0
 		content.position = slide_offset
 		animate_entrance()
-	
-	# Idle triggers immediately; it interacts nicely with entrance because
-	# entrance handles Position/Alpha, while Idle handles Rotation.
+
 	if idle_sway_enabled:
 		_start_idle_animation()
-
-# --- Core Logic ---
 
 func _update_content_pivot() -> void:
 	if not content: return
 	content.set_deferred(&"size", size)
-	#content.size = size
 	# Center pivot is crucial for both Scaling (Hover) and Rotation (Idle)
 	content.pivot_offset = size / 2.0
 

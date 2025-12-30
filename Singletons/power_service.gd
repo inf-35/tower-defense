@@ -35,6 +35,9 @@ func _disable_towers_for_deficit() -> void:
 		if tower in _disabled_towers or \
 		tower.type == Towers.Type.GENERATOR or tower.type == Towers.Type.PLAYER_CORE:
 			continue
+		# skip towers with no capacity cost
+		if is_zero_approx(Towers.get_tower_capacity(tower.type)):
+			continue
 			
 		if not tower.disabled:
 			tower.disabled = true

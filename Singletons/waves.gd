@@ -25,6 +25,8 @@ const ENEMY_GROUP: StringName = &"active_enemies"
 var _reconciliation_timer: Timer
 
 func _ready() -> void:
+	
+	
 	wave_started.connect(func(wave: int):
 		var wave_data := WaveData.new()
 		wave_data.wave = wave

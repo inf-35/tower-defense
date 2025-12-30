@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_r5l06")
-id_name = "flame_boost"
+id_name = "fiery_spirit"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_a2k8d")

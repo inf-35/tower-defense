@@ -2,16 +2,16 @@ extends UnitComponent
 class_name HealthComponent
 signal health_changed(new_health: float)
 
-@export var health_data: HealthData = load("res://Content/Health/tower_default.tres")
+@export var aes: float
+@export var health_data: Data = load("res://Content/Health/tower_default.tres") ##CANNOT BE FURTHER SPECIFIED - WILL CAUSE BUG
 
 var _modifiers_component: ModifiersComponent
 
 var max_health: float #updated by health setter
-var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH):
+var health: float:
 	set(new_health):
 		if health_data == null:
 			return
-
 		max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
 		new_health = clampf(new_health, 0.0, max_health)
 		if new_health == health:
@@ -22,7 +22,7 @@ var health: float = get_stat(_modifiers_component, health_data, Attributes.id.MA
 		
 		#NOTE: unit.died is now executed on unit.take_hit (after it calls take_damage)
 
-var shield: float = health_data.max_shield ##not linked to a attribute, simple counter
+var shield: float ##not linked to a attribute, simple counter
 #NOTE: shield does not support fancy effects, like boosts to shield as it is not linked to the modifiers component system
 
 func inject_components(modifiers_component: ModifiersComponent):
@@ -55,10 +55,11 @@ func take_damage(input_damage: float, breaking: bool = false):
 	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
 		health -= damage
 
-#func _ready():
-	#pass
-	##_STAGGER_CYCLE = 5
-	##_stagger = randi_range(0, _STAGGER_CYCLE)
+func _ready():
+	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
+	health = max_health
+	#_STAGGER_CYCLE = 5
+	#_stagger = randi_range(0, _STAGGER_CYCLE)
 	
 func _process(delta : float) -> void:
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)

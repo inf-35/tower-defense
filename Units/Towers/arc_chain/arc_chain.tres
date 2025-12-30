@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dcbvcllyygvrn"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_yjsgc"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_sjacr"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_udji3"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_pmy7p"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_pl7ym"]
+[ext_resource type="PackedScene" uid="uid://dstql8grnmxyn" path="res://Units/Towers/arc_chain/arc_chain.tscn" id="7_a64ra"]
+
+[resource]
+script = ExtResource("6_pl7ym")
+id = 16
+size = Vector2i(2, 2)
+cost = 60.0
+required_capacity = 2.0
+element = 4
+tower_name = "Arc (chain)"
+tower_description = "A powerful tower that fires chain lightning, striking multiple enemies. (doubled chain limit, damage falloff mitigation)"
+icon = ExtResource("1_yjsgc")
+inspector_actions = Array[ExtResource("2_sjacr")]([ExtResource("3_udji3")])
+tower_scene = ExtResource("7_a64ra")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

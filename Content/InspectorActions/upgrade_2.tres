@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="InspectorAction" load_steps=2 format=3 uid="uid://dg6gqnjsvso07"]
+
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="1_oegfd"]
+
+[resource]
+script = ExtResource("1_oegfd")
+upgrade_index = 1
+metadata/_custom_type_script = "uid://do6qrosup8u56"

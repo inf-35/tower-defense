@@ -11,5 +11,4 @@ func _ready():
 	fast_forward_button.pressed.connect(_on_button_pressed.bind(Clock.GameSpeed.FAST_FORWARD))
 
 func _on_button_pressed(gamespeed: Clock.GameSpeed):
-	print(gamespeed)
 	UI.gamespeed_toggled.emit(gamespeed)

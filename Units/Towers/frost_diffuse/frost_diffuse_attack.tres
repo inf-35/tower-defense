@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=5 format=3 uid="uid://mtogwrqdypp4"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_63ujh"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_dywx5"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_webrh"]
+
+[sub_resource type="Resource" id="Resource_h67ia"]
+script = ExtResource("3_webrh")
+cooldown = 2.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[resource]
+script = ExtResource("2_dywx5")
+delivery_method = 3
+range = 24.0
+cooldown = 0.8
+damage = 0.5
+status_effects = Array[ExtResource("3_webrh")]([SubResource("Resource_h67ia")])
+cone_angle = 360.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -1,0 +1,7 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://du0bv3ti1a6il"]
+
+[ext_resource type="FontFile" uid="uid://b1g536c04mk3e" path="res://Fonts/Skranji-Regular.ttf" id="1_5vahb"]
+
+[resource]
+base_font = ExtResource("1_5vahb")
+variation_transform = Transform2D(1, 0.15, 0, 1, 0, 0)

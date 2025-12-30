@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://db1mnpbbv6may"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_7nskn"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_nvanq"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_um6iv"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_h3vg4"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_u8u8f"]
+[ext_resource type="PackedScene" uid="uid://c66r1jpumpbce" path="res://Units/Towers/poison_chronic/poison_chronic.tscn" id="7_ljxae"]
+
+[resource]
+script = ExtResource("6_u8u8f")
+id = 43
+cost = 25.0
+element = 3
+is_upgrade = true
+tower_name = "Poison (chronic)"
+tower_description = "increased range +50% dur"
+icon = ExtResource("1_7nskn")
+inspector_actions = Array[ExtResource("2_nvanq")]([ExtResource("3_um6iv")])
+tower_scene = ExtResource("7_ljxae")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

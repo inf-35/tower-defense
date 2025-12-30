@@ -45,11 +45,17 @@ func _draw_vfx():
 
 		# --- Calculate common properties ---
 		var current_scale_val = 1.0 if not info.scale_over_lifetime else info.scale_over_lifetime.sample(normalized_lifetime)
+		current_scale_val *= info.scale
 		var current_color = Color.WHITE if not info.color_over_lifetime else info.color_over_lifetime.sample(normalized_lifetime)
-		var transform = Transform2D(vfx.rotation, vfx.position)
+		var transform := Transform2D(vfx.rotation, Vector2.ZERO).scaled(Vector2(current_scale_val, current_scale_val))
+		transform = transform.translated(vfx.position)
 		
 		# CRITICAL: We must clear the canvas item before drawing the new frame.
 		RenderingServer.canvas_item_clear(canvas_item_rid)
+		
+		# Apply the transform and color globally for this item
+		RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
+		RenderingServer.canvas_item_set_modulate(canvas_item_rid, current_color)
 		
 		# --- Call the correct RenderingServer function based on type ---
 		match info.vfx_type:
@@ -57,20 +63,20 @@ func _draw_vfx():
 				if not is_instance_valid(info.texture):
 					return #abort
 				transform = transform.scaled(Vector2.ONE * current_scale_val)
-				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
-				RenderingServer.canvas_item_set_modulate(canvas_item_rid, current_color)
 				
 				var frame := int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
 				var fx : int = frame % info.h_frames
 				@warning_ignore_start("integer_division")
 				var fy : int = frame / info.h_frames
-				var region : Rect2 = Rect2(fx * (info.texture.get_width() / info.h_frames), fy * (info.texture.get_height() / info.v_frames), info.texture.get_width() / info.h_frames, info.texture.get_height() / info.v_frames)
-				RenderingServer.canvas_item_add_texture_rect_region(canvas_item_rid, Rect2(Vector2.ZERO, region.size), info.texture.get_rid(), region)
+				var region_w = info.texture.get_width() / info.h_frames
+				var region_h = info.texture.get_height() / info.v_frames
+				var region : Rect2 = Rect2(fx * region_w, fy * region_h, region_w, region_h)
+				var draw_rect := Rect2(-region.size * 0.5, region.size)
+				RenderingServer.canvas_item_add_texture_rect_region(canvas_item_rid, draw_rect, info.texture.get_rid(), region)
 
 			VFXInfo.VFXType.CIRCLE:
 				var radius : float = info.radius * current_scale_val
-				# For primitives, position is handled by the transform, not the primitive's offset.
-				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
+				# For primitives, position is handled by the transform, not the primitive's offset.)
 				RenderingServer.canvas_item_add_circle(canvas_item_rid, Vector2.ZERO, radius, current_color)
 
 			VFXInfo.VFXType.RECTANGLE:

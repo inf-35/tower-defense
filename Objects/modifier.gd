@@ -18,3 +18,14 @@ func _init(_attribute: Attributes.id, _multiplicative: float = 1.0, _additive: f
 	cooldown = _cooldown
 	override = _override
 	source_id = _source_id
+	
+func duplicate() -> Modifier:
+	var modifier := Modifier.new(
+		attribute,
+		additive,
+		multiplicative,
+		cooldown,
+		override,
+		source_id,
+	)
+	return modifier

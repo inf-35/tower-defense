@@ -6,23 +6,16 @@ enum Type {
 	ADD_FLUX,
 	UNLOCK_TOWER,
 	ADD_RELIC,
+	ADD_RITE,
 	
 	EXPORT #workaround, this tells the initialiser that the reward is defined in inspector
 }
 
 @export var type: Type
-@export var params: Dictionary = {
-	#examples
-	ID.Rewards.FLUX_AMOUNT : 0.0,
-	ID.Rewards.TOWER_TYPE : Towers.Type.TURRET,
-	ID.Rewards.RELIC : Relics.COMMON_COLD,
-}
+@export var tower_type: Towers.Type
+@export var relic: RelicData
+@export var rite_type: Towers.Type
+@export var flux_amount: float
 
 @export var title: String = "dappled things" #used for terrain expansion previews and such
 @export_multiline var description: String = "Reward description"
-
-func _init(_type: Type = Type.EXPORT, _params: Dictionary = {}, _description: String = ""):
-	if _type != Type.EXPORT: self.type = _type
-	if not _params.is_empty(): self.params = _params
-	description = _description
-	title = _description #placeholder

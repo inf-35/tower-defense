@@ -11,7 +11,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	},
 	"PLAYER_HP": {
 		"title": "",
-		"description": "Player Health",
+		"description": "Player Health. If this reaches 0, the run ends.",
 		"icon": preload("res://Assets/hp_icon.png"),
 	},
 	"CAPACITY" : {
@@ -28,10 +28,20 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"title": "Anomaly",
 		"description": "A special Breach that will offer a choice of powerful rewards when its wave is cleared.",
 		"icon": null
-	}
+	},
+	"FROST": {
+		"title": "Frost",
+		"description": "This unit moves and attacks at a glacial rate.",
+		"icon": null,
+	},
+	"BURN": {
+		"title": "Burn",
+		"description": "This unit is burning and takes 0.5 damage per second per stack",
+		"icon": null,
+	},
 }
 
-const TOOLTIP_PANEL: PackedScene = preload("res://UI/_tooltip_panel.tscn")
+var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")
 
 var _regex: RegEx
 
@@ -125,8 +135,16 @@ func _resolve_tower_data(tower_id_str: String) -> Dictionary:
 
 # helper to fetch relic info
 func _resolve_relic_data(relic_id_str: String) -> Dictionary:
-	#TODO: implement
-	return {}
+	var relic: RelicData = Relics.relics.get(relic_id_str)
+	
+	if not relic:
+		return {}
+	
+	return {
+		"title": relic.title,
+		"description": relic.description,
+		"icon": relic.icon,
+	}
 
 func _verify_keywords():
 	for keyword: String in KEYWORDS:

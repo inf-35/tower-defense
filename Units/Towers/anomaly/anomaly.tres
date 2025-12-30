@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://bvpppbiinhis4"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_0xm1l"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_lwx4q"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_0xm1l"]
 [ext_resource type="PackedScene" uid="uid://yb7vgd4nljii" path="res://Units/Towers/anomaly/anomaly.tscn" id="2_7baw3"]
 [ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="2_b1ehy"]
 
@@ -10,9 +10,10 @@ script = ExtResource("1_lwx4q")
 id = 10
 cost = 0.0
 required_capacity = 0.0
-element = 5
-tower_name = "Anomaly"
-tower_description = "Activate for rewards"
+element = 4
+tower_name = "Shrine"
+tower_description = "Ancient ruins containing hidden artefacts. Can be activated with the spirits of fallen enemies."
 preview = ExtResource("2_b1ehy")
+inspector_actions = Array[ExtResource("2_0xm1l")]([])
 tower_scene = ExtResource("2_7baw3")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

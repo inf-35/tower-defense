@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://cvsugm8vn8kjy"]
+
+[ext_resource type="Script" uid="uid://bl072eqclcpj1" path="res://Content/Relics/inferno/status_compound_effect.gd" id="1_hfy0w"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_1xcp8"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_jklp7"]
+
+[sub_resource type="Resource" id="Resource_7jw3c"]
+script = ExtResource("1_hfy0w")
+schedule = 1
+metadata/_custom_type_script = "uid://bl072eqclcpj1"
+
+[resource]
+script = ExtResource("3_jklp7")
+global_effect = SubResource("Resource_7jw3c")
+title = "Inferno"
+description = "Applying Burn to an already Burning enemy has a 10% chance to add an extra stack to their existing Burn count."
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

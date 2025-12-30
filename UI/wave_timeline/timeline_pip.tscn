@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3 uid="uid://4vsohvgu4bte"]
+
+[ext_resource type="Script" uid="uid://derqkcnhnj7ao" path="res://UI/wave_timeline/timeline_pip.gd" id="1_5qpod"]
+[ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="2_so1hf"]
+
+[node name="TimelinePip" type="Control" node_paths=PackedStringArray("animatable_wrapper", "icon_rect", "background_panel")]
+clip_contents = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_5qpod")
+animatable_wrapper = NodePath("animatable_wrapper")
+icon_rect = NodePath("animatable_wrapper/icon")
+background_panel = NodePath("animatable_wrapper/background")
+metadata/_custom_type_script = "uid://derqkcnhnj7ao"
+
+[node name="animatable_wrapper" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("2_so1hf")
+metadata/_custom_type_script = "uid://2p1hsv7rivsk"
+
+[node name="icon" type="TextureRect" parent="animatable_wrapper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="background" type="Panel" parent="animatable_wrapper"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1

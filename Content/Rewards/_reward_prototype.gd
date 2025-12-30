@@ -11,18 +11,23 @@ class_name RewardPrototype #see Reward
 @export_subgroup("Parameters")
 @export var tower_type: Towers.Type = Towers.Type.VOID
 @export var relic_data: RelicData
+@export var rite_type: Towers.Type = Towers.Type.VOID
 @export var flux_amount: int = 0
 
 # converts this editor-friendly resource into the runtime Reward object
 func generate_reward() -> Reward:
-	var params: Dictionary = {}
+	var reward := Reward.new()
+	reward.type = type
+	reward.description = description
 	
 	match type:
 		Reward.Type.UNLOCK_TOWER:
-			params[ID.Rewards.TOWER_TYPE] = tower_type
+			reward.tower_type = tower_type
 		Reward.Type.ADD_RELIC:
-			params[ID.Rewards.RELIC] = relic_data
+			reward.relic = relic_data
+		Reward.Type.ADD_RITE:
+			reward.rite_type = rite_type
 		Reward.Type.ADD_FLUX:
-			params[ID.Rewards.FLUX_AMOUNT] = flux_amount
-
-	return Reward.new(type, params, description)
+			reward.flux_amount = flux_amount
+			
+	return reward

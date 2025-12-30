@@ -39,7 +39,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventKey:
 		if event.pressed and event.keycode == KEY_Q:
-			print("hansa!")
 			show_overlay = not show_overlay
 			queue_redraw()
 		

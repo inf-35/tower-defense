@@ -9,15 +9,24 @@ class_name PlantTowerBehavior
 
 # --- state ---
 var _current_bonus_damage: float = 0.0
-var _current_bonus_multiplicative_damage: float = 0.0
+var _current_bonus_multiplicative_damage: float = 0.0:
+	set(nec):
+		_current_bonus_multiplicative_damage = nec
+		print(unit, " ", _current_bonus_multiplicative_damage)
 var _growth_modifier: Modifier = null
 
 # this function is called by the unit's initialize() method
 func start() -> void:
 	# connect to the global signal that announces a new wave cycle
-	Phases.wave_cycle_started.connect(_on_wave_cycle_started, CONNECT_ONE_SHOT)
+	Phases.wave_ended.connect(_on_wave_cycle_started)
 	# apply the initial state (which is no bonus damage)
 	_apply_damage_modifier()
+	
+func transfer_state(untyped_new_behavior: Behavior):
+	var new_behavior := untyped_new_behavior as PlantTowerBehavior
+	new_behavior._current_bonus_damage = _current_bonus_damage
+	new_behavior._current_bonus_multiplicative_damage = _current_bonus_multiplicative_damage
+	new_behavior._apply_damage_modifier()
 
 # this is the core logic, triggered once per wave
 func _on_wave_cycle_started(_wave_number: int) -> void:

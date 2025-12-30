@@ -27,10 +27,11 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 
 # --- Universal Behavior Properties ---
 @export_category("Universal")
+@export var scale: float = 1.0
 @export var lifetime: float = 1.0
 @export var rotation_mode: RotationMode = RotationMode.STATIC # Changed default
 enum RotationMode { STATIC, FACE_VELOCITY, SPIN }
-@export var spin_speed: float = 360.0
+@export var spin_speed: float = 180.0
 @export var graphical_layer: int = 1000
 
 @export var scale_over_lifetime: Curve

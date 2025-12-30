@@ -11,6 +11,3 @@ func resolve(attribute: Attributes.id) -> Variant: #converts attributes.id to st
 
 func return_or_null(stringname: StringName) -> Variant:
 	return self.get(stringname) if stringname in self else null
-
-func _init():
-	pass

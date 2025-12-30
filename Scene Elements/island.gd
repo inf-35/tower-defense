@@ -30,7 +30,9 @@ const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1),
 #configuration
 const _DEBUG_SHOW_NAVCOST: bool = false
 
+
 func _ready():
+	Phases.start_game()
 	#register self with services that need references
 	PowerService.register_island(self)
 	
@@ -60,7 +62,7 @@ func _setup_preview_renderer() -> void:
 	preview_renderer._setup_visuals()
 	
 	var sketch_mat := ShaderMaterial.new()
-	sketch_mat.shader = preload("res://shaders/sketch_terrain.gdshader")
+	sketch_mat.shader = preload("res://Shaders/sketch_terrain.gdshader")
 	
 	# re-use noise from main renderer if possible, or create new
 	var noise = FastNoiseLite.new()
@@ -84,8 +86,6 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 		if tower_type == Towers.Type.VOID:
 			tower_grid[cell].sell()
 			return true
-		# handle upgrading (can be expanded)
-		tower_grid[cell].level += 1
 		return true
 	
 	if TerrainService.is_area_constructable(self, facing, cell, tower_type):
@@ -109,26 +109,15 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.tower_position = cell
 	tower.set_initial_behaviour_state(initial_state)
 	tower.add_to_group(References.TOWER_GROUP)
-	add_child(tower)
+	
 	tower.died.connect(func(_hit_report_data): update_navigation_grid()) #as unit becoems non-blocking upon unit death
 	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
+	
+	add_child(tower)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
 	_update_adjacencies_around(cell)
 	update_navigation_grid()
-	
-	# --- apply terrain modifiers ---
-	# after the tower is created and has its components, check the terrain it's on
-	if is_instance_valid(tower.modifiers_component):
-		# get the terrain base at the tower's location
-		var terrain_base: Terrain.Base = self.terrain_base_grid.get(cell, Terrain.Base.EARTH)
-		# get the list of modifier prototypes associated with this terrain
-		var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
-		
-		for proto: ModifierDataPrototype in modifier_prototypes:
-			var new_modifier: Modifier = proto.generate_modifier()
-			# add the modifier as a PERMANENT modifier, as it's tied to the static world state
-			tower.modifiers_component.add_permanent_modifier(new_modifier)
 			
 	#insert the new tower in the lookup table
 	if not _towers_by_type.has(tower.type):
@@ -138,6 +127,44 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower_created.emit(tower)
 	tower_changed.emit(cell)
 	return tower
+
+# request_upgrade checks funds/limits, then calls upgrade_tower
+func request_upgrade(old_tower: Tower, new_type: Towers.Type) -> bool:
+	if not is_instance_valid(old_tower): return false
+	if old_tower.abstractive: return false
+	if old_tower.current_state == Tower.State.RUINED: return false
+
+	# check limits (if new tower type is restricted)
+	if not TerrainService.is_area_constructable(self, old_tower.facing, old_tower.tower_position, new_type, true, old_tower):
+		return false
+
+	upgrade_tower(old_tower, new_type)
+	return true
+	
+func upgrade_tower(old_tower: Tower, new_type: Towers.Type) -> void:
+	var cell: Vector2i = old_tower.tower_position
+	var facing: Tower.Facing = old_tower.facing
+	
+	# construct new tower
+	var new_tower: Tower = construct_tower_at(cell, new_type, facing)
+	
+	# stat handover (hp)
+	if is_instance_valid(new_tower.health_component) and is_instance_valid(old_tower.health_component):
+		var damage: float = old_tower.health_component.max_health - old_tower.health_component.health
+		new_tower.health_component.health -= damage
+
+	# event handover (effects & behaviors & globals)
+	var evt = GameEvent.new()
+	evt.event_type = GameEvent.EventType.REPLACED
+	evt.data = UnitReplacedData.new(old_tower, new_tower)
+	# trigger local Components (Effects/Behaviors transfer state)
+	old_tower.on_event.emit(evt)
+	
+	# cleanup old tower
+	old_tower.queue_free() #(automatically cleans up tower_grid)
+	
+	## Visual Feedback
+	#VFXManager.play_vfx(ID.Particles.CONSTRUCTION_PUFF, new_tower.global_position, Vector2.UP)
 
 func update_navigation_grid() -> void:
 	Navigation.grid.clear()
@@ -229,6 +256,8 @@ func _on_tower_destroyed(tower: Tower):
 	var cell: Vector2i = tower.tower_position
 	#clear tower grid
 	for local_cell: Vector2i in tower.get_occupied_cells():
+		if not tower_grid[local_cell] == tower: #dont clear other towers' cells (i.e. upgrades)
+			continue
 		tower_grid.erase(local_cell)
 		_update_adjacencies_around(cell) #update adjacencies
 	#update capacity, caches, navigation

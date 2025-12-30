@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("2_sooba")
-range = 8.0
+range = 12.0
 damage = 4.0
 breaking = true
 status_effects = Array[ExtResource("3_b8i0i")]([null])

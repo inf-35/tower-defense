@@ -28,7 +28,7 @@ func _ready() -> void:
 	# (though with autoload order or call_deferred this might not be strictly necessary,
 	# but good for robustness if Player's _ready completes and emits before UI's _ready connects)
 	if Player:
-		_on_player_tower_types_update(Player.unlocked_towers)
+		_on_player_tower_types_update(Player.unlocked_towers, Player.rite_inventory)
 	else:
 		_clear_towers_bar() # Ensure it's empty if no towerss initially
 
@@ -38,7 +38,7 @@ func _clear_towers_bar() -> void:
 		towers_bar.remove_child(child) # Correct way to remove
 		child.queue_free() # Then free it
 
-func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type, bool]) -> void:
+func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type, bool], _rite_inventory: Dictionary[Towers.Type, int]) -> void:
 	_clear_towers_bar()
 	
 	var tower_types_by_id : Array[Towers.Type] = unlocked_tower_types.keys()
@@ -56,8 +56,5 @@ func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type
 		towers_bar.add_child(tower_option)
 	
 func _on_tower_button_pressed(type_id: Towers.Type) -> void:
-	# This function is called when a towers button is pressed.
-	# It emits a signal that ClickHandler (or another system) will listen to
-	# to know which tower type the player intends to place next.
-	UI.tower_selected.emit(type_id)
+	UI.tower_selected.emit(Towers.get_tower_prototype(type_id)) #update click handler
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(type_id)) #update inspector bar to fit whatever we're selecting

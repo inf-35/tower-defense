@@ -3,7 +3,7 @@ class_name Unit
 @warning_ignore_start("unused_signal")
 
 signal on_event(event: GameEvent) #polymorphic event bus
-signal components_ready()
+signal components_ready() ##fires when all components and the unit is ready
 signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto on_killed, which defines unit death behaviour. hit_report_data contains info of the hit that killed the enemy, if any
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
@@ -110,6 +110,10 @@ func _create_components() -> void:
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
+	
+	if is_instance_valid(hitbox) and abstractive:
+		hitbox.monitorable = false # disables the hitbox (if abstractive)
+		
 	died.connect(func(hit_report_data: HitReportData):
 		hit_report_data.flux_value = flux_value #submit base flux value to be modified
 		#NOTE: the global unit_died signal must fire before execution of on_killed, since on_killed
@@ -163,6 +167,7 @@ func _prepare_components() -> void:
 	
 	if health_component != null:
 		health_component.inject_components(modifiers_component)
+		_attach_health_bar()
 	
 	if attack_component != null:
 		attack_component.inject_components(modifiers_component)
@@ -201,15 +206,24 @@ func _setup_event_bus() -> void:
 		Player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
 	)
 
+func _attach_health_bar() -> void:
+	if abstractive or disabled:
+		return
+		
+	var hp_bar := preload("res://UI/unit_hp_bar/unit_hp_bar.tscn").instantiate()
+	add_child(hp_bar)
+	hp_bar.setup(self, health_component)
+
 func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
 		apply_effect(effect_prototype)
 
-func apply_effect(effect_prototype: EffectPrototype) -> void:
+func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void:
 	effect_prototypes.append(effect_prototype)
 	
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	effects[effect_prototype.schedule].append(effect_instance)
+	
 	effect_instance.attach_to(self)
 	
 	var type = effect_prototype.effect_type
@@ -239,6 +253,15 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 		effect.free()
 
 	effect_prototypes.erase(effect_prototype)
+
+# helper to find a specific running instance of a prototype on this unit
+func get_effect_instance_by_prototype(proto: EffectPrototype) -> EffectInstance:
+	# iterate through all schedules to find the instance
+	for schedule_list: Array in effects.values():
+		for instance: EffectInstance in schedule_list:
+			if instance.effect_prototype == proto:
+				return instance
+	return null
 
 func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant: ##access properties of intrinsic effects, mainly for UI
 	if not effects_by_type.has(effect_type):

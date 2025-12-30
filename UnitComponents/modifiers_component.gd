@@ -288,3 +288,8 @@ func has_status(status: Attributes.Status, threshold: float = 0.0) -> bool:
 	if not _status_effects.has(status):
 		return false
 	return _status_effects[status].stack > threshold
+
+func get_status_count(status: Attributes.Status) -> float:
+	if not _status_effects.has(status):
+		return 0.0
+	return _status_effects[status].stack

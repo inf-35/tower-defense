@@ -6,6 +6,7 @@ enum EventType {
 	HIT_RECEIVED, ##this happens right after we get hit but before we process its effects (attached with HitData)
 	HIT_DEALT, ##this happens after we inflict a hit on others (attached with HitReportData)
 	DIED, ##special subset of hit dealt signals, fired just after hit_dealt (attached with HitReportData, but the emitter unit is the newly dead unit)
+	REPLACED, ##fired when a unit is REPLACED by another, typically happens in upgrades (attached with UnitReplacedData)
 	
 	STATUS_ADDED, ##when a status is added
 	STATUS_REMOVED, ##when a status is removed

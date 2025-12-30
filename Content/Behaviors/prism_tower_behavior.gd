@@ -12,12 +12,10 @@ func start() -> void:
 	
 #called by TowerNetworkManager (we are the handler)
 func create_link(partner: Tower):
-	print(partner)
 	_create_prism_laser(partner)
 	pass
 	
 func remove_link(partner: Tower):
-	print(partner, " removed!")
 	_remove_prism_laser(partner)
 	
 func _create_prism_laser(prism_b: Tower) -> void:

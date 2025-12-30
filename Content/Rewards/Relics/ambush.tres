@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_ya5t6")
-id_name = "enfilade"
+id_name = "ambush"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_y0ud3")

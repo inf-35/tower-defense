@@ -1,14 +1,18 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://dnviex7f5jeta"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://dnviex7f5jeta"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_fagdf"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_a8fe4"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_42dav"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_rf2uk"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_gwu5g"]
 [ext_resource type="PackedScene" uid="uid://c05d2jkf6watt" path="res://Units/Towers/minigun/minigun.tscn" id="3_vhwkn"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_7eewx"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_cdwqs"]
 
 [resource]
 script = ExtResource("2_42dav")
 id = 11
 cost = 15.0
 tower_name = "Minigun"
-tower_description = "Slow AOE damage-dealer"
+tower_description = "Rapid-shoo"
 tower_scene = ExtResource("3_vhwkn")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

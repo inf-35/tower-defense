@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://t6q6wdqdrbhx"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_flj42"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_ktock"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_65jvl"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="3_hlffq"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_1jlla"]
+[ext_resource type="PackedScene" uid="uid://ht61d2kj36cm" path="res://Units/Towers/sunbeam_triplet/sunbeam_triplet.tscn" id="5_6jtf7"]
+
+[resource]
+script = ExtResource("4_1jlla")
+id = 38
+cost = 38.0
+element = 2
+is_upgrade = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Sunbeam (triplet)"
+tower_description = "Cheap unit redirector."
+inspector_actions = Array[ExtResource("2_ktock")]([ExtResource("3_65jvl")])
+tower_scene = ExtResource("5_6jtf7")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

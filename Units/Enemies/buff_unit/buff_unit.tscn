@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bj1w2uyud17o2"]
+[gd_scene load_steps=19 format=3 uid="uid://bj1w2uyud17o2"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_2d728"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_gbgnt"]
@@ -10,6 +10,11 @@
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_bu6ya"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_jiw1u"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_86qj0"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_omw1y"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="12_su75u"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="13_xowts"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="14_hhf6y"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="15_mldxy"]
 
 [sub_resource type="Resource" id="Resource_86qj0"]
 script = ExtResource("4_4dwkj")
@@ -21,10 +26,17 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
 size = Vector2(60.000015, 82.500015)
 
-[node name="BuffUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[sub_resource type="Resource" id="Resource_0s30q"]
+script = ExtResource("13_xowts")
+range = 8.0
+damage = 2.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[node name="BuffUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_2d728")
 hostile = true
+attack_only_when_blocked = true
 behavior = NodePath("DefaultBehavior")
 graphics = NodePath("Graphics")
 hitbox = NodePath("Hitbox")
@@ -32,6 +44,8 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
@@ -71,3 +85,12 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 [node name="DefaultBehavior" type="Node" parent="."]
 script = ExtResource("10_86qj0")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("11_omw1y")
+attack_data = SubResource("Resource_0s30q")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("15_mldxy")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"

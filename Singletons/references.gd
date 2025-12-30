@@ -8,13 +8,14 @@ signal references_ready()
 signal terrain_generating(parameters: GenerationParameters) ##fires before terrain generation, allows modification of generationparameters
 
 #scene tree globals
-@onready var root: Node = get_tree().get_root()
+var root: Node
 
-@onready var island: Island = root.get_node("Island")
-@onready var keep: Node
-@onready var camera: Camera = island.get_node("Camera2D")
-@onready var tower_preview: TowerPreview = island.get_node("TowerPreview")
-@onready var projectiles: Node2D = island.get_node("Projectiles")
+var island: Island
+var keep: Node
+var camera: Camera
+var tower_preview: TowerPreview
+var path_renderer: PathRenderer
+var projectiles: Node2D
 
 #global constants
 const TOWER_GROUP: StringName = &"towers"
@@ -33,6 +34,16 @@ func assign_stat_id() -> int:
 	current_stat_id += 1
 	return current_stat_id
 	
-func _ready():
+func start():
 	set_process(false)
+
+	root = get_tree().get_root()
+	island = root.get_node("Island")
+	#keep
+	camera = island.get_node("Camera2D")
+	tower_preview = island.get_node("TowerPreview")
+	projectiles = island.get_node("Projectiles")
+	path_renderer = island.get_node("PathRenderer")
+	
+	await get_tree().process_frame
 	references_ready.emit()

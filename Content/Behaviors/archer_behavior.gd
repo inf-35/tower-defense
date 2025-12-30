@@ -40,7 +40,7 @@ func update(delta: float) -> void:
 	_attempt_simple_attack()
 
 func _move_towards_keep() -> void:
-	siege_distance -= 10.0 #decrease siege distance
+	siege_distance -= Island.CELL_SIZE * 2 #decrease siege distance
 	if is_instance_valid(navigation_component):
 		# standard behavior: pathfind to the center of the map
 		navigation_component.goal = Vector2i.ZERO

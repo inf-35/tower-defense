@@ -1,75 +1,132 @@
 # Phases.gd
 extends Node
-#state machine for wave/phase progression
+# state machine for wave/phase progression
 
 # --- signals ---
 # this is the authoritative signal that a new wave cycle has begun.
 # UI and other systems should listen to this.
-signal wave_cycle_started(wave_number: int) #wave cycle started
+signal wave_cycle_started(wave_number: int) #wave cycle started (beginning of day)
 signal wave_ended(wave_number: int) #combat wave ended
 
+signal combat_started(wave_number: int) #combat wave started
+
+signal wave_schedule_updated() ##wave schedule updated
+
 # --- game state variables ---
-var current_wave_number: int = 0
 
 enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
-enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
+enum DayEvent { NONE, EXPANSION, REWARD_TOWER, REWARD_RELIC}
+enum CombatVariant { NORMAL, BOSS, SURGE}
+
+var current_wave_number: int = 0
 var current_phase: GamePhase = GamePhase.IDLE
+
+var is_game_over: bool = false
+
+enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
 var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
 
-enum WaveType { NORMAL, BOSS, REWARD, SURGE, EXPANSION }
-var wave_plan: Dictionary[int, WaveType] = {}
-const FINAL_WAVE: int = 50
+var wave_plan: Dictionary[int, Wave] = {}
+const FINAL_WAVE: int = 25
+class Wave: ## internal data container for a specific wave's configuration
+	var day_events: Array[DayEvent] = []
+	var combat_variant: CombatVariant = CombatVariant.NORMAL
 
 const DEBUG_PRINT_REPORTS: bool = true
 
 func _ready() -> void:
-	start_game.call_deferred()
-	wave_cycle_started.connect(UI.start_wave.emit) #connect the systems-side signal to the ui-side signal
-
+	wave_cycle_started.connect(UI.start_wave.emit)
+	combat_started.connect(UI.start_combat.emit)
+	wave_ended.connect(UI.end_wave.emit)
+	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
+	
 func start_game() -> void:
+	Clock.start()
+	References.start()
+	ClickHandler.start()
+	Player.start()
+	TowerNetworkManager.start()
+
+	current_wave_number = 0
+	current_phase = GamePhase.IDLE
+	
+	wave_plan.clear()
+	choice_queue.clear()
+	
+	is_game_over = false
+	
 	_report("starting game flow.")
 	_generate_wave_plan()
-	current_wave_number = 0
+	
 	_prepare_for_next_wave_cycle()
 
 func _generate_wave_plan() -> void:
 	_report("generating wave plan.")
 	wave_plan = {}
 	for i: int in range(1, FINAL_WAVE + 1):
-		wave_plan[i] = WaveType.NORMAL
-		#if i % Waves.WAVES_PER_EXPANSION_CHOICE == 1:
-			#wave_plan[i] = WaveType.REWARD
+		var wave := Wave.new()
+		# determine day event(s)
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
-			wave_plan[i] = WaveType.EXPANSION
-		if i == 20:
-			wave_plan[i] = WaveType.BOSS
-		#if i in [7, 13, 19]:
-			#wave_plan[i] = WaveType.SURGE
+			wave.day_events.append(DayEvent.EXPANSION)
+			
+		if i % 3 == 0:
+			wave.day_events.append(DayEvent.REWARD_TOWER)
+			
+		## rewards on specific day
+		#if i == 1:
+			#wave.day_events.append(DayEvent.REWARD_TOWER)
+		
+		if wave.day_events.is_empty():
+			wave.day_events.append(DayEvent.NONE)
 	
-	UI.update_wave_schedule.emit() # this signal is fine for a static UI display
+		# determine combat variant
+		if i == 20 or i == 40 or i == FINAL_WAVE:
+			wave.combat_variant = CombatVariant.BOSS
+		elif i in [7, 13, 19]:
+			wave.combat_variant = CombatVariant.SURGE
+		else:
+			wave.combat_variant = CombatVariant.NORMAL
+		
+		wave_plan[i] = wave
 
-# safely get the type of a wave from the plan
-func get_wave_type(wave_num: int) -> WaveType:
-	return wave_plan.get(wave_num, WaveType.NORMAL)
+	wave_schedule_updated.emit()
+
+# called by Waves.gd to determine what to spawn
+func get_combat_variant(wave_num: int) -> CombatVariant:
+	if wave_plan.has(wave_num):
+		return wave_plan[wave_num].combat_variant
+	return CombatVariant.NORMAL
+
+# helper to check if a wave has a specific day event (useful for UI timeline)
+func has_day_event(wave_num: int, event: DayEvent) -> bool:
+	if wave_plan.has(wave_num):
+		return wave_plan[wave_num].day_events.has(event)
+	return false
 
 func _prepare_for_next_wave_cycle() -> void:
 	current_wave_number += 1
-	_report("preparing for wave cycle " + str(current_wave_number))
+	
+	if current_wave_number > FINAL_WAVE:
+		current_wave_number -= 1
+		start_game_over(true)
+		return
+
+	var wave : Wave = wave_plan.get(current_wave_number, Wave.new())
+	_report("Preparing for wave cycle " + str(current_wave_number))
 	
 	# announce the new wave cycle to all listeners (e.g., WaveTimeline)
 	wave_cycle_started.emit(current_wave_number)
-
-	var upcoming_wave_type: WaveType = get_wave_type(current_wave_number)
-	_report("wave " + str(current_wave_number) + " is of type: " + WaveType.keys()[upcoming_wave_type])
-
-	# queue choices based on the plan.
-	match upcoming_wave_type:
-		WaveType.REWARD:
-			add_choice_to_queue(ChoiceType.REWARD_TOWER)
-			#add_choice_to_queue(ChoiceType.REWARD_RELIC)
-		WaveType.EXPANSION:
-			add_choice_to_queue(ChoiceType.EXPANSION)
+	# populate choice queue
+	choice_queue.clear()
+	for event: DayEvent in wave.day_events:
+		match event:
+			DayEvent.EXPANSION:
+				add_choice_to_queue(ChoiceType.EXPANSION)
+			DayEvent.REWARD_TOWER:
+				add_choice_to_queue(ChoiceType.REWARD_TOWER)
+			DayEvent.REWARD_RELIC:
+				add_choice_to_queue(ChoiceType.REWARD_RELIC)
 
 	if not choice_queue.is_empty():
 		var next_choice: ChoiceType = choice_queue.pop_front()
@@ -81,7 +138,7 @@ func add_choice_to_queue(type: ChoiceType) -> void:
 	choice_queue.append(type)
 	_report("added " + str(ChoiceType.keys()[type]) + " to choice queue.")
 
-# Main state progression logic
+# main state progression logic
 func _advance_phase():
 	match current_phase:
 		GamePhase.IDLE:
@@ -94,9 +151,9 @@ func _advance_phase():
 			current_phase = GamePhase.IDLE
 			_advance_phase() # go directly to the next cycle prep
 		GamePhase.GAME_OVER:
-			_report("game over state.")
+			_report("Game over state.")
 
-# --- Choice Phase Logic ---
+# --- choice Phase Logic ---
 func _start_choice_phase(type: ChoiceType) -> void:
 	current_phase = GamePhase.CHOICE
 	current_choice_type = type
@@ -116,7 +173,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 			)
 
 		ChoiceType.REWARD_TOWER:
-			RewardService.generate_and_present_choices(3)
+			RewardService.generate_and_present_choices(3, Reward.Type.UNLOCK_TOWER)
 			
 		ChoiceType.REWARD_RELIC:
 			RewardService.generate_and_present_choices(3, Reward.Type.ADD_RELIC)
@@ -147,7 +204,7 @@ func _on_choice_applied() -> void:
 	
 	_report("a choice has been successfully applied by its handler.")
 	# the service is responsible for hiding its own UI, so we don't need to do it here
-	if not choice_queue.is_empty():
+	if not choice_queue.is_empty(): # go to the next choice if there is one
 		var next_choice: ChoiceType = choice_queue.pop_front()
 		_start_choice_phase(next_choice)
 	else:
@@ -170,10 +227,13 @@ func _on_player_ended_building_phase() -> void:
 
 # --- Combat Wave Logic ---
 func _start_combat_wave() -> void:
+	combat_started.emit(current_wave_number)
 	current_phase = GamePhase.COMBAT_WAVE
 	_report("ordering Waves.gd to start combat for wave " + str(current_wave_number))
 	
 	if is_instance_valid(Waves):
+		if Waves.wave_ended.is_connected(_on_combat_wave_ended):
+			Waves.wave_ended.disconnect(_on_combat_wave_ended)
 		Waves.wave_ended.connect(_on_combat_wave_ended, CONNECT_ONE_SHOT)
 		Waves.start_combat_wave(current_wave_number)
 	else:
@@ -188,6 +248,14 @@ func _on_combat_wave_ended(_wave_number: int) -> void:
 	wave_ended.emit(current_wave_number)
 	current_phase = GamePhase.IDLE
 	_advance_phase()
+	
+func start_game_over(is_victory: bool) -> void:
+	is_game_over = true
+	current_phase = GamePhase.GAME_OVER
+	
+	UI.display_game_over.emit(is_victory)
+	_report("Game over!")
+	
 
 func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:

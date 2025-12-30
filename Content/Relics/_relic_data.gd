@@ -11,6 +11,7 @@ enum TargetType {
 	SPECIFIC_ELEMENT
 	# add more specific target types as needed
 }
+@export var id: String ## temporarily unused, instead using wrapper reward's id instead
 @export var target_type: TargetType
 
 # used only if target_type is SPECIFIC_TOWER_TYPE

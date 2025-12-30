@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://decwp0f16b3es"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_x1751"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_0wel6"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_wsrc5"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_7vn0t"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_aogod"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_cbc14"]
+[ext_resource type="PackedScene" uid="uid://bvcro6a1dvflk" path="res://Units/Towers/frost_diffuse/frost_diffuse.tscn" id="7_nkeyn"]
+
+[resource]
+script = ExtResource("6_cbc14")
+id = 41
+cost = 16.0
+element = 1
+is_upgrade = true
+tower_name = "Frost Tower (diffuse)"
+tower_description = "Inflicts mild frost to nearby enemies. (slight increased range)"
+tower_scene = ExtResource("7_nkeyn")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

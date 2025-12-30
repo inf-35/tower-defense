@@ -1,0 +1,91 @@
+[gd_scene load_steps=18 format=3 uid="uid://dstql8grnmxyn"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_pifbh"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_8tp0s"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="3_5py4k"]
+[ext_resource type="Resource" uid="uid://cr16wxfnweavd" path="res://Units/Towers/arc_chain/arc_chain_lightning_effect.tres" id="4_jkiny"]
+[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/_default_tower_behavior.gd" id="5_ovwgj"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_jd3es"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_c64s3"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_hs6cf"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="9_yet86"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_uwtey"]
+[ext_resource type="Resource" uid="uid://ctv4gs3ktwre2" path="res://Units/Towers/arc_chain/arc_chain_attack.tres" id="11_7263k"]
+[ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="12_euwgl"]
+[ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="13_me2s6"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_tmnpt"]
+
+[sub_resource type="Resource" id="Resource_uhk0q"]
+script = ExtResource("2_8tp0s")
+attribute = 6
+label = "DMG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_yr17l"]
+script = ExtResource("2_8tp0s")
+attribute = 7
+label = "RNG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_qo260"]
+script = ExtResource("2_8tp0s")
+attribute = 8
+label = "RTE"
+suffix = " /s"
+special_modifier = 0
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[node name="ArcChain" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_pifbh")
+type = 44
+turret = NodePath("Graphics/Turret")
+stat_displays = Array[ExtResource("2_8tp0s")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
+behavior = NodePath("DefaultTowerBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+intrinsic_effects = Array[ExtResource("3_5py4k")]([ExtResource("4_jkiny")])
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="DefaultTowerBehavior" type="Node" parent="."]
+script = ExtResource("5_ovwgj")
+metadata/_custom_type_script = "uid://cs61b35p7jme8"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("6_jd3es")
+movement_data = ExtResource("7_c64s3")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("8_hs6cf")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("9_yet86")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+script = ExtResource("10_uwtey")
+attack_data = ExtResource("11_7263k")
+muzzle = NodePath("../Graphics/Turret/Muzzle")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.083000004, 0.083000004)
+texture = ExtResource("12_euwgl")
+
+[node name="Turret" type="Sprite2D" parent="Graphics"]
+z_index = 1
+texture = ExtResource("13_me2s6")
+offset = Vector2(28, 0)
+
+[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
+position = Vector2(51.0289, 0)
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("14_tmnpt")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

@@ -1,17 +1,37 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://bq7gxyeslc6om"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://cwfim8d0xn61w"]
 
-[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_fmb7o"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_okvp2"]
-[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_ao5vp"]
-[ext_resource type="PackedScene" uid="uid://dsd8wiupnn31w" path="res://Units/Towers/sunbeam/sunbeam.tscn" id="4_4286i"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_uxu0x"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_xqmxb"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="3_6dt4b"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_2dfky"]
+[ext_resource type="PackedScene" uid="uid://drdga8oye2d8x" path="res://Units/Towers/sunbeam/sunbeam.tscn" id="5_oliv4"]
+
+[sub_resource type="Resource" id="Resource_74q3n"]
+script = ExtResource("2_xqmxb")
+metadata/_custom_type_script = "uid://do6qrosup8u56"
+
+[sub_resource type="Resource" id="Resource_qp5fc"]
+script = ExtResource("2_xqmxb")
+upgrade_index = 1
+metadata/_custom_type_script = "uid://do6qrosup8u56"
+
+[sub_resource type="Resource" id="Resource_4ofox"]
+script = ExtResource("2_xqmxb")
+type = 1
+label = "Sell"
+metadata/_custom_type_script = "uid://do6qrosup8u56"
 
 [resource]
-script = ExtResource("3_ao5vp")
+script = ExtResource("4_2dfky")
 id = 25
 cost = 20.0
 element = 2
+upgrades_into = Dictionary[int, float]({
+38: 15.0,
+39: 18.0
+})
 tower_name = "Sunbeam"
-tower_description = "Tracks enemies over a wide area and fires lasers upon them, inflicting weak but long-lasting burn."
-icon = ExtResource("1_fmb7o")
-tower_scene = ExtResource("4_4286i")
+tower_description = "An advanced laser-firing tower that tracks enemies over long range, continuously dealing damage and burning them."
+inspector_actions = Array[ExtResource("2_xqmxb")]([SubResource("Resource_74q3n"), SubResource("Resource_qp5fc"), SubResource("Resource_4ofox")])
+tower_scene = ExtResource("5_oliv4")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -1,0 +1,64 @@
+[gd_scene load_steps=12 format=3 uid="uid://bvcro6a1dvflk"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_mbw2h"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_llh2w"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_b8x7b"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_pdljy"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="5_ajscq"]
+[ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="6_dw0ox"]
+[ext_resource type="Texture2D" uid="uid://dp45rs1pb7wf5" path="res://Assets/frost_tower_base.png" id="7_rdea8"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_o7uxg"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_3m066"]
+[ext_resource type="Resource" uid="uid://mtogwrqdypp4" path="res://Units/Towers/frost_diffuse/frost_diffuse_attack.tres" id="10_ktvv6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
+radius = 600.0
+
+[node name="FrostDiffuse" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_mbw2h")
+type = 41
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("2_llh2w")
+movement_data = ExtResource("3_b8x7b")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_pdljy")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("5_ajscq")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("6_dw0ox")
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+texture = ExtResource("7_rdea8")
+
+[node name="Range" type="Area2D" parent="."]
+visible = false
+scale = Vector2(0.1, 0.1)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Range"]
+shape = SubResource("CircleShape2D_lmklq")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("8_o7uxg")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("9_3m066")
+attack_data = ExtResource("10_ktvv6")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

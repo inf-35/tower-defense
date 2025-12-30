@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://drig6he1d7esa"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_a3n2r"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_uo0we"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_jbt70"]
+[ext_resource type="PackedScene" uid="uid://duodm4d3x2f7h" path="res://Units/Towers/plant_upgrade_1/plant_upgrade_1.tscn" id="4_tvtun"]
+
+[resource]
+script = ExtResource("3_jbt70")
+id = 27
+cost = 0.0
+element = 3
+is_upgrade = true
+tower_name = "Upgraded Plant"
+tower_description = "Weak turret that gains a +10% damage boost each wave (does not compound)."
+icon = ExtResource("1_a3n2r")
+tower_scene = ExtResource("4_tvtun")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

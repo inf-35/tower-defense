@@ -48,7 +48,7 @@ class StatusEffectData:
 class ReactionData:
 	var requisites: Dictionary[Status, float] #what statuses in what amount does this reaction need
 	var effect: Callable #should have one argument (host unit)
-	
+		 
 	func _init(_requisites: Dictionary[Status, float], _effect: Callable):
 		requisites = _requisites
 		effect = _effect
@@ -60,7 +60,7 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -1, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
+		id.REGENERATION, -0.5, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.5 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
 		id.REGEN_PERCENT, -0.05, 0.0, true, Color(0, 1, 0, 0.5) # -5% max hp every second

@@ -1,17 +1,31 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://ck5p8qw63gfhx"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://ck5p8qw63gfhx"]
 
-[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_bxren"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_32gg8"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_x6lxw"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_1xnkv"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_32gg8"]
 [ext_resource type="PackedScene" uid="uid://cjv7g5iwxihva" path="res://Units/Towers/turret/turret.tscn" id="2_bxren"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_p42es"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_l0cjb"]
+
+[sub_resource type="Resource" id="Resource_1xnkv"]
+script = ExtResource("2_1xnkv")
+upgrade_index = 1
+metadata/_custom_type_script = "uid://do6qrosup8u56"
 
 [resource]
 script = ExtResource("1_x6lxw")
 id = 2
 cost = 7.0
+upgrades_into = Dictionary[int, float]({
+34: 10.0,
+35: 10.0
+})
 tower_name = "Turret"
-tower_description = "Single-target all-rounder. Costs 5.0 {FLUX}
-{T_TURRET}"
-icon = ExtResource("1_bxren")
+tower_description = "A crude yet effective all-rounder that fires bolts towards enemies.
+
+{T_TURRET}
+{R_WINTERS_SPIRIT}"
+inspector_actions = Array[ExtResource("2_1xnkv")]([ExtResource("4_l0cjb"), SubResource("Resource_1xnkv"), ExtResource("3_p42es")])
 tower_scene = ExtResource("2_bxren")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

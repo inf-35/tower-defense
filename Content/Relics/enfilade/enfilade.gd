@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name EnfiladeEffect
 
-@export var modifier: ModifierDataPrototype
+@export var modifier: ModifierDataPrototype ##modifier applied to recently built towers
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.TOWER_BUILT]

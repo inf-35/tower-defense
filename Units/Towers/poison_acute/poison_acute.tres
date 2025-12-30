@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://biebnjmqg3m6h"]
+
+[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_upb0q"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vijtv"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_2ovja"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_27lxm"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_xwdom"]
+[ext_resource type="PackedScene" uid="uid://buquakjiigu17" path="res://Units/Towers/poison_acute/poison_acute.tscn" id="7_6ta21"]
+
+[resource]
+script = ExtResource("6_xwdom")
+id = 42
+cost = 25.0
+element = 3
+is_upgrade = true
+tower_name = "Poison (acute)"
+tower_description = "This upgraded poison tower has a decreased cone angle, but an increased damage and more potent poison."
+icon = ExtResource("1_upb0q")
+inspector_actions = Array[ExtResource("2_vijtv")]([ExtResource("3_2ovja")])
+tower_scene = ExtResource("7_6ta21")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

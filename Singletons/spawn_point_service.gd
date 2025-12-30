@@ -14,7 +14,8 @@ func register_breach(breach_tower: Tower, seed: bool = true) -> void:
 			_active_breaches.append(breach_tower)
 		# listen for its destruction to remove it from tracking
 		if not _breach_seeds.has(breach_tower):
-			breach_tower.died.connect(func(_hit_report_data): _on_breach_destroyed(breach_tower), CONNECT_ONE_SHOT)
+			breach_tower.died.connect(func(_hit_report_data): _on_breach_destroyed(breach_tower))
+			breach_tower.tree_exiting.connect(func(): _on_breach_destroyed(breach_tower))
 		else:
 			_breach_seeds.erase(breach_tower)
 

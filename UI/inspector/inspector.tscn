@@ -1,0 +1,147 @@
+[gd_scene load_steps=7 format=3 uid="uid://plk4oiflev5x"]
+
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_2ber5"]
+[ext_resource type="Script" uid="uid://cr8iyxr7mn4kd" path="res://UI/inspector/inspector.gd" id="1_kvbly"]
+[ext_resource type="Script" uid="uid://bxcpffjdkujg" path="res://UI/aspect_ratio_container.gd" id="2_6mo1h"]
+[ext_resource type="PackedScene" uid="uid://xce2w3es51dx" path="res://UI/inspector/inspector_action_button.tscn" id="3_l0dwj"]
+[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="4_2ber5"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_re0sn"]
+
+[node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "healthbar", "inspector_title", "subtitle", "status_container", "button_container", "stats", "description")]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -360.0
+offset_top = -180.0
+offset_right = 360.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("1_2ber5")
+script = ExtResource("1_kvbly")
+tower_overview = NodePath("tower_overview")
+inspector_icon = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid/TextureRect")
+healthbar = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer2/HealthBar")
+inspector_title = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/Title/inspector_title")
+subtitle = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/Title/subtitle")
+status_container = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/Title/status_container")
+button_container = NodePath("action_button_container")
+action_button_scene = ExtResource("3_l0dwj")
+stats = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer/stats")
+description = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer/description")
+
+[node name="tower_overview" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="tower_overview"]
+layout_mode = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="Inspector" type="HBoxContainer" parent="tower_overview/MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"hbox_20"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector"]
+clip_contents = true
+layout_mode = 2
+
+[node name="AspectRatioSolid" type="AspectRatioContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_6mo1h")
+metadata/_custom_type_script = "uid://bxcpffjdkujg"
+
+[node name="TextureRect" type="TextureRect" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid"]
+layout_mode = 2
+texture = ExtResource("4_2ber5")
+expand_mode = 1
+
+[node name="HealthBar" type="ProgressBar" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_type_variation = &"healthbar"
+value = 50.0
+show_percentage = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"vbox_5"
+
+[node name="Title" type="HBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"hbox_5"
+
+[node name="inspector_title" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
+layout_mode = 2
+theme_type_variation = &"LabelHeader"
+text = "FLAMETHROWER"
+vertical_alignment = 2
+
+[node name="subtitle" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
+layout_mode = 2
+theme_type_variation = &"LabelInlineheader"
+text = "mk 7"
+vertical_alignment = 2
+
+[node name="status_container" type="HBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"hbox_10"
+alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"vbox_10"
+
+[node name="stats" type="GridContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 40
+columns = 3
+
+[node name="description" type="RichTextLabel" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_stretch_ratio = 0.5
+theme = ExtResource("1_2ber5")
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
+text = "Inflicts flame to multiple enemies in a large cone.aaaaaaaaaaaaaaaaa"
+fit_content = true
+script = ExtResource("5_re0sn")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="action_button_container" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -115.0
+offset_right = -10.0
+offset_bottom = -75.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"hbox_20"
+alignment = 2

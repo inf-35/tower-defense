@@ -9,11 +9,13 @@ var effect_type: Effects.Type ##id of this type of effect
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 ##negative = permanent
 
+var stacks: int = 0 ##how many stacks of this effect (mainly used for bookkeeping)
+
 var state: RefCounted ##strategy delegate class that stores state information
 #NOTE: all queryable information about the information should be stored within state
 #or within effectprototype
 
-const GLOBAL_RECURSION_LIMIT: int = 2 ##limit for effect recursion; see Unit effect parsing
+const GLOBAL_RECURSION_LIMIT: int = 5 ##limit for effect recursion; see Unit effect parsing
 
 var host: Unit ##to which unit does this effect apply onto
 var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect

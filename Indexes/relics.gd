@@ -9,3 +9,6 @@ static var WILDERNESS: RelicData = load("res://Content/Relics/wilderness/wildern
 static var TRANCE: RelicData = load("res://Content/Relics/trance/trance.tres")
 static var ENFILADE: RelicData = load("res://Content/Relics/enfilade/enfilade.tres")
 static var AMBUSH: RelicData = load("res://Content/Relics/ambush/ambush.tres")
+static var INFERNO: RelicData = load("res://Content/Relics/inferno/inferno.tres")
+
+static var relics: Dictionary[StringName, RelicData] = {} ## relics indexed by id, loaded by rewardservice

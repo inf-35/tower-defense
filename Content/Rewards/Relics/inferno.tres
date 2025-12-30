@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://c0dfrhbq8dwty"]
+
+[ext_resource type="Resource" uid="uid://cvsugm8vn8kjy" path="res://Content/Relics/inferno/inferno.tres" id="1_kqwta"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_xedwg"]
+
+[resource]
+script = ExtResource("2_xedwg")
+id_name = "inferno"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_kqwta")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

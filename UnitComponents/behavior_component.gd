@@ -18,8 +18,7 @@ var turret: Node2D
 #generic "timer" variable
 var _cooldown: float = 0.0 ##NOTE: this is not the attack cooldown, which can be found in AttackComponent
 
-# this function is called by the unit to give the behavior all the tools it needs
-func initialise(host_unit: Unit):
+func initialise(host_unit: Unit): ##his function is called by the unit to give the behavior all the tools it needs
 	set_process(false)
 	
 	self.unit = host_unit
@@ -47,18 +46,25 @@ func initialise(host_unit: Unit):
 		
 		if event.event_type == GameEvent.EventType.HIT_RECEIVED:
 			_play_animation(&"hit")
+			
+		if event.event_type == GameEvent.EventType.REPLACED: #handle transfer to new unit behavior
+			var data := event.data as UnitReplacedData
+			if data.old_unit == unit:
+				if is_instance_valid(data.new_unit.behavior):
+					transfer_state(data.new_unit.behavior)
 	)
-# function called when the unit wants to detach this behavior (i.e. upon death)
-func detach():
+
+func detach(): ##function called when the unit wants to detach this behavior (i.e. upon death)
 	pass
 
-#behavior start function, called at the start of behavior
-func start() -> void:
+func transfer_state(new_behavior: Behavior): ##called when we want to transfer state to another behavior (i.e. upgrading)
+	new_behavior._cooldown = _cooldown
+
+func start() -> void: ##behavior start function, called at the start of behavior when the unit is created or revived
 	#by default units try to navigate to the origin
 	_attempt_navigate_to_origin()
 
-# this is the main update loop, called by the unit's _process function
-func update(delta: float) -> void: #delta is already game delta
+func update(delta: float) -> void: ##main update loop; delta is already game delta
 	# this virtual function will be overridden by concrete behaviors
 	_cooldown += delta
 	_attempt_simple_attack()

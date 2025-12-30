@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_pghpy")
-id_name = "contagion"
+id_name = "subprime"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_v6k8q")

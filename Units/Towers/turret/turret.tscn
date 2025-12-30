@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=25 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_i3qpa"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_hp3w6"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="10_i3qpa"]
 [ext_resource type="Texture2D" uid="uid://co8no1mocxejn" path="res://Assets/ballista_turret_base.png" id="11_uhk0q"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="12_qo260"]
 [ext_resource type="Texture2D" uid="uid://4smmqg2tegf8" path="res://Assets/ballista_turret_bow.png" id="12_yr17l"]
 
 [sub_resource type="Resource" id="Resource_uhk0q"]
@@ -153,6 +154,11 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
+[sub_resource type="Resource" id="Resource_rvgqw"]
+script = ExtResource("12_qo260")
+max_health = 20.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
+
 [node name="Turret" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_lj076")
@@ -169,28 +175,13 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="DefaultTowerBehavior" type="Node" parent="."]
-script = ExtResource("3_i3qpa")
-metadata/_custom_type_script = "uid://cs61b35p7jme8"
-
-[node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("3_soln4")
-movement_data = ExtResource("4_joj2e")
-metadata/_custom_type_script = "uid://bj2kqlul6w1an"
-
-[node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("5_liko0")
-metadata/_custom_type_script = "uid://b016qjmysn53e"
-
 [node name="RangeComponent" type="Node" parent="."]
 script = ExtResource("6_ug8w7")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
-script = ExtResource("7_lkyt2")
-attack_data = ExtResource("8_rghec")
-muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
-metadata/_custom_type_script = "uid://detgar3t50qgi"
+[node name="DefaultTowerBehavior" type="Node" parent="."]
+script = ExtResource("3_i3qpa")
+metadata/_custom_type_script = "uid://cs61b35p7jme8"
 
 [node name="reference" type="Sprite2D" parent="."]
 visible = false
@@ -211,16 +202,31 @@ position = Vector2(0.47718072, 1.6484106)
 scale = Vector2(1.3162339, 0.769)
 
 [node name="Bow" type="Sprite2D" parent="Graphics/TurretFrame"]
-z_index = 1
 position = Vector2(28.571423, 0)
 texture = ExtResource("12_yr17l")
 offset = Vector2(-30, 0)
-
-[node name="ModifiersComponent" type="Node" parent="."]
-script = ExtResource("9_hp3w6")
-metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_uhk0q")
 }
+
+[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+script = ExtResource("7_lkyt2")
+attack_data = ExtResource("8_rghec")
+muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_hp3w6")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_liko0")
+health_data = SubResource("Resource_rvgqw")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_soln4")
+movement_data = ExtResource("4_joj2e")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://dmw6i3c23lwuw"]
+
+[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_lxky5"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_iq2h4"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_pdx2k"]
+[ext_resource type="PackedScene" uid="uid://dycu3x8f8w1wp" path="res://Units/Towers/rite_poisons/rite_poisons.tscn" id="4_0yfmt"]
+
+[resource]
+script = ExtResource("3_pdx2k")
+id = 29
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Poisons Rite"
+tower_description = "Cheap unit redirector."
+tower_scene = ExtResource("4_0yfmt")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

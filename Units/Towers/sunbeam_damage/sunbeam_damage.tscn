@@ -1,0 +1,166 @@
+[gd_scene load_steps=24 format=3 uid="uid://dv0y3cfl7f6af"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_1kjh6"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_26ch1"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="3_toe73"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_12wx2"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="5_m7o1c"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="6_wo4y1"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="7_1rsfg"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="8_1dia4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="9_k1mq1"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="10_2r7u1"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="11_srwmj"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_5ddil"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="13_2dqcl"]
+[ext_resource type="Script" uid="uid://de7t1kfa4c2yb" path="res://Units/Towers/sunbeam/sunbeam_behavior.gd" id="14_m7tub"]
+
+[sub_resource type="Resource" id="Resource_p6ncc"]
+script = ExtResource("2_26ch1")
+attribute = 6
+label = "DMG"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_x2me6"]
+script = ExtResource("6_wo4y1")
+type = 1
+stack = 2.0
+cooldown = 4.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_16r00"]
+script = ExtResource("5_m7o1c")
+range = 60.0
+cooldown = 0.1
+damage = 0.4
+status_effects = Array[ExtResource("6_wo4y1")]([SubResource("Resource_x2me6")])
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[sub_resource type="Resource" id="Resource_1dhlk"]
+script = ExtResource("10_2r7u1")
+max_health = 20.0
+regeneration = null
+regen_percent = null
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]
+size = Vector2(10, 10)
+
+[sub_resource type="Animation" id="Animation_uhk0q"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_i3qpa"]
+resource_name = "attack"
+length = 0.3
+
+[sub_resource type="Animation" id="Animation_yr17l"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uhk0q"]
+_data = {
+&"RESET": SubResource("Animation_uhk0q"),
+&"attack": SubResource("Animation_i3qpa"),
+&"hit": SubResource("Animation_yr17l")
+}
+
+[node name="SunbeamDamage" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_1kjh6")
+type = 38
+stat_displays = Array[ExtResource("2_26ch1")]([SubResource("Resource_p6ncc")])
+behavior = NodePath("SunbeamBehavior")
+graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("3_toe73")
+attack_data = SubResource("Resource_16r00")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("7_1rsfg")
+movement_data = ExtResource("8_1dia4")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("9_k1mq1")
+health_data = SubResource("Resource_1dhlk")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="refeerence" type="Sprite2D" parent="."]
+visible = false
+texture = SubResource("PlaceholderTexture2D_p6ncc")
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("11_srwmj")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("12_5ddil")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_uhk0q")
+}
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("13_2dqcl")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="SunbeamBehavior" type="Node" parent="."]
+script = ExtResource("14_m7tub")
+max_targets = 1
+laser_width = 3.0
+metadata/_custom_type_script = "uid://de7t1kfa4c2yb"

@@ -39,13 +39,17 @@ func _scan_directory_recursive(path: String) -> void:
 			if not file_name.begins_with("."): #ignore . and ..
 				# recursively scan subdirectories
 				_scan_directory_recursive(path + file_name + "/")
-		elif (file_name.ends_with(".tres") or file_name.ends_with(".res")):
+		elif (file_name.ends_with(".tres") or file_name.ends_with(".res") or file_name.ends_with(".tres.remap")):
+			file_name = file_name.trim_suffix(".remap") #trim remap from file paths, if it exists (for web builds)
 			var full_path: String = path + file_name
 			var resource: Resource = load(full_path)
 			
 			if resource is RewardPrototype:
 				# convert the Resource into the runtime instance and add to pool
 				reward_pool.append(resource.generate_reward())
+				
+				if resource.type == Reward.Type.ADD_RELIC:
+					Relics.relics[resource.id_name.to_upper()] = resource.relic_data
 			else:
 				pass
 				
@@ -72,11 +76,14 @@ func generate_and_present_choices(choice_count: int, filter = null) -> void: ##w
 			break
 		
 		var current_reward: Reward = available_rewards[i]
-		#reject towers and relics already held by the player
-		if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.params[ID.Rewards.TOWER_TYPE]):
+		#reject towers, relics and rites already held by the player
+		if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.tower_type):
 			i += 1
 			continue
-		elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.params[ID.Rewards.RELIC]):
+		elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.relic):
+			i += 1
+			continue
+		elif current_reward.type == Reward.Type.ADD_RITE and Player.get_tower_limit(current_reward.rite_type) > 0:
 			i += 1
 			continue
 
@@ -92,7 +99,6 @@ func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
 
 func select_reward(choice_id: int) -> void:
-	print(choice_id)
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
 		reward_process_complete.emit()
@@ -106,18 +112,23 @@ func select_reward(choice_id: int) -> void:
 	
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
+
 func apply_reward(reward: Reward) -> void:
 	match reward.type:
 		Reward.Type.ADD_FLUX:
-			var amount: int = reward.params.get(ID.Rewards.FLUX_AMOUNT, 0)
+			var amount: float = reward.flux_amount
 			Player.flux += amount
 			
 		Reward.Type.UNLOCK_TOWER:
-			var tower_type: Towers.Type = reward.params.get(ID.Rewards.TOWER_TYPE, Towers.Type.VOID)
+			var tower_type: Towers.Type = reward.tower_type
 			if tower_type != Towers.Type.VOID:
 				Player.unlock_tower(tower_type)
 
 		Reward.Type.ADD_RELIC:
-			var relic = reward.params.get(ID.Rewards.RELIC)
-			if relic is RelicData:
+			var relic: RelicData = reward.relic
+			if relic:
 				Player.add_relic(relic)
+		
+		Reward.Type.ADD_RITE:
+			var rite_type: Towers.Type = reward.rite_type
+			Player.add_rite(rite_type, 1)

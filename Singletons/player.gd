@@ -18,10 +18,14 @@ var flux: float = 200.0:
 		flux = value
 		flux_changed.emit(flux)
 		
-var hp: float = 20.0:
+var hp: float:
 	set(value):
 		hp = value
 		hp_changed.emit(hp)
+		
+		if hp <= 0.0:
+			if not Phases.is_game_over:
+				Phases.start_game_over(false)
 
 var used_capacity: float = 0.0:
 	set(value):
@@ -36,10 +40,12 @@ var tower_capacity: float = 0.0:
 var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 	set(value):
 		unlocked_towers = value
-		unlocked_towers_changed.emit(unlocked_towers)
+		unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 		
 var _tower_limits: Dictionary[Towers.Type, int] = {} ##stores placement limits of various towers, by default -1, which is infinite
-		
+
+var rite_inventory: Dictionary[Towers.Type, int] = {}
+
 var active_relics: Array[RelicData]
 
 var _active_effects_container: Node
@@ -49,42 +55,82 @@ var ruin_service: RuinService
 var global_event_service: GlobalEventService
 
 func _ready():
-	#setup event bus
-	global_event_service = GlobalEventService.new()
-	add_child(global_event_service)
-	global_event_service.initialise_event_bus(on_event)
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
+	UI.upgrade_tower_requested.connect(_on_upgrade_tower_requested)
 	#couple playerside logic signals with UI output signals
 	flux_changed.connect(UI.update_flux.emit)
 	capacity_changed.connect(UI.update_capacity.emit)
 	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	relics_changed.connect(UI.update_relics.emit)
+
+func start():
+	for unit: Unit in get_tree().get_nodes_in_group(References.TOWER_GROUP):
+		unit.queue_free()
+		
+	for unit: Unit in get_tree().get_nodes_in_group(Waves.ENEMY_GROUP):
+		unit.queue_free()
+		
+	rite_inventory.clear()
+	_tower_limits.clear()
+	unlocked_towers.clear()
+	active_relics.clear()
+	
+	if _active_effects_container: _active_effects_container.free()
+	if global_event_service: global_event_service.free()
+	if ruin_service: ruin_service.free()
+
+	#setup event bus
+	global_event_service = GlobalEventService.new()
+	add_child(global_event_service)
+	global_event_service.initialise_event_bus(on_event)
+	
 	#setup global effects container
 	_active_effects_container = Node.new()
 	_active_effects_container.name = "ActiveGlobalEffects"
 	add_child(_active_effects_container)
-	
+
 	#create and setup services
 	ruin_service = RuinService.new()
 	add_child(ruin_service)
 	ruin_service.initialise()
 	
 	References.references_ready.connect(_setup_state, CONNECT_ONE_SHOT)
-	
+
 func _setup_state():
 	#initial state setup
 	self.unlocked_towers = {
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		#Towers.Type.SUNBEAM: true,
+		Towers.Type.CANNON: true,
 	}
-	flux = 20.0
-	#RewardService.apply_reward(Reward.new(Reward.Type.ADD_RELIC, {ID.Rewards.RELIC: Relics.AMBUSH}))
 	
+	flux = 20.0
+	hp = 20.0
+	
+	var reward := Reward.new()
+	reward.type = Reward.Type.ADD_RELIC
+	reward.relic = Relics.COMMON_COLD
+	RewardService.apply_reward(reward)
+	
+	reward = Reward.new()
+	reward.type = Reward.Type.ADD_RITE
+	reward.rite_type = Towers.Type.RITE_FROST
+	RewardService.apply_reward(reward)
+	##
+	reward = Reward.new()
+	reward.type = Reward.Type.ADD_RITE
+	reward.rite_type = Towers.Type.RITE_POISONS
+	RewardService.apply_reward(reward)
+	##
+	#reward = Reward.new()
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_FIST
+	#RewardService.apply_reward(reward)
+
 #capacity helper functions
 func add_to_used_capacity(amount: float):
 	self.used_capacity += amount
@@ -104,7 +150,7 @@ func has_capacity(tower_type : Towers.Type) -> bool:
 #tower unlock helper functions
 func unlock_tower(tower_type : Towers.Type, unlock : bool = true):
 	unlocked_towers[tower_type] = unlock
-	unlocked_towers_changed.emit(unlocked_towers)
+	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 	
 func is_tower_unlocked(tower_type : Towers.Type) -> bool:
 	return unlocked_towers.get(tower_type, false)
@@ -116,6 +162,20 @@ func add_to_tower_limit(type: Towers.Type, amount: int) -> void:
 
 func get_tower_limit(type: Towers.Type) -> int:
 	return _tower_limits.get(type, -1)
+	
+func add_rite(type: Towers.Type, amount: int) -> void:
+	var current: int = rite_inventory.get(type, 0)
+	rite_inventory[type] = maxi(current + amount, 0)
+	
+	if rite_inventory[type] > 0:
+		unlocked_towers[type] = true
+	else:
+		unlocked_towers.erase(type)
+	
+	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
+	
+func get_rite_count(type: Towers.Type) -> int:
+	return rite_inventory.get(type, 0)
 	
 #relic entry point (to add new relics)
 func add_relic(relic: RelicData) -> void:
@@ -192,6 +252,9 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 	# 3. If the Island confirms placement, deduct resources.
 	if success:
 		self.flux -= Towers.get_tower_cost(tower_type)
+		
+		if Towers.is_tower_rite(tower_type):
+			self.add_rite(tower_type, -1)
 		#TODO: Towers.update_tower_cost(tower_type, 1)
 
 func _on_sell_tower_requested(tower):
@@ -199,3 +262,13 @@ func _on_sell_tower_requested(tower):
 		return
 	if tower is Tower:
 		tower.sell()
+		
+func _on_upgrade_tower_requested(old_tower: Tower, upgrade_type: Towers.Type):
+	var cost: float = Towers.get_tower_upgrade_cost(old_tower.type, upgrade_type)
+	if Player.flux < cost:
+		return
+	
+	var success: bool = References.island.request_upgrade(old_tower, upgrade_type)
+	
+	if success:
+		self.flux -= cost

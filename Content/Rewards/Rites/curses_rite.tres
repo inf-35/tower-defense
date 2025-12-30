@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://c7mffibu44dem"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_ufhsq"]
+
+[resource]
+script = ExtResource("1_ufhsq")
+id_name = "flame_rite"
+description = "this is a relic reward description"
+type = 3
+rite_type = 28
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

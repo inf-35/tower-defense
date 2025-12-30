@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dpng4wlphbj2b"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_mb624"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_5ypk0"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_suo1f"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_se0kw"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_b4srf"]
+[ext_resource type="PackedScene" uid="uid://bydbgt0sydxll" path="res://Units/Towers/turret_upgrade_bleed/turret_bleed.tscn" id="7_a3gih"]
+
+[resource]
+script = ExtResource("6_b4srf")
+id = 34
+cost = 17.0
+is_upgrade = true
+tower_name = "Turret (bleed)"
+tower_description = "Armed with barbed arrows, this upgraded turret maims multiple nearby enemies in a single attack and inflicts bleed, but has a decreased range."
+inspector_actions = Array[ExtResource("2_5ypk0")]([ExtResource("3_suo1f")])
+tower_scene = ExtResource("7_a3gih")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

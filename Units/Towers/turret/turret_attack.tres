@@ -1,14 +1,16 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=6 format=3 uid="uid://b026mhuu7c8a1"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://b026mhuu7c8a1"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_5qqag"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_1q65b"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_1q65b"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_sxpqw"]
+[ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="5_e3651"]
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_sxpqw")
-vfx_type = 1
+texture = ExtResource("5_e3651")
 radius = 2.0
+scale = 0.1
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
@@ -19,5 +21,4 @@ range = 30.0
 damage = 1.5
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0
-projectile_lifetime = 20.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

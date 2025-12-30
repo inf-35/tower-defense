@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InspectorAction" load_steps=2 format=3 uid="uid://b3b6naynouf2j"]
+
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="1_73b22"]
+
+[resource]
+script = ExtResource("1_73b22")
+type = 1
+label = "Sell"
+metadata/_custom_type_script = "uid://do6qrosup8u56"

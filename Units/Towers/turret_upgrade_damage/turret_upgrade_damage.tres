@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://bafv15lpvlyy0"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_xah2b"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_q4iom"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_ckii5"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_aycso"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_4inb7"]
+[ext_resource type="PackedScene" uid="uid://km2c086gqptv" path="res://Units/Towers/turret_upgrade_damage/turret_damage.tscn" id="7_2sobc"]
+
+[resource]
+script = ExtResource("6_4inb7")
+id = 35
+cost = 17.0
+is_upgrade = true
+tower_name = "Turret (damage)"
+tower_description = "Equipped with extra-heavy bolts, this upgraded turret trades crowd control for sheer damage output."
+inspector_actions = Array[ExtResource("2_q4iom")]([ExtResource("3_ckii5")])
+tower_scene = ExtResource("7_2sobc")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

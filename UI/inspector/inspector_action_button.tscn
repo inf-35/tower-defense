@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://xce2w3es51dx"]
+
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_oxcn6"]
+
+[node name="InspectorActionButton" type="Button"]
+custom_minimum_size = Vector2(120, 40)
+offset_right = 40.0
+offset_bottom = 8.0
+theme = ExtResource("1_oxcn6")

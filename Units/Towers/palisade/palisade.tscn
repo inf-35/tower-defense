@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://uyqncqkt255h"]
+[gd_scene load_steps=17 format=3 uid="uid://uyqncqkt255h"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_o21m0"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_p6aan"]
@@ -10,24 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="7_ylobt"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_w22p4"]
 
-[sub_resource type="Resource" id="Resource_uhk0q"]
+[sub_resource type="Resource" id="Resource_p6ncc"]
 script = ExtResource("2_p6aan")
-attribute = 6
-label = "DMG"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_yr17l"]
-script = ExtResource("2_p6aan")
-attribute = 7
-label = "RNG"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_qo260"]
-script = ExtResource("2_p6aan")
-attribute = 8
-label = "RTE"
-suffix = " /s"
-special_modifier = 0
+attribute = 0
+label = "HP"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
@@ -35,7 +21,6 @@ script = ExtResource("7_p6ncc")
 max_health = 20.0
 regeneration = null
 regen_percent = null
-max_shield = null
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]
@@ -107,7 +92,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_o21m0")
 type = 6
-stat_displays = Array[ExtResource("2_p6aan")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
+stat_displays = Array[ExtResource("2_p6aan")]([SubResource("Resource_p6ncc")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

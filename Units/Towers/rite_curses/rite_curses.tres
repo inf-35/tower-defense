@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cgk03k5hmm2tg"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_lswoy"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_bwgb5"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cu7js"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_avhhg"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_lqs4e"]
+[ext_resource type="PackedScene" uid="uid://dw4c3by6twkb7" path="res://Units/Towers/rite_curses/rite_curses.tscn" id="4_3swcv"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_4ttw6"]
+
+[resource]
+script = ExtResource("3_avhhg")
+id = 28
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Curses Rite"
+tower_description = "Adjacent towers' attacks gain 1 stack of curse."
+tower_scene = ExtResource("4_3swcv")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

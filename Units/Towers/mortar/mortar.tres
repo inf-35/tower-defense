@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://fsas6ethkjl2"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://fsas6ethkjl2"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_e38eq"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_dtqqj"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_a7a3b"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_n1ccw"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_hsyy1"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_yivyx"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_5wuvk"]
 [ext_resource type="PackedScene" uid="uid://clq5akjbo7s7q" path="res://Units/Towers/mortar/mortar.tscn" id="4_flo2w"]
 
 [resource]
@@ -11,6 +14,6 @@ id = 22
 size = Vector2i(2, 2)
 cost = 20.0
 tower_name = "Mortar"
-tower_description = "Slow yet far-reaching AOE damage-dealer"
+tower_description = "Slow yet far-reaching AOE damage-dealer, effective at crowd control."
 tower_scene = ExtResource("4_flo2w")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

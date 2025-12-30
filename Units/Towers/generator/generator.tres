@@ -1,14 +1,19 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://kiqqpyvi5e1s"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://kiqqpyvi5e1s"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_2oild"]
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_5gso1"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_mpnj5"]
 [ext_resource type="PackedScene" uid="uid://y3fmjqd4dpgt" path="res://Units/Towers/generator/generator.tscn" id="2_2oild"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_ctjw1"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_eb5jw"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_a0644"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_hupis"]
 
 [resource]
 script = ExtResource("1_2oild")
 id = 5
+required_capacity = 0.0
 element = 5
 tower_name = "Generator"
-tower_description = "Generates tower capacity when placed on RUINS tiles."
+tower_description = "A humble village. Produces capacity, but can only be placed on settlement tiles."
 tower_scene = ExtResource("2_2oild")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

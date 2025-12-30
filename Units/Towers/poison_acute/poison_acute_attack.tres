@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://pgv8dma31bbs"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_c272b"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_xwksd"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_1hndp"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_e73p8"]
+
+[sub_resource type="Resource" id="Resource_x7527"]
+script = ExtResource("3_1hndp")
+type = 2
+stack = 2.0
+cooldown = 4.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_e3651"]
+script = ExtResource("4_e73p8")
+vfx_type = 1
+radius = 2.0
+rotation_mode = 1
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
+[resource]
+script = ExtResource("2_xwksd")
+delivery_method = 3
+range = 12.0
+cooldown = 0.5
+radius = 12.0
+damage = 0.8
+status_effects = Array[ExtResource("3_1hndp")]([SubResource("Resource_x7527")])
+vfx_on_spawn = SubResource("Resource_e3651")
+projectile_speed = 80.0
+cone_angle = 100.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

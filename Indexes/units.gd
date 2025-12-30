@@ -32,17 +32,17 @@ enum Type {
 static var unit_stats : Dictionary[Type, UnitStat] = {
 	Type.BASIC: UnitStat.new(
 		preload("res://Units/Enemies/basic_unit/basic_unit.tscn"),
-		0.5,
+		0.4,
 		1.0
 	),
 	Type.BUFF: UnitStat.new(
 		preload("res://Units/Enemies/buff_unit/buff_unit.tscn"),
-		0.8,
+		0.6,
 		2.0,
 	),
 	Type.DRIFTER: UnitStat.new(
 		preload("res://Units/Enemies/drifter/drifter.tscn"),
-		0.8,
+		0.7,
 		1.5,
 	),
 	Type.ARCHER: UnitStat.new(
@@ -52,27 +52,27 @@ static var unit_stats : Dictionary[Type, UnitStat] = {
 	),
 	Type.TROLL: UnitStat.new(
 		preload("res://Units/Enemies/troll/troll.tscn"),
-		1.5,
+		1.0,
 		4.0
 	),
 	Type.WARRIOR: UnitStat.new(
 		preload("res://Units/Enemies/warrior/warrior.tscn"),
-		0.8,
+		0.5,
 		1.5,
 	),
 	Type.HEALER: UnitStat.new(
 		preload("res://Units/Enemies/healer/healer.tscn"),
-		1.2,
+		0.8,
 		2.0,
 	),
 	Type.SPRINTER: UnitStat.new(
 		preload("res://Units/Enemies/sprinter/sprinter.tscn"),
-		1.2,
+		0.7,
 		1.5
 	),
 	Type.FLESHBLOB: UnitStat.new(
 		preload("res://Units/Enemies/fleshblob/fleshblob.tscn"),
-		1.2,
+		0.5,
 		1.5
 	),
 	Type.FLESHLET: UnitStat.new(

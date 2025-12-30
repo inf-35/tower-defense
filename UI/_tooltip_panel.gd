@@ -99,10 +99,9 @@ func on_link_mouse_exited() -> void:
 	if not is_solidified:
 		# if not solid yet, leaving the link kills it immediately
 		close()
-	else:
+	elif _grace_timer.is_inside_tree():
 		# if solid, give the user a split second to move mouse from text to the panel
 		_grace_timer.start()
-		push_warning(self, " grace timer start!")
 
 func _on_solidify_timeout() -> void:
 	is_solidified = true

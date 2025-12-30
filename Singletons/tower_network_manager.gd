@@ -20,7 +20,7 @@ var _handlers: Dictionary[Tower, Node] = {}
 # we store the active prism laser links to manage them
 var _active_prism_links: Array[Vector2i] = []
 
-func _ready() -> void:
+func start() -> void:
 	# listen for any grid change to trigger a full rebuild of all networks
 	References.island.tower_changed.connect(_on_grid_changed)
 

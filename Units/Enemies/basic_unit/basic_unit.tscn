@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_n3sy1"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_phfvd"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_urfjf"]
-[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_ns662"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_n0rgw"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="7_j01gd"]
 [ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_n0rgw"]
@@ -12,6 +11,7 @@
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="9_n3sy1"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_ns662"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_j01gd"]
+[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="13_j01gd"]
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="13_n0rgw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
@@ -48,11 +48,6 @@ script = ExtResource("3_phfvd")
 face_towards_movement = false
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("4_urfjf")
-health_data = ExtResource("5_ns662")
-metadata/_custom_type_script = "uid://b016qjmysn53e"
-
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_j01gd")
 scale = Vector2(0.10810186, 0.10810187)
@@ -84,3 +79,9 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 script = ExtResource("10_ns662")
 attack_data = ExtResource("13_n0rgw")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_urfjf")
+aes = 250.0
+health_data = ExtResource("13_j01gd")
+metadata/_custom_type_script = "uid://b016qjmysn53e"

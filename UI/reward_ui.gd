@@ -9,7 +9,7 @@ var active_cards: Array[RewardOptionCard] = []
 func _ready() -> void:
 	visible = false
 	
-	# Connect to UI Bus
+	# connect to UI Bus
 	UI.display_reward_choices.connect(_present_options)
 	UI.hide_reward_choices.connect(_hide_options)
 

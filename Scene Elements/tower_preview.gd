@@ -42,6 +42,6 @@ func _draw():
 	if true: #some sort of tower stats condition
 		# Only draw the range circle if placement is valid
 		if tower_sprite.modulate == VALID_TINT:
-			var range_color = Color(1, 1, 1, 0.25)
+			var range_color = Color(1, 1, 1, 0.8)
 			# Draw the range circle from the center of the node
-			draw_arc(tower_sprite.position, Towers.get_tower_stat(tower_type, Attributes.id.RANGE), 0, TAU, 32, range_color)
+			draw_arc(tower_sprite.position, Towers.get_tower_stat(tower_type, Attributes.id.RANGE), 0, TAU, 32, range_color, 1)

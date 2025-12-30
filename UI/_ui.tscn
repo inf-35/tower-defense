@@ -1,21 +1,25 @@
-[gd_scene load_steps=17 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=21 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
-[ext_resource type="Script" uid="uid://u2j8pvnub2cs" path="res://UI/expansion_ui.gd" id="2_dajm1"]
+[ext_resource type="Script" uid="uid://u2j8pvnub2cs" path="res://UI/expansion_ui/expansion_ui.gd" id="2_dajm1"]
+[ext_resource type="Script" uid="uid://bt5ioaut6ihr4" path="res://UI/game_over_screen/game_over_screen.gd" id="2_gisub"]
 [ext_resource type="Script" uid="uid://df70wn2fe03ih" path="res://UI/flux_label.gd" id="3_aw3sh"]
-[ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector.tscn" id="3_rmtg4"]
+[ext_resource type="PackedScene" uid="uid://plk4oiflev5x" path="res://UI/inspector/inspector.tscn" id="3_rmtg4"]
 [ext_resource type="Script" uid="uid://bffvatofklaff" path="res://UI/reward_ui.gd" id="4_q3aj2"]
 [ext_resource type="PackedScene" uid="uid://5eohem1tdwbg" path="res://UI/reward_option_card.tscn" id="5_m8qfw"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_x42ai"]
-[ext_resource type="PackedScene" uid="uid://dti7nnkxq7kl0" path="res://UI/wave_timeline.tscn" id="6_4g3kg"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
 [ext_resource type="Script" uid="uid://cauusuod0mrq8" path="res://UI/time_control_buttons.gd" id="9_doea8"]
+[ext_resource type="Script" uid="uid://brbwle80gvof" path="res://UI/wave_timeline/wave_timeline.gd" id="9_x42ai"]
 [ext_resource type="Script" uid="uid://cusv1l6vww08n" path="res://UI/relic_display.gd" id="10_aasu8"]
-[ext_resource type="Texture2D" uid="uid://jx5cr78dqj13" path="res://Assets/pause.svg" id="10_gdbfk"]
+[ext_resource type="PackedScene" uid="uid://4vsohvgu4bte" path="res://UI/wave_timeline/timeline_pip.tscn" id="10_m8qfw"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="11_gdbfk"]
-[ext_resource type="Texture2D" uid="uid://b762tk55ay2gk" path="res://Assets/1x.svg" id="11_hpkop"]
-[ext_resource type="Texture2D" uid="uid://cyr35bv278y38" path="res://Assets/2x.svg" id="12_x42ai"]
+[ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="12_tsiox"]
+[ext_resource type="Texture2D" uid="uid://b3hbychxfqjdx" path="res://Assets/pause_icon.png" id="12_x42ai"]
+[ext_resource type="Texture2D" uid="uid://dnbhfdu0a4g3p" path="res://Assets/play_icon.png" id="14_m8qfw"]
+[ext_resource type="Texture2D" uid="uid://iooil5qk2j5k" path="res://Assets/double_time_icon.png" id="15_aasu8"]
+[ext_resource type="Texture2D" uid="uid://dnvbyvrkef00w" path="res://Assets/timeline_pip_holder.png" id="16_aasu8"]
 
 [node name="UI" type="CanvasLayer"]
 process_mode = 3
@@ -34,22 +38,168 @@ theme_type_variation = &"MarginMinor"
 layout_mode = 2
 mouse_filter = 2
 
+[node name="game_over_screen" type="Control" parent="Margin/ui_space" node_paths=PackedStringArray("title_label", "wave_label", "relic_container", "tower_container", "restart_button", "quit_button")]
+process_mode = 3
+visible = false
+z_index = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_gisub")
+title_label = NodePath("PanelContainer/MarginContainer/VBoxContainer/status_text")
+wave_label = NodePath("PanelContainer/MarginContainer/VBoxContainer/wave_text")
+relic_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/Relics/ScrollContainer/relics")
+tower_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/Towers/ScrollContainer/towers")
+restart_button = NodePath("PanelContainer/Control/buttons/restart_button")
+quit_button = NodePath("PanelContainer/Control/buttons/main_menu_button")
+
+[node name="Background" type="Panel" parent="Margin/ui_space/game_over_screen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/game_over_screen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -250.0
+offset_right = 400.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/game_over_screen/PanelContainer"]
+layout_mode = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"vbox_10"
+
+[node name="status_text" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"rt_s40"
+theme_override_font_sizes/normal_font_size = 40
+bbcode_enabled = true
+text = "Victory!"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="wave_text" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"rt_s20"
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "Reached wave 25"
+fit_content = true
+horizontal_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="Towers" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+theme_type_variation = &"vbox_5"
+
+[node name="towers_title" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers"]
+layout_mode = 2
+theme_type_variation = &"rt_s20_descriptive"
+text = "Towers used"
+fit_content = true
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="towers" type="GridContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 10
+
+[node name="Relics" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"vbox_5"
+
+[node name="relics_title" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics"]
+layout_mode = 2
+theme_type_variation = &"rt_s20_descriptive"
+text = "Relics collected"
+fit_content = true
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="relics" type="GridContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 10
+
+[node name="Control" type="Control" parent="Margin/ui_space/game_over_screen/PanelContainer"]
+layout_mode = 2
+
+[node name="buttons" type="HBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -296.0
+offset_top = -28.0
+offset_right = -21.0
+offset_bottom = 12.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_type_variation = &"hbox_20"
+
+[node name="restart_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"FlatButton"
+text = " Restart "
+
+[node name="main_menu_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"FlatButton"
+text = "Main Menu"
+
 [node name="building_bar" parent="Margin/ui_space" instance=ExtResource("1_dajm1")]
-clip_contents = true
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_right = 0.0
 anchor_bottom = 0.5
-offset_left = 0.0
+offset_left = 1.0
 offset_top = -300.0
-offset_right = 200.0
+offset_right = 201.0
 offset_bottom = 300.0
 grow_vertical = 2
 size_flags_horizontal = 0
 
 [node name="Expansion" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("_vbox")]
-visible = false
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
 anchor_right = 1.0
@@ -68,14 +218,16 @@ _vbox = NodePath("OptionsContainer")
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 0.4
-anchor_right = 0.7
-anchor_bottom = 0.6
+anchor_top = 0.35
+anchor_right = 0.75
+anchor_bottom = 0.65
+theme_type_variation = &"vbox_5"
 alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("card_list")]
 visible = false
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -125,89 +277,229 @@ offset_right = 360.0
 offset_bottom = 150.0
 mouse_filter = 2
 
-[node name="Stats" type="VBoxContainer" parent="Margin/ui_space/Stats"]
+[node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats"]
+clip_contents = true
+layout_mode = 0
+offset_left = 29.0
+offset_top = 54.0
+offset_right = 341.0
+offset_bottom = 157.0
+size_flags_vertical = 3
+columns = 6
+script = ExtResource("10_aasu8")
+
+[node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/Stats"]
 layout_mode = 0
 offset_right = 360.0
-offset_bottom = 150.0
-theme_type_variation = &"vbox_5"
-
-[node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/Stats/Stats"]
-layout_mode = 2
+offset_bottom = 95.0
+mouse_filter = 2
 theme_type_variation = &"fancy_banner"
 
-[node name="stats_label" type="RichTextLabel" parent="Margin/ui_space/Stats/Stats/PanelContainer"]
+[node name="stats_label" type="RichTextLabel" parent="Margin/ui_space/Stats/PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"rt_s20"
 bbcode_enabled = true
 text = "Flux Label"
 fit_content = true
 script = ExtResource("3_aw3sh")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats/Stats"]
-clip_contents = true
-layout_mode = 2
-size_flags_vertical = 3
-columns = 6
-script = ExtResource("10_aasu8")
-
-[node name="TimeControls" type="VBoxContainer" parent="Margin/ui_space"]
-custom_minimum_size = Vector2(300, 150)
+[node name="TimeControls" type="Control" parent="Margin/ui_space"]
+custom_minimum_size = Vector2(200, 150)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
+offset_left = -200.0
+offset_top = -5.0
+offset_bottom = 165.0
 grow_horizontal = 0
+mouse_filter = 2
 theme_type_variation = &"vbox_10"
 
-[node name="WaveLabel" type="Label" parent="Margin/ui_space/TimeControls"]
-layout_mode = 2
-theme_type_variation = &"LabelHeader"
-text = "WAVE 30"
-horizontal_alignment = 2
-script = ExtResource("6_b5f40")
+[node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/TimeControls"]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -255.0
+offset_bottom = 90.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"fancy_banner_flipped"
 
-[node name="WaveTimeline" parent="Margin/ui_space/TimeControls" instance=ExtResource("6_4g3kg")]
-custom_minimum_size = Vector2(100, 40)
+[node name="WaveTimeline" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer" node_paths=PackedStringArray("slot_container", "pips_layer")]
 layout_mode = 2
+mouse_filter = 2
+script = ExtResource("9_x42ai")
+slot_container = NodePath("slot_container")
+pips_layer = NodePath("pips_layer")
+pip_scene = ExtResource("10_m8qfw")
+metadata/_custom_type_script = "uid://brbwle80gvof"
+
+[node name="pips_layer" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="slot_container" type="HBoxContainer" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -107.0
+offset_top = -12.0
+offset_right = 120.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"hbox_10"
+alignment = 1
+
+[node name="slot" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="slot2" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="slot3" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="slot4" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="slot5" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="slot6" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container"]
+custom_minimum_size = Vector2(25, 20)
+layout_mode = 2
+mouse_filter = 2
 
 [node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls" node_paths=PackedStringArray("pause_button", "base_button", "fast_forward_button")]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -185.0
+offset_top = 53.0
+offset_right = -25.0
+offset_bottom = 73.0
+grow_horizontal = 0
 theme_type_variation = &"hbox_10"
 alignment = 2
 script = ExtResource("9_doea8")
-pause_button = NodePath("PauseButton")
-base_button = NodePath("BaseButton")
-fast_forward_button = NodePath("FastForwardButton")
+pause_button = NodePath("AnimatableUI/PauseButton")
+base_button = NodePath("AnimatableUI2/PlayButton")
+fast_forward_button = NodePath("AnimatableUI3/FastForwardButton")
 
-[node name="PauseButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons"]
+[node name="AnimatableUI" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-texture_normal = ExtResource("10_gdbfk")
-ignore_texture_size = true
-stretch_mode = 5
-script = ExtResource("11_gdbfk")
-metadata/_custom_type_script = "uid://dmty142sb38lp"
+script = ExtResource("12_tsiox")
+content = NodePath("PauseButton")
+hover_scale = Vector2(1.2, 1.2)
+metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
-[node name="BaseButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons"]
+[node name="PauseButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI"]
 custom_minimum_size = Vector2(20, 20)
-layout_mode = 2
-texture_normal = ExtResource("11_hpkop")
-ignore_texture_size = true
-stretch_mode = 5
-script = ExtResource("11_gdbfk")
-metadata/_custom_type_script = "uid://dmty142sb38lp"
-
-[node name="FastForwardButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons"]
-custom_minimum_size = Vector2(20, 20)
-layout_mode = 2
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 20.0
 texture_normal = ExtResource("12_x42ai")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
+
+[node name="AnimatableUI2" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" node_paths=PackedStringArray("content")]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+script = ExtResource("12_tsiox")
+content = NodePath("PlayButton")
+hover_scale = Vector2(1.2, 1.2)
+metadata/_custom_type_script = "uid://2p1hsv7rivsk"
+
+[node name="PlayButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI2"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 20.0
+texture_normal = ExtResource("14_m8qfw")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("11_gdbfk")
+metadata/_custom_type_script = "uid://dmty142sb38lp"
+
+[node name="AnimatableUI3" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" node_paths=PackedStringArray("content")]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+script = ExtResource("12_tsiox")
+content = NodePath("FastForwardButton")
+hover_scale = Vector2(1.2, 1.2)
+metadata/_custom_type_script = "uid://2p1hsv7rivsk"
+
+[node name="FastForwardButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI3"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 20.0
+texture_normal = ExtResource("15_aasu8")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("11_gdbfk")
+metadata/_custom_type_script = "uid://dmty142sb38lp"
+
+[node name="PanelContainer2" type="TextureRect" parent="Margin/ui_space/TimeControls"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 0.11800001
+anchor_right = 1.0
+anchor_bottom = 0.11800001
+offset_left = -235.0
+offset_top = 2.9399986
+offset_right = -185.0
+offset_bottom = 51.94
+mouse_filter = 2
+texture = ExtResource("16_aasu8")
+expand_mode = 1
+
+[node name="WaveLabel" type="RichTextLabel" parent="Margin/ui_space/TimeControls/PanelContainer2"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.333
+anchor_bottom = 0.333
+offset_left = 13.0
+offset_top = 1.6829987
+offset_right = 40.0
+offset_bottom = 29.683
+theme_type_variation = &"rt_s20"
+bbcode_enabled = true
+text = "30
+"
+fit_content = true
+horizontal_alignment = 1
+script = ExtResource("6_b5f40")
 
 [node name="Inspector" parent="Margin/ui_space" instance=ExtResource("3_rmtg4")]
 layout_mode = 1

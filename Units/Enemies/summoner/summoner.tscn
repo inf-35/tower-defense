@@ -38,9 +38,9 @@ shader_parameter/overlay_color = Color(0, 0, 1, 0)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
 size = Vector2(48.12503, 48.750034)
 
-[sub_resource type="Resource" id="Resource_eh6fv"]
+[sub_resource type="Resource" id="Resource_bj3fk"]
 script = ExtResource("14_srfs8")
-range = 4.0
+cooldown = 5.0
 damage = 3.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
@@ -105,5 +105,5 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("13_o8ua7")
-attack_data = SubResource("Resource_eh6fv")
+attack_data = SubResource("Resource_bj3fk")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
