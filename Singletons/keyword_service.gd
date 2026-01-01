@@ -19,6 +19,26 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "Player Capacity",
 		"icon": preload("res://Assets/capacity_icon.png"),
 	},
+	"UNIT_HP": {
+		"title": "",
+		"description": "Unit health. How much damage this unit can take before being destroyed.",
+		"icon": preload("res://Assets/hp_icon.png")
+	},
+	"UNIT_DAMAGE": {
+		"title": "",
+		"description": "Damage. How much damage this unit deals per hit.",
+		"icon": preload("res://Assets/damage_icon.png")
+	},
+	"UNIT_RANGE": {
+		"title": "",
+		"description": "Range. How far this unit can attack from.",
+		"icon": preload("res://Assets/range_icon.png")
+	},
+	"UNIT_HITRATE": {
+		"title": "",
+		"description": "Hitrate. How often this unit can attack.",
+		"icon": preload("res://Assets/cooldown_icon.png")
+	},
 	"BREACH": {
 		"title": "Breach",
 		"description": "An active enemy spawn point. Will close after a set number of waves.",
@@ -37,6 +57,16 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"BURN": {
 		"title": "Burn",
 		"description": "This unit is burning and takes 0.5 damage per second per stack",
+		"icon": null,
+	},
+	"BLEED": {
+		"title": "Bleed",
+		"description": "Bleeding units take 1 more damage per hit per stack of bleed",
+		"icon": null,
+	},
+	"CURSED": {
+		"title": "Cursed",
+		"description": "Cursed units take 20% more damage per stack of curse.",
 		"icon": null,
 	},
 }
@@ -64,6 +94,9 @@ func get_keyword_data(keyword: String) -> Dictionary:
 	# 2. check for tower prefix
 	if upper_key.begins_with("T_"):
 		return _resolve_tower_data(upper_key.trim_prefix("T_"))
+		
+	if upper_key.begins_with("U_"):
+		return _resolve_unit_data(upper_key.trim_prefix("U_"))
 		
 	# 3. check for relic prefix
 	if upper_key.begins_with("R_"):
@@ -124,18 +157,53 @@ func _resolve_tower_data(tower_id_str: String) -> Dictionary:
 	if not Towers.Type.has(tower_id_str):
 		return {}
 		
-	var type: int = Towers.Type.get(tower_id_str)
+	var type: Towers.Type = Towers.Type.get(tower_id_str)
+	var prototype: Tower = Towers.get_tower_prototype(type)
+	
+	var desc: String = "" 
+	if prototype and not prototype.stat_displays.is_empty():
+		for stat_display: StatDisplayInfo in prototype.stat_displays:
+			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_instance(prototype, stat_display), stat_display)
+			desc += stat_display.label + " " + str(value) + stat_display.suffix
+			desc += "\n"
+		
+	desc += Towers.get_tower_description(type)
 	
 	# build dictionary to match standard keyword format
 	return {
 		"title": Towers.get_tower_name(type),
-		"description": Towers.get_tower_description(type),
+		"description": desc,
 		"icon": Towers.get_tower_icon(type)
+	}
+	
+func _resolve_unit_data(unit_id_str: String) -> Dictionary:
+	# convert string ID (e.g. "CANNON") to enum value
+	if not Units.Type.has(unit_id_str):
+		return {}
+		
+	var type: Units.Type = Units.Type.get(unit_id_str)
+	var prototype: Unit = Units.get_unit_prototype(type)
+	push_warning(unit_id_str," ",prototype)
+	var desc: String = ""
+	if prototype and not Units.get_stat_displays(type).is_empty():
+		for stat_display: StatDisplayInfo in Units.get_stat_displays(type):
+			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_unit(prototype, stat_display), stat_display)
+			desc += stat_display.label + " " + str(value) + stat_display.suffix
+			desc += "\n"
+		
+	desc += Units.get_unit_description(type)
+	
+	# build dictionary to match standard keyword format
+	return {
+		"title": Units.get_unit_name(type),
+		"description": desc,
+		"icon": null,
 	}
 
 # helper to fetch relic info
 func _resolve_relic_data(relic_id_str: String) -> Dictionary:
-	var relic: RelicData = Relics.relics.get(relic_id_str)
+	var type: RelicData.Type = int(relic_id_str)
+	var relic: RelicData = Relics.relics[type]
 	
 	if not relic:
 		return {}

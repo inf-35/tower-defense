@@ -73,9 +73,10 @@ func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat
 
 func get_tower_prototype(tower_type: Type) -> Tower:
 	if not tower_prototypes.has(tower_type): #if no prototype
+		print(Towers.Type.keys()[tower_type])
 		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
 		tower_prototypes[tower_type].abstractive = true #disable all effects and events
-		add_child(tower_prototypes[tower_type]) #trigger _ready() calls
+		add_child.call_deferred(tower_prototypes[tower_type]) #trigger _ready() calls
 
 		tower_prototypes[tower_type].tower_position = Vector2i(1915 * tower_type * tower_prototypes[tower_type].unit_id, 5823 * tower_type * tower_prototypes[tower_type].unit_id) #somewhere extremely far away
 		#these prototype towers provide a "default" baseline to lookup from.

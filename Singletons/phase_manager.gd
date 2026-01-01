@@ -28,7 +28,7 @@ var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
 
 var wave_plan: Dictionary[int, Wave] = {}
-const FINAL_WAVE: int = 25
+const FINAL_WAVE: int = 16
 class Wave: ## internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL
@@ -146,6 +146,7 @@ func _advance_phase():
 		GamePhase.CHOICE:
 			_start_building_phase()
 		GamePhase.BUILDING:
+			UI.day_event_ended.emit()
 			_start_combat_wave()
 		GamePhase.COMBAT_WAVE:
 			current_phase = GamePhase.IDLE
@@ -205,6 +206,7 @@ func _on_choice_applied() -> void:
 	_report("a choice has been successfully applied by its handler.")
 	# the service is responsible for hiding its own UI, so we don't need to do it here
 	if not choice_queue.is_empty(): # go to the next choice if there is one
+		UI.day_event_ended.emit()
 		var next_choice: ChoiceType = choice_queue.pop_front()
 		_start_choice_phase(next_choice)
 	else:

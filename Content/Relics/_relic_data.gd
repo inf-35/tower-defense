@@ -11,7 +11,28 @@ enum TargetType {
 	SPECIFIC_ELEMENT
 	# add more specific target types as needed
 }
-@export var id: String ## temporarily unused, instead using wrapper reward's id instead
+
+enum Type {
+	AMBUSH,
+	BROKEN_MIRROR,
+	COMMON_COLD,
+	CONTAGION,
+	ENFILADE,
+	FIERY_SPIRIT,
+	HYPOTHERMIA,
+	INFERNO,
+	MONEY_MARKET,
+	NATURES_SPIRIT,
+	PERMAFROST,
+	SEPSIS,
+	STUMBLING_BLOCKS,
+	SUBPRIME,
+	TRANCE,
+	WILDERNESS,
+	WINTERS_SPIRIT
+}
+
+@export var type: Type
 @export var target_type: TargetType
 
 # used only if target_type is SPECIFIC_TOWER_TYPE

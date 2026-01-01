@@ -20,6 +20,7 @@ metadata/_custom_type_script = "uid://c06ve61msauiy"
 
 [resource]
 script = ExtResource("3_jj0c7")
+type = 4
 global_effect = SubResource("Resource_5ble4")
 title = "Enfilade"
 description = "When a tower is placed mid-battle, it gains a 300% fire rate boost for the first 5 seconds."

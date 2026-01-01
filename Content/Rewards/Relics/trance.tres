@@ -1,7 +1,15 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://dqr2xiik4rji7"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://dqr2xiik4rji7"]
 
 [ext_resource type="Resource" uid="uid://dic8sge2e6pmb" path="res://Content/Relics/trance/trance.tres" id="1_4qk27"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_foarx"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_m7t0u"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_tvflo"]
+
+[sub_resource type="Resource" id="Resource_14db7"]
+script = ExtResource("2_tvflo")
+tower_types = Array[int]([18, 28])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
 
 [resource]
 script = ExtResource("2_m7t0u")
@@ -9,4 +17,6 @@ id_name = "trance"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_4qk27")
+base_weight = 400.0
+bias_rules = Array[ExtResource("1_foarx")]([SubResource("Resource_14db7")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

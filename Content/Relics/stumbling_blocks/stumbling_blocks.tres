@@ -19,6 +19,7 @@ metadata/_custom_type_script = "uid://c6lrutd6k1p1l"
 
 [resource]
 script = ExtResource("2_wrs5o")
+type = 12
 global_effect = SubResource("Resource_p0ayh")
 title = "Stumbling Blocks"
 description = "Rubble slows down enemies by another 50%."

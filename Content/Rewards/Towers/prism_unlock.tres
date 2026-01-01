@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://b1eo7olgr8dm2"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://b1eo7olgr8dm2"]
 
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_btqxa"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_q8dp8"]
 
 [resource]
 script = ExtResource("1_btqxa")

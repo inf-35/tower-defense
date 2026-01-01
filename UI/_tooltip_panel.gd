@@ -2,8 +2,8 @@ extends PanelContainer
 class_name TooltipPanel
 
 # --- configuration ---
-const SOLIDIFY_TIME: float = 0.8
-const GRACE_TIME: float = 0.3 # time allowed to move mouse from link to panel
+const SOLIDIFY_TIME: float = 0.4
+const GRACE_TIME: float = 0.2 # time allowed to move mouse from link to panel
 const MOUSE_OFFSET: Vector2 = Vector2(20, 20)
 
 # --- visual references ---

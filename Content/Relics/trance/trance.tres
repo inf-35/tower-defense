@@ -10,6 +10,7 @@ metadata/_custom_type_script = "uid://bsqsmnqngcku6"
 
 [resource]
 script = ExtResource("2_sloqq")
+type = 14
 global_effect = SubResource("Resource_be2qu")
 title = "Trance"
 description = "Killing cursed enemies halves the subsequent cooldown of the tower that killed the enemy."

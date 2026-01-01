@@ -1,8 +1,9 @@
-[gd_scene load_steps=21 format=3 uid="uid://uyeylgrvtiyj"]
+[gd_scene load_steps=22 format=3 uid="uid://uyeylgrvtiyj"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ngn05"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_4ads2"]
 [ext_resource type="Script" uid="uid://g5t7r5umsmw2" path="res://Content/Behaviors/mage_tower_behavior.gd" id="3_4yu0f"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="3_nf0er"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_if2uy"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_vwio8"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_7cmip"]
@@ -106,7 +107,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_ngn05")
 type = 18
-stat_displays = Array[ExtResource("2_4ads2")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
+stat_displays = Array[ExtResource("2_4ads2")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260"), ExtResource("3_nf0er")])
 behavior = NodePath("MageBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

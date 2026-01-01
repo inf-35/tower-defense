@@ -16,7 +16,8 @@ func _init() -> void:
 # all scripts MUST CALL THIS for text modification
 func set_parsed_text(_text: String) -> void:
 	# use the service to convert user-friendly text into BBCode
-	self.text = KeywordService.parse_text_for_bbcode(_text)
+	if text != _text:
+		self.text = KeywordService.parse_text_for_bbcode(_text)
 
 func _on_meta_hover_started(meta: Variant) -> void:
 	var keyword: String = str(meta)

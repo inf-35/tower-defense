@@ -49,7 +49,7 @@ func _scan_directory_recursive(path: String) -> void:
 				reward_pool.append(resource.generate_reward())
 				
 				if resource.type == Reward.Type.ADD_RELIC:
-					Relics.relics[resource.id_name.to_upper()] = resource.relic_data
+					Relics.relics[resource.relic_data.type] = resource.relic_data
 			else:
 				pass
 				
@@ -58,45 +58,113 @@ func _scan_directory_recursive(path: String) -> void:
 	dir.list_dir_end()
 
 # --- public api ---
+#
+#func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is the Reward.Type being selected for
+	#if reward_pool.is_empty():
+		#push_warning("RewardService: Reward pool is empty. Cannot generate choices.")
+		#reward_process_complete.emit()
+		#return
+#
+	#_current_reward_options_by_id.clear()
+	#var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate()
+	#available_rewards.shuffle()
+	#
+	#var chosen_rewards: int = 0
+	#var i: int = 0
+	#while chosen_rewards < choice_count:
+		#if available_rewards.size() - 1 < i:
+			#break
+		#
+		#var current_reward: Reward = available_rewards[i]
+		##reject towers, relics and rites already held by the player
+		#if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.tower_type):
+			#i += 1
+			#continue
+		#elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.relic):
+			#i += 1
+			#continue
+		#elif current_reward.type == Reward.Type.ADD_RITE and Player.get_tower_limit(current_reward.rite_type) > 0:
+			#i += 1
+			#continue
+#
+		#_current_reward_options_by_id[chosen_rewards] = available_rewards[i]
+		#chosen_rewards += 1
+		#i += 1
+		#
+	#is_choosing_reward = true
+	#
+	#UI.display_reward_choices.emit(_current_reward_options_by_id.values())
 
-func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is the Reward.Type being selected for
-	if reward_pool.is_empty():
-		push_warning("RewardService: Reward pool is empty. Cannot generate choices.")
-		reward_process_complete.emit()
-		return
-
-	_current_reward_options_by_id.clear()
-	var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate()
-	available_rewards.shuffle()
+func generate_and_present_choices(choice_count: int, type_filter: Reward.Type = -1) -> void:
+	var rewards: Array[Reward] = get_rewards(choice_count, type_filter)
 	
-	var chosen_rewards: int = 0
-	var i: int = 0
-	while chosen_rewards < choice_count:
-		if available_rewards.size() - 1 < i:
-			break
-		
-		var current_reward: Reward = available_rewards[i]
-		#reject towers, relics and rites already held by the player
-		if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.tower_type):
-			i += 1
-			continue
-		elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.relic):
-			i += 1
-			continue
-		elif current_reward.type == Reward.Type.ADD_RITE and Player.get_tower_limit(current_reward.rite_type) > 0:
-			i += 1
-			continue
+	for i: int in len(rewards):
+		_current_reward_options_by_id[i] = rewards[i]
 
-		_current_reward_options_by_id[chosen_rewards] = available_rewards[i]
-		chosen_rewards += 1
-		i += 1
-		
 	is_choosing_reward = true
-	
 	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
+
+func get_rewards(choice_count: int, type_filter: Reward.Type = -1) -> Array[Reward]:
+	var rewards: Array[Reward] = []
+	
+	var candidates: Array[Reward] = []
+	var weights: Array[float] = []
+	var total_weight: float = 0.0
+	
+	# loop through all loaded rewards
+	for reward: Reward in reward_pool:
+		# filter by requested type
+		if type_filter != -1 and reward.type != type_filter:
+			continue
+
+		var weight: float = 100.0
+		weight = _calculate_reward_weight(reward)
+
+		if weight > 0.0:
+			candidates.append(reward)
+			weights.append(weight)
+			total_weight += weight
+	
+	for i: int in choice_count:
+		if total_weight <= 0: break
+		
+		var chosen_index: int = _pick_weighted_index(weights, total_weight)
+		var chosen_reward: Reward = candidates[chosen_index]
+	
+		rewards.append(chosen_reward)
+		# remove from pool to prevent duplicates in the same choice screen
+		total_weight -= weights[chosen_index]
+		candidates.remove_at(chosen_index)
+		weights.remove_at(chosen_index)
+		
+	return rewards
 
 func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
+	
+func _calculate_reward_weight(reward: Reward) -> float:
+	var final_weight: float = reward.base_weight
+	
+	for rule: RewardBiasRule in reward.bias_rules:
+		final_weight *= rule.get_multiplier()
+		
+		# optimization: If weight hits 0, stop calculating
+		if final_weight <= 0.0:
+			return 0.0
+			
+	return final_weight
+
+func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
+	var roll: float = randf_range(0.0, total_weight)
+	var accumulated: float = 0.0
+	
+	for i: int in weights.size():
+		accumulated += weights[i]
+		if roll <= accumulated:
+			return i
+	
+	push_warning("Reward service: roll failed!")
+	return weights.size() - 1 # fallback
 
 func select_reward(choice_id: int) -> void:
 	if not _current_reward_options_by_id.has(choice_id):

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://bfqcyg57w0c83"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_fttwl"]
+
+[resource]
+script = ExtResource("1_fttwl")
+attribute = 3
+label = "SPD"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

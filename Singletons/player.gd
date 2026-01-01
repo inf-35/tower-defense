@@ -105,26 +105,28 @@ func _setup_state():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.CANNON: true,
+		Towers.Type.MAGE: true,
+		Towers.Type.FIREWALL: true,
+		Towers.Type.MORTAR: true,
 	}
 	
 	flux = 20.0
 	hp = 20.0
 	
-	var reward := Reward.new()
-	reward.type = Reward.Type.ADD_RELIC
-	reward.relic = Relics.COMMON_COLD
-	RewardService.apply_reward(reward)
-	
-	reward = Reward.new()
-	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_FROST
-	RewardService.apply_reward(reward)
-	##
-	reward = Reward.new()
-	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_POISONS
-	RewardService.apply_reward(reward)
+	#var reward := Reward.new()
+	#reward.type = Reward.Type.ADD_RELIC
+	#reward.relic = Relics.COMMON_COLD
+	#RewardService.apply_reward(reward)
+	#
+	#reward = Reward.new()
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_FROST
+	#RewardService.apply_reward(reward)
+	###
+	#reward = Reward.new()
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_POISONS
+	#RewardService.apply_reward(reward)
 	##
 	#reward = Reward.new()
 	#reward.type = Reward.Type.ADD_RITE

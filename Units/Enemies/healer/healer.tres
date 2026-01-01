@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://bxw1aw4jbe21q"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_arpyk"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_8gry3"]
+[ext_resource type="PackedScene" uid="uid://bl12mn0bm7utq" path="res://Units/Enemies/healer/healer.tscn" id="2_rthdo"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_fvg2m"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_76r1b"]
+
+[resource]
+script = ExtResource("1_arpyk")
+title = "Healer"
+description = "Heals nearby enemies."
+stat_displays = Array[ExtResource("2_8gry3")]([ExtResource("3_fvg2m"), ExtResource("4_76r1b")])
+unit_scene = ExtResource("2_rthdo")
+flux_value = 0.8
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

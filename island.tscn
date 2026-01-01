@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=18 format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://vbik6qfqhxwb" path="res://projectiles_display.gd" id="3_qurb2"]
 [ext_resource type="Script" uid="uid://bngvtmcvgq4vj" path="res://path_renderer.gd" id="6_gljqa"]
 [ext_resource type="Script" uid="uid://crec8t188v1g2" path="res://terrain_renderer.gd" id="7_b4opu"]
+[ext_resource type="Texture2D" uid="uid://cl3v55kq2nvey" path="res://Assets/path_straight.png" id="7_l23qb"]
+[ext_resource type="Texture2D" uid="uid://djeiqqv05gtef" path="res://Assets/path_corner.png" id="8_aibdv"]
 [ext_resource type="Shader" uid="uid://5lkovhtioof2" path="res://Shaders/sketch_terrain.gdshader" id="8_c7iw8"]
 [ext_resource type="Shader" uid="uid://by08yeo185ck8" path="res://Shaders/watercolor_terrain.gdshader" id="9_8ervs"]
 [ext_resource type="Texture2D" uid="uid://ckta0r6pis0if" path="res://Assets/brushstroke_multiply.png" id="10_8ervs"]
@@ -44,6 +46,9 @@ script = ExtResource("3_fgmf3")
 [node name="PathRenderer" type="Node2D" parent="."]
 z_index = 80
 script = ExtResource("6_gljqa")
+stroke_texture = ExtResource("7_l23qb")
+corner_texture = ExtResource("8_aibdv")
+stroke_spacing = 10.0
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 
 [node name="PreviewRenderer" type="Node2D" parent="."]

@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_0fd6n"]
 [ext_resource type="Resource" uid="uid://bfougfx6aba1c" path="res://Content/Effects/capacity_generator.tres" id="4_v8yu7"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sxhhn"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="8_w5o8d"]
+[ext_resource type="Texture2D" uid="uid://cmdt8h3ekawqj" path="res://Assets/village.png" id="7_o38am"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
 
 [node name="Generator" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
@@ -30,9 +30,8 @@ script = ExtResource("5_sxhhn")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 0.556863, 1)
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("8_w5o8d")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_o38am")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("9_qtlu4")

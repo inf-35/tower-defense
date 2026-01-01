@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://ck5p8qw63gfhx"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_32gg8"]
+[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="1_12t77"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_x6lxw"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_1xnkv"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_32gg8"]
@@ -23,9 +23,9 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Turret"
 tower_description = "A crude yet effective all-rounder that fires bolts towards enemies.
-
-{T_TURRET}
-{R_WINTERS_SPIRIT}"
+"
+icon = ExtResource("2_32gg8")
+preview = ExtResource("1_12t77")
 inspector_actions = Array[ExtResource("2_1xnkv")]([ExtResource("4_l0cjb"), SubResource("Resource_1xnkv"), ExtResource("3_p42es")])
 tower_scene = ExtResource("2_bxren")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

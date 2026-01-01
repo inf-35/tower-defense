@@ -108,7 +108,8 @@ func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 							anomaly_desc += " ({T_%s})" % Towers.Type.keys()[tower_type]
 						elif anomaly_data.reward.type == Reward.Type.ADD_RELIC:
 							var relic: RelicData = anomaly_data.reward.relic
-							anomaly_desc += " ({R_%s})" % relic.title.to_upper()
+							anomaly_desc += " ({R_%s})" % str(relic.type)
+							print(relic.title.to_snake_case().to_upper(), " by expansion")
 						elif anomaly_data.reward.type == Reward.Type.ADD_RITE:
 							var rite_type: Towers.Type = anomaly_data.reward.rite_type
 							anomaly_desc += " ({T_%s})" % Towers.Type.keys()[rite_type]

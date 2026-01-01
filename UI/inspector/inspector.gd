@@ -19,6 +19,7 @@ class_name Inspector
 
 var inspector_mode: InspectorMode
 var current_tower: Tower
+var _preview_upgrade_type: Towers.Type = Towers.Type.VOID ## void means no preview (normal mode)
 
 enum InspectorMode {
 	TowerOverview
@@ -27,9 +28,6 @@ enum InspectorMode {
 func _ready():
 	healthbar.min_value = 0.0
 	stats.columns = stats_per_line
-	
-	#upgrade_button.pressed.connect(_on_upgrade_button_pressed)
-	#sell_button.pressed.connect(_on_sell_button_pressed)
 
 	UI.update_inspector_bar.connect(_on_inspector_contents_tower_update)
 	UI.update_unit_state.connect(func(unit : Unit):
@@ -42,6 +40,9 @@ func _ready():
 	)
 
 func _on_inspector_contents_tower_update(tower : Tower):
+	if not tower.is_ready:
+		await tower.components_ready
+	
 	stats.columns = stats_per_line
 	
 	if tower != current_tower: #this is a new tower being switched to
@@ -55,29 +56,121 @@ func _on_inspector_contents_tower_update(tower : Tower):
 		)
 	
 	current_tower = tower
-	var tower_type : Towers.Type = tower.type
-	
-	inspector_icon.texture = Towers.get_tower_icon(tower_type)
+	# update header/desc normally
+	_update_header_visuals(tower.type)
+	# reset preview state when switching towers
+	_preview_upgrade_type = Towers.Type.VOID
 
-	inspector_title.text = Towers.get_tower_name(tower_type)
-	subtitle.text = "mk" + str(tower.level) #TODO: implement localisation
-	description.set_parsed_text(Towers.get_tower_description(tower_type))
 	
-	for child : Control in stats.get_children():
-		child.free() #queue_free will cause bugs with get_child_count()
-	
-	# Get the list of display instructions from the tower's data resource
-	var displays_to_create : Array[StatDisplayInfo] = tower.stat_displays
-	# Loop through the instructions (in original order)
-	#NOTE: DO NOT MUTATE displays_to_create
-	for display_info : StatDisplayInfo in displays_to_create:
-		_display_stat(tower, display_info)
+	_refresh_stats() # update stats
 	
 	tower.get_unit_state() #this prompts the tower to send us its health too
 	
-	_refresh_actions(tower)
+	_refresh_actions(tower) # update actions
 	_update_status_display(tower)
 	
+func _update_header_visuals(tower_type: Towers.Type) -> void:
+	inspector_icon.texture = Towers.get_tower_icon(tower_type)
+	inspector_title.text = Towers.get_tower_name(tower_type)
+	if _preview_upgrade_type == Towers.Type.VOID:
+		subtitle.text = ""
+	else:
+		subtitle.text = " ->%s" % Towers.get_tower_name(_preview_upgrade_type)
+		
+	description.set_parsed_text(Towers.get_tower_description(tower_type))
+	
+func _refresh_stats() -> void:
+	for child : Control in stats.get_children():
+		child.free() #queue_free will cause bugs with get_child_count()
+		
+	if not is_instance_valid(current_tower):
+		return
+	# determine mode
+	if _preview_upgrade_type != Towers.Type.VOID:
+		_render_preview_stats()
+	else:
+		_render_live_stats()
+		
+func _render_live_stats() -> void: # for standard stat displays
+	# use current tower instance's stat displays
+	for display_info: StatDisplayInfo in current_tower.stat_displays:
+		var value: Variant = get_stat_value_from_instance(current_tower, display_info)
+		if value == null: continue
+		
+		value = apply_display_modifiers(value, display_info) #format
+		var text: String = display_info.label + " " + str(value) + display_info.suffix
+		
+		var label := InteractiveRichTextLabel.new()
+		label.bbcode_enabled = true
+		label.fit_content = true
+		label.set_parsed_text(text)
+		label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		stats.add_child(label)
+
+func _render_preview_stats() -> void:
+	var current_type: Towers.Type = current_tower.type
+	var next_type: Towers.Type = _preview_upgrade_type
+	
+	var current_proto: Tower = Towers.get_tower_prototype(current_type)
+	var next_proto: Tower = Towers.get_tower_prototype(next_type)
+	if (not next_proto) or (not current_proto):
+		return
+	
+	current_proto.tower_position = current_tower.tower_position
+	next_proto.tower_position = current_tower.tower_position 
+	
+	for display_info in next_proto.stat_displays:
+		# compare BASE stats (prototype vs prototype)
+		# only modifiers included are terrain modifiers
+		var val_old = get_stat_value_from_instance(current_proto, display_info)
+		var val_new = get_stat_value_from_instance(next_proto, display_info)
+
+		if val_old == null or val_new == null: continue
+		
+		# Format Numbers
+		var old_fmt = apply_display_modifiers(val_old, display_info)
+		var new_fmt = apply_display_modifiers(val_new, display_info)
+		
+		# Determine Color
+		var color_code: String = Color.GRAY.to_html() # Grey/White
+		
+		var bad_color: String = Color(0.6, 0.3, 0.3, 1.0).to_html()
+		var good_color: String = Color(0.3, 0.6, 0.365, 1.0).to_html()
+	
+		# Check if numeric for comparison
+		if (typeof(val_new) == TYPE_FLOAT or typeof(val_new) == TYPE_INT) and \
+		   (typeof(val_old) == TYPE_FLOAT or typeof(val_old) == TYPE_INT):
+			
+			var diff: float = float(val_new) - float(val_old)
+			
+			if not is_zero_approx(diff):
+				# Handle "Lower is Better" for Reciprocal stats (Cooldown)
+				var lower_is_better: bool = (display_info.special_modifier == DisplayStatModifier.RECIPROCAL)
+				
+				if diff > 0:
+					color_code = bad_color if lower_is_better else good_color # Red if bad, Green if good
+				else:
+					color_code = good_color if lower_is_better else bad_color # Green if bad (lower), Red if good
+		
+		# Construct BBCode
+		var bbcode: String = "%s [color=#888888]%s[/color] [color=%s]%s[/color]%s" % [
+			display_info.label, 
+			str(old_fmt), 
+			color_code, 
+			str(new_fmt),
+			display_info.suffix
+		]
+		
+		# Create RichTextLabel
+		var rtl := InteractiveRichTextLabel.new()
+		rtl.bbcode_enabled = true
+		rtl.set_parsed_text(bbcode)
+		rtl.fit_content = true
+		rtl.autowrap_mode = TextServer.AUTOWRAP_OFF
+		stats.add_child(rtl)
+		
+	Towers.reset_tower_prototype(next_proto.type)
+
 func _refresh_actions(tower: Tower) -> void:
 	# clear existing buttons
 	for child: Node in button_container.get_children():
@@ -111,8 +204,30 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 				if Player.flux < cost:
 					is_disabled = true
 					
-				btn.pressed.connect(UI.upgrade_tower_requested.emit.bind(tower, next_type))
-		
+				btn.pressed.connect(func():
+					if not is_instance_valid(tower):
+						return
+					
+					_preview_upgrade_type = Towers.Type.VOID
+					UI.upgrade_tower_requested.emit(tower, next_type)
+				)
+				btn.mouse_entered.connect(func():
+					if not is_instance_valid(tower):
+						return
+						
+					_preview_upgrade_type = next_type
+					_update_header_visuals(tower.type)
+					_refresh_stats()
+				)
+				btn.mouse_exited.connect(func():
+					if not is_instance_valid(tower):
+						return
+
+					_preview_upgrade_type = Towers.Type.VOID
+					_update_header_visuals(tower.type)
+					_refresh_stats()
+				)
+				
 		InspectorAction.ActionType.SELL:
 			var sell_value: float = roundi(tower.flux_value * 10) * 0.1
 			btn.text += " (%d)" % sell_value
@@ -141,6 +256,7 @@ enum DisplayStatModifier {
 	CAPACITY_GENERATION,
 	WAVES_LEFT_IN_PHASE,
 	ANOMALY_REWARD_PREVIEW,
+	DISPLAY_ATTACK_STATUSES
 }
 
 func _update_status_display(tower: Tower) -> void:
@@ -247,51 +363,18 @@ func _create_status_widget(icon: Texture2D, title: String, desc: String, stacks:
 	
 	status_container.add_child(wrapper)
 
-func _display_stat(tower: Tower, display_info: StatDisplayInfo):
-	var value : Variant
-	var override: bool = false
-	
-	# Handle special cases first
-	match display_info.special_modifier:
-		DisplayStatModifier.CORE_FLUX:
-			override = true
-			value = Player.flux
-
-		DisplayStatModifier.CAPACITY:
-			override = true
-			value = Towers.get_tower_capacity(tower.type)
-			#value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"capacity_generated")
-			if value == null: return # abort if this special stat isn't found
-		
-		DisplayStatModifier.CAPACITY_GENERATION:
-			override = true
-			value = tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation") #see CapacityGeneratorEffect
-			if value == null: return
-
-		DisplayStatModifier.LINE_BREAK:
-			override = true
-			value = null
-			var spaces_to_add : int = stats_per_line - stats.get_child_count() % stats_per_line
-			if spaces_to_add == stats_per_line: #we already have a line break anyways
-				return
-				
-			for space_index : int in spaces_to_add:
-				var space := Label.new()
-				space.text = ""
-				stats.add_child(space)
-				
-		DisplayStatModifier.RETRIEVE_FIRST_ATTACK_STATUS_STACK:
-			override = true
-			value = tower.attack_component.attack_data.status_effects[0].stack
-			
+static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) -> Variant:
+	var value: Variant = null
+	# handle overrides
+	match info.special_modifier:
+		DisplayStatModifier.CORE_FLUX: return Player.flux
+		DisplayStatModifier.CAPACITY: return Towers.get_tower_capacity(tower.type)
+		DisplayStatModifier.LINE_BREAK: return null
+		DisplayStatModifier.CAPACITY_GENERATION: 
+			return tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation")
 		DisplayStatModifier.WAVES_LEFT_IN_PHASE:
-			override = true
-			value = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
-			#used by any tower which has a wave-based state i.e. anomaly, breach, etc.
-			if value == null: return # abort if this special stat isn't found
-			
+			return tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 		DisplayStatModifier.ANOMALY_REWARD_PREVIEW:
-			override = true
 			var waves_left_to_reward: int = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 			var reward: Reward = tower.get_behavior_attribute(ID.UnitState.REWARD_PREVIEW)
 			
@@ -301,35 +384,71 @@ func _display_stat(tower: Tower, display_info: StatDisplayInfo):
 				value = Towers.get_tower_name(reward.tower_type) + " in " + str(waves_left_to_reward) + " waves."
 			elif reward.type == Reward.Type.ADD_RITE:
 				value = Towers.get_tower_name(reward.rite_type) + " in " + str(waves_left_to_reward) + " waves."
+			
+			return value
+		DisplayStatModifier.DISPLAY_ATTACK_STATUSES:
+			if not is_instance_valid(tower.attack_component):
+				return null
+			
+			# Access the data defining the attack
+			var data: AttackData = tower.attack_component.attack_data
+			return _format_status_effects(data)
+			
+	# if we're still here, we didnt hit any overrides
+	if tower.modifiers_component and tower.modifiers_component.has_stat(info.attribute):
+		value = tower.modifiers_component.pull_stat(info.attribute)
+	else:
+		value =  tower.get_stat(info.attribute)
+	#elif Towers.get_tower_stat(tower.type, info.attribute):
+		#value = Towers.get_tower_stat(tower.type, info.attribute)
 		
-	# Get the value from the tower's components if not overridden
-	if not override:
-		var attribute = display_info.attribute
-		if tower.modifiers_component and tower.modifiers_component.has_stat(attribute):
-			value = tower.modifiers_component.pull_stat(attribute)
-		elif Towers.get_tower_stat(tower.type, attribute): # Fallback for previews
-			value = Towers.get_tower_stat(tower.type, attribute)
+	return value
+	
+static func get_stat_value_from_unit(unit: Unit, info: StatDisplayInfo) -> Variant:
+	var value: Variant
+	
+	if unit.modifiers_component and unit.modifiers_component.has_stat(info.attribute):
+		value = unit.modifiers_component.pull_stat(info.attribute)
+	else:
+		value =  unit.get_stat(info.attribute)
+	
+	return value
+	
+static func _format_status_effects(attack_data: AttackData) -> String:
+	if not attack_data or attack_data.status_effects.is_empty():
+		return "None" # Or null to hide the line entirely
+		
+	var parts: Array[String] = []
 
-	if value == null:
-		return # Don't display if no value could be found
+	for status_effect: StatusEffectPrototype in attack_data.status_effects:
+		var stacks: float = status_effect.stack
+		var duration: float = status_effect.cooldown
 		
-	# Apply final modifiers
-	if display_info.special_modifier == DisplayStatModifier.RECIPROCAL and value != 0:
+		# Get String Key (e.g. 5 -> "POISON")
+		var status_key: String = Attributes.Status.keys()[status_effect.type]
+		
+		# Use KeywordService to get the Icon + Colored Name
+		var bbcode_name: String = KeywordService.parse_text_for_bbcode("{%s}" % status_key)
+		
+		# Format: "[Icon] Poison (5s)" or "[Icon] Frost x2 (3s)"
+		var entry = bbcode_name
+		if stacks > 0.0:
+			entry += " x%d" % snappedf(stacks, 0.1)
+		if duration > 0:
+			entry += " [color=#888888](%ss)[/color]" % str(snappedf(duration, 0.1))
+		else:
+			entry += " (permanent)"
+			
+		parts.append(entry)
+		
+	return ", ".join(parts)
+	
+static func apply_display_modifiers(value: Variant, info: StatDisplayInfo) -> Variant: ##for formatting raw values (from _get_stat_value_from_instance)
+	if info.special_modifier == DisplayStatModifier.RECIPROCAL and float(value) != 0:
 		value = 1.0 / float(value)
-
-	if display_info.special_modifier == DisplayStatModifier.INVERT:
+	if info.special_modifier == DisplayStatModifier.INVERT:
 		value *= -1
-	
-	if typeof(value) == TYPE_FLOAT: #round to 2dp
-		value = snappedf(value, 0.01)
 
-	var stat_label := Label.new()
-	stat_label.text = display_info.label + " " + str(value) + display_info.suffix
-	stats.add_child(stat_label)
-
-func _on_upgrade_button_pressed():
-	if is_instance_valid(current_tower) and not Towers.get_tower_upgrades(current_tower.type).is_empty():
-		UI.upgrade_tower_requested.emit(current_tower, Towers.get_tower_upgrades(current_tower.type)[0])
-	
-func _on_sell_button_pressed():
-	UI.sell_tower_requested.emit(current_tower)
+	if typeof(value) == TYPE_FLOAT:
+		return snappedf(value, 0.01)
+	return value

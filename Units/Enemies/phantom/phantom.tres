@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://cjymwipchiax2"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_juj3o"]
+[ext_resource type="PackedScene" uid="uid://chmntoippcxd" path="res://Units/Enemies/phantom/phantom.tscn" id="2_phe1k"]
+
+[resource]
+script = ExtResource("1_juj3o")
+unit_scene = ExtResource("2_phe1k")
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

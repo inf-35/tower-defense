@@ -14,8 +14,9 @@ metadata/_custom_type_script = "uid://c1ydyvx8fvx8g"
 
 [resource]
 script = ExtResource("4_gq43s")
+type = 1
 global_effect = SubResource("Resource_sk8em")
-title = "Ambush"
+title = "Broken Mirror"
 description = "Each stack of curse also inflicts a stack of bleeding on enemies.
 "
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

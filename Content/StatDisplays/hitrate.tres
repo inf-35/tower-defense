@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_1vs86")
 attribute = 8
-label = "RTE"
+label = "{UNIT_HITRATE}"
 suffix = "/s"
 special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

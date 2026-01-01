@@ -13,6 +13,7 @@ metadata/_custom_type_script = "uid://c1ydyvx8fvx8g"
 
 [resource]
 script = ExtResource("3_8px1t")
+type = 2
 global_effect = SubResource("Resource_xr361")
 title = "Common Cold"
 description = "Each stack of poison inflicted also inflicts half a stack of frost."

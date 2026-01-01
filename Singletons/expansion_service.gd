@@ -101,7 +101,7 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	anomaly_rule.tower_type = Towers.Type.ANOMALY
 	anomaly_rule.seed_placement = PlacementLogic.EDGE
 	anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(
-		RewardService.reward_pool.pick_random().duplicate_deep(), 2
+		RewardService.get_rewards(1)[0], 2
 	)
 	#NOTE: no special terrain
 	initial_params.placement_rules.append(breach_rule)
@@ -122,7 +122,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
 		var anomaly_rule: PlacementRule = expansion_params.placement_rules[1]
 		anomaly_rule.tower_initial_state[&"_anomaly_data"] = AnomalyData.new(
-			RewardService.reward_pool.pick_random().duplicate_deep(), 1
+			RewardService.get_rewards(1)[0], 1
 		)
 		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():

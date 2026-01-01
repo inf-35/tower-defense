@@ -11,4 +11,4 @@ static var ENFILADE: RelicData = load("res://Content/Relics/enfilade/enfilade.tr
 static var AMBUSH: RelicData = load("res://Content/Relics/ambush/ambush.tres")
 static var INFERNO: RelicData = load("res://Content/Relics/inferno/inferno.tres")
 
-static var relics: Dictionary[StringName, RelicData] = {} ## relics indexed by id, loaded by rewardservice
+static var relics: Dictionary[RelicData.Type, RelicData] = {} ## relics indexed by type, loaded by reward_service

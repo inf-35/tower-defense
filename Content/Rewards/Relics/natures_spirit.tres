@@ -5,7 +5,6 @@
 
 [resource]
 script = ExtResource("1_r4xtp")
-id_name = "natures_spirit"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_xh51h")

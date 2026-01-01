@@ -19,6 +19,7 @@ signal upgrade_tower_requested(tower: Tower, upgrade_type: Towers.Type)
 signal update_wave_schedule()
 signal start_wave(wave : int)
 signal end_wave(wave: int)
+signal day_event_ended() ##when any day event, including NONE, ends.
 signal start_combat(wave: int)
 signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()

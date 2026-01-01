@@ -5,7 +5,5 @@
 [resource]
 script = ExtResource("1_5swmd")
 attribute = 6
-label = "DMG"
-suffix = ""
-special_modifier = 4
+label = "{UNIT_DAMAGE}"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

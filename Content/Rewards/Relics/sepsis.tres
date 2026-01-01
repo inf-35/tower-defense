@@ -1,7 +1,21 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://c3k8ksfodhx2v"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=7 format=3 uid="uid://c3k8ksfodhx2v"]
 
 [ext_resource type="Resource" uid="uid://dxodj5es1nf4c" path="res://Content/Relics/sepsis/sepsis.tres" id="1_ab7jb"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_yv3j0"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_7b1fw"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_ftl3m"]
+
+[sub_resource type="Resource" id="Resource_0lulv"]
+script = ExtResource("2_ftl3m")
+tower_types = Array[int]([2])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[sub_resource type="Resource" id="Resource_h070i"]
+script = ExtResource("2_ftl3m")
+tower_types = Array[int]([14, 15, 21])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
 
 [resource]
 script = ExtResource("2_7b1fw")
@@ -9,4 +23,6 @@ id_name = "sepsis"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_ab7jb")
+base_weight = 1000.0
+bias_rules = Array[ExtResource("1_yv3j0")]([SubResource("Resource_0lulv"), SubResource("Resource_h070i")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -11,6 +11,7 @@ metadata/_custom_type_script = "uid://blhhsrfq8l8fj"
 
 [resource]
 script = ExtResource("2_07pg8")
+type = 13
 global_effect = SubResource("Resource_gv3lq")
 title = "Subprime"
 description = "Earn more gold the closer enemies die to your keep, up to 100% more."

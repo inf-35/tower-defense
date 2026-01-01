@@ -115,7 +115,7 @@ theme_type_variation = &"vbox_10"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/h_separation = 40
+theme_override_constants/h_separation = 20
 columns = 3
 
 [node name="description" type="RichTextLabel" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer"]

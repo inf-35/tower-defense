@@ -93,7 +93,7 @@ func _on_mouse_entered() -> void:
 				# stack format is [Units.Type, Count]
 				var type_id = stack[0]
 				var count = stack[1]
-				var unit_name = Units.Type.keys()[type_id].capitalize()
+				var unit_name = "{U_%s}" % str(Units.Type.keys()[stack[0]])
 				desc_text += "\n• %dx %s" % [count, unit_name]
 				
 	else:

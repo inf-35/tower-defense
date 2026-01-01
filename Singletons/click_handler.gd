@@ -77,7 +77,8 @@ func _enter_preview_state(tower: Tower):
 
 	current_state = State.PREVIEWING
 	preview_tower_prototype = tower
-	preview_tower_prototype.visible = true
+	preview_tower_prototype.visible = false
+	preview_tower_prototype.modulate = Color(1,1,1,0.6)
 	current_preview.setup(preview_tower_prototype.type)
 	current_preview.show()
 	# Trigger an immediate update of the preview at the current mouse position.
@@ -160,7 +161,13 @@ func _update_preview_visuals():
 		return
 	
 	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
-	preview_tower_position = Island.position_to_cell(mouse_pos)
+	var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
+	var effective_size: Vector2i = base_size
+	if int(preview_tower_facing) % 2 != 0:
+		effective_size = Vector2i(base_size.y, base_size.x)
+	var center_offset: Vector2i = effective_size * 0.5
+	preview_tower_position = Island.position_to_cell(mouse_pos) - center_offset
+	
 	if preview_tower_position != preview_tower_prototype.tower_position or preview_tower_facing != preview_tower_prototype.facing:
 		preview_tower_prototype.tower_position = preview_tower_position
 		preview_tower_prototype.facing = preview_tower_facing

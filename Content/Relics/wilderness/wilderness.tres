@@ -21,6 +21,7 @@ metadata/_custom_type_script = "uid://b74ug56sj02f0"
 
 [resource]
 script = ExtResource("2_8phli")
+type = 15
 global_effect = SubResource("Resource_0dc4p")
 title = "Wilderness"
 description = "All nature towers gain +10% fire rate per adjacent forest (neutral structure tile), scaling exponentially."

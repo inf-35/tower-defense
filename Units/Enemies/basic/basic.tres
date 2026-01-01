@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://ki06q2nupqr4"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_38k20"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_iugvc"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_5ux05"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_sh6hu"]
+[ext_resource type="PackedScene" uid="uid://cq3xh22ociyaa" path="res://Units/Enemies/basic/basic_unit.tscn" id="5_r3od5"]
+
+[resource]
+script = ExtResource("1_38k20")
+title = "Basic"
+description = "A basic unit"
+stat_displays = Array[ExtResource("2_iugvc")]([ExtResource("3_5ux05"), ExtResource("4_sh6hu")])
+unit_scene = ExtResource("5_r3od5")
+flux_value = 0.6
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

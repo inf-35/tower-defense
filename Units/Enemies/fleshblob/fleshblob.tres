@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://0mp22jqe34a7"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_62c0u"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_d8r2g"]
+[ext_resource type="PackedScene" uid="uid://c3kljuov5fl5a" path="res://Units/Enemies/fleshblob/fleshblob.tscn" id="2_wj0ta"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_021ty"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_th4qc"]
+
+[resource]
+script = ExtResource("1_62c0u")
+title = "Fleshblob"
+description = "Splits into three {U_FLESHLET}s"
+stat_displays = Array[ExtResource("2_d8r2g")]([ExtResource("3_021ty"), ExtResource("4_th4qc")])
+unit_scene = ExtResource("2_wj0ta")
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

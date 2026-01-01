@@ -11,6 +11,7 @@ metadata/_custom_type_script = "uid://ble10drla0jee"
 
 [resource]
 script = ExtResource("3_b4qhr")
+type = 6
 global_effect = SubResource("Resource_j5shw")
 title = "Hypothermia"
 description = "Enemies take 20% more damage per stack of frost.

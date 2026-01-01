@@ -11,9 +11,10 @@
 [resource]
 script = ExtResource("1_2oild")
 id = 5
+cost = 8.0
 required_capacity = 0.0
 element = 5
-tower_name = "Generator"
+tower_name = "Village"
 tower_description = "A humble village. Produces capacity, but can only be placed on settlement tiles."
 tower_scene = ExtResource("2_2oild")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

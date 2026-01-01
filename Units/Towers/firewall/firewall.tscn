@@ -2,8 +2,11 @@
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_mpu13"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_b88dd"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_nim3f"]
 [ext_resource type="Script" uid="uid://bn051b65hjvrv" path="res://Units/Towers/firewall/firewall_behavior.gd" id="3_tds48"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_owxfk"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_w76k3"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_6nj57"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_qsd2p"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_sa5r4"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_u4q0k"]
@@ -11,26 +14,6 @@
 [ext_resource type="Resource" uid="uid://c1714d1rsmu04" path="res://Units/Towers/firewall/firewall_attack.tres" id="9_vqe15"]
 [ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="10_tds48"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_a5hl3"]
-
-[sub_resource type="Resource" id="Resource_uhk0q"]
-script = ExtResource("2_b88dd")
-attribute = 6
-label = "DMG"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_yr17l"]
-script = ExtResource("2_b88dd")
-attribute = 7
-label = "RNG"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
-[sub_resource type="Resource" id="Resource_qo260"]
-script = ExtResource("2_b88dd")
-attribute = 8
-label = "RTE"
-suffix = " /s"
-special_modifier = 0
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_i3qpa"]
 size = Vector2(10, 10)
@@ -108,7 +91,7 @@ _data = {
 z_index = 1
 script = ExtResource("1_mpu13")
 type = 23
-stat_displays = Array[ExtResource("2_b88dd")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
+stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_6nj57")])
 behavior = NodePath("FirewallBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

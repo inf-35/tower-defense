@@ -131,7 +131,7 @@ func _create_hitbox():
 
 	
 	hitbox.add_child(collision_shape)
-	add_child(hitbox)
+	add_child.call_deferred(hitbox)
 		
 func _ready():
 	name = name + " " + str(unit_id)
@@ -147,6 +147,7 @@ func _ready():
 		behavior = DefaultBehavior.new()
 		add_child(behavior)
 	
+	is_ready = true
 	components_ready.emit()
 	behavior.initialise(self)
 

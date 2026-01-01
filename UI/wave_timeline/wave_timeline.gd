@@ -26,10 +26,10 @@ func _ready() -> void:
 			_slots.append(child)
 			# make slots invisible, they are just position markers
 			child.modulate.a = 0 
-	_on_wave_cycle_started(0)
+	_advance_timeline()
 	
-	UI.start_wave.connect(_on_wave_cycle_started)
-	UI.start_combat.connect(_on_wave_cycle_started)
+	UI.start_wave.connect(func(_wave): _advance_timeline())
+	UI.day_event_ended.connect(_advance_timeline)
 	# UI.show_building_ui.connect(_advance_timeline) TODO: listen for inter-day event switches
 	
 	# initial build (after phases has determined schedule)
@@ -41,7 +41,7 @@ func _ready() -> void:
 	
 # called when a new wave starts.
 # shifts everything left, destroys the old current, spawns new future.
-func _on_wave_cycle_started(_wave: int) -> void:
+func _advance_timeline() -> void:
 	# ensure we have enough future data
 	_refill_schedule_buffer()
 

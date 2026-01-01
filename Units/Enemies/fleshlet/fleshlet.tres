@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://evhxdaiutprk"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_esoto"]
+[ext_resource type="PackedScene" uid="uid://wqqym3asl720" path="res://Units/Enemies/fleshlet/fleshlet.tscn" id="2_6ty6k"]
+
+[resource]
+script = ExtResource("1_esoto")
+unit_scene = ExtResource("2_6ty6k")
+flux_value = 0.0
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

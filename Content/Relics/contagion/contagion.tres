@@ -30,6 +30,7 @@ metadata/_custom_type_script = "uid://b3pxsdqsg7fgg"
 
 [resource]
 script = ExtResource("3_2aaqs")
+type = 3
 global_effect = SubResource("Resource_cyxyu")
 title = "Contagion"
 description = "Enemies with two or more stacks of poison infect nearby enemies with 1 stack of poison when hit."

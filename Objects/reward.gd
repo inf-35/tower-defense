@@ -17,5 +17,8 @@ enum Type {
 @export var rite_type: Towers.Type
 @export var flux_amount: float
 
+@export var base_weight: float = 100.0 ## higher = more common, 0 = disabled.
+@export var bias_rules: Array[RewardBiasRule] = []
+
 @export var title: String = "dappled things" #used for terrain expansion previews and such
 @export_multiline var description: String = "Reward description"

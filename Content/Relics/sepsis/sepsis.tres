@@ -6,12 +6,14 @@
 
 [sub_resource type="Resource" id="Resource_3khoc"]
 script = ExtResource("1_f6sm4")
+duration_multiplier = 2.0
 metadata/_custom_type_script = "uid://cccy0vq60whro"
 
 [resource]
 script = ExtResource("3_hou0f")
+type = 11
 global_effect = SubResource("Resource_3khoc")
 title = "Sepsis"
-description = "All poison effects on already bleeding enemies last 50% longer.
+description = "All poison effects on already bleeding enemies last 100% longer.
 "
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

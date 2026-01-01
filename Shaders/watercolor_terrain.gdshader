@@ -51,7 +51,7 @@ void fragment() {
 	// 5. vibrancy
 	float inner_strength = clamp((dist_value - cut_threshold) / (1.0 - cut_threshold), 0.0, 1.0);
 	float vibrancy = pow(inner_strength, center_falloff);
-	float watercolor_noise = pow(texture(noise_texture, noise_uv).r, noise_falloff);
+	float watercolor_noise = pow(texture(noise_texture, noise_uv + vec2(0.005, 0.005) * TIME).r, noise_falloff);
 	vibrancy = vibrancy * (1.0 - noise_strength) + watercolor_noise * vibrancy * noise_strength;
 
 	// 6. texture & color

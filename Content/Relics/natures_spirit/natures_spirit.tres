@@ -12,6 +12,7 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [resource]
 script = ExtResource("2_1c5fl")
+type = 9
 target_type = 4
 specific_element = 3
 modifier_prototypes = Array[ExtResource("1_rh4l4")]([SubResource("Resource_rh4l4")])

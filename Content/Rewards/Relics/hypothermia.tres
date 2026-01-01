@@ -1,7 +1,15 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://olyx74tpldoy"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://olyx74tpldoy"]
 
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_h2rqm"]
 [ext_resource type="Resource" uid="uid://cia08bmtkwtuh" path="res://Content/Relics/hypothermia/hypothermia.tres" id="1_r3jpj"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_kg0ul"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_nxiwp"]
+
+[sub_resource type="Resource" id="Resource_64yqs"]
+script = ExtResource("2_kg0ul")
+tower_types = Array[int]([24, 3, 30])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
 
 [resource]
 script = ExtResource("2_nxiwp")
@@ -9,4 +17,6 @@ id_name = "hypothermia"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_r3jpj")
+base_weight = 200.0
+bias_rules = Array[ExtResource("1_h2rqm")]([SubResource("Resource_64yqs")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

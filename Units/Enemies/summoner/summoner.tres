@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://csini2j86ryc"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_ktdqc"]
+[ext_resource type="PackedScene" uid="uid://13cf44n6d3h8" path="res://Units/Enemies/summoner/summoner.tscn" id="2_ysn46"]
+
+[resource]
+script = ExtResource("1_ktdqc")
+unit_scene = ExtResource("2_ysn46")
+flux_value = 0.7
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

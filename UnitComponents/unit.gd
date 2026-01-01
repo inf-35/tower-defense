@@ -57,6 +57,8 @@ var disabled: bool:
 		if graphics and graphics.material != null:
 			graphics.material.set_shader_parameter(&"overlay_color", Color(0.0, 0.0, 0.0, 1.0) if disabled else Color(0,0,0,0))
 			graphics.material.set_shader_parameter(&"transparency", 0.3 if disabled else 1.0)
+			
+var is_ready: bool = false
 
 func _ready():
 	name = name + " " + str(unit_id)
@@ -69,6 +71,7 @@ func _ready():
 		behavior = DefaultBehavior.new()
 		add_child(behavior)
 	
+	is_ready = true
 	components_ready.emit()
 	behavior.initialise(self)
 
@@ -356,7 +359,7 @@ func take_hit(hit: HitData):
 	for status: Attributes.Status in hit.status_effects:
 		var stack: float = hit.status_effects[status].x
 		var cooldown: float = hit.status_effects[status].y
-		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id)
+		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id if is_instance_valid(hit.source) else 0)
 	
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT

@@ -13,6 +13,7 @@ metadata/_custom_type_script = "uid://bx75y7j76chrr"
 
 [resource]
 script = ExtResource("2_fv8q0")
+type = 8
 global_effect = SubResource("Resource_nsj5c")
 title = "Money Market"
 description = "Earn 5% of your current gold at the end of every wave, up to 50 per wave."

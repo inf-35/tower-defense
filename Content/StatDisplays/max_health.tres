@@ -5,7 +5,5 @@
 [resource]
 script = ExtResource("1_1m0ki")
 attribute = 0
-label = "MAX HP"
-suffix = ""
-special_modifier = 4
+label = "{UNIT_HP}"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

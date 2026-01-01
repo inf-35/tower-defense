@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=9 format=3 uid="uid://dtuoi4uublbd4"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_t4jdu"]
+[ext_resource type="PackedScene" uid="uid://bn2b51cmejpc5" path="res://Units/Enemies/troll/troll.tscn" id="2_7o2a8"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_34ncb"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_ie7yu"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_ewk0k"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="5_3ghmx"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="6_etyv3"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="7_ei6jt"]
+
+[resource]
+script = ExtResource("1_t4jdu")
+title = "Troll"
+description = "Massive unit that pathfinds directly to your keep, smashing walls in its path."
+stat_displays = Array[ExtResource("2_34ncb")]([ExtResource("3_ie7yu"), ExtResource("4_ewk0k"), ExtResource("5_3ghmx"), ExtResource("6_etyv3"), ExtResource("7_ei6jt")])
+unit_scene = ExtResource("2_7o2a8")
+flux_value = 1.0
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

@@ -42,6 +42,7 @@ Audio="*res://Singletons/audio.gd"
 KeywordService="*res://Singletons/keyword_service.gd"
 CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 TowerNetworkManager="*res://Singletons/tower_network_manager.gd"
+Units="*res://Singletons/units.gd"
 
 [display]
 

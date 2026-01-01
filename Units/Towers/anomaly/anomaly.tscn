@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_hd4ab"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_dq7x7"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_4q3qk"]
-[ext_resource type="Texture2D" uid="uid://dcfduo7hvvlqh" path="res://Assets/prism_base.png" id="5_kpo63"]
+[ext_resource type="Texture2D" uid="uid://047al1lxlxht" path="res://Assets/shrine.png" id="5_kpo63"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_0e6gm"]
 [ext_resource type="Script" uid="uid://bwh4er8ltu171" path="res://Content/Behaviors/anomaly_behavior.gd" id="7_5gpfh"]
 [ext_resource type="Script" uid="uid://dwpna5u0ynf44" path="res://Content/anomaly_data.gd" id="9_0knjx"]
@@ -20,7 +20,6 @@ description = "Maintain adjacent towers for waves to stabilise and claim its rew
 metadata/_custom_type_script = "uid://dwpna5u0ynf44"
 
 [node name="Anomaly" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]
-modulate = Color(1, 0, 0, 1)
 z_index = 1
 script = ExtResource("1_5uxnm")
 type = 10
@@ -39,7 +38,7 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 position = Vector2(-1.9073486e-06, -1.9073486e-06)
-scale = Vector2(0.072, 0.072)
+scale = Vector2(0.06, 0.06)
 texture = ExtResource("5_kpo63")
 
 [node name="ModifiersComponent" type="Node" parent="."]

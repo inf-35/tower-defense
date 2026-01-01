@@ -11,6 +11,7 @@ metadata/_custom_type_script = "uid://bl072eqclcpj1"
 
 [resource]
 script = ExtResource("3_jklp7")
+type = 7
 global_effect = SubResource("Resource_7jw3c")
 title = "Inferno"
 description = "Applying Burn to an already Burning enemy has a 10% chance to add an extra stack to their existing Burn count."

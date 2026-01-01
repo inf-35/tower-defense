@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://ce17xllwmvr42"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_q86ym"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_jmdnu"]
+[ext_resource type="PackedScene" uid="uid://lvhut8mofy7k" path="res://Units/Enemies/warrior/warrior.tscn" id="2_upri3"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_qqk5r"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_1ttpw"]
+
+[resource]
+script = ExtResource("1_q86ym")
+title = "Warrior"
+description = "Stronger"
+stat_displays = Array[ExtResource("2_jmdnu")]([ExtResource("3_qqk5r"), ExtResource("4_1ttpw")])
+unit_scene = ExtResource("2_upri3")
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://drhwn8nkwoiep"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_mf7or"]
+[ext_resource type="PackedScene" uid="uid://kdo8nuuiowl5" path="res://Units/Enemies/sprinter/sprinter.tscn" id="2_ceu77"]
+
+[resource]
+script = ExtResource("1_mf7or")
+unit_scene = ExtResource("2_ceu77")
+flux_value = 0.7
+metadata/_custom_type_script = "uid://bnpluy6agmetj"
