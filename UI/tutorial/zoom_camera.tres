@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://y7yrf4tia2hh"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_pd3b0"]
+
+[resource]
+script = ExtResource("1_pd3b0")
+instruction_text = "TUTORIAL
+Zoom in/out with the scroll wheel."
+highlight_target = 5
+trigger_type = 3
+trigger_amount = 0.1
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

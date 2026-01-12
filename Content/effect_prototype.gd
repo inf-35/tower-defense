@@ -25,6 +25,9 @@ var event_handler: Callable = _handle_event
 @abstract func _handle_detach(instance: EffectInstance) -> void
 @abstract func _handle_event(instance: EffectInstance, event: GameEvent) -> void
 
+func on_tick(instance: EffectInstance, delta: float) -> void:
+	pass
+
 @abstract func create_instance() -> EffectInstance
 
 func return_generic_instance() -> EffectInstance: ##helper for child classes (returns most generic instance)

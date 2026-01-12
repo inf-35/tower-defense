@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=19 format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://dy6knj1yfeag2" path="res://Assets/brushstroke_multiply_03.png" id="13_ad6l7"]
 [ext_resource type="Texture2D" uid="uid://cimvwfmb6t2bf" path="res://Assets/brushstroke_multiply_04.png" id="14_cj5nf"]
 [ext_resource type="Script" uid="uid://b3n6ehcpq3nug" path="res://Scene Elements/nav_debugger.gd" id="15_ad6l7"]
+[ext_resource type="Script" uid="uid://ibj2mt03m5av" path="res://UnitComponents/range_indicator.gd" id="18_aibdv"]
 
 [node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
 y_sort_enabled = true
@@ -28,11 +29,11 @@ preview_renderer = NodePath("PreviewRenderer")
 zoom = Vector2(4, 4)
 script = ExtResource("2_04hb4")
 
+[node name="UI" parent="." instance=ExtResource("2_hdtfb")]
+
 [node name="Tooltips" type="CanvasLayer" parent="."]
 process_mode = 3
 layer = 2
-
-[node name="UI" parent="." instance=ExtResource("2_hdtfb")]
 
 [node name="Projectiles" type="Node2D" parent="."]
 z_index = 300
@@ -44,7 +45,7 @@ z_index = 250
 script = ExtResource("3_fgmf3")
 
 [node name="PathRenderer" type="Node2D" parent="."]
-z_index = 80
+z_index = 200
 script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
 corner_texture = ExtResource("8_aibdv")
@@ -65,8 +66,8 @@ script = ExtResource("7_b4opu")
 shader = ExtResource("9_8ervs")
 max_gradient_depth = 3.0
 background_stain_color = Color(1, 0.944, 0.84000003, 1)
-paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
-wash_color = Color(0.79083, 0.87, 0.7482, 0.19607843)
+paint_color = Color(0.81722, 0.87, 0.7482, 0.77254903)
+wash_color = Color(0.7888, 0.87, 0.7482, 0.28235295)
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
 
 [node name="NavigationDebugger" type="Node2D" parent="."]
@@ -75,3 +76,12 @@ z_index = 100
 script = ExtResource("15_ad6l7")
 draw_flow_arrows = true
 metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
+
+[node name="RangeIndicator" type="Node2D" parent="."]
+z_index = 500
+z_as_relative = false
+script = ExtResource("18_aibdv")
+metadata/_custom_type_script = "uid://ibj2mt03m5av"
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://dnnoi478ixu4y"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://dnnoi478ixu4y"]
 
 [ext_resource type="Script" uid="uid://c1ydyvx8fvx8g" path="res://Content/Relics/common_cold/status_linkage_effect.gd" id="1_c0otv"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_sk8em"]
+[ext_resource type="Texture2D" uid="uid://dkprjhchu67hc" path="res://Assets/broken_mirror_icon.png" id="2_sk8em"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="4_gq43s"]
 
 [sub_resource type="Resource" id="Resource_sk8em"]
@@ -17,6 +18,7 @@ script = ExtResource("4_gq43s")
 type = 1
 global_effect = SubResource("Resource_sk8em")
 title = "Broken Mirror"
-description = "Each stack of curse also inflicts a stack of bleeding on enemies.
+description = "Each stack of {CURSED} also inflicts a stack of {BLEED} on enemies.
 "
+icon = ExtResource("2_sk8em")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -26,6 +26,7 @@ uniform float cut_threshold : hint_range(0.0, 0.5) = 0.05;
 uniform float edge_softness : hint_range(0.0, 0.2) = 0.0;
 uniform float center_falloff : hint_range(0.1, 5.0) = 1.0;
 uniform float noise_falloff: hint_range(0.1, 5.0) = 1.0;
+uniform float brush_strength: hint_range(0.0, 1.0) = 0.8;
 
 void fragment() {
 	// 1. coordinate setup
@@ -60,8 +61,8 @@ void fragment() {
 
 	vec4 final_color = mix(wash_color, paint_color, vibrancy);
 	final_color = mix(final_color, final_color * paper, 0.1);
-	
-	float brush_alpha = clamp(texture(brush_mask_texture, UV).a * 2.0, 0.5, 2.0);
+
+	float brush_alpha = pow(clamp(texture(brush_mask_texture, UV).a * 2.0, 0.5, 1.0), 2.0);
 	//COLOR = vec4(final_color.rgb, alpha * final_color.a);
-	COLOR = vec4(final_color.rgb, brush_alpha * alpha * final_color.a);
+	COLOR = vec4(final_color.rgb, (brush_alpha * brush_strength + (1.0 - brush_strength)) * alpha * final_color.a);
 }

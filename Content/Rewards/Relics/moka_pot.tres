@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=4 format=3 uid="uid://u0enq81t6c16"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_2wekn"]
+[ext_resource type="Resource" uid="uid://beau0lx5n808m" path="res://Content/Relics/moka_pot/moka_pot.tres" id="2_ebo6i"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="4_cc1g4"]
+
+[resource]
+script = ExtResource("4_cc1g4")
+id_name = "broken_mirror"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("2_ebo6i")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://dfav5m1g45ei7"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://dfav5m1g45ei7"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_8k2ig"]
+[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="1_jdu8k"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_jw8vq"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_rx7qn"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_81j8p"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_tlrxg"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_1lefd"]
 [ext_resource type="PackedScene" uid="uid://b67314yk7nbgp" path="res://Units/Towers/palisade_upgrade_1/palisade.tscn" id="4_2toid"]
 
 [resource]
@@ -14,5 +17,6 @@ element = 6
 is_upgrade = true
 tower_name = "Palisade Upgrade 1"
 tower_description = "upgraded palisaed"
+icon = ExtResource("1_jdu8k")
 tower_scene = ExtResource("4_2toid")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

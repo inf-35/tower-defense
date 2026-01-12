@@ -1,43 +1,63 @@
-# keyword_service.gd (Autoload Singleton)
 extends Node
 
 var ICON_SIZE: int = 25
+#NOTE:
+#parameters: icon_size, color, label
 # master dictionary for static keywords
 const KEYWORDS: Dictionary[String, Dictionary] = {
 	"FLUX": {
-		"title": "",
+		"title": "Gold",
+		"display": "",
 		"description": "The primary currency used for building and upgrading towers.",
 		"icon": preload("res://Assets/gold_icon.png"),
 	},
 	"PLAYER_HP": {
-		"title": "",
-		"description": "Player Health. If this reaches 0, the run ends.",
+		"title": "Player Health",
+		"display": "",
+		"description": "If this reaches 0, the run ends.",
 		"icon": preload("res://Assets/hp_icon.png"),
 	},
-	"CAPACITY" : {
-		"title": "",
-		"description": "Player Capacity",
-		"icon": preload("res://Assets/capacity_icon.png"),
+	"POPULATION" : {
+		"title": "Population",
+		"display": "",
+		"description": "Towers require population to operate. Cap is increased by building {T_GENERATOR|label=Villages}.",
+		"icon": preload("res://Assets/population_icon.png")
 	},
 	"UNIT_HP": {
-		"title": "",
-		"description": "Unit health. How much damage this unit can take before being destroyed.",
+		"title": "Unit health",
+		"display": "",
+		"description": "How much damage this unit can take before being destroyed.",
 		"icon": preload("res://Assets/hp_icon.png")
 	},
 	"UNIT_DAMAGE": {
-		"title": "",
-		"description": "Damage. How much damage this unit deals per hit.",
+		"title": "Damage",
+		"display": "",
+		"description": "How much damage this unit deals per hit.",
 		"icon": preload("res://Assets/damage_icon.png")
 	},
 	"UNIT_RANGE": {
-		"title": "",
-		"description": "Range. How far this unit can attack from.",
+		"title": "Range",
+		"display": "",
+		"description": "How far this unit can attack from.",
 		"icon": preload("res://Assets/range_icon.png")
 	},
 	"UNIT_HITRATE": {
-		"title": "",
-		"description": "Hitrate. How often this unit can attack.",
+		"title": "Hitrate",
+		"display": "",
+		"description": "How often this unit can attack.",
 		"icon": preload("res://Assets/cooldown_icon.png")
+	},
+	"UNIT_SPEED": {
+		"title": "Speed",
+		"display": "",
+		"description": "How fast this unit travels.",
+		"icon": preload("res://Assets/speed_icon.png")
+	},
+	"UNIT_RADIUS": {
+		"title": "Radius",
+		"display": "",
+		"description": "How large the AOE of attacks are.",
+		"icon": preload("res://Assets/radius.png")
 	},
 	"BREACH": {
 		"title": "Breach",
@@ -51,26 +71,47 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	},
 	"FROST": {
 		"title": "Frost",
+		"display": "",
 		"description": "This unit moves and attacks at a glacial rate.",
-		"icon": null,
+		"icon": preload("res://Assets/frost_icon.png")
 	},
 	"BURN": {
 		"title": "Burn",
+		"display": "",
 		"description": "This unit is burning and takes 0.5 damage per second per stack",
-		"icon": null,
+		"icon": preload("res://Assets/burn_icon.png")
 	},
 	"BLEED": {
 		"title": "Bleed",
-		"description": "Bleeding units take 1 more damage per hit per stack of bleed",
-		"icon": null,
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 0.5 more extra flat damage per hit per stack of bleed",
+		"icon": preload("res://Assets/bleed_icon.png")
 	},
 	"CURSED": {
 		"title": "Cursed",
-		"description": "Cursed units take 20% more damage per stack of curse.",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 20% more damage per stack of curse.",
+		"icon": preload("res://Assets/cursed_icon.png")
+	},
+	"POISON": {
+		"title": "Poison",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 5% max HP of damage per second per stack.",
+		"icon": preload("res://Assets/poison_icon.png"),
+	},
+	"STATUS_EFFECT_LABEL": {
+		"title": "Status",
+		"display": "[Status]",
+		"description": "A temporary modifier that affects a unit or tower's stats. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
 		"icon": null,
 	},
+	"RITE_LABEL": {
+		"title": "Rite",
+		"display": "[Rite]",
+		"description": "Powerful, limited-use artifacts. Complements and enhances your towers' abilities on the field.",
+		"icon": null,
+	}
 }
-
 var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")
 
 var _regex: RegEx
@@ -80,7 +121,7 @@ func _ready():
 	
 	# initialize regex for parsing {KEYWORD} patterns
 	_regex = RegEx.new()
-	_regex.compile("\\{([A-Z0-9_]+)\\}")
+	_regex.compile("\\{([^}]+)\\}") 
 
 # the main public API for other scripts to query
 # now supports dynamic lookup for T_ (tower) and R_ (relic) prefixes
@@ -111,19 +152,30 @@ func parse_text_for_bbcode(text: String) -> String:
 		
 	var parsed_text: String = text
 	var matches: Array[RegExMatch] = _regex.search_all(text)
-	
-	# iterate backwards to avoid invalidating string indices if we were modifying in place,
-	# but since we are doing replace string-wise, simple iteration is fine.
+
 	# we use a dictionary to avoid processing the same keyword twice in one string.
 	var processed_keys: Dictionary = {}
 	
 	for match_result in matches:
 		var full_placeholder: String = match_result.get_string(0) # e.g. {FLUX}
-		var keyword: String = match_result.get_string(1) # e.g. FLUX
+		var content: String = match_result.get_string(1) # e.g. FLUX
 		
-		if processed_keys.has(keyword):
+		if processed_keys.has(full_placeholder):
 			continue
-		processed_keys[keyword] = true
+		processed_keys[full_placeholder] = true
+		
+		#parse parameters
+		var parts: PackedStringArray = content.split("|")
+		var keyword: String = parts[0] # the first part, which should be the keyword (ie UNIT_HP)
+		var params: Dictionary = {}
+		for i: int in range(1, parts.size()): #omit the keyword
+			var param_str: String = parts[i]
+			var parameter_split = param_str.split("=")
+			if parameter_split.size() == 2:
+				params[parameter_split[0]] = parameter_split[1]
+				# eg "size=32" -> ("size", "32") -> {size: 32}
+			else:
+				pass
 		
 		# verify data exists before linking
 		var data: Dictionary = get_keyword_data(keyword)
@@ -133,16 +185,32 @@ func parse_text_for_bbcode(text: String) -> String:
 			
 			if data.has("icon") and data.icon != null:
 				var tex: Texture2D = data.icon
+				var target_icon_size: int = ICON_SIZE
+				if params.has("icon_size"):
+					target_icon_size = int(params.icon_size)
+				
+				var icon_size_x: float = tex.get_width()
+				var icon_size_y: float = tex.get_height()
+				var scale: float = ((target_icon_size / icon_size_y) + (target_icon_size / icon_size_x)) * 0.5
 				# ensure resource exists and has a path for BBCode to find it
 				if tex.resource_path != "":
 					# add image tag followed by a space
-					inner_content += "[img=%sx%s]%s[/img]" % [ICON_SIZE, ICON_SIZE, tex.resource_path]
+					inner_content += "[img=%sx%s]%s[/img]" % [icon_size_x * scale, icon_size_y * scale, tex.resource_path]
 			
 			# add the text title
-			inner_content += data.title
+			if params.has("label"):
+				inner_content += params.label # manual input fields supersede
+			elif data.has("display"):
+				inner_content += data.display
+			else:
+				inner_content += data.title
+				
+			var color_code = "blue" #default
+			if params.has("color"):
+				color_code = params.color
 			
 			#wrap the combined content in the URL and Color tags
-			var bbcode_link: String = "[color=blue][url=%s]%s[/url][/color]" % [keyword, inner_content]
+			var bbcode_link: String = "[color=%s][url=%s]%s[/url][/color]" % [color_code, keyword, inner_content]
 			#replaced text with parsed text
 			parsed_text = parsed_text.replace(full_placeholder, bbcode_link)
 		else:
@@ -172,6 +240,7 @@ func _resolve_tower_data(tower_id_str: String) -> Dictionary:
 	# build dictionary to match standard keyword format
 	return {
 		"title": Towers.get_tower_name(type),
+		"labels": "[Tower]",
 		"description": desc,
 		"icon": Towers.get_tower_icon(type)
 	}
@@ -183,7 +252,6 @@ func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 		
 	var type: Units.Type = Units.Type.get(unit_id_str)
 	var prototype: Unit = Units.get_unit_prototype(type)
-	push_warning(unit_id_str," ",prototype)
 	var desc: String = ""
 	if prototype and not Units.get_stat_displays(type).is_empty():
 		for stat_display: StatDisplayInfo in Units.get_stat_displays(type):
@@ -196,6 +264,7 @@ func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 	# build dictionary to match standard keyword format
 	return {
 		"title": Units.get_unit_name(type),
+		"labels": "[Unit]",
 		"description": desc,
 		"icon": null,
 	}
@@ -210,6 +279,7 @@ func _resolve_relic_data(relic_id_str: String) -> Dictionary:
 	
 	return {
 		"title": relic.title,
+		"labels": "[Relic]",
 		"description": relic.description,
 		"icon": relic.icon,
 	}

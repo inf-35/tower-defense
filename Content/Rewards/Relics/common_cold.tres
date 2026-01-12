@@ -3,11 +3,11 @@
 [ext_resource type="Resource" uid="uid://cdgwf65nwokpo" path="res://Content/Relics/common_cold/common_cold.tres" id="1_01twd"]
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_cxsu7"]
 [ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_4xnxi"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_aoevb"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_aoevb"]
 
 [sub_resource type="Resource" id="Resource_rkgwf"]
 script = ExtResource("2_4xnxi")
-tower_types = Array[int]([14, 21, 15])
+tower_types = Array[int]([14, 21])
 operation = 1
 metadata/_custom_type_script = "uid://7k2jlkybgih"
 
@@ -17,6 +17,6 @@ id_name = "common_cold"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_01twd")
-base_weight = 200.0
+base_weight = 150.0
 bias_rules = Array[ExtResource("1_cxsu7")]([SubResource("Resource_rkgwf")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=13 format=3 uid="uid://ngmwkn6iulj5"]
+
+[ext_resource type="Script" uid="uid://ch7sc2jwaeksm" path="res://Content/Relics/white_hot_iron/white_hot_iron_effect.gd" id="1_nfytc"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_hij5e"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_32odi"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_r2t0r"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="4_w44gr"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="5_d5ols"]
+[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="6_bhjbu"]
+[ext_resource type="Texture2D" uid="uid://jiarq84q4b4f" path="res://Assets/white_hot_poker_icon.png" id="7_r2t0r"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="8_r2t0r"]
+
+[sub_resource type="Resource" id="Resource_cggor"]
+script = ExtResource("5_d5ols")
+texture = ExtResource("6_bhjbu")
+scale = 0.05
+rotation_mode = 1
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
+[sub_resource type="Resource" id="Resource_f1jib"]
+script = ExtResource("3_r2t0r")
+delivery_method = 2
+damage = 1.0
+vfx_on_spawn = SubResource("Resource_cggor")
+projectile_speed = 160.0
+projectile_lifetime = 0.35
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[sub_resource type="Resource" id="Resource_fm8su"]
+script = ExtResource("1_nfytc")
+spark_count = 5
+spark_attack_data = SubResource("Resource_f1jib")
+metadata/_custom_type_script = "uid://ch7sc2jwaeksm"
+
+[resource]
+script = ExtResource("3_32odi")
+type = 21
+global_effect = SubResource("Resource_fm8su")
+title = "White-Hot Iron"
+description = "When a {BURN|label=Burning} enemy takes 6 or more damage at once, release 5 sparks. Sparks deal 1 damage and inflict {BURN} equal to 50% of the original victim's stacks."
+icon = ExtResource("7_r2t0r")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

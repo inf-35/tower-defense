@@ -16,10 +16,12 @@ var _current_bonus_multiplicative_damage: float = 0.0:
 var _growth_modifier: Modifier = null
 
 # this function is called by the unit's initialize() method
-func start() -> void:
+func _ready() -> void:
 	# connect to the global signal that announces a new wave cycle
 	Phases.wave_ended.connect(_on_wave_cycle_started)
 	# apply the initial state (which is no bonus damage)
+
+func start():
 	_apply_damage_modifier()
 	
 func transfer_state(untyped_new_behavior: Behavior):

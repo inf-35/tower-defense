@@ -95,7 +95,7 @@ func _scan_directory_recursive(path: String) -> void:
 	#
 	#UI.display_reward_choices.emit(_current_reward_options_by_id.values())
 
-func generate_and_present_choices(choice_count: int, type_filter: Reward.Type = -1) -> void:
+func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.Type] = []) -> void:
 	var rewards: Array[Reward] = get_rewards(choice_count, type_filter)
 	
 	for i: int in len(rewards):
@@ -104,7 +104,7 @@ func generate_and_present_choices(choice_count: int, type_filter: Reward.Type = 
 	is_choosing_reward = true
 	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
 
-func get_rewards(choice_count: int, type_filter: Reward.Type = -1) -> Array[Reward]:
+func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Array[Reward]:
 	var rewards: Array[Reward] = []
 	
 	var candidates: Array[Reward] = []
@@ -114,7 +114,7 @@ func get_rewards(choice_count: int, type_filter: Reward.Type = -1) -> Array[Rewa
 	# loop through all loaded rewards
 	for reward: Reward in reward_pool:
 		# filter by requested type
-		if type_filter != -1 and reward.type != type_filter:
+		if (not type_filter.is_empty()) and (not type_filter.has(reward.type)):
 			continue
 
 		var weight: float = 100.0

@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=13 format=3 uid="uid://bbovk7qh751ho"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5tggy"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_j3b25"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_2oygm"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_c17k8"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_2l3en"]
+[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="5_x6ns0"]
+[ext_resource type="Script" uid="uid://bp6do8b78pj4k" path="res://Content/Relics/amethyst_skull/amethyst_skull_effect.gd" id="6_058vl"]
+[ext_resource type="Texture2D" uid="uid://cuhsw8o5nes3h" path="res://Assets/amethyst_skull_icon.png" id="7_5tggy"]
+
+[sub_resource type="Resource" id="Resource_dk6pn"]
+script = ExtResource("3_c17k8")
+type = 4
+cooldown = 3.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_e3651"]
+script = ExtResource("4_2l3en")
+texture = ExtResource("5_x6ns0")
+radius = 1.5
+scale = 0.15
+rotation_mode = 1
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
+[sub_resource type="Resource" id="Resource_wyw1l"]
+script = ExtResource("2_5tggy")
+delivery_method = 1
+status_effects = Array[ExtResource("3_c17k8")]([SubResource("Resource_dk6pn")])
+vfx_on_spawn = SubResource("Resource_e3651")
+projectile_speed = 160.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[sub_resource type="Resource" id="Resource_2oygm"]
+script = ExtResource("6_058vl")
+search_radius = 40.0
+damage_multiplier = 0.2
+projectile_data = SubResource("Resource_wyw1l")
+metadata/_custom_type_script = "uid://bp6do8b78pj4k"
+
+[resource]
+script = ExtResource("3_2oygm")
+global_effect = SubResource("Resource_2oygm")
+title = "Amethyst Skull"
+description = "When {CURSED}Cursed units die, a magical bolt dealing 20% of the dead unit's {UNIT_HP} in damage is fired towards a nearby cursed unit (if there is one)."
+icon = ExtResource("7_5tggy")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

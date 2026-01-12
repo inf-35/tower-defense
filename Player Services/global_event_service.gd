@@ -83,3 +83,8 @@ func _handle_event(_unit: Unit, game_event: GameEvent) -> void:
 		# iterate through global effects
 		for global_effect: EffectInstance in effects_of_type:
 			global_effect.handle_event_unfiltered(game_event)
+
+func _process(_d: float) -> void:
+	var delta: float = Clock.game_delta
+	for instance: EffectInstance in _active_instances:
+		instance.effect_prototype.on_tick(instance, delta)

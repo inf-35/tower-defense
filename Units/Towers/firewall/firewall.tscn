@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://b4jjm1837mjs3"]
+[gd_scene load_steps=22 format=3 uid="uid://b4jjm1837mjs3"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_mpu13"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_b88dd"]
@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://bn051b65hjvrv" path="res://Units/Towers/firewall/firewall_behavior.gd" id="3_tds48"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_owxfk"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_w76k3"]
-[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_6nj57"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="5_nim3f"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_qsd2p"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_sa5r4"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_u4q0k"]
@@ -14,6 +14,7 @@
 [ext_resource type="Resource" uid="uid://c1714d1rsmu04" path="res://Units/Towers/firewall/firewall_attack.tres" id="9_vqe15"]
 [ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="10_tds48"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_a5hl3"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_w76k3"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_i3qpa"]
 size = Vector2(10, 10)
@@ -88,10 +89,10 @@ _data = {
 }
 
 [node name="Firewall" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 1
+z_index = 80
 script = ExtResource("1_mpu13")
 type = 23
-stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_6nj57")])
+stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_nim3f")])
 behavior = NodePath("FirewallBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -136,6 +137,10 @@ texture = ExtResource("10_tds48")
 [node name="Muzzle" type="Marker2D" parent="Graphics"]
 position = Vector2(0.47718075, 1.6484104)
 scale = Vector2(1.3162339, 0.769)
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("14_w76k3")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("12_a5hl3")

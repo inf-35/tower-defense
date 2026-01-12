@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cjv7g5iwxihva"]
+[gd_scene load_steps=26 format=3 uid="uid://cjv7g5iwxihva"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_lj076"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_i3qpa"]
@@ -14,6 +14,7 @@
 [ext_resource type="Resource" uid="uid://b026mhuu7c8a1" path="res://Units/Towers/turret/turret_attack.tres" id="8_rghec"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_hp3w6"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="10_i3qpa"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_5nypl"]
 [ext_resource type="Texture2D" uid="uid://co8no1mocxejn" path="res://Assets/ballista_turret_base.png" id="11_uhk0q"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="12_qo260"]
 [ext_resource type="Texture2D" uid="uid://4smmqg2tegf8" path="res://Assets/ballista_turret_bow.png" id="12_yr17l"]
@@ -189,7 +190,12 @@ position = Vector2(28.571423, 0)
 texture = ExtResource("12_yr17l")
 offset = Vector2(-30, 0)
 
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("11_5nypl")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_motion_local = true
 libraries = {
 &"": SubResource("AnimationLibrary_uhk0q")
 }

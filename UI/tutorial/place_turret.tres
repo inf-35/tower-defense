@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://cc82q34boq7w6"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_wa6jf"]
+
+[resource]
+script = ExtResource("1_wa6jf")
+instruction_text = "Place down a turret."
+highlight_target = 1
+trigger_action = &"0"
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

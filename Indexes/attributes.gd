@@ -72,11 +72,20 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.DAMAGE_TAKEN, 0.0, 1.2, true, Color(0.446, 0.002, 0.768, 0.5)
 	),
 	Status.BLEED: StatusEffectData.new(
-		id.FLAT_DAMAGE_TAKEN, 1.0, 0.0, true, Color(1,0,0,0.5),
+		id.FLAT_DAMAGE_TAKEN, 0.5, 0.0, true, Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.0, false, Color(1, 1, 0.5) #completely stops enemies
 	)
+}
+
+const status_effect_icons: Dictionary[Status, Texture2D] = {
+	Status.FROST: preload("res://Assets/frost_icon.png"),
+	Status.BURN: preload("res://Assets/burn_icon.png"),
+	Status.CURSED: preload("res://Assets/cursed_icon.png"),
+	Status.BLEED: preload("res://Assets/bleed_icon.png"),
+	Status.POISON: preload("res://Assets/poison_icon.png"),
+	Status.STUN: preload("res://Assets/frost_icon.png")
 }
 
 var reactions: Array[ReactionData] = [
@@ -97,3 +106,5 @@ static func generate_damage_callable(dmg: float) -> Callable:
 		
 		unit.take_hit(hit_data)
 		
+static func get_icon(status: Attributes.Status) -> Texture2D:
+	return status_effect_icons[status]

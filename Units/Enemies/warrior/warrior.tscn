@@ -1,9 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://lvhut8mofy7k"]
+[gd_scene load_steps=22 format=3 uid="uid://lvhut8mofy7k"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_1marj"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_lb2at"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_o2o6m"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_lcmr6"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_nspst"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="5_lj1uh"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_balvs"]
 [ext_resource type="Texture2D" uid="uid://p30x2gd2skej" path="res://Assets/warrior.png" id="7_lj1uh"]
@@ -16,9 +17,16 @@
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="14_mb2by"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="15_ffhjg"]
 
+[sub_resource type="Resource" id="Resource_mb2by"]
+script = ExtResource("4_nspst")
+max_speed = 18.0
+acceleration = 200.0
+turn_speed = 100.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
 [sub_resource type="Resource" id="Resource_d3klt"]
 script = ExtResource("5_lj1uh")
-max_health = 6.0
+max_health = 8.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
@@ -37,12 +45,14 @@ cooldown = 0.75
 damage = 4.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
-[node name="Warrior" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Warrior" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
 script = ExtResource("1_1marj")
 hostile = true
 attack_only_when_blocked = true
 behavior = NodePath("DefaultBehavior")
 graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
@@ -58,6 +68,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_o2o6m")
 face_towards_movement = false
+movement_data = SubResource("Resource_mb2by")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]

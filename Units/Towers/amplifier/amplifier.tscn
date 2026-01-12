@@ -1,18 +1,20 @@
-[gd_scene load_steps=10 format=3 uid="uid://drp3bgm0uvb35"]
+[gd_scene load_steps=12 format=3 uid="uid://drp3bgm0uvb35"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tb8yo"]
 [ext_resource type="Script" uid="uid://bdhsnunw7upow" path="res://Content/Behaviors/amplifier_behavior.gd" id="2_686l8"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_hpk50"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_wqpev"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_yk6el"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_lt4mf"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_6amt4"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_7d4kk"]
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="7_m3al0"]
+[ext_resource type="Texture2D" uid="uid://msgb740b4isk" path="res://Assets/workshop.png" id="7_686l8"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bes4o"]
 
 [sub_resource type="Resource" id="Resource_hpk50"]
 script = ExtResource("3_wqpev")
 attribute = 8
-multiplicative = 0.8
+multiplicative = 0.714
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -20,6 +22,7 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 z_index = 100
 script = ExtResource("1_tb8yo")
 type = 8
+stat_displays = Array[ExtResource("2_hpk50")]([ExtResource("3_yk6el")])
 behavior = NodePath("AmplifierBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -42,9 +45,8 @@ script = ExtResource("6_7d4kk")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-modulate = Color(0.992964, 0.470988, 0, 1)
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("7_m3al0")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_686l8")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("8_bes4o")

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://bucr734q81yue"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_mcmk5"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_2lqea"]
+[ext_resource type="Resource" uid="uid://dubd7pcr7wbnk" path="res://Content/Relics/mucous_sac/mucous_sac.tres" id="3_mcmk5"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="4_om58y"]
+
+[sub_resource type="Resource" id="Resource_rkgwf"]
+script = ExtResource("2_2lqea")
+tower_types = Array[int]([14, 21])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[resource]
+script = ExtResource("4_om58y")
+id_name = "common_cold"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("3_mcmk5")
+base_weight = 150.0
+bias_rules = Array[ExtResource("1_mcmk5")]([SubResource("Resource_rkgwf")])
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

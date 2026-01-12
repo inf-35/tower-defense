@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://dubd7pcr7wbnk"]
+
+[ext_resource type="PackedScene" uid="uid://b7ikev455648n" path="res://Content/Relics/mucous_sac/poison_cloud.tscn" id="1_i5j5g"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_u01nx"]
+[ext_resource type="Script" uid="uid://crqsbq6q4f12w" path="res://Content/Relics/mucous_sac/mucous_sac_effect.gd" id="2_xhwtb"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_i5j5g"]
+[ext_resource type="Texture2D" uid="uid://b6aqqw0ucn6wg" path="res://Assets/spore_sac_icon.png" id="3_xhwtb"]
+
+[sub_resource type="Resource" id="Resource_86uia"]
+script = ExtResource("2_xhwtb")
+hazard_scene = ExtResource("1_i5j5g")
+spawn_chance = 1.0
+metadata/_custom_type_script = "uid://crqsbq6q4f12w"
+
+[resource]
+script = ExtResource("3_i5j5g")
+type = 18
+global_effect = SubResource("Resource_86uia")
+title = "Spore Sac"
+description = "When {POISON}poisoned enemies die, they leave behind an AOE cloud that poisons and deals 0.2 dps to nearby enemies. This cloud lasts 3 seconds."
+icon = ExtResource("3_xhwtb")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

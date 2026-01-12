@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cc4c4um3tp57h"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cc4c4um3tp57h"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_yoitb"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_epbui"]
+[ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="1_2p0vd"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_wao5w"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_klcfn"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_px87o"]
@@ -19,6 +18,8 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Flame Rite"
-tower_description = "Adjacent towers' attacks gain 1 stack of burn."
+tower_description = "Adjacent towers' attacks gain 1 stack of {BURN}"
+icon = ExtResource("1_2p0vd")
+preview = ExtResource("1_2p0vd")
 tower_scene = ExtResource("4_sg5f4")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

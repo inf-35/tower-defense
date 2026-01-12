@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://dxcwdjh4dma3e"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://dxcwdjh4dma3e"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_tcu0v"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_65w2x"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_3ikei"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_qlphn"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_mtbe3"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_wyq48"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_0883x"]
 [ext_resource type="PackedScene" uid="uid://rvm1pqpxpkfp" path="res://Units/Towers/rite_liberty/rite_liberty.tscn" id="4_iipgr"]
 
 [resource]
@@ -10,12 +13,12 @@ script = ExtResource("3_mtbe3")
 id = 32
 cost = 0.0
 required_capacity = 0.0
-element = 6
+element = 4
 is_rite = true
 upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Liberty Rite"
-tower_description = "All adjacencies: Affected towers gain 20% fire rate per empty adjacency"
+tower_description = "All adjacent towers gain 40% {UNIT_HITRATE} per empty adjacency."
 tower_scene = ExtResource("4_iipgr")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

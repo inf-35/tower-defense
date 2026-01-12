@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=9 format=3 uid="uid://djnmsx27kjjyi"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=10 format=3 uid="uid://djnmsx27kjjyi"]
 
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_qnr0w"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_qp08h"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_2aaqs"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_x1i2k"]
 [ext_resource type="Script" uid="uid://b3pxsdqsg7fgg" path="res://Content/Relics/contagion/status_inflict_causes_hit.gd" id="4_1xrdm"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="5_x1i2k"]
 
 [sub_resource type="Resource" id="Resource_6ewx0"]
 script = ExtResource("3_x1i2k")
@@ -33,5 +34,5 @@ script = ExtResource("3_2aaqs")
 type = 3
 global_effect = SubResource("Resource_cyxyu")
 title = "Contagion"
-description = "Enemies with two or more stacks of poison infect nearby enemies with 1 stack of poison when hit."
+description = "Enemies with two or more stacks of {POISON} infect nearby enemies with 1 stack of {POISON} when hit."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

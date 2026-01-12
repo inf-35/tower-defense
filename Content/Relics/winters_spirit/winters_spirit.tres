@@ -1,28 +1,31 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://3gfb1ujydb5l"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://3gfb1ujydb5l"]
 
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_mvlrb"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="1_belbj"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_belbj"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_etxib"]
 
-[sub_resource type="Resource" id="Resource_rh4l4"]
-script = ExtResource("1_mvlrb")
+[sub_resource type="Resource" id="Resource_belbj"]
+script = ExtResource("2_belbj")
+target_filter = 2
+required_element = 1
 attribute = 6
-multiplicative = 1.2
+multiplicative = 1.25
 override = null
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
-[sub_resource type="Resource" id="Resource_hyisy"]
-script = ExtResource("1_mvlrb")
+[sub_resource type="Resource" id="Resource_befk8"]
+script = ExtResource("2_belbj")
+target_filter = 2
+required_element = 1
 attribute = 7
-multiplicative = 1.2
+multiplicative = 1.3
 override = null
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [resource]
 script = ExtResource("2_etxib")
 type = 16
-target_type = 4
-specific_element = 1
-modifier_prototypes = Array[ExtResource("1_mvlrb")]([SubResource("Resource_rh4l4"), SubResource("Resource_hyisy")])
+modifier_prototypes = Array[ExtResource("2_belbj")]([SubResource("Resource_belbj"), SubResource("Resource_befk8")])
 title = "Winter's Spirit"
-description = "All frost towers gain +20% damage, +40% range."
+description = "All frost towers (frost, snowball) gain +25% {UNIT_DAMAGE}, +30% {UNIT_RANGE}"
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

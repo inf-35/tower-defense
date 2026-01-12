@@ -47,7 +47,7 @@ var effects_by_type: Dictionary[Effects.Type, Array] = {
 var unit_id: int = References.assign_unit_id()
 var blocked: bool #whether this unit is currently blocked by a tower
 
-var abstractive: bool: #this unit is not an actual unit (see prototypes, Towers)
+var abstractive: bool: #fathis unit is not an actual unit (see prototypes, Towers)
 	set(na):
 		abstractive = na
 		disabled = true
@@ -87,6 +87,7 @@ func _create_components() -> void:
 		var n_modifiers_component: = ModifiersComponent.new()
 		add_child(n_modifiers_component)
 		modifiers_component = n_modifiers_component
+		
 	if movement_component == null: #by default, add an immobile movement component
 		var n_movement_component: = MovementComponent.new()
 		n_movement_component.movement_data = load("res://Content/Movement/immobile_mvmt.tres")
@@ -213,7 +214,7 @@ func _attach_health_bar() -> void:
 	if abstractive or disabled:
 		return
 		
-	var hp_bar := preload("res://UI/unit_hp_bar/unit_hp_bar.tscn").instantiate()
+	var hp_bar = load("res://UI/unit_hp_bar/unit_hp_bar.tscn").instantiate()
 	add_child(hp_bar)
 	hp_bar.setup(self, health_component)
 
@@ -226,7 +227,7 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void:
 	
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	effects[effect_prototype.schedule].append(effect_instance)
-	
+	effect_instance.stacks = stacks
 	effect_instance.attach_to(self)
 	
 	var type = effect_prototype.effect_type
@@ -317,34 +318,39 @@ func take_hit(hit: HitData):
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
 		
-	var source_position: Vector2 = hit.source.global_position if is_instance_valid(hit.source) else self.global_position #used to render ccosmetic particle effects
-		
+	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
+	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
+	
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
 	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
+	
+	if hit.negate: #ignore negated hits
+		return
 	
 	var damage: float = evt.data.damage
 	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
 	health_component.take_damage(damage, evt.data.breaking)
 	#measure what happened
 	var delta_health: float = benchmark - health_component.health #measure damage caused
-	var unit_dead: bool = is_zero_approx(health_component.health)
+	var unit_dead: bool = is_zero_approx(health_component.health) #are we dead?
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
 	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
 	hit_report.target = self
+	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
 	
 	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
 
-		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, (self.global_position - source_position).angle())
+		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
 		
 		died.emit(hit_report) #NOTE: this is when the unit dies
 	else:
-		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, (self.global_position - source_position).angle())
+		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
 		
 		var shader_material: ShaderMaterial = graphics.material as ShaderMaterial
 		shader_material.set_shader_parameter(&"flash_intensity", 1.0)
@@ -359,6 +365,8 @@ func take_hit(hit: HitData):
 	for status: Attributes.Status in hit.status_effects:
 		var stack: float = hit.status_effects[status].x
 		var cooldown: float = hit.status_effects[status].y
+		if stack <= 0.0: #refuse to process insignificant status effects (will crash if not done otherwise)
+			continue
 		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id if is_instance_valid(hit.source) else 0)
 	
 	var hit_report_evt := GameEvent.new()
@@ -384,7 +392,7 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Player.flux += hit_report_data.flux_value #reward player with flux
+	Player.flux += hit_report_data.flux_value * 0.25 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
 	behavior.detach() #disable behavior
@@ -396,9 +404,9 @@ func on_killed(hit_report_data: HitReportData) -> void:
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
 	return References.island.get_terrain_base(movement_component.cell_position)
 	
-func get_stat(attr: Attributes.id): #GENERIC get stat function, should only be used for ui related purposes
+func get_stat(attr: Attributes.id): #GENERIC get stat function
 	if health_component != null:
-		if attr == Attributes.id.MAX_HEALTH or attr == Attributes.id.REGENERATION or attr == Attributes.id.REGEN_PERCENT:
+		if attr == Attributes.id.MAX_HEALTH or attr == Attributes.id.REGENERATION or attr == Attributes.id.REGEN_PERCENT or attr == Attributes.id.DAMAGE_TAKEN or attr == Attributes.id.FLAT_DAMAGE_TAKEN:
 			return health_component.get_stat(modifiers_component, health_component.health_data, attr)
 
 	if movement_component != null:

@@ -29,7 +29,7 @@ func _process(_d: float):
 		# Update position and rotation
 		vfx.position += vfx.velocity * delta
 		match vfx.vfx_info.rotation_mode:
-			VFXInfo.RotationMode.FACE_VELOCITY:
+			VFXInfo.RotationMode.FACE_VELOCITY when not vfx.velocity.is_zero_approx():
 				vfx.rotation = vfx.velocity.angle()
 			VFXInfo.RotationMode.SPIN:
 				vfx.rotation += vfx.vfx_info.spin_speed * delta

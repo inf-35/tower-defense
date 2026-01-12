@@ -7,6 +7,7 @@ var target: Unit ##eventual target of the hit
 var damage_caused: float = 0.0 ##how much damage did the target receive
 var overkill: float = 0.0 ##how much more damage did the target receive than was necessary
 var death_caused: bool = false ##did the target die?
+var velocity: Vector2 ##instantaneous velocity of the projectile upon impact
 #potential death effects
 var flux_value: float = 0.0 ##if target killed by hit, how much flux does it drop?
 #book-keeping

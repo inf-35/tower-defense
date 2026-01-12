@@ -1,15 +1,21 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3 uid="uid://uenttfgkleio"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://uenttfgkleio"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_mii87"]
+[ext_resource type="Texture2D" uid="uid://msgb740b4isk" path="res://Assets/workshop.png" id="1_7qglk"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_y5gus"]
 [ext_resource type="PackedScene" uid="uid://drp3bgm0uvb35" path="res://Units/Towers/amplifier/amplifier.tscn" id="2_12f5q"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_jgjmg"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_b4mcw"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_q2orp"]
+[ext_resource type="Texture2D" uid="uid://c1r5pglgs0rxw" path="res://Assets/workshop_icon.png" id="5_7qglk"]
 
 [resource]
 script = ExtResource("1_y5gus")
 id = 8
-cost = 15.0
+cost = 8.0
 element = 5
-tower_name = "Amplifier"
-tower_description = "Adjacent towers gain 25% increase to firerate."
+tower_name = "Workshop"
+tower_description = "Adjacent towers gain 40% {UNIT_HITRATE} (stacks)."
+icon = ExtResource("1_7qglk")
+preview = ExtResource("5_7qglk")
 tower_scene = ExtResource("2_12f5q")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

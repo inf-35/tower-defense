@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://beau0lx5n808m"]
+
+[ext_resource type="Texture2D" uid="uid://h2n1ysfdtn0s" path="res://Assets/moka_pot_icon.png" id="1_v2o2p"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_jp10k"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_pvilu"]
+
+[sub_resource type="Resource" id="Resource_v2o2p"]
+script = ExtResource("2_jp10k")
+target_filter = 1
+attribute = 6
+multiplicative = 1.35
+override = null
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
+
+[sub_resource type="Resource" id="Resource_jp10k"]
+script = ExtResource("2_jp10k")
+target_filter = 3
+attribute = 3
+multiplicative = 1.2
+override = null
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
+
+[resource]
+script = ExtResource("3_pvilu")
+type = 24
+modifier_prototypes = Array[ExtResource("2_jp10k")]([SubResource("Resource_v2o2p"), SubResource("Resource_jp10k")])
+title = "Moka Pot"
+description = "All towers gain +35% {UNIT_DAMAGE}, but all enemies gain +25% {UNIT_SPEED}"
+icon = ExtResource("1_v2o2p")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

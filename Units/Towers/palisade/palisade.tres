@@ -1,19 +1,14 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://c0v2rl1btmv55"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://c0v2rl1btmv55"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_h5q3w"]
 [ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_qp5fc"]
 [ext_resource type="PackedScene" uid="uid://uyqncqkt255h" path="res://Units/Towers/palisade/palisade.tscn" id="2_8e64g"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_mo865"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_qv0k3"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_mo865"]
+[ext_resource type="Texture2D" uid="uid://jvnkuek7luj8" path="res://Assets/wall_icon.png" id="4_mo865"]
 
 [sub_resource type="Resource" id="Resource_74q3n"]
 script = ExtResource("2_mo865")
-metadata/_custom_type_script = "uid://do6qrosup8u56"
-
-[sub_resource type="Resource" id="Resource_qp5fc"]
-script = ExtResource("2_mo865")
-upgrade_index = 1
 metadata/_custom_type_script = "uid://do6qrosup8u56"
 
 [resource]
@@ -25,8 +20,9 @@ element = 6
 upgrades_into = Dictionary[int, float]({
 26: 4.0
 })
-tower_name = "Palisade"
+tower_name = "Wall"
 tower_description = "A simple wall."
-inspector_actions = Array[ExtResource("2_mo865")]([SubResource("Resource_74q3n"), SubResource("Resource_qp5fc"), ExtResource("3_mo865")])
+preview = ExtResource("4_mo865")
+inspector_actions = Array[ExtResource("2_mo865")]([SubResource("Resource_74q3n"), ExtResource("3_mo865")])
 tower_scene = ExtResource("2_8e64g")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

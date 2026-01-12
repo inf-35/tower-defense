@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://dic8sge2e6pmb"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://dic8sge2e6pmb"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_2oouv"]
 [ext_resource type="Script" uid="uid://bsqsmnqngcku6" path="res://Content/Relics/trance/kill_cooldown_reduction_effect.gd" id="1_sloqq"]
+[ext_resource type="Texture2D" uid="uid://cyqsdo8dsgosj" path="res://Assets/trance_icon.png" id="2_be2qu"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_sloqq"]
 
 [sub_resource type="Resource" id="Resource_be2qu"]
@@ -13,5 +14,6 @@ script = ExtResource("2_sloqq")
 type = 14
 global_effect = SubResource("Resource_be2qu")
 title = "Trance"
-description = "Killing cursed enemies halves the subsequent cooldown of the tower that killed the enemy."
+description = "Killing {CURSED} enemies halves the subsequent cooldown of the tower that killed the enemy."
+icon = ExtResource("2_be2qu")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

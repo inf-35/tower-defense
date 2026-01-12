@@ -74,6 +74,12 @@ func update(delta: float) -> void: ##main update loop; delta is already game del
 func get_display_data() -> Dictionary:
 	return {} # return an empty dictionary by default
 
+func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
+	var tower := unit as Tower
+	if not tower.get_stat(Attributes.id.RANGE):
+		return
+	canvas.draw_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
+	
 # a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):

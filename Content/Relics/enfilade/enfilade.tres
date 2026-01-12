@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://bb7hnjn38vhw8"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://bb7hnjn38vhw8"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_lflh5"]
 [ext_resource type="Script" uid="uid://c06ve61msauiy" path="res://Content/Relics/enfilade/enfilade.gd" id="2_ex4gp"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="3_ex4gp"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_jj0c7"]
 
 [sub_resource type="Resource" id="Resource_mkcmd"]
@@ -23,5 +24,5 @@ script = ExtResource("3_jj0c7")
 type = 4
 global_effect = SubResource("Resource_5ble4")
 title = "Enfilade"
-description = "When a tower is placed mid-battle, it gains a 300% fire rate boost for the first 5 seconds."
+description = "When a tower is placed mid-battle, it gains a 300% {UNIT_HITRATE} boost for the first 5 seconds."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

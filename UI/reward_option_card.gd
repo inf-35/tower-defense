@@ -59,7 +59,7 @@ func _apply_visuals(reward: Reward) -> void:
 		Reward.Type.UNLOCK_TOWER:
 			var type: Towers.Type = reward.tower_type
 			# fetch tower preview/icon
-			icon_tex = Towers.get_tower_preview(type)
+			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
 			desc_text = Towers.get_tower_description(type)
 			
@@ -68,6 +68,13 @@ func _apply_visuals(reward: Reward) -> void:
 			icon_tex = relic.icon
 			title_text = "New Relic: [color=#66ccff]%s[/color]" % relic.title
 			desc_text = relic.description
+			
+		Reward.Type.ADD_RITE:
+			var type: Towers.Type = reward.rite_type
+			# fetch tower preview/icon
+			icon_tex = Towers.get_tower_icon(type)
+			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
+			desc_text = Towers.get_tower_description(type)
 				
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount

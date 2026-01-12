@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://c6u4q872sxmr8"]
 
 [ext_resource type="Resource" uid="uid://bcbxd5ipm6y5q" path="res://Content/Relics/ambush/ambush.tres" id="1_y0ud3"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_ya5t6"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_ya5t6"]
 
 [resource]
 script = ExtResource("2_ya5t6")

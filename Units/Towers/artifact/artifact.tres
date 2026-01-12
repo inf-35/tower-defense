@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://i4rth1wwepot"]
+
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_ssqom"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_k5w14"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_v48tl"]
+[ext_resource type="PackedScene" uid="uid://hakkxt3e1pe6" path="res://Units/Towers/artifact/artifact.tscn" id="5_dkoyp"]
+
+[resource]
+script = ExtResource("4_v48tl")
+id = 7
+cost = 1.5
+required_capacity = 0.0
+element = 5
+tower_name = "Artifact"
+tower_description = "Ancient relic. Takes one wave to excavate after being found."
+preview = ExtResource("1_ssqom")
+inspector_actions = Array[ExtResource("2_k5w14")]([])
+tower_scene = ExtResource("5_dkoyp")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

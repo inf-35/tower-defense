@@ -1,11 +1,21 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://b6shtlq1xr4k3"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://b6shtlq1xr4k3"]
 
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_r4xtp"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_mebe4"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_r4xtp"]
 [ext_resource type="Resource" uid="uid://cc6y0hr2pgsep" path="res://Content/Relics/natures_spirit/natures_spirit.tres" id="1_xh51h"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_elxrs"]
+
+[sub_resource type="Resource" id="Resource_adb5r"]
+script = ExtResource("2_elxrs")
+tower_types = Array[int]([15, 14])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
 
 [resource]
 script = ExtResource("1_r4xtp")
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_xh51h")
+base_weight = 150.0
+bias_rules = Array[ExtResource("1_mebe4")]([SubResource("Resource_adb5r")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -15,13 +15,13 @@ func start() -> void:
 	tower.adjacency_updated.connect(_on_adjacency_updated)
 	tower.died.connect(_on_death)
 	tower.tree_exiting.connect(_on_death)
-	print(tower, " effect-distributor-behavior started!")
 	_on_adjacency_updated(tower.get_adjacent_towers())
 
 # logic to sync buffs with current grid state
 func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
 	var current_neighbors: Array[Tower] = []
 	var host_tower := unit as Tower
+
 	# identify valid neighbours
 	for adjacency: Vector2i in adj_map:
 		if not _is_local_direction_allowed(host_tower.facing, adjacency):
@@ -42,14 +42,10 @@ func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
 			_modify_stack(new_tower, 1)
 			
 	_buffed_neighbors = current_neighbors
+	
 func _is_local_direction_allowed(host_facing: Tower.Facing, grid_dir: Vector2i) -> bool:
 	var grid_idx: Tower.Facing
-	match grid_dir:
-		Vector2i(0, -1): grid_idx = Tower.Facing.UP
-		Vector2i(1, 0):  grid_idx = Tower.Facing.RIGHT
-		Vector2i(0, 1):  grid_idx = Tower.Facing.DOWN
-		Vector2i(-1, 0): grid_idx = Tower.Facing.LEFT
-		_: return false #invalid vector
+	grid_idx = Tower.get_side_from_offset(unit.size, grid_dir)
 
 	# calculate local index relative to facing
 	var local_idx: int = (grid_idx - host_facing + 4) % 4
@@ -64,13 +60,12 @@ func _is_local_direction_allowed(host_facing: Tower.Facing, grid_dir: Vector2i) 
 func _modify_stack(target: Tower, amount: int) -> void:
 	if not is_instance_valid(target):
 		return
-	print(target," ",amount," adjacency stacks mdoified")
 	# check if target already has effect
 	var instance: EffectInstance = target.get_effect_instance_by_prototype(buff_effect)
-	
+
 	if amount > 0:
 		if instance:
-			instance.stacks += 1 #add stacks
+			instance.stacks += amount #add stacks
 		else:
 			target.apply_effect(buff_effect) #apply new buff
 	else: #removing stacks
@@ -91,3 +86,24 @@ func _on_death(_hit_report_data: HitReportData = null) -> void:
 	tower.adjacency_updated.disconnect(_on_adjacency_updated)
 	tower.died.disconnect(_on_death)
 	tower.tree_exiting.disconnect(_on_death)
+
+func draw_visuals(canvas: RangeIndicator) -> void:
+	var tower := unit as Tower
+	if not is_instance_valid(tower): return
+	
+	var margin: int = 2
+	var cell_size := Island.CELL_SIZE - margin
+	var half_size := Vector2(cell_size, cell_size) * 0.5
+
+	var adj_cells: Array[Vector2i] = tower.get_adjacent_cells()
+	
+	for cell: Vector2i in adj_cells:
+		var dir_vec: Vector2i = cell - tower.tower_position
+
+		if not _is_local_direction_allowed(tower.facing, dir_vec):
+			continue
+
+		var pos = Island.cell_to_position(cell)
+		var rect = Rect2(pos - half_size, Vector2(cell_size, cell_size))
+
+		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)

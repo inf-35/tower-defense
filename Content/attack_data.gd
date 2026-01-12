@@ -79,6 +79,7 @@ func generate_generic_delivery_data() -> DeliveryData: ##generates a generic (un
 	delivery_data.delivery_method = delivery_method
 	delivery_data.cone_angle = cone_angle
 	delivery_data.projectile_speed = projectile_speed
+	delivery_data.projectile_lifetime = projectile_lifetime
 	
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:

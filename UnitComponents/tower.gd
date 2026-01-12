@@ -42,17 +42,40 @@ var tower_position: Vector2i = Vector2i.ZERO:
 			modifiers_component.remove_modifier(terrain_modifier)
 		_terrain_modifiers.clear()
 		
-		if is_instance_valid(modifiers_component):
-			# get the terrain base at the tower's location
-			var terrain_base: Terrain.Base = References.island.terrain_base_grid.get(tower_position, Terrain.Base.EARTH)
-			# get the list of modifier prototypes associated with this terrain
-			var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
+		var total_area: float = float(size.x * size.y)
+		var modifier_counts: Dictionary[ModifierDataPrototype, int] = {}
+		for x: int in size.x:
+			for y: int in size.y:
+				var check_cell: Vector2i = tower_position + Vector2i(x, y)
+				
+				# Get terrain at this specific tile
+				var terrain_base: Terrain.Base = References.island.get_terrain_base(check_cell)
+				var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
+				
+				for proto: ModifierDataPrototype in modifier_prototypes:
+					if not modifier_counts.has(proto):
+						modifier_counts[proto] = 0
+					modifier_counts[proto] += 1
+
+		# generate and scale the final modifiers
+		for proto: ModifierDataPrototype in modifier_counts:
+			var tile_count: int = modifier_counts[proto]
+			var proportion: float = float(tile_count) / total_area
 			
-			for proto: ModifierDataPrototype in modifier_prototypes:
-				var new_modifier: Modifier = proto.generate_modifier()
-				# add the modifier as a PERMANENT modifier, as it's tied to the static world state
-				modifiers_component.add_modifier(new_modifier)
-				_terrain_modifiers.append(new_modifier)
+			# If the tower is fully on this terrain (proportion == 1.0), it gets full effect.
+			# If it's half on (0.5), it gets half effect.
+			
+			var new_modifier: Modifier = proto.generate_modifier()
+
+			if new_modifier.additive != 0.0:
+				new_modifier.additive *= proportion
+
+			if new_modifier.multiplicative != 1.0:
+				var deviation: float = new_modifier.multiplicative - 1.0
+				new_modifier.multiplicative = 1.0 + (deviation * proportion)
+			
+			_terrain_modifiers.append(new_modifier)
+			modifiers_component.add_modifier(new_modifier)
 
 var _terrain_modifiers: Array[Modifier] = [] ## modifiers for terrain effects (i.e. high ground)
 var size: Vector2i = Vector2i.ONE ## this is inclusive of facing
@@ -104,11 +127,10 @@ func resurrect() -> void:
 	behavior.start()
 	# 4. reattach all effects
 	for effect_prototype: EffectPrototype in effect_prototypes:
-		apply_effect(effect_prototype) #detach all effects
+		apply_effect(effect_prototype) #attach all effects
 
 func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
-	
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		remove_effect(effect_prototype) #detach all effects
 
@@ -206,8 +228,36 @@ func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid gr
 	return neighbors
 	
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
-	#TODO: reconfigure this to use the more robust get_adjacent_cells
-	return References.island.get_adjacent_towers(self.tower_position)
+	if behavior.has_method(&"get_adjacent_towers"):
+		return behavior.get_adjacent_towers()
+	
+	var adjacencies: Dictionary[Vector2i, Tower]
+	for cell: Vector2i in get_adjacent_cells():
+		var tower : Tower = References.island.get_tower_on_tile(cell)
+		if tower:
+			adjacencies[cell] = tower
+			
+	return adjacencies
+	
+static func get_side_from_offset(tower_size: Vector2i, rel_offset: Vector2i) -> Facing:
+	# 1. Check Vertical Sides (Top/Bottom)
+	# The offset must be within the tower's horizontal bounds (x: 0 to width-1)
+	if rel_offset.x >= 0 and rel_offset.x < tower_size.x:
+		if rel_offset.y < 0: 
+			return Facing.UP
+		if rel_offset.y >= tower_size.y: 
+			return Facing.DOWN
+
+	# 2. Check Horizontal Sides (Left/Right)
+	# The offset must be within the tower's vertical bounds (y: 0 to height-1)
+	if rel_offset.y >= 0 and rel_offset.y < tower_size.y:
+		if rel_offset.x < 0: 
+			return Facing.LEFT
+		if rel_offset.x >= tower_size.x: 
+			return Facing.RIGHT
+
+	# 3. Fallback (Diagonal corner or Inside tower)
+	return 10
 
 func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for a specific tile occupied by this tower
 	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour

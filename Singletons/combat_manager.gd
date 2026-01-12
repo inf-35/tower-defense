@@ -37,6 +37,8 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 		if delivery_data.use_initial_velocity_override: #we probably have no intercept position
 			starting_velocity = delivery_data.initial_velocity
 			delay = delivery_data.projectile_lifetime
+			
+		hit_data.velocity = starting_velocity
 		
 		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, starting_velocity, delay)
 		Clock.await_game_time(delay).connect(func():
@@ -60,6 +62,9 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 		#if we reach here, the projectile has some aoe
 		var units: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, intercept_position, target_affiliation)
 		for unit_hit: Unit in units:
+			if delivery_data.excluded_units.has(unit_hit):
+				continue
+			
 			var hit_copy = hit_data.duplicate()
 			hit_copy.target = unit_hit
 			unit_hit.take_hit(hit_copy)
@@ -111,9 +116,12 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		projectile_velocity = initial_velocity
 		
 		_current_pierces_left = delivery_data.pierce
-		_exclude_colliders.append(hit_data.source.hitbox.get_rid())
+		if is_instance_valid(hit_data.source):
+			_exclude_colliders.append(hit_data.source.hitbox.get_rid())
 		 #we manage lifetime and velocity by ourselves
 		vfx_instance =  VFXManager.play_vfx(hit_data.vfx_on_spawn, projectile_position, Vector2.ZERO, VFXInfo.INFINITE_LIFETIME)
+		if hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY:
+			vfx_instance.rotation = initial_velocity.angle()
 		
 	func tick(delta: float):
 		projectile_age += delta
@@ -156,7 +164,6 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 					return # projectile destroyed
 				# if continuing (pierce), we must exclude this collider and nudge forward
 				_exclude_colliders.append(result.rid)
-
 		if projectile_age > delivery_data.projectile_lifetime and delivery_data.projectile_lifetime > 0.0: #timeout
 			_on_destruct()
 
@@ -217,17 +224,22 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		return false #hit something allied that is not a structure (ignore)
 	
 	func _apply_hit_to_unit(unit: Unit, impact_pos: Vector2):
+		hit_data.velocity = projectile_velocity
 		_apply_impact_vfx(impact_pos)
 		
 		var hit_copy: HitData = hit_data.duplicate() as HitData #prevent mutation of original hitdata
 		hit_copy.target = unit 
 
 		if is_zero_approx(hit_data.radius):
+			if delivery_data.excluded_units.has(unit):
+				return
 			unit.take_hit(hit_copy)
 		else:
 			# trigger AOE at this point
 			var units_in_aoe: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_pos, target_affiliation)
 			for hit_unit: Unit in units_in_aoe:
+				if delivery_data.excluded_units.has(hit_unit):
+					continue
 				var aoe_hit: HitData = hit_data.duplicate() as HitData
 				aoe_hit.target = hit_unit
 				hit_unit.take_hit(aoe_hit)
@@ -263,6 +275,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
 			#TODO: implement visuals
 			target.take_hit(hit_data)
+			if source:
+				hit_data.velocity = (target.global_position - source.global_position).normalized()
 			Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
 		
 		DeliveryData.DeliveryMethod.LINE_AOE:
@@ -291,12 +305,15 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 				var hitbox = collider_data.collider as Hitbox
 				if not is_instance_valid(hitbox):
 					continue
-					
+				
 				var unit : Unit = hitbox.unit
+				if delivery_data.excluded_units.has(unit):
+					continue
 				# Create a deep copy of the hit data for each target.
 				#NOTE: we CANNOT pass by reference here, otherwise different units getting hit
 				#would affect each other.
 				var hit_copy: HitData = hit_data.duplicate()
+				hit_copy.velocity = (unit.global_position - source.position).normalized()
 				hit_copy.target = unit
 				unit.take_hit(hit_copy)
 			
@@ -313,6 +330,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			var cone_half_angle_rad : float = deg_to_rad(delivery_data.cone_angle * 0.5)
 			
 			for unit: Unit in potential_targets:
+				if delivery_data.excluded_units.has(unit):
+					continue
 				var to_target_direction : Vector2 = (unit.global_position - source_position).normalized()
 				
 				if not is_zero_approx(delivery_data.cone_angle):
@@ -321,7 +340,8 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 					if dot_product < cos(cone_half_angle_rad): #we are outside the cone
 						continue
 				
-				var hit_copy = hit_data.duplicate()
+				var hit_copy: HitData = hit_data.duplicate()
+				hit_copy.velocity = to_target_direction
 				hit_copy.target = unit
 				unit.take_hit(hit_copy)
 		

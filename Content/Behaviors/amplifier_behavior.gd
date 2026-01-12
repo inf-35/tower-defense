@@ -28,7 +28,7 @@ func start() -> void:
 	# we need to wait a frame for the island to settle its adjacency calculations.
 	await get_tree().process_frame
 	if is_instance_valid(tower):
-		_on_adjacency_updated(References.island.get_adjacent_towers(tower.tower_position))
+		_on_adjacency_updated(tower.get_adjacent_towers())
 
 # this is the main logic, triggered whenever the host tower's neighbors change.
 func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:

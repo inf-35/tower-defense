@@ -65,6 +65,10 @@ func _ready():
 	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	relics_changed.connect(UI.update_relics.emit)
+	
+	Phases.wave_ended.connect(func(_wave):
+		Player.flux += 6
+	)
 
 func start():
 	for unit: Unit in get_tree().get_nodes_in_group(References.TOWER_GROUP):
@@ -77,6 +81,9 @@ func start():
 	_tower_limits.clear()
 	unlocked_towers.clear()
 	active_relics.clear()
+	
+	tower_capacity = 0.0
+	used_capacity = 0.0
 	
 	if _active_effects_container: _active_effects_container.free()
 	if global_event_service: global_event_service.free()
@@ -106,32 +113,34 @@ func _setup_state():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.MAGE: true,
-		Towers.Type.FIREWALL: true,
-		Towers.Type.MORTAR: true,
+		#Towers.Type.SNOWBALL: true,
+		##Towers.Type.FROST_TOWER: true,
+		#Towers.Type.RITE_LIBERTY: true,
+		#Towers.Type.FIREWALL: true,
+		#Towers.Type.MAGE: true,
 	}
+#
+	#add_rite(Towers.Type.RITE_CURSES, 20)
+	#add_rite(Towers.Type.RITE_POISONS, 20)
+	#add_rite(Towers.Type.RITE_FLAME, 20)
+	#add_rite(Towers.Type.RITE_FROST, 20)
 	
-	flux = 20.0
-	hp = 20.0
+	var reward := Reward.new()
+	reward.type = Reward.Type.ADD_RELIC
+	reward.relic = Relics.PAPER_UMBRELLA
+	RewardService.apply_reward(reward)
+	reward.relic = Relics.MACUAHUITL
+	RewardService.apply_reward(reward)
+	reward.relic = Relics.EARLY_BIRD
+	RewardService.apply_reward(reward)
 	
-	#var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.COMMON_COLD
-	#RewardService.apply_reward(reward)
-	#
-	#reward = Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_FROST
-	#RewardService.apply_reward(reward)
-	###
-	#reward = Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_POISONS
-	#RewardService.apply_reward(reward)
-	##
-	#reward = Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_FIST
-	#RewardService.apply_reward(reward)
+	flux = 200.0
+	hp = 2000.0
+	
+	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))
+	UI.update_relics.emit()
+	UI.update_flux.emit(flux)
+	UI.update_health.emit(hp)
 
 #capacity helper functions
 func add_to_used_capacity(amount: float):
@@ -176,7 +185,7 @@ func add_rite(type: Towers.Type, amount: int) -> void:
 	
 	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 	
-func get_rite_count(type: Towers.Type) -> int:
+func get_rite_count(type: Towers.Type) -> int: ##number of rites left
 	return rite_inventory.get(type, 0)
 	
 #relic entry point (to add new relics)
@@ -206,32 +215,15 @@ func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 	
 	for relic: RelicData in active_relics:
 		# check if the unit matches the relic's targeting rules
-		if _unit_matches_target(unit, relic) and not relic.modifier_prototypes.is_empty():
-			for modifier_prototype: ModifierDataPrototype in relic.modifier_prototypes:
-				var new_modifier : Modifier = modifier_prototype.generate_modifier()
-				# brand it with a source ID for debugging, if needed
-				new_modifier.source_id = -1 # use a special ID for global mods
-				relevant_modifiers.append(new_modifier)
+		for modifier_prototype: GlobalModifierPrototype in relic.modifier_prototypes:
+			if not modifier_prototype.matches_unit(unit):
+				continue
+			var new_modifier : Modifier = modifier_prototype.generate_modifier()
+			# brand it with a source ID for debugging, if needed
+			new_modifier.source_id = -1 # use a special ID for global mods
+			relevant_modifiers.append(new_modifier)
 
 	return relevant_modifiers
-
-# internal helper for checking targeting rules
-func _unit_matches_target(unit: Unit, relic: RelicData) -> bool:
-	match relic.target_type:
-		RelicData.TargetType.ALL_TOWERS:
-			return unit is Tower
-		RelicData.TargetType.ALL_ENEMIES:
-			return not (unit is Tower) # a simple proxy for being an enemy
-		RelicData.TargetType.SPECIFIC_TOWER_TYPE:
-			return unit is Tower and unit.type == relic.specific_tower_type
-		RelicData.TargetType.SPECIFIC_ELEMENT:
-			return unit is Tower and Towers.get_tower_element(unit.type) == relic.specific_element
-		RelicData.TargetType.PLAYER:
-			# this would apply to player-specific stats like starting flux, etc.
-			# not implemented in ModifiersComponent yet, but the structure supports it
-			return false 
-			
-	return false
 	
 # MODIFIED: Tower placement request now focuses only on player-side checks.
 # it asks the Island to handle the actual placement validation and construction.
@@ -243,7 +235,7 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 	if flux < Towers.get_tower_cost(tower_type):
 		return
 	
-	if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.RUINS):
+	if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
 		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity:
 			# NOTE: You could add a UI warning here about insufficient capacity.
 			return

@@ -9,7 +9,7 @@ enum Type {
 	CANNON,
 	GENERATOR,
 	PALISADE,
-	CATALYST, ##deprecated
+	ARTIFACT,
 	AMPLIFIER,
 	BREACH,
 	ANOMALY,
@@ -73,12 +73,13 @@ func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat
 
 func get_tower_prototype(tower_type: Type) -> Tower:
 	if not tower_prototypes.has(tower_type): #if no prototype
-		print(Towers.Type.keys()[tower_type])
 		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
 		tower_prototypes[tower_type].abstractive = true #disable all effects and events
 		add_child.call_deferred(tower_prototypes[tower_type]) #trigger _ready() calls
 
 		tower_prototypes[tower_type].tower_position = Vector2i(1915 * tower_type * tower_prototypes[tower_type].unit_id, 5823 * tower_type * tower_prototypes[tower_type].unit_id) #somewhere extremely far away
+		tower_prototypes[tower_type].facing = Tower.Facing.UP
+		tower_prototypes[tower_type].size = Towers.get_tower_size(tower_type)
 		#these prototype towers provide a "default" baseline to lookup from.
 	return tower_prototypes[tower_type]
 
@@ -86,6 +87,7 @@ func reset_tower_prototype(tower_type: Type) -> void: ##resets a tower prototype
 	var prototype := tower_prototypes[tower_type] as Tower
 	if prototype:
 		prototype.tower_position = Vector2i(1915 * tower_type * prototype.unit_id, 5823 * tower_type * prototype.unit_id)
+		prototype.facing = Tower.Facing.UP
 	
 func get_tower_size(tower_type: Type) -> Vector2i:
 	return tower_stats[tower_type].size
@@ -113,6 +115,9 @@ func get_tower_capacity(tower_type : Type) -> float:
 
 func get_tower_scene(tower_type: Type) -> PackedScene:
 	return tower_stats[tower_type].tower_scene
+	
+func get_tower_allowed_terrains(tower_type: Type) -> Array[Terrain.Base]:
+	return tower_stats[tower_type].allowed_terrain
 
 func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name

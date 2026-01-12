@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=2 format=3 uid="uid://be6mvr445njdq"]
-
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_srf07"]
-
-[resource]
-script = ExtResource("1_srf07")
-id_name = "mortar"
-tower_type = 22
-metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

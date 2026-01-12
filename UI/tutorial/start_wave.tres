@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://chvgmo5qufvcp"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_40tdq"]
+
+[resource]
+script = ExtResource("1_40tdq")
+instruction_text = "Start the wave and face your enemies."
+highlight_target = 3
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

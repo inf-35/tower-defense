@@ -28,6 +28,7 @@ var _grid_texture: ImageTexture
 var _grid_data: Dictionary = {} # stores Vector2i -> bool (is_land)
 # visual state trackers
 var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} # stores Vector2i -> Sprite2D
+var _active_previews: Dictionary[Vector2i, Sprite2D] = {} # for preview sprites only
 var _active_brush_strokes: Dictionary[Vector2i, Sprite2D]
 # bounds management
 # we track the top-left coordinate of the current image grid
@@ -127,8 +128,6 @@ func _setup_visuals() -> void:
 	
 	_update_rect_transform()
 
-# --- public api ---
-
 # accepts a list of tiles to add/remove to minimize resize operations
 # changes: dictionary of { Vector2i cell: bool is_land }
 func apply_terrain_changes(changes: Dictionary) -> void:
@@ -213,15 +212,20 @@ func clear_decorations() -> void:
 	for cell: Vector2i in _active_decorations:
 		if is_instance_valid(_active_decorations[cell]):
 			_active_decorations[cell].queue_free()
+	for cell: Vector2i in _active_previews:
+		if is_instance_valid(_active_previews[cell]):
+			_active_previews[cell].queue_free()
+	
 	_active_decorations.clear()
+	_active_previews.clear()
 
 # stamps a specific Tower Preview Sprite at a cell
 func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
 	# clean up any existing decoration at this cell
-	if _active_decorations.has(cell):
-		if is_instance_valid(_active_decorations[cell]):
-			_active_decorations[cell].queue_free()
-		_active_decorations.erase(cell)
+	if _active_previews.has(cell):
+		if is_instance_valid(_active_previews[cell]):
+			_active_previews[cell].queue_free()
+		_active_previews.erase(cell)
 	
 	if tower_type == -1: # Towers.Type.VOID
 		return
@@ -242,7 +246,7 @@ func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
 
 	# add to the existing decoration container so it sits on top of the terrain/sketch
 	_decoration_container.add_child(sprite)
-	_active_decorations[cell] = sprite
+	_active_previews[cell] = sprite
 
 # completely clears and replaces the terrain with the new set of tiles
 func reset_grid(new_land_tiles: Array[Vector2i]) -> void:
@@ -291,6 +295,9 @@ func set_color_param(param_name: String, value: Color) -> void:
 func _spawn_brush_stroke(cell: Vector2i) -> void:
 	if _active_brush_strokes.has(cell):
 		return
+		
+	if not (cell.x % 2 == 0 and cell.y % 2 == 0):
+		return
 	
 	var brush_tex: Texture2D = brush_textures.pick_random()
 	var sprite: Sprite2D = Sprite2D.new()
@@ -314,7 +321,7 @@ func _spawn_brush_stroke(cell: Vector2i) -> void:
 	# randomisation
 	sprite.rotation = randf() * TAU
 	sprite.modulate = Color(1,1,1, randf_range(0.5, 1.0))
-	var s: float = (randf_range(0.5, 1.0) ** 2) * 0.2
+	var s: float = (randf_range(0.5, 1.0)) * 0.4
 	sprite.scale = Vector2(s, s)
 	
 	_brush_viewport.add_child(sprite)

@@ -14,6 +14,7 @@ class_name TowerData
 @export var is_rite: bool = false ##is this tower type a rite?
 @export var upgrades_into: Dictionary[Towers.Type, float] = {} ##list of possible upgrades, where key is Type and value is cost (in gold)
 
+@export var allowed_terrain: Array[Terrain.Base] = [] #if empty, allows all constructable terrains
 #navigation
 @export var navcost: int = 100
 

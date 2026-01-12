@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=25 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_v6kvy"]
@@ -20,9 +20,39 @@
 [ext_resource type="Texture2D" uid="uid://dnbhfdu0a4g3p" path="res://Assets/play_icon.png" id="14_m8qfw"]
 [ext_resource type="Texture2D" uid="uid://iooil5qk2j5k" path="res://Assets/double_time_icon.png" id="15_aasu8"]
 [ext_resource type="Texture2D" uid="uid://dnvbyvrkef00w" path="res://Assets/timeline_pip_holder.png" id="16_aasu8"]
+[ext_resource type="Script" uid="uid://ddlb750e0o03a" path="res://UI/tutorial/tutorial_manager.gd" id="21_7qncy"]
+[ext_resource type="Shader" uid="uid://filx1mvi3oje" path="res://Shaders/tutorial_spotlight.gdshader" id="22_b47fn"]
+[ext_resource type="PackedScene" uid="uid://cbdyajq0i6jec" path="res://UI/cursor_info/cursor_info.tscn" id="23_vlen6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
+shader = ExtResource("22_b47fn")
+shader_parameter/color = Color(0, 0, 0, 0.1764706)
+shader_parameter/spotlight_center = Vector2(0.5, 0.5)
+shader_parameter/spotlight_size = Vector2(0.1, 0.1)
+shader_parameter/is_active = true
 
 [node name="UI" type="CanvasLayer"]
 process_mode = 3
+
+[node name="TutorialManager" type="CanvasLayer" parent="." node_paths=PackedStringArray("overlay_color_rect", "instruction_label")]
+layer = 3
+script = ExtResource("21_7qncy")
+overlay_color_rect = NodePath("ColorRect")
+instruction_label = NodePath("../Margin/ui_space/tutorial_instruction_label")
+metadata/_custom_type_script = "uid://ddlb750e0o03a"
+
+[node name="ColorRect" type="ColorRect" parent="TutorialManager"]
+material = SubResource("ShaderMaterial_vlen6")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="CursorInfo" parent="." instance=ExtResource("23_vlen6")]
+offset_right = 74.0
+offset_bottom = 34.0
 
 [node name="Margin" type="MarginContainer" parent="."]
 anchors_preset = 15
@@ -199,9 +229,24 @@ offset_bottom = 300.0
 grow_vertical = 2
 size_flags_horizontal = 0
 
+[node name="tutorial_instruction_label" type="RichTextLabel" parent="Margin/ui_space"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 102.0
+offset_right = 473.0
+offset_bottom = 212.0
+theme_type_variation = &"rt_s20"
+bbcode_enabled = true
+text = "Tutorial
+Press ak"
+scroll_active = false
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
 [node name="Expansion" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("_vbox")]
 self_modulate = Color(1, 1, 1, 0)
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -8.0
@@ -226,7 +271,6 @@ alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("card_list")]
-visible = false
 z_index = 1
 layout_mode = 1
 anchors_preset = 15
@@ -254,6 +298,7 @@ theme_type_variation = &"vbox_20"
 
 [node name="title" type="RichTextLabel" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
 layout_mode = 2
+theme_override_colors/default_color = Color(1, 0.98039216, 0.95686275, 1)
 bbcode_enabled = true
 text = "Choose a tower"
 fit_content = true
@@ -266,6 +311,7 @@ layout_mode = 2
 theme_type_variation = &"vbox_20"
 
 [node name="reroll" type="Button" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 text = "reroll"

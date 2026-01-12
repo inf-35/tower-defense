@@ -24,7 +24,7 @@ func _ready() -> void:
 
 	_damage_timer.wait_time = cooldown
 	_damage_timer.timeout.connect(_on_damage_tick)
-	_damage_timer.start()
+	_damage_timer.start() #BUG: this isnt actually based on gametime
 	
 	self.area_entered.connect(_on_area_entered)
 	self.area_exited.connect(_on_area_exited)

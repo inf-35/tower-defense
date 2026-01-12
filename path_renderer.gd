@@ -11,13 +11,23 @@ class_name PathRenderer
 @export var stroke_spacing: float = 5.0 ## Distance between stamps on straight lines
 @export var stroke_scale: Vector2 = Vector2(0.1, 0.1)
 
+@export var line_color: Color = Color(0.2, 0.15, 0.1, 0.8) # Standard Path
+@export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) # Wall-ignoring Path
+@export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) # Invalid Path
+
+
 @export_subgroup("Jitter")
 @export var pos_jitter: float = 0.5 ## Random offset in pixels
 @export var rot_jitter: float = 5.0 ## Random rotation in degrees
 @export var scale_jitter: float = 0.0 ## Random scale variation (e.g. 0.1 = +/- 10%)
 
-var _path_cache: Dictionary[Vector2i, PackedVector2Array] = {}
-var _preview_path_cache: Dictionary[Vector2i, PackedVector2Array] = {}
+class PathRender:
+	var points: PackedVector2Array
+	var is_phasing: bool
+	var is_valid: bool = true
+
+var _path_cache: Array[PathRender]
+var _preview_path_cache: Array[PathRender]
 var _is_previewing: bool = false
 var _is_preview_blocked: bool = false
 
@@ -31,23 +41,24 @@ func _ready() -> void:
 	Navigation.field_ready.connect(func(_goal, _ignore): _on_navigation_grid_updated())
 	_on_navigation_grid_updated()
 
-# --- Public API (Unchanged) ---
-
 func update_preview(blocker_cells: Array[Vector2i]) -> void:
 	_is_previewing = true
 	_preview_path_cache.clear()
 	_is_preview_blocked = false
 	
+	var modes = _get_current_wave_modes()
+	
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
 	var target_cell: Vector2i = Vector2i.ZERO
 	
 	for start_cell: Vector2i in spawn_points:
-		var path_data := Navigation.get_hypothetical_path(start_cell, target_cell, blocker_cells, false)
-		if path_data.status == Navigation.PathData.Status.FOUND_PATH:
-			_preview_path_cache[start_cell] = _convert_path_to_world(start_cell, path_data.path)
-		else:
-			_is_preview_blocked = true
-			
+		if modes.normal:
+			var path_render: PathRender = _generate_path_render(start_cell, blocker_cells, false, true)
+			_preview_path_cache.append(path_render)
+		
+		if modes.phasing:
+			var path_render: PathRender = _generate_path_render(start_cell, blocker_cells, true, true)
+			_preview_path_cache.append(path_render)
 	queue_redraw()
 
 func clear_preview() -> void:
@@ -56,20 +67,68 @@ func clear_preview() -> void:
 	queue_redraw()
 
 func _on_navigation_grid_updated() -> void:
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().process_frame
 	_path_cache.clear()
 
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	var target_cell: Vector2i = Vector2i.ZERO
+	var modes = _get_current_wave_modes()
 	
 	for start_cell: Vector2i in spawn_points:
-		var path_data: Navigation.PathData = Navigation.find_path(start_cell, target_cell, false)
-		if path_data.status == Navigation.PathData.Status.FOUND_PATH:
-			_path_cache[start_cell] = _convert_path_to_world(start_cell, path_data.path)
+		if modes.normal:
+			var data = _generate_path_render(start_cell, [], false, false)
+			if data.is_valid: _path_cache.append(data)
+			
+		if modes.phasing:
+			var data = _generate_path_render(start_cell, [], true, false)
+			if data.is_valid: _path_cache.append(data)
 	
 	queue_redraw()
 
 # --- Internal Helpers ---
+
+func _get_current_wave_modes() -> Dictionary:
+	var modes = { "normal": false, "phasing": false }
+	
+	# If outside combat/setup, default to normal
+	if Phases.current_wave_number <= 0:
+		modes.normal = true
+		return modes
+		
+	var enemies = WaveEnemies.get_enemies_for_wave(Phases.current_wave_number)
+	
+	if enemies.is_empty():
+		modes.normal = true
+		return modes
+		
+	for stack in enemies:
+		var type = stack[0]
+		# Explicit check for known phasing unit types
+		if type == Units.Type.TROLL or type == Units.Type.PHANTOM:
+			modes.phasing = true
+		else:
+			modes.normal = true
+	return modes
+			
+func _generate_path_render(start: Vector2i, blockers: Array[Vector2i], ignore_walls: bool, is_hypothetical: bool) -> PathRender:
+	var goal = Vector2i.ZERO
+	var result = PathRender.new()
+	result.is_phasing = ignore_walls
+	
+	var path_struct: Navigation.PathData
+	
+	if is_hypothetical:
+		path_struct = Navigation.get_hypothetical_path(start, goal, blockers, ignore_walls)
+	else:
+		path_struct = Navigation.find_path(start, goal, ignore_walls)
+		
+	if path_struct.status == Navigation.PathData.Status.FOUND_PATH:
+		result.points = _convert_path_to_world(start, path_struct.path)
+		result.is_valid = true
+	else:
+		result.points = []
+		result.is_valid = false
+		
+	return result
 
 func _convert_path_to_world(start: Vector2i, path_cells: Array[Vector2i]) -> PackedVector2Array:
 	var world_points := PackedVector2Array([Island.cell_to_position(start)])
@@ -78,18 +137,26 @@ func _convert_path_to_world(start: Vector2i, path_cells: Array[Vector2i]) -> Pac
 	return world_points
 
 func _draw() -> void:
-	var cache_to_draw: Dictionary = _preview_path_cache if _is_previewing else _path_cache
-	
+	var list_to_draw = _preview_path_cache if _is_previewing else _path_cache
 	# Determine color
-	var draw_color: Color = tint_color
-	
-	# Adjust opacity for overlap
-	draw_color.a = draw_color.a / max(1, cache_to_draw.size() * 0.5)
 
-	for start_cell: Vector2i in cache_to_draw:
-		var points: PackedVector2Array = cache_to_draw[start_cell]
-		if points.size() > 1:
-			_draw_stamped_path(points, draw_color)
+	for data: PathRender in list_to_draw:
+		if data.points.size() <= 1: continue
+		
+		var draw_color: Color = phasing_color if data.is_phasing else line_color
+		if not data.is_valid:
+			# Only show blocked paths if we are previewing
+			if _is_previewing:
+				draw_color = blocked_color
+			else:
+				continue
+		else:
+			draw_color = phasing_color if data.is_phasing else line_color
+			
+		# Adjust opacity for overlap
+		draw_color.a = draw_color.a / max(1, list_to_draw.size() * 0.5)
+		if data.is_phasing: draw_color.a *= 3.0
+		_draw_stamped_path(data.points, draw_color)
 
 # --- Stamping Logic ---
 

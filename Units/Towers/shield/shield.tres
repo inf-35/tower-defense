@@ -1,16 +1,20 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://cwr024x6a14pi"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cwr024x6a14pi"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_eh8ci"]
+[ext_resource type="Texture2D" uid="uid://sv2v7deixlsu" path="res://Assets/green_tower_base.png" id="1_4pgog"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_eljxj"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_kr28s"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_qim14"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_deqwe"]
 [ext_resource type="PackedScene" uid="uid://dv6kdb6a6pltb" path="res://Units/Towers/shield/shield.tscn" id="3_krrll"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_ayum4"]
 
 [resource]
 script = ExtResource("2_kr28s")
 id = 12
-cost = 15.0
-element = 5
+cost = 12.0
+element = 4
 tower_name = "Shield"
-tower_description = "Adjacent towers take 75% less damage."
+tower_description = "Towers adjacent to shields take 50% less damage."
+icon = ExtResource("1_4pgog")
+preview = ExtResource("1_4pgog")
 tower_scene = ExtResource("3_krrll")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

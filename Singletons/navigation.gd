@@ -307,7 +307,7 @@ func _build_flow_field(goal: Vector2i, ignore_walls: bool) -> Dictionary:
 			var base_nav_cost: int = grid[neighbor]
 			
 			if ignore_walls:
-				move_cost = 0
+				move_cost = BASE_COST
 			else:
 				move_cost = base_nav_cost
 
@@ -342,12 +342,11 @@ func _find_path_internal(start: Vector2i, goal: Vector2i, ignore_walls: bool, ex
 				
 			# --- Override Logic ---
 			var move_cost: int
-			if extra_blockers.has(neighbor):
+			move_cost = grid[neighbor]
+			if extra_blockers.has(neighbor) and not ignore_walls:
 				move_cost = 100 # Treated as wall
 			elif ignore_walls:
-				move_cost = 1
-			else:
-				move_cost = max(1, grid[neighbor])
+				move_cost = BASE_COST
 
 			var tentative_g: float = g_score[current] + float(move_cost)
 			if not g_score.has(neighbor) or tentative_g < g_score[neighbor]:

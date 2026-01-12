@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://cwfim8d0xn61w"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cwfim8d0xn61w"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_uxu0x"]
+[ext_resource type="Texture2D" uid="uid://c1tt5b201g52i" path="res://Assets/sunbeam_provisional.png" id="1_jl5ad"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_xqmxb"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="3_6dt4b"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_2dfky"]
 [ext_resource type="PackedScene" uid="uid://drdga8oye2d8x" path="res://Units/Towers/sunbeam/sunbeam.tscn" id="5_oliv4"]
 
@@ -32,6 +31,8 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Sunbeam"
 tower_description = "An advanced laser-firing tower that tracks enemies over long range, continuously dealing damage and burning them."
+icon = ExtResource("1_jl5ad")
+preview = ExtResource("1_jl5ad")
 inspector_actions = Array[ExtResource("2_xqmxb")]([SubResource("Resource_74q3n"), SubResource("Resource_qp5fc"), SubResource("Resource_4ofox")])
 tower_scene = ExtResource("5_oliv4")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

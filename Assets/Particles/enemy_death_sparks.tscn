@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://yrq6p7udl2o1"]
 
-[ext_resource type="Texture2D" uid="uid://dabd71sica5nc" path="res://Assets/icon.svg" id="1_454rc"]
+[ext_resource type="Texture2D" uid="uid://bcrmt4oeeptht" path="res://Assets/blood_particle.png" id="1_454rc"]
 
 [sub_resource type="Curve" id="Curve_xsuc0"]
 _data = [Vector2(0, 0.0449438), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -12,11 +12,12 @@ curve = SubResource("Curve_xsuc0")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_tipg2"]
 particle_flag_disable_z = true
 emission_shape = 1
-emission_sphere_radius = 8.0
+emission_sphere_radius = 3.0
 spread = 140.0
-initial_velocity_min = 20.0
-initial_velocity_max = 160.0
-gravity = Vector3(0, 200, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 50.0
+gravity = Vector3(0, 100, 0)
+scale_max = 5.0
 scale_curve = SubResource("CurveTexture_85dsb")
 
 [node name="EnemyDeathSparks" type="GPUParticles2D"]

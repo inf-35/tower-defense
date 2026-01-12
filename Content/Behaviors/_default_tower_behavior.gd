@@ -55,7 +55,7 @@ func update(_delta: float) -> void:
 			#TODO: optimisation: predict once, and have the target unit tell us if it renavigates
 			var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_cooldown)
 			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
-			var target_angle: float = direction_to_target.angle()
+			var target_angle: float = direction_to_target.angle() - graphics.global_rotation
 			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
 			var required_turn_speed: float = angle_diff / maxf(attack_cooldown, 0.01)
 			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
@@ -87,7 +87,7 @@ func _attack(_target: Unit):
 	# snap towards target
 	var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_component.current_cooldown)
 	var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
-	turret.rotation = direction_to_target.angle()
+	turret.rotation = direction_to_target.angle() - graphics.global_rotation
 	_play_animation(&"attack")
 	attack_component.attack(_locked_target)
 

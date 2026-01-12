@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://ckcvmlnjkpd1s"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_ecstj"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_lpgnt"]
+[ext_resource type="Resource" uid="uid://debfwlmcaoe8a" path="res://Content/Relics/ice_shards/ice_shards.tres" id="3_ecstj"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="4_7t36j"]
+
+[sub_resource type="Resource" id="Resource_64yqs"]
+script = ExtResource("2_lpgnt")
+tower_types = Array[int]([24, 3, 30])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[resource]
+script = ExtResource("4_7t36j")
+id_name = "hypothermia"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("3_ecstj")
+base_weight = 150.0
+bias_rules = Array[ExtResource("1_ecstj")]([SubResource("Resource_64yqs")])
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

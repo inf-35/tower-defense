@@ -11,7 +11,6 @@ func get_navcost_for_cell(cell: Vector2i): #see Tower.get_navcost_for_cell
 	var center_x := floori(tower.size.x * 0.5)
 	var center_y := floori(tower.size.y * 0.5)
 	var gate_local_pos := Vector2i(center_x, center_y)
-	print(gate_local_pos)
 	if local_pos == gate_local_pos:
 		return Navigation.BASE_COST
 	else:

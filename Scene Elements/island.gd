@@ -44,7 +44,6 @@ func _ready():
 	# place the player's core tower
 	var keep: Tower = construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE) #NOTE: this must come first (id = 0)
 	References.keep = keep
-	UI.update_inspector_bar.emit(keep)
 	
 	update_shore_boundary()
 	update_navigation_grid()
@@ -118,7 +117,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	add_child(tower)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
-	_update_adjacencies_around(cell)
+	_update_adjacencies_around_tower(tower)
 	update_navigation_grid()
 			
 	#insert the new tower in the lookup table
@@ -234,6 +233,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 			var choice: ExpansionChoice = _preview_choices[local_choice_id]
 			for cell: Vector2i in choice.block_data:
 				var cell_data: Terrain.CellData = choice.block_data[cell]
+				preview_renderer.update_decoration(cell, cell_data.terrain)
 				if cell_data.feature != Towers.Type.VOID:
 					preview_renderer.set_preview_feature(cell, cell_data.feature)
 	
@@ -249,7 +249,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		
 		for cell: Vector2i in active_choice.block_data:
 			var cell_data: Terrain.CellData = active_choice.block_data[cell]
-			
+			preview_renderer.update_decoration(cell, cell_data.terrain)
 			if cell_data.feature != Towers.Type.VOID:
 				preview_renderer.set_preview_feature(cell, cell_data.feature)
 	
@@ -258,24 +258,29 @@ func _on_tower_destroyed(tower: Tower):
 	var cell: Vector2i = tower.tower_position
 	#clear tower grid
 	for local_cell: Vector2i in tower.get_occupied_cells():
+		if not tower_grid.has(local_cell):
+			continue
 		if not tower_grid[local_cell] == tower: #dont clear other towers' cells (i.e. upgrades)
 			continue
 		tower_grid.erase(local_cell)
-		_update_adjacencies_around(cell) #update adjacencies
+	_update_adjacencies_around_tower(tower)
 	#update capacity, caches, navigation
 	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
 	update_navigation_grid()
 	_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
+	
+func _update_adjacencies_around_tower(tower: Tower):
+	var adjacencies: Array[Vector2i] = tower.get_adjacent_cells()
+	for adjacency: Vector2i in adjacencies:
+		if tower_grid.has(adjacency):
+			tower_grid[adjacency].adjacency_updated.emit(tower_grid[adjacency].get_adjacent_towers())
 
 func _update_adjacencies_around(cell: Vector2i):
 	# ... (Function retained as is)
 	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
-	if tower_grid.has(cell):
-		tower_grid[cell].adjacency_updated.emit(adjacent_towers)
-	
 	for tower: Tower in adjacent_towers.values():
-		var local_adjacencies: Dictionary[Vector2i, Tower] = get_adjacent_towers(tower.tower_position)
+		var local_adjacencies: Dictionary[Vector2i, Tower] = tower.get_adjacent_towers()
 		tower.adjacency_updated.emit(local_adjacencies)
 
 #static data access functions
@@ -285,7 +290,7 @@ func get_towers_by_type(type: Towers.Type) -> Array:
 func get_tower_on_tile(cell: Vector2i):
 	return tower_grid.get(cell, null)
 
-func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]:
+func get_adjacent_towers(cell: Vector2i) -> Dictionary[Vector2i, Tower]: ##get towers adjacent to a single cell
 	#NOTE: tower.get_adjacent_towers() should preferably be used instead if the Tower reference is first known
 	var output: Dictionary[Vector2i, Tower] = {}
 	for dir: Vector2i in DIRS:

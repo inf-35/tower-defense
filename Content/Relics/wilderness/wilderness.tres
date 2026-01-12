@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://ddu0kih5o36wt"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://ddu0kih5o36wt"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_465g7"]
 [ext_resource type="Script" uid="uid://b74ug56sj02f0" path="res://Content/Relics/wilderness/_adjacency_boost.gd" id="2_7sn2y"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_8phli"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="3_7sn2y"]
 
 [sub_resource type="Resource" id="Resource_w8u05"]
 script = ExtResource("1_465g7")
 attribute = 8
-multiplicative = 0.833
+multiplicative = 0.8
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -24,5 +25,5 @@ script = ExtResource("2_8phli")
 type = 15
 global_effect = SubResource("Resource_0dc4p")
 title = "Wilderness"
-description = "All nature towers gain +10% fire rate per adjacent forest (neutral structure tile), scaling exponentially."
+description = "All nature towers (plant, poison) gain +25% {UNIT_HITRATE} per adjacent {T_FOREST}."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

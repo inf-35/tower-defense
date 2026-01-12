@@ -1,30 +1,30 @@
 [gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://j7epcpye37my"]
 
 [ext_resource type="Script" uid="uid://n4hk6ylcusd2" path="res://Content/Relics/permafrost/permafrost_effect.gd" id="1_2wcwk"]
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_731hi"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_2wcwk"]
 [ext_resource type="Texture2D" uid="uid://dp45rs1pb7wf5" path="res://Assets/frost_tower_base.png" id="2_voteb"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_voteb"]
 
-[sub_resource type="Resource" id="Resource_voteb"]
+[sub_resource type="Resource" id="Resource_lytq2"]
 script = ExtResource("1_2wcwk")
 schedule = 1
 metadata/_custom_type_script = "uid://n4hk6ylcusd2"
 
-[sub_resource type="Resource" id="Resource_lytq2"]
-script = ExtResource("1_731hi")
+[sub_resource type="Resource" id="Resource_tnm52"]
+script = ExtResource("3_voteb")
+target_filter = 2
+required_element = 1
 attribute = 8
-multiplicative = 1.429
+multiplicative = 1.333
 override = null
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [resource]
 script = ExtResource("2_2wcwk")
 type = 10
-target_type = 4
-specific_element = 1
-modifier_prototypes = Array[ExtResource("1_731hi")]([SubResource("Resource_lytq2")])
-global_effect = SubResource("Resource_voteb")
+modifier_prototypes = Array[ExtResource("3_voteb")]([SubResource("Resource_tnm52")])
+global_effect = SubResource("Resource_lytq2")
 title = "Permafrost"
-description = "All frost towers inflict one more stack of frost, but have a 30% reduced fire rate."
+description = "All frost towers (frost, snowball) inflict one more stack of {FROST}, but have a 25% reduced {UNIT_HITRATE}"
 icon = ExtResource("2_voteb")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

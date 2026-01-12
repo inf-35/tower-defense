@@ -24,7 +24,7 @@ func _init():
 	pass
 	
 func detach() -> void:
-	if is_instance_valid(host) and not host.disabled:
+	if is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 	
 func attach_to(_host: Unit) -> void:

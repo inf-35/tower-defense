@@ -11,6 +11,7 @@ enum DeliveryMethod {
 }
 
 var target: Unit ##reference to the actual target of this projectile
+var excluded_units: Array[Unit] ## units that are excluded (mainly from non-targeted projectiles)
 var use_source_position_override: bool = false ##if true, enables source_position override
 var source_position: Vector2 ##custom source position. if use_source_position_override is true, oversrides source (from HitData)'s position
 var use_initial_velocity_override: bool = false ##if true, uses initial_velocity

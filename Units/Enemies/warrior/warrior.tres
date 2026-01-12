@@ -12,4 +12,5 @@ title = "Warrior"
 description = "Stronger"
 stat_displays = Array[ExtResource("2_jmdnu")]([ExtResource("3_qqk5r"), ExtResource("4_1ttpw")])
 unit_scene = ExtResource("2_upri3")
+flux_value = 0.4
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

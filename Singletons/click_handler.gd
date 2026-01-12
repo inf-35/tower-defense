@@ -32,6 +32,90 @@ func start():
 	UI.update_flux.connect(func(_flux: float): _update_preview_visuals(), CONNECT_REFERENCE_COUNTED)
 	UI.update_capacity.connect(func(_used: float, _total: float): _update_preview_visuals(), CONNECT_REFERENCE_COUNTED)
 
+func _process(_delta: float) -> void:
+	if not enabled or not is_instance_valid(UI.cursor_info):
+		return
+		
+	match current_state:
+		State.IDLE:
+			_update_idle_tooltip()
+		State.PREVIEWING:
+			_update_preview_tooltip()
+		State.TOWER_SELECTED:
+			# Hide tooltip if a tower is selected (cleaner UI)
+			UI.cursor_info.display_message("")
+
+func _update_idle_tooltip() -> void:
+	if get_viewport() == null:
+		return
+
+	var mouse_pos = References.camera.get_global_mouse_position()
+	var cell = Island.position_to_cell(mouse_pos)
+	var island = References.island
+	var msg = ""
+	
+	# Priority 1: Hovering over a Unit/Enemy?
+	# (Requires raycast or iterating active enemies. Optional implementation)
+	
+	# Priority 2: Hovering over a Tower?
+	var tower = island.get_tower_on_tile(cell)
+	if tower:
+		msg = Towers.get_tower_name(tower.type)
+		# Optional: Add status info
+		if tower.modifiers_component.has_status(Attributes.Status.FROST):
+			msg += " (Frozen)"
+	
+	# Priority 3: Terrain Info
+	else:
+		if island.terrain_base_grid.has(cell):
+			var terrain = island.get_terrain_base(cell)
+			msg = Terrain.Base.keys()[terrain].capitalize()
+			
+			# Add flavor for special tiles
+			if terrain == Terrain.Base.HIGHLAND:
+				msg += "\n(Range Bonus)"
+			elif terrain == Terrain.Base.SETTLEMENT:
+				msg += "\n(Used to build villages)"
+		else:
+			msg = "Uncharted"
+
+	UI.cursor_info.display_message(msg, false)
+
+func _update_preview_tooltip() -> void:
+	# If placement is valid, show cost or nothing
+	var cell := Island.position_to_cell(References.camera.get_global_mouse_position())
+	var island := References.island
+	
+	if preview_is_valid:
+		var msg: String = ""
+		# If it's a rite, show inventory count
+		if Towers.is_tower_rite(preview_tower_prototype.type):
+			var count = Player.get_rite_count(preview_tower_prototype.type)
+			msg += "Rite Available: %d\n" % count
+			
+		if island.terrain_base_grid.has(cell):
+			var terrain = island.get_terrain_base(cell)
+			msg += Terrain.Base.keys()[terrain].capitalize()
+			
+			# Add flavor for special tiles
+			if terrain == Terrain.Base.HIGHLAND:
+				msg += "\n(Range Bonus)"
+			elif terrain == Terrain.Base.SETTLEMENT:
+				msg += "\n(Used to build villages)"
+		else:
+			msg = "Uncharted"
+		
+		UI.cursor_info.display_message(msg, false)
+	else:
+		# If invalid, get the specific reason
+		# Note: We used 'preview_tower_position' which was calculated in _update_preview_visuals
+		var error_msg = TerrainService.get_construction_error_message(
+			References.island, 
+			preview_tower_position, 
+			preview_tower_prototype
+		)
+		UI.cursor_info.display_message(error_msg, true)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not enabled:
 		return
@@ -46,6 +130,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Rotation can be handled universally if a preview is active
 	if current_state == State.PREVIEWING and event.is_action_pressed("rotate_preview"):
 		preview_tower_facing = (preview_tower_facing + 1) % Tower.Facing.size() as Tower.Facing
+		var rotated_size: Vector2 = Towers.get_tower_size(preview_tower_prototype.type)
+		if (preview_tower_facing as int) % 2 != 0:
+			rotated_size = Vector2(rotated_size.y, rotated_size.x)
+			preview_tower_prototype.size = rotated_size
 		_update_preview_visuals()
 
 func _enter_idle_state():
@@ -71,9 +159,8 @@ func _enter_idle_state():
 	current_state = State.IDLE
 
 func _enter_preview_state(tower: Tower):
-	# If a tower was selected (or previewed), deselect it first.
 	if current_state == State.TOWER_SELECTED or current_state == State.PREVIEWING:
-		_enter_idle_state() # Reset to a clean state first
+		_enter_idle_state() # reset to a clean state first
 
 	current_state = State.PREVIEWING
 	preview_tower_prototype = tower
@@ -81,21 +168,23 @@ func _enter_preview_state(tower: Tower):
 	preview_tower_prototype.modulate = Color(1,1,1,0.6)
 	current_preview.setup(preview_tower_prototype.type)
 	current_preview.show()
-	# Trigger an immediate update of the preview at the current mouse position.
+	# trigger an immediate update of the preview at the current mouse position
 	_update_preview_visuals()
-
+	# lock on range indicator
+	References.range_indicator.select(preview_tower_prototype)
+	
 func _enter_tower_selected_state(tower: Tower):
-	# If we were previewing, cancel it.
-	if current_state == State.PREVIEWING:
-		_enter_idle_state() # Reset to a clean state first
+	if current_state == State.PREVIEWING or current_state == State.TOWER_SELECTED:
+		_enter_idle_state() # reset to a clean state first
 
 	current_state = State.TOWER_SELECTED
 	selected_tower = tower
 	tower_was_selected.emit(selected_tower)
 	UI.update_inspector_bar.emit(selected_tower)
-
-# --- Input Handlers (Called by _unhandled_input) ---
-
+	
+	References.range_indicator.select(tower)
+	
+# input handlers
 func _handle_idle_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 		# The only thing we can do in the IDLE state is select a tower.
@@ -174,18 +263,20 @@ func _update_preview_visuals():
 		
 		var occupied_cells: Array[Vector2i] = []
 		var size := preview_tower_prototype.size
-			
-		for x in range(size.x):
-			for y in range(size.y):
-				occupied_cells.append(preview_tower_position + Vector2i(x, y))
 
-		# 2. Send to Renderer
+		for x in size.x:
+			for y in size.y:
+				var navcost: float = preview_tower_prototype.get_navcost_for_cell(preview_tower_position + Vector2i(x,y))
+				if not is_equal_approx(navcost, Navigation.BASE_COST): #filter out cells marked as transparent
+					occupied_cells.append(preview_tower_position + Vector2i(x, y))
+
+		# send to path renderer
 		if is_instance_valid(References.path_renderer):
 			References.path_renderer.update_preview(occupied_cells)
+			
+		preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_facing, preview_tower_position, preview_tower_prototype.type, true)
+		current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 
-	preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_facing, preview_tower_position, preview_tower_prototype.type, true)
-
-	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 	
 # new helper to create and manage the temporary inspection unit
 func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vector2i) -> void: ##for terrain preview!
@@ -201,7 +292,7 @@ func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vecto
 	_ghost_unit_for_inspection.abstractive = true # IMPORTANT: prevents it from interacting with gameplay
 	_ghost_unit_for_inspection.visible = false
 	_ghost_unit_for_inspection.tower_position = cell_pos
-	print("Ghost unit: ", cell_pos)
+
 	# pass the preview's initial state data to the ghost unit so its behavior is configured correctly
 	if not cell_data.initial_state.is_empty():
 		_ghost_unit_for_inspection.set_initial_behaviour_state(cell_data.initial_state)
@@ -219,5 +310,7 @@ func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vecto
 
 # --- Signal Connections ---
 func _on_build_tower_selected(tower: Tower):
+	if not tower.is_ready:
+		await tower.components_ready
 	# The UI is requesting to start building a tower.
 	_enter_preview_state(tower)

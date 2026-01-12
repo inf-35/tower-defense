@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://dnnoi478ixu4y" path="res://Content/Relics/broken_mirror/broken_mirror.tres" id="1_bxsop"]
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_crvro"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_jewe7"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_jewe7"]
 [ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_y734l"]
 
 [sub_resource type="Resource" id="Resource_kyx07"]
@@ -17,6 +17,6 @@ id_name = "broken_mirror"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_bxsop")
-base_weight = 200.0
+base_weight = 150.0
 bias_rules = Array[ExtResource("1_crvro")]([SubResource("Resource_kyx07")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

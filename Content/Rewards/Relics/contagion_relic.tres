@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://bp514kbx88mhb"]
 
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="1_2s358"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_2s358"]
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_85s73"]
 [ext_resource type="Resource" uid="uid://djnmsx27kjjyi" path="res://Content/Relics/contagion/contagion.tres" id="1_ews1q"]
 [ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_hqes0"]
@@ -17,6 +17,6 @@ id_name = "contagion"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_ews1q")
-base_weight = 800.0
+base_weight = 200.0
 bias_rules = Array[ExtResource("1_85s73")]([SubResource("Resource_hxy52")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

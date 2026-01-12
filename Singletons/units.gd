@@ -15,7 +15,8 @@ enum Type {
 	PHANTOM,
 	EFFIGY,
 	SUMMONER,
-	ZOMBIE
+	ZOMBIE,
+	GIANT
 }
 
 var unit_stats: Dictionary[Type, UnitData] = {}

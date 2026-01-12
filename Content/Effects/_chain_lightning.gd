@@ -69,7 +69,7 @@ func _execute_chain_lightning(host: Tower, initial_report: HitReportData) -> voi
 		jump_hit_data.recursion = initial_report.recursion + 1
 		
 		# use hitscan delivery to apply damage instantly from the position of the last enemy
-		var delivery_data: DeliveryData = host.attack_component.attack_data.generate_delivery_data()
+		var delivery_data: DeliveryData = host.attack_component.attack_data.generate_generic_delivery_data()
 		delivery_data.use_source_position_override = true
 		delivery_data.source_position = last_hit_target.global_position
 

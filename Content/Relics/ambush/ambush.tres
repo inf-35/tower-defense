@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=9 format=3 uid="uid://bcbxd5ipm6y5q"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=10 format=3 uid="uid://bcbxd5ipm6y5q"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_2jsxo"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_a12k8"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_dd3kw"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_lj7yh"]
 [ext_resource type="Script" uid="uid://ce5bynwct2hta" path="res://Content/Relics/ambush/ambush_effect.gd" id="4_2yjpv"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="5_lj7yh"]
 
 [sub_resource type="Resource" id="Resource_26g71"]
 script = ExtResource("3_lj7yh")
@@ -15,8 +16,6 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 [sub_resource type="Resource" id="Resource_meiml"]
 script = ExtResource("2_dd3kw")
 delivery_method = 3
-range = 40.0
-radius = 70.0
 status_effects = Array[ExtResource("3_lj7yh")]([SubResource("Resource_26g71")])
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

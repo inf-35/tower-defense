@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://cia08bmtkwtuh"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://cia08bmtkwtuh"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_64dk7"]
 [ext_resource type="Script" uid="uid://ble10drla0jee" path="res://Content/Relics/hypothermia/damage_boost_status_effect.gd" id="1_htyje"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="2_j5shw"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_b4qhr"]
 
 [sub_resource type="Resource" id="Resource_j5shw"]
@@ -14,6 +15,6 @@ script = ExtResource("3_b4qhr")
 type = 6
 global_effect = SubResource("Resource_j5shw")
 title = "Hypothermia"
-description = "Enemies take 20% more damage per stack of frost.
+description = "Enemies take 20% more damage per stack of {FROST}
 "
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

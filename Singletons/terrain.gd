@@ -3,7 +3,7 @@ extends Node #terrain
 
 enum Base { #base terrain type
 	EARTH,
-	RUINS,
+	SETTLEMENT,
 	HIGHLAND,
 }
 class CellData: #used to communicate info during runtime

@@ -9,8 +9,8 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_5efsi"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_s4vh2"]
 [ext_resource type="Resource" uid="uid://cnyf604vqitng" path="res://Units/Towers/snowball/snowball_attack.tres" id="9_18pqd"]
-[ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="10_w3bcp"]
-[ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="11_6f74u"]
+[ext_resource type="Texture2D" uid="uid://r76io870gwkf" path="res://Assets/snowball_tower.png" id="10_7iuwt"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_pw7yb"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_qyrm2"]
 
 [sub_resource type="Resource" id="Resource_uhk0q"]
@@ -33,11 +33,10 @@ suffix = " /s"
 special_modifier = 0
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
-[node name="Snowball" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Snowball" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_yhqet")
 type = 13
-turret = NodePath("Graphics/Turret")
 stat_displays = Array[ExtResource("2_r83sm")]([SubResource("Resource_uhk0q"), SubResource("Resource_yr17l"), SubResource("Resource_qo260")])
 behavior = NodePath("SnowballBehavior")
 graphics = NodePath("Graphics")
@@ -71,13 +70,12 @@ attack_data = ExtResource("9_18pqd")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.048, 0.048)
-texture = ExtResource("10_w3bcp")
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10_7iuwt")
 
-[node name="Turret" type="Sprite2D" parent="Graphics"]
-z_index = 1
-texture = ExtResource("11_6f74u")
-offset = Vector2(28, 0)
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("11_pw7yb")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("12_qyrm2")

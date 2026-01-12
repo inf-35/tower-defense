@@ -24,6 +24,7 @@ func _ready() -> void:
 	start_wave_button.pressed.connect(func():
 		UI.building_phase_ended.emit()
 	)
+
 	# Request initial state if Player might have initialized before UI connected
 	# (though with autoload order or call_deferred this might not be strictly necessary,
 	# but good for robustness if Player's _ready completes and emits before UI's _ready connects)
@@ -31,6 +32,8 @@ func _ready() -> void:
 		_on_player_tower_types_update(Player.unlocked_towers, Player.rite_inventory)
 	else:
 		_clear_towers_bar() # Ensure it's empty if no towerss initially
+		
+	UI.tutorial_manager.register_element(TutorialManager.Reference.START_WAVE_BUTTON, start_wave_button)
 
 
 func _clear_towers_bar() -> void:
@@ -54,7 +57,12 @@ func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type
 		
 		tower_option.pressed.connect(_on_tower_button_pressed.bind(unlocked_tower_type))
 		towers_bar.add_child(tower_option)
-	
+		
+		if unlocked_tower_type == Towers.Type.PALISADE:
+			UI.tutorial_manager.register_element(TutorialManager.Reference.PALISADE_BUTTON, tower_option)
+		elif unlocked_tower_type == Towers.Type.TURRET:
+			UI.tutorial_manager.register_element(TutorialManager.Reference.TURRET_BUTTON, tower_option)
+
 func _on_tower_button_pressed(type_id: Towers.Type) -> void:
 	UI.tower_selected.emit(Towers.get_tower_prototype(type_id)) #update click handler
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(type_id)) #update inspector bar to fit whatever we're selecting

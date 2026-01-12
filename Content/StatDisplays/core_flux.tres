@@ -4,8 +4,6 @@
 
 [resource]
 script = ExtResource("1_ksr4b")
-attribute = 10
-label = "FLUX"
-suffix = ""
+label = "{PLAYER_HP}"
 special_modifier = 1
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

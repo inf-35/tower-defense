@@ -14,3 +14,4 @@ const HIGH_ALLIED_PROJECTILES: int = 400
 const HIGH_ENEMY_PROJECTILES: int = 450
 const INWORLD_UI: int = 500 ##healthbars, labels, etc.
 const HUD: int = 600
+const TUTORIAL: int = 700

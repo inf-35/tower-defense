@@ -8,9 +8,9 @@
 
 [resource]
 script = ExtResource("1_38k20")
-title = "Basic"
-description = "A basic unit"
+title = "Goblin"
+description = "Weak, yet dangerous in numbers."
 stat_displays = Array[ExtResource("2_iugvc")]([ExtResource("3_5ux05"), ExtResource("4_sh6hu")])
 unit_scene = ExtResource("5_r3od5")
-flux_value = 0.6
+flux_value = 0.7
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

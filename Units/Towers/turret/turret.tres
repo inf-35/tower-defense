@@ -23,7 +23,8 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Turret"
 tower_description = "A crude yet effective all-rounder that fires bolts towards enemies.
-"
+
+{CURSED}"
 icon = ExtResource("2_32gg8")
 preview = ExtResource("1_12t77")
 inspector_actions = Array[ExtResource("2_1xnkv")]([ExtResource("4_l0cjb"), SubResource("Resource_1xnkv"), ExtResource("3_p42es")])

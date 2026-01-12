@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bn2b51cmejpc5"]
+[gd_scene load_steps=17 format=3 uid="uid://bn2b51cmejpc5"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_r3k45"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_8wtba"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_bbnn2"]
 [ext_resource type="Resource" uid="uid://by3rh077dcq6w" path="res://Units/Enemies/troll/troll_hp.tres" id="6_cbyq1"]
 [ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="7_bvdqm"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="7_tmp1d"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_yo6oh"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_inom0"]
 [ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="10_3mlr7"]
@@ -58,12 +59,22 @@ script = ExtResource("5_bbnn2")
 health_data = ExtResource("6_cbyq1")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
+[node name="ContactShadow" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+position = Vector2(0, 1)
+script = ExtResource("7_tmp1d")
+shadow_size = Vector2(8, 3.5)
+color = Color(0.1764706, 0.19215687, 0.2784314, 0.34117648)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"
+
 [node name="Graphics" type="Sprite2D" parent="."]
-position = Vector2(1, -3)
+position = Vector2(1, -4)
 scale = Vector2(0.096, 0.096)
 texture = ExtResource("7_bvdqm")
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("8_yo6oh")

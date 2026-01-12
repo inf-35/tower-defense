@@ -1,0 +1,58 @@
+[gd_scene load_steps=11 format=3 uid="uid://b7ikev455648n"]
+
+[ext_resource type="Script" uid="uid://c5mfnkyxvbtun" path="res://Units/Entities/hurtbox.gd" id="1_dka0b"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_3615q"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_ldfs7"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="4_lfs5o"]
+[ext_resource type="Texture2D" uid="uid://crps220emdfox" path="res://Assets/poison_cloud_particle.png" id="5_3615q"]
+
+[sub_resource type="Resource" id="Resource_wt7ho"]
+script = ExtResource("4_lfs5o")
+type = 2
+cooldown = 1.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_11e6o"]
+script = ExtResource("3_ldfs7")
+cooldown = 0.5
+radius = 8.0
+damage = 0.1
+status_effects = Array[ExtResource("4_lfs5o")]([SubResource("Resource_wt7ho")])
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[sub_resource type="Gradient" id="Gradient_ldfs7"]
+offsets = PackedFloat32Array(0, 0.04761905, 0.9047619, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.99051857, 1, 1, 1, 0.80784315, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lfs5o"]
+gradient = SubResource("Gradient_ldfs7")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7phyu"]
+particle_flag_disable_z = true
+emission_shape_offset = Vector3(1, 2, 0)
+emission_shape_scale = Vector3(10, 10, 1)
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = -9.9999895
+angle_max = 10.0000105
+radial_velocity_min = -2.2351742e-05
+radial_velocity_max = 1.9999776
+gravity = Vector3(0, -1, 0)
+scale_min = 0.049999997
+scale_max = 0.08
+color_ramp = SubResource("GradientTexture1D_lfs5o")
+hue_variation_min = -0.010000022
+hue_variation_max = -0.010000022
+
+[node name="PoisonCloud" type="Node2D"]
+script = ExtResource("1_dka0b")
+attack_data = SubResource("Resource_11e6o")
+metadata/_custom_type_script = "uid://c5mfnkyxvbtun"
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+z_index = 90
+z_as_relative = false
+amount = 1
+texture = ExtResource("5_3615q")
+lifetime = 3.0
+process_material = SubResource("ParticleProcessMaterial_7phyu")

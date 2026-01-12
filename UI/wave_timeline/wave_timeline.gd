@@ -39,6 +39,9 @@ func _ready() -> void:
 		_initialize_pips()
 	)
 	
+
+	UI.tutorial_manager.register_element(TutorialManager.Reference.WAVE_TIMELINE, self)
+	
 # called when a new wave starts.
 # shifts everything left, destroys the old current, spawns new future.
 func _advance_timeline() -> void:
@@ -88,7 +91,10 @@ func _refill_schedule_buffer() -> void: ## converts the PhaseManager's wave_plan
 	# keep generating until we have enough entries to fill the UI + buffer (2)
 	while _schedule.size() < slot_count + 2:
 		var wave: Phases.Wave = Phases.wave_plan.get(_last_generated_wave, null)
-
+		
+		if _last_generated_wave > Phases.FINAL_WAVE:
+			break
+		
 		if not wave:
 			# if looking too far into future (beyond FINAL_WAVE), assume normal
 			wave = Phases.Wave.new() 

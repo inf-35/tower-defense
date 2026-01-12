@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://1e5o2052vyu"]
+[gd_scene load_steps=20 format=3 uid="uid://1e5o2052vyu"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ek1vy"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_agli2"]
@@ -8,8 +8,9 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_lh065"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_7xme7"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_iwhy7"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="9_1cmnt"]
+[ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="9_bcr4u"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_jjkix"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_v7ev7"]
 
 [sub_resource type="Resource" id="Resource_p6ncc"]
 script = ExtResource("2_agli2")
@@ -128,7 +129,11 @@ texture = SubResource("PlaceholderTexture2D_p6ncc")
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("9_1cmnt")
+texture = ExtResource("9_bcr4u")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("10_v7ev7")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("10_jjkix")

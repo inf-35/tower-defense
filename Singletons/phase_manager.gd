@@ -10,7 +10,7 @@ signal wave_ended(wave_number: int) #combat wave ended
 
 signal combat_started(wave_number: int) #combat wave started
 
-signal wave_schedule_updated() ##wave schedule updated
+signal wave_schedule_updated() ## wave schedule updated
 
 # --- game state variables ---
 
@@ -28,7 +28,7 @@ var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
 
 var wave_plan: Dictionary[int, Wave] = {}
-const FINAL_WAVE: int = 16
+const FINAL_WAVE: int = 3
 class Wave: ## internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL
@@ -59,7 +59,35 @@ func start_game() -> void:
 	_report("starting game flow.")
 	_generate_wave_plan()
 	
+	start_tutorial()
+	
 	_prepare_for_next_wave_cycle()
+	
+func start_tutorial():
+	var steps: Array[TutorialStep] = [
+		preload("res://UI/tutorial/pan_camera.tres"),
+		preload("res://UI/tutorial/zoom_camera.tres")
+	]
+	
+	var palisade: TutorialStep = preload("res://UI/tutorial/place_palisade.tres")
+	palisade.trigger_signal = UI.place_tower_requested
+	palisade.desired_parameters = [Towers.Type.PALISADE]
+	
+	var turret: TutorialStep = preload("res://UI/tutorial/place_turret.tres")
+	turret.trigger_signal = UI.place_tower_requested
+	turret.desired_parameters = [Towers.Type.TURRET]
+	
+	var timeline: TutorialStep = preload("res://UI/tutorial/hover_wave_timeline.tres")
+	
+	var start_wave: TutorialStep = preload("res://UI/tutorial/start_wave.tres")
+	start_wave.trigger_signal = UI.building_phase_ended
+	start_wave.desired_parameters = []
+	
+	steps.append(palisade)
+	steps.append(turret)
+	steps.append(timeline)
+	steps.append(start_wave)
+	#UI.tutorial_manager.start_sequence(steps)
 
 func _generate_wave_plan() -> void:
 	_report("generating wave plan.")
@@ -71,6 +99,9 @@ func _generate_wave_plan() -> void:
 			wave.day_events.append(DayEvent.EXPANSION)
 			
 		if i % 3 == 0:
+			wave.day_events.append(DayEvent.REWARD_RELIC)
+			
+		if i % 4 == 0:
 			wave.day_events.append(DayEvent.REWARD_TOWER)
 			
 		## rewards on specific day
@@ -106,11 +137,6 @@ func has_day_event(wave_num: int, event: DayEvent) -> bool:
 
 func _prepare_for_next_wave_cycle() -> void:
 	current_wave_number += 1
-	
-	if current_wave_number > FINAL_WAVE:
-		current_wave_number -= 1
-		start_game_over(true)
-		return
 
 	var wave : Wave = wave_plan.get(current_wave_number, Wave.new())
 	_report("Preparing for wave cycle " + str(current_wave_number))
@@ -174,10 +200,10 @@ func _start_choice_phase(type: ChoiceType) -> void:
 			)
 
 		ChoiceType.REWARD_TOWER:
-			RewardService.generate_and_present_choices(3, Reward.Type.UNLOCK_TOWER)
+			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER])
 			
 		ChoiceType.REWARD_RELIC:
-			RewardService.generate_and_present_choices(3, Reward.Type.ADD_RELIC)
+			RewardService.generate_and_present_choices(3, [Reward.Type.ADD_RELIC, Reward.Type.ADD_RITE])
 
 # responds to the player selecting an option on the UI
 func _on_player_made_choice(choice_id: int) -> void:
@@ -248,7 +274,11 @@ func _on_combat_wave_ended(_wave_number: int) -> void:
 		return
 	_report("combat wave " + str(current_wave_number) + " reported as ended by Waves.gd.")
 	wave_ended.emit(current_wave_number)
-	current_phase = GamePhase.IDLE
+	
+	if current_wave_number >= FINAL_WAVE:
+		start_game_over(true)
+		return
+		
 	_advance_phase()
 	
 func start_game_over(is_victory: bool) -> void:
@@ -257,7 +287,6 @@ func start_game_over(is_victory: bool) -> void:
 	
 	UI.display_game_over.emit(is_victory)
 	_report("Game over!")
-	
 
 func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:

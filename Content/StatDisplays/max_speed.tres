@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_fttwl")
 attribute = 3
-label = "SPD"
+label = "{UNIT_SPEED}"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"

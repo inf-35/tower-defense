@@ -1,30 +1,30 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://cdplbjjeissy3"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=8 format=3 uid="uid://cdplbjjeissy3"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_f50kn"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_6chqq"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_mr3g7"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_1227p"]
+[ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="5_x0bic"]
 
 [sub_resource type="Resource" id="Resource_i3c6p"]
 script = ExtResource("3_mr3g7")
 type = 5
-stack = 2.0
 cooldown = 2.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_1227p")
-vfx_type = 1
+texture = ExtResource("5_x0bic")
 radius = 2.0
+scale = 0.1
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
 script = ExtResource("2_6chqq")
 delivery_method = 1
-cooldown = 0.8
-radius = 8.0
-damage = 1.0
+radius = 5.0
+damage = 0.8
 status_effects = Array[ExtResource("3_mr3g7")]([SubResource("Resource_i3c6p")])
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0

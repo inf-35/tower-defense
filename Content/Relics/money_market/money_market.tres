@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://c80vp855pe6oq"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://c80vp855pe6oq"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_6oyvi"]
 [ext_resource type="Script" uid="uid://bx75y7j76chrr" path="res://Content/Relics/money_market/interest_relic.gd" id="1_vo0tq"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_fv8q0"]
+[ext_resource type="Texture2D" uid="uid://cr6o3h4hr3tpd" path="res://Assets/money_market_icon.png" id="2_nsj5c"]
 
 [sub_resource type="Resource" id="Resource_nsj5c"]
 script = ExtResource("1_vo0tq")
@@ -17,4 +18,5 @@ type = 8
 global_effect = SubResource("Resource_nsj5c")
 title = "Money Market"
 description = "Earn 5% of your current gold at the end of every wave, up to 50 per wave."
+icon = ExtResource("2_nsj5c")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_1p8mj"]
 [ext_resource type="Resource" uid="uid://j7epcpye37my" path="res://Content/Relics/permafrost/permafrost.tres" id="1_3w7od"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_0krbu"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_0krbu"]
 [ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_d35qb"]
 
 [sub_resource type="Resource" id="Resource_vpvqy"]
 script = ExtResource("2_d35qb")
-tower_types = Array[int]([3, 30, 24])
+tower_types = Array[int]([3, 24])
 operation = 1
 metadata/_custom_type_script = "uid://7k2jlkybgih"
 

@@ -10,9 +10,7 @@
 [ext_resource type="Resource" uid="uid://cqoa0ljfot6ra" path="res://Content/Effects/capacity_player_core.tres" id="5_ok6e0"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_ok6e0"]
 [ext_resource type="Texture2D" uid="uid://djssw4y7st7r3" path="res://Assets/keep.png" id="8_cg3ju"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ok6e0"]
-size = Vector2(20, 20)
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="9_ok6e0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
 radius = 7.0
@@ -39,9 +37,10 @@ position = Vector2(0, -5.9604645e-08)
 scale = Vector2(0.06126645, 0.06126646)
 texture = ExtResource("8_cg3ju")
 
-[node name="reference" type="Sprite2D" parent="."]
-visible = false
-texture = SubResource("PlaceholderTexture2D_ok6e0")
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("9_ok6e0")
+height_multiplier = 2.0
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="CoreHitbox" type="Area2D" parent="."]
 collision_layer = 0

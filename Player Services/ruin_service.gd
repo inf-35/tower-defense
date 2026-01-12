@@ -2,7 +2,7 @@ extends Node
 class_name RuinService
 
 # defines why a tower was ruined, which dictates its fate
-enum RuinReason { KILLED, SOLD }
+enum RuinReason { KILLED, SOLD, DESTROYED }
 
 # we track the tower node itself and the reason it was ruined
 var _ruined_towers: Dictionary[Tower, RuinReason] = {}
@@ -35,8 +35,7 @@ func _on_wave_ended(_wave_number: int) -> void:
 	
 	for tower: Tower in towers_to_process:
 		if not is_instance_valid(tower):
-			# if the tower was somehow destroyed by another means, clean it up
-			_ruined_towers.erase(tower)
+			# if the tower was somehow destroyed by another means, pass
 			continue
 
 		var reason: RuinReason = _ruined_towers[tower]

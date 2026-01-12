@@ -9,7 +9,7 @@ class CapacityState extends RefCounted:
 	var last_capacity_generation: float = 0.0
 
 func _init() -> void:
-	event_hooks =  [GameEvent.EventType.ADJACENCY_UPDATED]
+	event_hooks =  [GameEvent.EventType.ADJACENCY_UPDATED, GameEvent.EventType.DIED]
 
 func create_instance() -> EffectInstance:
 	var instance := EffectInstance.new()
@@ -26,6 +26,7 @@ func _handle_attach(instance: EffectInstance):
 func _handle_detach(instance: EffectInstance):
 	var state := instance.state as CapacityState
 	Player.remove_from_total_capacity(state.last_capacity_generation)
+	state.last_capacity_generation = 0.0
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type == GameEvent.EventType.ADJACENCY_UPDATED:

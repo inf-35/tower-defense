@@ -15,6 +15,7 @@ var keep: Node
 var camera: Camera
 var tower_preview: TowerPreview
 var path_renderer: PathRenderer
+var range_indicator: RangeIndicator
 var projectiles: Node2D
 
 #global constants
@@ -44,6 +45,7 @@ func start():
 	tower_preview = island.get_node("TowerPreview")
 	projectiles = island.get_node("Projectiles")
 	path_renderer = island.get_node("PathRenderer")
+	range_indicator = island.get_node("RangeIndicator")
 	
 	await get_tree().process_frame
 	references_ready.emit()

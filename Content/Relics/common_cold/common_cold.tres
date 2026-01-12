@@ -16,6 +16,6 @@ script = ExtResource("3_8px1t")
 type = 2
 global_effect = SubResource("Resource_xr361")
 title = "Common Cold"
-description = "Each stack of poison inflicted also inflicts half a stack of frost."
+description = "Each stack of {POISON} inflicted also inflicts half a stack of {FROST}"
 icon = ExtResource("2_4q4qk")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

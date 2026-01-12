@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=4 format=3 uid="uid://j2581i8vspxa"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_8btou"]
+[ext_resource type="Resource" uid="uid://crmjnrrw87ea1" path="res://Content/Relics/dynamite/dynamite.tres" id="2_8btou"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_ymbpn"]
+
+[resource]
+script = ExtResource("3_ymbpn")
+id_name = "ambush"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("2_8btou")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

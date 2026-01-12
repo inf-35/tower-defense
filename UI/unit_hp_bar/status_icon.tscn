@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://m6uvw5uwem5a"]
+
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_fxei5"]
+[ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="2_ml2c4"]
+[ext_resource type="Script" uid="uid://r6r6mrya0npo" path="res://UI/unit_hp_bar/unit_status_icon.gd" id="3_ml2c4"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_s8phw"]
+
+[node name="StatusIcon" type="TextureProgressBar" node_paths=PackedStringArray("stack_label")]
+offset_right = 46.0
+offset_bottom = 38.0
+scale = Vector2(0.1, 0.1)
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme = ExtResource("1_fxei5")
+max_value = 4.0
+value = 1.0
+allow_greater = true
+allow_lesser = true
+fill_mode = 3
+texture_under = ExtResource("2_ml2c4")
+texture_progress = ExtResource("2_ml2c4")
+tint_under = Color(1, 1, 1, 0.12156863)
+script = ExtResource("3_ml2c4")
+stack_label = NodePath("InteractiveRichTextLabel")
+
+[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_type_variation = &"rt_s20"
+theme_override_colors/font_outline_color = Color(1, 0.98039216, 0.94509804, 1)
+theme_override_constants/outline_size = 6
+bbcode_enabled = true
+text = "4x"
+scroll_active = false
+script = ExtResource("3_s8phw")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"

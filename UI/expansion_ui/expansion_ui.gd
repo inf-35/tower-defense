@@ -44,8 +44,9 @@ func _hide_confirmation():
 	_confirmation_button.disabled = true
 	
 func _populate_buttons(data: Array[ExpansionChoice]):
-	for button: Node in option_buttons:
+	for button: Node in _vbox.get_children():
 		button.queue_free()
+
 	option_buttons.clear()
 	
 	for i: int in len(data):
@@ -109,13 +110,30 @@ func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 						elif anomaly_data.reward.type == Reward.Type.ADD_RELIC:
 							var relic: RelicData = anomaly_data.reward.relic
 							anomaly_desc += " ({R_%s})" % str(relic.type)
-							print(relic.title.to_snake_case().to_upper(), " by expansion")
 						elif anomaly_data.reward.type == Reward.Type.ADD_RITE:
 							var rite_type: Towers.Type = anomaly_data.reward.rite_type
 							anomaly_desc += " ({T_%s})" % Towers.Type.keys()[rite_type]
 						else:
 							anomaly_desc += " (%s)" % anomaly_data.reward.title
 				distinct_anomaly_list.append(anomaly_desc)
+	
+			elif cell_data.feature == Towers.Type.ARTIFACT:
+				var artifact_desc: String = feature_name
+				if show_anomaly_contents and cell_data.initial_state.has(&"reward"):
+					var reward: Reward = cell_data.initial_state[&"reward"]
+					if reward.type == Reward.Type.UNLOCK_TOWER:
+						var tower_type: Towers.Type = reward.tower_type
+						artifact_desc += " ({T_%s})" % Towers.Type.keys()[tower_type]
+					elif reward.type == Reward.Type.ADD_RELIC:
+						var relic: RelicData = reward.relic
+						artifact_desc += " ({R_%s})" % str(relic.type)
+					elif reward.type == Reward.Type.ADD_RITE:
+						var rite_type: Towers.Type = reward.rite_type
+						artifact_desc += " ({T_%s})" % Towers.Type.keys()[rite_type]
+					else:
+						artifact_desc += " (%s)" % reward.title
+						
+				distinct_anomaly_list.append(artifact_desc)
 			else:
 				# all other towers are consolidated
 				standard_feature_counts[feature_name] = standard_feature_counts.get(feature_name, 0) + 1

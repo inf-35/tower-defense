@@ -12,7 +12,7 @@ const INVALID_TINT = Color(1, 0.3, 0.3, 0.7)
 
 func _ready():
 	tower_sprite = Sprite2D.new()
-	tower_sprite.scale = Vector2(0.1, 0.1)
+	tower_sprite.scale = Vector2(0.06, 0.06)
 	add_child(tower_sprite)
 
 # Call this once to set up the preview's visual and data
@@ -27,7 +27,7 @@ func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i):
 
 	tower_sprite.modulate = VALID_TINT if is_valid else INVALID_TINT
 	tower_sprite.rotation = facing * PI * 0.5
-	tower_sprite.scale = Vector2(Towers.get_tower_size(tower_type) * Island.CELL_SIZE) / tower_sprite.texture.get_size()
+	tower_sprite.scale = Vector2(0.06, 0.06)
 	var base_size: Vector2i = Towers.get_tower_size(tower_type)
 	var center_offset: Vector2 = (base_size) * Island.CELL_SIZE * 0.5
 	if int(facing) % 2 != 0:
@@ -36,15 +36,15 @@ func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i):
 	# Trigger the _draw() function to update any custom overlays
 	queue_redraw()
 
-func _draw():
-	if not is_instance_valid(tower_sprite):
-		return
-	#if not tower_stats:
+#func _draw():
+	#if not is_instance_valid(tower_sprite):
 		#return
-	# Draw an overlay, like a range indicator
-	if true: #some sort of tower stats condition
-		# Only draw the range circle if placement is valid
-		if tower_sprite.modulate == VALID_TINT:
-			var range_color = Color(1, 1, 1, 0.8)
-			# Draw the range circle from the center of the node
-			draw_arc(tower_sprite.position, Towers.get_tower_stat(tower_type, Attributes.id.RANGE), 0, TAU, 32, range_color, 1)
+	##if not tower_stats:
+		##return
+	## Draw an overlay, like a range indicator
+	#if true: #some sort of tower stats condition
+		## Only draw the range circle if placement is valid
+		#if tower_sprite.modulate == VALID_TINT:
+			#var range_color = Color(1, 1, 1, 0.8)
+			## Draw the range circle from the center of the node
+			#draw_arc(tower_sprite.position, Towers.get_tower_stat(tower_type, Attributes.id.RANGE), 0, TAU, 32, range_color, 1)

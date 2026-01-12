@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://dmw6i3c23lwuw"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dmw6i3c23lwuw"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_lxky5"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_iq2h4"]
+[ext_resource type="Texture2D" uid="uid://bve6w360ouk63" path="res://Assets/poison_rite.png" id="1_47pug"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_0b6ek"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_pdx2k"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_s566f"]
 [ext_resource type="PackedScene" uid="uid://dycu3x8f8w1wp" path="res://Units/Towers/rite_poisons/rite_poisons.tscn" id="4_0yfmt"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_2ahuk"]
 
 [resource]
 script = ExtResource("3_pdx2k")
@@ -16,6 +18,8 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Poisons Rite"
-tower_description = "Cheap unit redirector."
+tower_description = "Adjacent towers' attacks gain 1 stack of {POISON}."
+icon = ExtResource("1_47pug")
+preview = ExtResource("1_47pug")
 tower_scene = ExtResource("4_0yfmt")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

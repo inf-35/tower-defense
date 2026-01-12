@@ -1,20 +1,22 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://ndg855khj2v6"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=8 format=3 uid="uid://ndg855khj2v6"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_dk6pn"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_3gio5"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_dxh48"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_l3dtt"]
+[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="5_3gio5"]
 
 [sub_resource type="Resource" id="Resource_dk6pn"]
 script = ExtResource("3_dxh48")
 type = 4
-cooldown = 4.0
+cooldown = 3.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_l3dtt")
-vfx_type = 1
+texture = ExtResource("5_3gio5")
 radius = 1.5
+scale = 0.1
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 

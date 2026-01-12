@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cledbfomsigv"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cledbfomsigv"]
 
-[ext_resource type="Texture2D" uid="uid://byt5j2wvoja0y" path="res://turret_base.svg" id="1_cob1y"]
+[ext_resource type="Texture2D" uid="uid://r76io870gwkf" path="res://Assets/snowball_tower.png" id="1_5y808"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cmlbd"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_fn38c"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_rds7e"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_tm8p4"]
 [ext_resource type="PackedScene" uid="uid://c7chrtlkjrrxn" path="res://Units/Towers/snowball/snowball.tscn" id="4_eo045"]
@@ -13,7 +12,8 @@ script = ExtResource("3_tm8p4")
 id = 24
 element = 1
 tower_name = "Snowball"
-tower_description = "This tower releases snowballs that travel through enemies in straight lines, inflicting frost and dealing damage to those that stand in its path. Snowballs stop only when they reach the tower's range or when they hit a structure."
-icon = ExtResource("1_cob1y")
+tower_description = "Fires a piercing snowball that damages and {FROST|label=Freezes} all enemies in a line. The projectile stops only at max range or when hitting a structure."
+icon = ExtResource("1_5y808")
+preview = ExtResource("1_5y808")
 tower_scene = ExtResource("4_eo045")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

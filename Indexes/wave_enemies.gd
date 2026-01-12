@@ -3,10 +3,10 @@ class_name WaveEnemies
 const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	# Example: Wave 1 is just 5 Basics (Tutorial)
 	1: [
-		[Units.Type.BASIC, 5],
+		[Units.Type.BASIC, 3],
 	],
 	2: [
-		[Units.Type.BASIC, 8],
+		[Units.Type.BASIC, 6],
 	],
 	3: [
 		[Units.Type.BASIC, 4],
@@ -22,75 +22,60 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	6 : [
 		[Units.Type.BASIC, 4],
-		[Units.Type.HEALER, 1],
-		[Units.Type.BASIC, 4],
-		[Units.Type.HEALER, 1],
+		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 4],
 	],
 	7 : [
-		[Units.Type.TROLL, 3],
+		[Units.Type.BUFF, 5],
+		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 8],
 	],
 	8 : [
-		[Units.Type.TROLL, 3],
-		[Units.Type.BUFF, 2],
-		[Units.Type.BASIC, 6],
+		[Units.Type.BUFF, 8],
+		[Units.Type.DRIFTER, 4],
 		[Units.Type.HEALER, 2],
-		[Units.Type.DRIFTER, 3],
+		[Units.Type.BASIC, 8],
 	],
 	9 : [
-		[Units.Type.BASIC, 18],
-		[Units.Type.BUFF, 4],
-		[Units.Type.ARCHER, 6],
+		[Units.Type.DRIFTER, 8],
+		[Units.Type.BASIC, 10],
+		[Units.Type.HEALER, 2],
+		[Units.Type.BUFF, 10],
 	],
 	10 : [
 		[Units.Type.TROLL, 3],
 		[Units.Type.BASIC, 10],
-		[Units.Type.HEALER, 3],
-		[Units.Type.DRIFTER, 4],
-		[Units.Type.ARCHER, 4],
-		[Units.Type.BUFF, 4],
 	],
 	11 : [
+		[Units.Type.TROLL, 3],
+		[Units.Type.BASIC, 10],
 		[Units.Type.BUFF, 8],
-		[Units.Type.HEALER, 3],
-		[Units.Type.WARRIOR, 16],
 	],
 	12 : [
-		[Units.Type.DRIFTER, 5],
-		[Units.Type.WARRIOR, 16],
-		[Units.Type.TROLL, 3],
-		[Units.Type.HEALER, 4],
-		[Units.Type.BUFF, 6],
+		[Units.Type.WARRIOR, 10],
+		[Units.Type.HEALER, 2],
+		[Units.Type.WARRIOR, 10],
+		[Units.Type.HEALER, 2],
 	],
 	13 : [
-		[Units.Type.SUMMONER, 5],
-		[Units.Type.HEALER, 3],
-		[Units.Type.SUMMONER, 5],
-		
+		[Units.Type.GIANT, 10],
 	],
 	14 : [
-		[Units.Type.TROLL, 9],
+		[Units.Type.TROLL, 3],
+		[Units.Type.DRIFTER, 4],
+		[Units.Type.GIANT, 4],
 		[Units.Type.HEALER, 4],
+		[Units.Type.WARRIOR, 5],
 	],
 	15 : [
-		[Units.Type.WARRIOR, 22],
-		[Units.Type.BUFF, 20],
-		[Units.Type.HEALER, 5],
-		[Units.Type.ARCHER, 5],
+		[Units.Type.TROLL, 10],
 	],
 	16 : [
 		[Units.Type.TROLL, 5],
-		[Units.Type.WARRIOR, 20],
-		[Units.Type.HEALER, 3],
-		[Units.Type.DRIFTER, 16],
-		[Units.Type.ARCHER, 5],
-		[Units.Type.HEALER, 2],
-		[Units.Type.BUFF, 8],
-	],
-	17 : [
-		[Units.Type.FLESHBLOB, 30],
-		[Units.Type.TROLL, 5],
+		[Units.Type.DRIFTER, 8],
+		[Units.Type.GIANT, 8],
+		[Units.Type.HEALER, 4],
+		[Units.Type.WARRIOR, 6],
 	]
 }
 # --- unit catalog ---

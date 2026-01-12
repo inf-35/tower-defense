@@ -79,12 +79,14 @@ func _movement_logic():
 	self.global_position = final_pos
 
 func show_tooltip(data: Dictionary, parent: TooltipPanel = null) -> void:
+	z_index = 750
+	z_as_relative = false
 	# hierarchy management
 	parent_tooltip = parent
 	if is_instance_valid(parent_tooltip):
 		parent_tooltip.register_child(self)
 	
-	title_label.set_parsed_text(data.get(&"title", "N/A"))
+	title_label.set_parsed_text(data.get(&"title", "N/A") + " " + data.get(&"labels", ""))
 	description_label.set_parsed_text(data.get(&"description", ""))
 	
 	self.visible = true

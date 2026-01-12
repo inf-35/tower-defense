@@ -36,7 +36,6 @@ func _trigger_ambush_explosion(source_tower: Tower) -> void:
 	if attack_data == null:
 		push_warning("AmbushEffect: Triggered but no AttackData assigned.")
 		return
-	push_warning("!")
 	# generate the hit payload from the designer-configured resource
 	var hit_data: HitData = attack_data.generate_generic_hit_data()
 	hit_data.source = source_tower

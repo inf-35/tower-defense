@@ -44,3 +44,6 @@ signal update_health(health: float)
 signal update_relics()
 #Handler/Sidebar -> Inspector
 signal update_inspector_bar(tower: Tower)
+
+static var tutorial_manager: TutorialManager
+static var cursor_info: CursorInfo

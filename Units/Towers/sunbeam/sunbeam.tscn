@@ -1,25 +1,25 @@
-[gd_scene load_steps=24 format=3 uid="uid://drdga8oye2d8x"]
+[gd_scene load_steps=30 format=3 uid="uid://drdga8oye2d8x"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2nx6i"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3hu1k"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_vubbs"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_16r00"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_d4rmn"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_em7xm"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_fg7j2"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_jbnbs"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="5_kblh8"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="6_2gfii"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="6_avtv1"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_nu2lb"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_5w4p6"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_rrug3"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="11_jbnbs"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="11_pvecx"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_vm5lm"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="12_vubbs"]
 [ext_resource type="Script" uid="uid://de7t1kfa4c2yb" path="res://Units/Towers/sunbeam/sunbeam_behavior.gd" id="14_d4rmn"]
-
-[sub_resource type="Resource" id="Resource_p6ncc"]
-script = ExtResource("2_3hu1k")
-attribute = 6
-label = "DMG"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+[ext_resource type="Texture2D" uid="uid://c1tt5b201g52i" path="res://Assets/sunbeam_provisional.png" id="15_vubbs"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_16r00"]
 
 [sub_resource type="Resource" id="Resource_x2me6"]
 script = ExtResource("6_2gfii")
@@ -27,12 +27,18 @@ type = 1
 cooldown = 4.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
+[sub_resource type="Resource" id="Resource_avtv1"]
+script = ExtResource("11_jbnbs")
+vfx_type = 4
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
 [sub_resource type="Resource" id="Resource_16r00"]
 script = ExtResource("5_kblh8")
 range = 50.0
-cooldown = 0.1
-damage = 0.2
+cooldown = 0.2
+damage = 0.1
 status_effects = Array[ExtResource("6_2gfii")]([SubResource("Resource_x2me6")])
+vfx_on_spawn = SubResource("Resource_avtv1")
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
@@ -111,7 +117,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_2nx6i")
 type = 25
-stat_displays = Array[ExtResource("2_3hu1k")]([SubResource("Resource_p6ncc")])
+stat_displays = Array[ExtResource("2_3hu1k")]([ExtResource("3_vubbs"), ExtResource("4_16r00"), ExtResource("5_jbnbs"), ExtResource("6_avtv1")])
 behavior = NodePath("SunbeamBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -143,7 +149,11 @@ texture = SubResource("PlaceholderTexture2D_p6ncc")
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("12_vubbs")
+texture = ExtResource("15_vubbs")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("16_16r00")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("12_vm5lm")
@@ -156,9 +166,11 @@ libraries = {
 
 [node name="RangeComponent" type="Node" parent="."]
 script = ExtResource("7_5w4p6")
+targeting_mode = 1
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="SunbeamBehavior" type="Node" parent="."]
 script = ExtResource("14_d4rmn")
-max_targets = 1
+laser_width = 1.5
+laser_color = Color(1, 0.56666666, 0, 0.49803922)
 metadata/_custom_type_script = "uid://de7t1kfa4c2yb"

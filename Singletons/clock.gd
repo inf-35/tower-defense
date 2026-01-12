@@ -15,7 +15,7 @@ enum GameSpeed {
 }
 
 const PAUSE_SPEED: float = 0.0
-const BASE_SPEED: float = 1.0
+const BASE_SPEED: float = 5.0
 const FAST_FORWARD_SPEED: float = 2.0
 
 # --- public api ---
@@ -41,8 +41,7 @@ func _ready():
 			GameSpeed.BASE:
 				speed_multiplier = BASE_SPEED
 			GameSpeed.FAST_FORWARD:
-				#speed_multiplier = FAST_FORWARD_SPEED
-				speed_multiplier *= 2
+				speed_multiplier = FAST_FORWARD_SPEED
 		
 		print("Clock: current gamespeed is ", speed_multiplier)
 	)
@@ -54,13 +53,13 @@ func start():
 
 # the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
-	game_delta = delta * speed_multiplier
-
 	if Input.is_action_just_pressed("pause"):
-		if is_equal_approx(speed_multiplier, BASE_SPEED):
+		if not is_equal_approx(speed_multiplier, PAUSE_SPEED):
 			speed_multiplier = PAUSE_SPEED
 		else:
 			speed_multiplier = BASE_SPEED
+			
+	game_delta = delta * speed_multiplier
 	
 	# update all active custom timers
 	if _active_timers.is_empty():

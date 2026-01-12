@@ -8,8 +8,8 @@
 
 [resource]
 script = ExtResource("1_2qfkt")
-title = "Buff"
-description = "Strong yet slow"
+title = "Orc"
+description = "Strong yet slow."
 stat_displays = Array[ExtResource("2_00b60")]([ExtResource("3_c42nr"), ExtResource("4_u3yoc")])
 unit_scene = ExtResource("5_123hm")
 flux_value = 0.6

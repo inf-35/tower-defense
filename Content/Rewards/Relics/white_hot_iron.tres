@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=7 format=3 uid="uid://blibl24d27f8n"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_iet1l"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_tyu6n"]
+[ext_resource type="Resource" uid="uid://ngmwkn6iulj5" path="res://Content/Relics/white_hot_iron/white_hot_iron.tres" id="3_d328i"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_we0yb"]
+
+[sub_resource type="Resource" id="Resource_u3nda"]
+script = ExtResource("2_tyu6n")
+tower_types = Array[int]([31, 23, 20])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[sub_resource type="Resource" id="Resource_t640b"]
+script = ExtResource("2_tyu6n")
+tower_types = Array[int]([4])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[resource]
+script = ExtResource("3_we0yb")
+id_name = "broken_mirror"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("3_d328i")
+base_weight = 300.0
+bias_rules = Array[ExtResource("1_iet1l")]([SubResource("Resource_u3nda"), SubResource("Resource_t640b")])
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

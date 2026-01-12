@@ -12,6 +12,9 @@ var health: float:
 	set(new_health):
 		if health_data == null:
 			return
+		if is_equal_approx(health, new_health):
+			return
+
 		max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
 		new_health = clampf(new_health, 0.0, max_health)
 		if new_health == health:
@@ -42,10 +45,8 @@ func inject_components(modifiers_component: ModifiersComponent):
 	shield = health_data.max_shield
 	UI.update_unit_health.emit(unit, max_health, health)
 
-func take_damage(input_damage: float, breaking: bool = false):
+func take_damage(damage: float, breaking: bool = false):
 	var absorbed_damage: float = 0 #damage absorbed by shield
-	var damage: float = input_damage * get_stat(_modifiers_component, health_data, Attributes.id.DAMAGE_TAKEN) as float
-	damage += get_stat(_modifiers_component, health_data, Attributes.id.FLAT_DAMAGE_TAKEN) as float
 	#shield phase
 	if breaking:
 		absorbed_damage = min(damage, shield)

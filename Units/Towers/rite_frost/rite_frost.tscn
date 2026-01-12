@@ -1,13 +1,14 @@
-[gd_scene load_steps=19 format=3 uid="uid://b21gcksdjjogi"]
+[gd_scene load_steps=20 format=3 uid="uid://b21gcksdjjogi"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_vcul2"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_0ydxq"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_sa6kb"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_wofhw"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_v7esy"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="8_nmt3j"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_rrc3c"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="9_sa6kb"]
+[ext_resource type="Texture2D" uid="uid://coxdl3nr3cjjs" path="res://Assets/frost_rite.png" id="9_v7esy"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_rrc3c"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_u5mqx"]
 [ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="10_v7esy"]
 
@@ -128,7 +129,11 @@ texture = SubResource("PlaceholderTexture2D_p6ncc")
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("8_nmt3j")
+texture = ExtResource("9_v7esy")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("10_rrc3c")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("10_u5mqx")

@@ -38,7 +38,7 @@ func setup(entry: WaveTimeline.TimelineEntry) -> void:
 			Phases.DayEvent.EXPANSION:
 				icon_rect.texture = preload("res://Assets/expansion_phase_icon.png")
 			_:
-				pass # implement
+				icon_rect.texture = preload("res://Assets/day_phase_icon.png")
 
 	# enter scene (grow from nothign)
 	if is_instance_valid(animatable_wrapper):

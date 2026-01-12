@@ -44,10 +44,8 @@ func _update_bonus(instance: EffectInstance) -> void:
 		if References.island.get_tower_on_tile(cell) == null:
 			empty_count += 1
 
-	var total_rate_bonus: float = empty_count * fire_rate_bonus_per_empty
-	print(total_rate_bonus)
+	var total_rate_bonus: float = empty_count * fire_rate_bonus_per_empty * instance.stacks
 	var cooldown_mult: float = 1.0 / (1.0 + total_rate_bonus) #use the reciprocal to find cooldown bonus
-
 	var state := instance.state as LibertyState
 	
 	if is_instance_valid(state.modifier):
@@ -58,5 +56,5 @@ func _update_bonus(instance: EffectInstance) -> void:
 	else:
 		# create new modifier
 		var mod := Modifier.new(Attributes.id.COOLDOWN, cooldown_mult, 0.0, -1.0)
-		tower.modifiers_component.add_modifier(mod)
 		state.modifier = mod
+		tower.modifiers_component.add_modifier(mod)

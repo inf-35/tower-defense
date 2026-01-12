@@ -1,6 +1,8 @@
 extends EventData
 class_name HitData #stores information about a hit (runtime)
 
+var negate: bool = false ##if set true, this hit is not processed
+
 var source: Unit ##dealer of hit
 var target: Unit ##receiver of hit
 var target_affiliation: bool ##affiliation of target (true for hostile, false for allied)
@@ -17,6 +19,9 @@ var modifiers: Array[Modifier] = []
 var status_effects: Dictionary[Attributes.Status, Vector2] = {} ##Attributes.Status -> Vector2(stack, cooldown)
 
 var expected_damage: float = 0.0 ##see TargetingCoordinator, projected amount of damage caused
+
+
+var velocity: Vector2 ## instantaneous velocity of the projectile, set by CombatManager
 
 var vfx_on_spawn : VFXInfo #see VFXManager and VFXInstance
 var vfx_on_impact : VFXInfo

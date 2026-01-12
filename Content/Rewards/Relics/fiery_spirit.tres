@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://1yeeeiby535x" path="res://Content/Relics/fiery_spirit/fiery_spirit.tres" id="1_a2k8d"]
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_r5l06"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_r5l06"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_r5l06"]
 
 [resource]
 script = ExtResource("2_r5l06")

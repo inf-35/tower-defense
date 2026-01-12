@@ -39,6 +39,7 @@ func _ready():
 			_on_inspected_tower_health_update(current_tower, max_hp, hp)
 	)
 
+
 func _on_inspector_contents_tower_update(tower : Tower):
 	if not tower.is_ready:
 		await tower.components_ready

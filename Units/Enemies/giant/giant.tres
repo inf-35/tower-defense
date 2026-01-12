@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://dkwoamejg8ipn"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_10iif"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_r5cwj"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_xwohu"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_8qnxe"]
+[ext_resource type="PackedScene" uid="uid://birkilvgh417t" path="res://Units/Enemies/giant/giant.tscn" id="5_oh00t"]
+
+[resource]
+script = ExtResource("1_10iif")
+title = "Giant"
+description = "Very tanky"
+stat_displays = Array[ExtResource("2_r5cwj")]([ExtResource("3_xwohu"), ExtResource("4_8qnxe")])
+unit_scene = ExtResource("5_oh00t")
+flux_value = 0.6
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

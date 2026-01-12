@@ -11,6 +11,8 @@ var _status_effects: Dictionary[Attributes.Status, StatusEffect] = {}
 # cache of computed effective stats
 var _effective_cache: Dictionary[Attributes.id, float] = {}
 
+signal status_changed(type: Attributes.Status, stacks: float, duration: float)
+
 func _ready():
 	stat_changed.connect(func(_stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
@@ -109,6 +111,7 @@ func update_status(status: StatusEffect) -> void:
 		if _status_effects.has(status.type):
 			_status_effects.erase(status.type)
 		
+		status_changed.emit(status.type, status.stack, status.cooldown)
 		_recalculate_overlay_color()
 		return
 
@@ -121,6 +124,8 @@ func update_status(status: StatusEffect) -> void:
 	else:
 		add_modifier(new_modifier)
 		
+	var time_left: float = status.timer.duration - status.timer.time_elapsed if is_instance_valid(status.timer) else -1.0
+	status_changed.emit(status.type, status.stack, time_left)
 		
 	_recalculate_overlay_color()
 	

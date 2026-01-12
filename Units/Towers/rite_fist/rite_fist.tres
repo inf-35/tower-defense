@@ -1,9 +1,12 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://cq8fk6wk6wb6a"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://cq8fk6wk6wb6a"]
 
-[ext_resource type="Texture2D" uid="uid://0jheepvm47t4" path="res://Assets/palisade.svg" id="1_xhss7"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_pskx4"]
 [ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="2_s2s6s"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vpfkn"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_domf5"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_f4n2c"]
 [ext_resource type="PackedScene" uid="uid://din6sbre3mwxa" path="res://Units/Towers/rite_fist/rite_fist.tscn" id="4_5v4fe"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_wcdsk"]
 
 [resource]
 script = ExtResource("3_f4n2c")
@@ -16,6 +19,6 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of the Fist"
-tower_description = "Attacks consume all Status Effects to deal +40% damage per stack removed."
+tower_description = "Attacks consume all {STATUS_EFFECT_LABEL} to deal +40% {UNIT_DAMAGE} per stack consumed."
 tower_scene = ExtResource("4_5v4fe")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -1,18 +1,20 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://drslua0wfw62h"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_dhi2e"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_vcib8"]
+[ext_resource type="Texture2D" uid="uid://d0g5jqpqajbyi" path="res://Assets/cannon_full.png" id="1_vcib8"]
 [ext_resource type="PackedScene" uid="uid://crffqaa5utxrm" path="res://Units/Towers/cannon/cannon.tscn" id="2_gll86"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_prod2"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_0jc38"]
 [ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_ctl03"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="5_67qk8"]
+[ext_resource type="Texture2D" uid="uid://dumjwd7geyjbj" path="res://Assets/cannon_icon.png" id="5_prod2"]
 
 [resource]
 script = ExtResource("1_dhi2e")
 id = 4
-cost = 15.0
+cost = 12.0
 tower_name = "Cannon"
 tower_description = "Slow, yet a powerful heavy-hitter."
+icon = ExtResource("1_vcib8")
+preview = ExtResource("5_prod2")
 tower_scene = ExtResource("2_gll86")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -6,7 +6,6 @@
 script = ExtResource("1_3k5b6")
 collision_shape = NodePath("CollisionShape2D")
 _damage_timer = NodePath("Timer")
-tick_rate = 0.5
 metadata/_custom_type_script = "uid://cglhkkavm76aw"
 
 [node name="Timer" type="Timer" parent="."]

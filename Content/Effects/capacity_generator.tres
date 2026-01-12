@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_760fe")
-bonus_terrain_type = 1
-bonus_capacity_amount = 4.0
+base_capacity = 5.0
 effect_type = 2
+schedule = 1
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

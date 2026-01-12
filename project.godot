@@ -43,6 +43,7 @@ KeywordService="*res://Singletons/keyword_service.gd"
 CatalystRecipes="*res://Indexes/catalyst_recipes.gd"
 TowerNetworkManager="*res://Singletons/tower_network_manager.gd"
 Units="*res://Singletons/units.gd"
+Sun="*res://Singletons/sun.gd"
 
 [display]
 
@@ -50,8 +51,11 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/stretch/scale=0.8
 window/vsync/vsync_mode=0
+
+[editor]
+
+movie_writer/movie_file="C:/Users/admin/Downloads/projects/tower-defense/movies/movie_1.avi"
 
 [gui]
 

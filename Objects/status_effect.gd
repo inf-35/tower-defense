@@ -22,11 +22,12 @@ func refresh(new_stack: float, new_cooldown: float) -> void:
 	# 2. duration precedence: the new duration is the LONGEST of what remains or the new cooldown
 	var remaining_time: float = 0.0
 	if is_instance_valid(timer):
-		remaining_time = timer.duration
+		remaining_time = timer.duration - timer.time_elapsed
 
 	var new_duration: float = max(remaining_time, new_cooldown)
 	# restart the timer with the new, dominant duration
 	if is_instance_valid(timer) and new_duration > 0.0:
+		timer.time_elapsed = 0.0
 		timer.duration = new_duration
 
 		

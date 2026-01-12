@@ -14,6 +14,6 @@ func _ready():
 			return
 
 		Player.hp -= 1
-		
-		area.unit.died.emit(HitReportData.new()) #TODO: implement hitreportdata reason (i.e. died, deleted, etc.)
+
+		area.unit.died.emit.call_deferred(HitReportData.new())
 	)

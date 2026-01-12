@@ -1,15 +1,21 @@
-[gd_scene load_steps=12 format=3 uid="uid://b5w56jjx8pany"]
+[gd_scene load_steps=18 format=3 uid="uid://b5w56jjx8pany"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8tw53"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_5w00j"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_6aoul"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_cycj3"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_4xa4o"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_ywqh1"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_r2l7t"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_sejtu"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_4vlia"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="6_age1v"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="6_vnb4f"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_5npwk"]
 [ext_resource type="Texture2D" uid="uid://dp45rs1pb7wf5" path="res://Assets/frost_tower_base.png" id="7_u0bn4"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_j0i6s"]
 [ext_resource type="Resource" uid="uid://b4ac8wgm70768" path="res://Units/Towers/frost_tower/frost_attack.tres" id="10_wqvsu"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="13_cycj3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
@@ -18,6 +24,7 @@ radius = 600.0
 z_index = 100
 script = ExtResource("1_8tw53")
 type = 3
+stat_displays = Array[ExtResource("2_5w00j")]([ExtResource("3_cycj3"), ExtResource("4_4xa4o"), ExtResource("5_sejtu"), ExtResource("6_age1v")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -45,6 +52,10 @@ texture = ExtResource("6_vnb4f")
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
 texture = ExtResource("7_u0bn4")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("13_cycj3")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="Range" type="Area2D" parent="."]
 visible = false

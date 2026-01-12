@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://bfoxhem44o0ot"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_j2xu8"]
+[ext_resource type="Texture2D" uid="uid://33ys88kaqt2d" path="res://Assets/firewall_icon.png" id="1_j2xu8"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_j2xu8"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_a5i7e"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_h0mnq"]
@@ -16,7 +16,8 @@ cost = 18.0
 required_capacity = 1.5
 element = 2
 tower_name = "Firewall"
-tower_description = "Sets alight enemies passing through the middle, briefly inflicting severe burn."
-preview = ExtResource("5_a5i7e")
+tower_description = "Sets alight enemies passing through the middle, briefly inflicting severe {BURN|label=Burn}."
+icon = ExtResource("5_a5i7e")
+preview = ExtResource("1_j2xu8")
 tower_scene = ExtResource("4_wrccv")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

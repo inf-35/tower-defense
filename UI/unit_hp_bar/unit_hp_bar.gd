@@ -6,6 +6,10 @@ var bar_size: Vector2 = Vector2(5, 1.2)
 var _health_component: HealthComponent
 var _parent_unit: Node2D
 
+var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon]
+
+const VERTICAL_OFFSET: Vector2 = Vector2(0,-5)
+
 func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	_parent_unit = unit
 	_health_component = health_comp
@@ -19,8 +23,11 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	bar_size.y *= scale_factor * 0.25 + 1
 	
 	size = bar_size
-	position = Vector2(0, -5) - bar_size * 0.5
+	position = VERTICAL_OFFSET - bar_size * 0.5
+	step = 0.01
 	
+	if unit.modifiers_component:
+		unit.modifiers_component.status_changed.connect(_on_status_changed)
 
 func _process(_delta):
 	if is_instance_valid(_parent_unit):
@@ -36,3 +43,42 @@ func _on_health_changed(new_health: float) -> void:
 	var is_alive = new_health > 0
 	
 	visible = is_damaged and is_alive
+	
+func _on_status_changed(status: Attributes.Status, stacks: float, duration: float):
+	if stacks <= 0.0: #removal
+		if not _status_icons.has(status):
+			return
+			
+		var icon_to_remove: UnitStatusIcon = _status_icons[status]
+		_status_icons.erase(status)
+		icon_to_remove.free()
+		_reposition_icons()
+		return
+	
+	else: #addition/refresh
+		if not _status_icons.has(status):
+			_status_icons[status] = preload("res://UI/unit_hp_bar/status_icon.tscn").instantiate()
+			_status_icons[status].setup(status)
+			add_child(_status_icons[status])
+
+		_status_icons[status].update_data(stacks, duration)
+		_reposition_icons() 
+		
+func _reposition_icons() -> void:
+	var active_icons: Array[UnitStatusIcon] = _status_icons.values()
+	var spacing: float = 2.0
+	
+	var total_width: float = 0.0
+	#pre-position
+	for icon: Control in active_icons:
+		var w: float = icon.size.x * icon.scale.x
+		total_width += w
+	
+	var accumulated_width: float = 0.0
+	for icon: Control in active_icons:
+		var w: float = icon.size.x * icon.scale.x
+		icon.position = VERTICAL_OFFSET
+		icon.position.x = 0.0 - total_width * 0.5 + w * 0.5 + accumulated_width
+		accumulated_width += w
+		
+		

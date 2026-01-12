@@ -1,28 +1,31 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://1yeeeiby535x"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://1yeeeiby535x"]
 
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_0ctvc"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="1_qbejg"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_hyisy"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_qbejg"]
 
-[sub_resource type="Resource" id="Resource_rh4l4"]
-script = ExtResource("1_0ctvc")
+[sub_resource type="Resource" id="Resource_qbejg"]
+script = ExtResource("2_hyisy")
+target_filter = 2
+required_element = 2
 attribute = 6
 multiplicative = 1.2
 override = null
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [sub_resource type="Resource" id="Resource_hyisy"]
-script = ExtResource("1_0ctvc")
+script = ExtResource("2_hyisy")
+target_filter = 2
+required_element = 2
 attribute = 8
 multiplicative = 0.833
 override = null
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [resource]
 script = ExtResource("2_qbejg")
 type = 5
-target_type = 4
-specific_element = 2
-modifier_prototypes = Array[ExtResource("1_0ctvc")]([SubResource("Resource_rh4l4"), SubResource("Resource_hyisy")])
+modifier_prototypes = Array[ExtResource("2_hyisy")]([SubResource("Resource_qbejg"), SubResource("Resource_hyisy")])
 title = "Fiery Spirit"
-description = "All flame towers gain a +20% damage, +20% fire rate boost"
+description = "All flame towers gain a +20% {UNIT_DAMAGE}, +20% {UNIT_HITRATE}"
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

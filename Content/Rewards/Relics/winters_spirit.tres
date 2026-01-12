@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://bs8cxc35wskja"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=4 format=3 uid="uid://bs8cxc35wskja"]
 
 [ext_resource type="Resource" uid="uid://3gfb1ujydb5l" path="res://Content/Relics/winters_spirit/winters_spirit.tres" id="1_gq4bb"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/Rewards/_reward_prototype.gd" id="2_psukq"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_psukq"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_psukq"]
 
 [resource]
 script = ExtResource("2_psukq")
