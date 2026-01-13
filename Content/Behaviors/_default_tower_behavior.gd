@@ -8,6 +8,9 @@ var _current_state: State = State.READY
 var _locked_target: Unit = null
 var _in_anticipation: bool = false ##whether the unit is in an anticipation state
 
+var predicted_target_pos: Vector2 
+var prediction_valid: bool = false
+
 func start() -> void:
 	if not is_instance_valid(animation_player):
 		return
@@ -52,8 +55,9 @@ func update(_delta: float) -> void:
 				return
 			
 			# turn towards target
-			#TODO: optimisation: predict once, and have the target unit tell us if it renavigates
-			var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_cooldown)
+			if not prediction_valid:
+				predicted_target_pos = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_cooldown)
+				prediction_valid = true
 			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
 			var target_angle: float = direction_to_target.angle() - graphics.global_rotation
 			var angle_diff: float = abs(angle_difference(turret.rotation, target_angle))
@@ -72,9 +76,11 @@ func _enter_state(new_state: State, target: Unit = null) -> void:
 	match _current_state:
 		State.READY:
 			_locked_target = null
+			prediction_valid = false #reset prediction status
 
 		State.WIND_UP:
 			_locked_target = target
+			prediction_valid = false
 			
 			# command the unit to play its anticipation animation
 			if (not is_instance_valid(animation_player)) or not animation_player.has_animation(&"attack_windup"):

@@ -125,17 +125,17 @@ func _setup_state():
 	#add_rite(Towers.Type.RITE_FLAME, 20)
 	#add_rite(Towers.Type.RITE_FROST, 20)
 	
-	var reward := Reward.new()
-	reward.type = Reward.Type.ADD_RELIC
-	reward.relic = Relics.PAPER_UMBRELLA
-	RewardService.apply_reward(reward)
-	reward.relic = Relics.MACUAHUITL
-	RewardService.apply_reward(reward)
-	reward.relic = Relics.EARLY_BIRD
-	RewardService.apply_reward(reward)
+	#var reward := Reward.new()
+	#reward.type = Reward.Type.ADD_RELIC
+	#reward.relic = Relics.PAPER_UMBRELLA
+	#RewardService.apply_reward(reward)
+	#reward.relic = Relics.MACUAHUITL
+	#RewardService.apply_reward(reward)
+	#reward.relic = Relics.EARLY_BIRD
+	#RewardService.apply_reward(reward)
 	
 	flux = 200.0
-	hp = 2000.0
+	hp = 200.0
 	
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))
 	UI.update_relics.emit()

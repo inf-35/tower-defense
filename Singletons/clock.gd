@@ -15,7 +15,7 @@ enum GameSpeed {
 }
 
 const PAUSE_SPEED: float = 0.0
-const BASE_SPEED: float = 5.0
+const BASE_SPEED: float = 1.0
 const FAST_FORWARD_SPEED: float = 2.0
 
 # --- public api ---

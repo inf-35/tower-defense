@@ -22,7 +22,7 @@ upgrades_into = Dictionary[int, float]({
 43: 12.0
 })
 tower_name = "Poison"
-tower_description = "Releases a mist of poison, inflicting nearby enemies with mild yet long-lasting poison."
+tower_description = "Releases a noxious mist, inflicting nearby enemies with mild yet long-lasting {POISON}."
 icon = ExtResource("1_bbdyr")
 preview = ExtResource("5_0yc7i")
 inspector_actions = Array[ExtResource("2_bbdyr")]([ExtResource("3_0yc7i"), ExtResource("4_0pd5h"), SubResource("Resource_bbdyr")])

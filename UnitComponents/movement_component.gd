@@ -21,7 +21,7 @@ const _ERROR_SQUARED: float = 2.0 ** 2  #allowable error for units from target p
 var position: Vector2:
 	set(new_position):
 		position = new_position
-		unit.position = position
+		unit.global_position = position
 		
 		if _stagger % 8 == 0:
 			cell_position = Island.position_to_cell(position)
@@ -53,7 +53,7 @@ func inject_components(n_graphics: Node2D, modifiers_component = null):
 	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
 	
 func _ready():
-	_STAGGER_CYCLE = 3
+	_STAGGER_CYCLE = 5
 	_stagger = randi_range(0, _STAGGER_CYCLE)
 	position = position #trigger setter functions, esp. cell
 	cell_position = Island.position_to_cell(position)
@@ -61,9 +61,13 @@ func _ready():
 
 func _physics_process(_delta: float) -> void:
 	_stagger += 1
-	
+	_accumulated_delta += Clock.physics_game_delta
+	position += velocity * Clock.physics_game_delta
+	if _stagger % _STAGGER_CYCLE != 0:
+		return
+
 	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
-	var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
+	#var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
 	
 	if movement_data == null:
 		return  # no data → do nothing
@@ -82,9 +86,8 @@ func _physics_process(_delta: float) -> void:
 	if face_towards_movement and velocity.length_squared() > 0.01:
 		unit.rotation = velocity.angle()
 
-	position += velocity * Clock.physics_game_delta
-	_update_walk_cycle(Clock.physics_game_delta)
-	#_accumulated_delta = 0.0 #reset accumulated delta
+	_update_walk_cycle(_accumulated_delta)
+	_accumulated_delta = 0.0 #reset accumulated delta
 	
 func _update_walk_cycle(delta: float) -> void:
 	if not jiggle_enabled or not is_instance_valid(graphics):

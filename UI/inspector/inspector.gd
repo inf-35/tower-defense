@@ -185,6 +185,9 @@ func _refresh_actions(tower: Tower) -> void:
 		_create_action_button(tower, action)
 	
 func _create_action_button(tower: Tower, action: InspectorAction) -> void:
+	if action.type == InspectorAction.ActionType.UPGRADE:
+		return
+	
 	var btn := action_button_scene.instantiate() as Button
 	button_container.add_child(btn)
 	

@@ -3,7 +3,7 @@ class_name WaveEnemies
 const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	# Example: Wave 1 is just 5 Basics (Tutorial)
 	1: [
-		[Units.Type.BASIC, 3],
+		[Units.Type.BASIC, 200],
 	],
 	2: [
 		[Units.Type.BASIC, 6],

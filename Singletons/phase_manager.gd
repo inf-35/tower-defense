@@ -28,7 +28,7 @@ var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
 
 var wave_plan: Dictionary[int, Wave] = {}
-const FINAL_WAVE: int = 3
+const FINAL_WAVE: int = 16
 class Wave: ## internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL

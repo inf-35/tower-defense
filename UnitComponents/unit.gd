@@ -7,6 +7,8 @@ signal components_ready() ##fires when all components and the unit is ready
 signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto on_killed, which defines unit death behaviour. hit_report_data contains info of the hit that killed the enemy, if any
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
+
+static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -214,7 +216,7 @@ func _attach_health_bar() -> void:
 	if abstractive or disabled:
 		return
 		
-	var hp_bar = load("res://UI/unit_hp_bar/unit_hp_bar.tscn").instantiate()
+	var hp_bar = HP_BAR_SCENE.instantiate()
 	add_child(hp_bar)
 	hp_bar.setup(self, health_component)
 

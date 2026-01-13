@@ -31,7 +31,7 @@ func inject_components(movement: MovementComponent):
 func _ready():
 	# Listen for global path updates (e.g. maze changed)
 	Navigation.field_cleared.connect(update_path)
-	_STAGGER_CYCLE = 3
+	_STAGGER_CYCLE = 5
 	_stagger += randi_range(0, _STAGGER_CYCLE)
 
 func _process(delta: float):
