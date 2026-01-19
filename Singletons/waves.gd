@@ -15,7 +15,7 @@ var _enemies_planned: Array[Array] = []
 
 # --- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
-const EXPANSION_BLOCK_SIZE: int = 30
+const EXPANSION_BLOCK_SIZE: int = 18
 const WAVES_PER_EXPANSION_CHOICE: int = 2 #testing
 const EXPANSION_CHOICES_COUNT: int = 4
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
@@ -25,8 +25,6 @@ const ENEMY_GROUP: StringName = &"active_enemies"
 var _reconciliation_timer: Timer
 
 func _ready() -> void:
-	
-	
 	wave_started.connect(func(wave: int):
 		var wave_data := WaveData.new()
 		wave_data.wave = wave

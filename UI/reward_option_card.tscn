@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_opmj4"]
 
 [node name="card" type="Control" node_paths=PackedStringArray("_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "description")]
-custom_minimum_size = Vector2(600, 150)
+custom_minimum_size = Vector2(1200, 300)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 428.0
@@ -35,7 +35,7 @@ grow_vertical = 2
 theme_type_variation = &"hbox_10"
 
 [node name="icon_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(150, 100)
+custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 mouse_filter = 1
 script = ExtResource("3_soafu")

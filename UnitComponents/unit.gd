@@ -257,7 +257,7 @@ func remove_effect(effect_prototype: EffectPrototype) -> void:
 				effects_by_type.erase(type)
 		
 		effect.free()
-
+#
 	effect_prototypes.erase(effect_prototype)
 
 # helper to find a specific running instance of a prototype on this unit

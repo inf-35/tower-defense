@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Poisons Rite"
-tower_description = "Adjacent towers' attacks gain 1 stack of {POISON}."
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 1 stack of {POISON}."
 icon = ExtResource("1_47pug")
 preview = ExtResource("1_47pug")
 tower_scene = ExtResource("4_0yfmt")

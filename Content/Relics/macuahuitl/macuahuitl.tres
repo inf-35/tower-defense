@@ -7,8 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_kbic1"]
 script = ExtResource("1_3apu2")
-bleed_stacks_added = 3.0
-bleed_duration = 1.0
+bleed_duration = 0.8
 schedule = 1
 metadata/_custom_type_script = "uid://bkh1iolpvnhku"
 
@@ -17,6 +16,6 @@ script = ExtResource("3_kbic1")
 type = 23
 global_effect = SubResource("Resource_kbic1")
 title = "Macuahuitl"
-description = "Every fourth attack by a kinetic tower (crossbow, cannon, spikes, etc.) gains four additional stacks of {BLEED}"
+description = "Every fourth attack by a kinetic tower (crossbow, cannon, spikes, etc.) gains two additional stacks of {BLEED}"
 icon = ExtResource("2_3apu2")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

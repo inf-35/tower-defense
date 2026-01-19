@@ -40,6 +40,8 @@ func update(delta: float) -> void:
 	_attempt_simple_attack()
 
 func _move_towards_keep() -> void:
+	movement_component.speed_control = 1.0
+	
 	siege_distance -= Island.CELL_SIZE * 2 #decrease siege distance
 	if is_instance_valid(navigation_component):
 		# standard behavior: pathfind to the center of the map
@@ -47,11 +49,4 @@ func _move_towards_keep() -> void:
 
 func _hold_position() -> void:
 	if is_instance_valid(navigation_component) and is_instance_valid(movement_component):
-		# 1. tell navigation we want to stay exactly where we are
-		# this prevents the pathfinder from trying to generate a path to (0,0)
-		navigation_component.goal = movement_component.cell_position
-		
-		# 2. force physics stop
-		# we manually zero the direction to prevent sliding if the navigation logic 
-		# ran before this script in the frame
-		movement_component.target_direction = Vector2.ZERO
+		movement_component.speed_control = 0.4 #the archer slows down immensely (hold in place)

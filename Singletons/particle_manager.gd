@@ -13,10 +13,13 @@ const INITIAL_POOL_SIZE: int = 5
 var _emitter_pool: Dictionary = {}
 
 func _ready() -> void:
-	# Pre-populate pools
+	# initial shader compilation
 	for effect_name: StringName in particle_library:
 		_emitter_pool[effect_name] = []
 		_expand_pool(effect_name, INITIAL_POOL_SIZE)
+	# pre-populate pools
+	for effect_name: StringName in particle_library:
+		play_particles(effect_name, Vector2(10000, 203000.0))
 
 func play_particles(effect_name: StringName, position: Vector2, rotation: float = 0.0) -> void:
 	if not _emitter_pool.has(effect_name):

@@ -1,12 +1,9 @@
 extends Node2D
 class_name PathRenderer
 
-# --- Configuration ---
-@export_group("Assets")
 @export var stroke_texture: Texture2D ## The main brush stroke (straight lines)
 @export var corner_texture: Texture2D ## The stamp for 90 degree turns
 
-@export_group("Style")
 @export var tint_color: Color = Color(1,1,1,0.6)
 @export var stroke_spacing: float = 5.0 ## Distance between stamps on straight lines
 @export var stroke_scale: Vector2 = Vector2(0.1, 0.1)
@@ -15,11 +12,17 @@ class_name PathRenderer
 @export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) # Wall-ignoring Path
 @export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) # Invalid Path
 
-
-@export_subgroup("Jitter")
 @export var pos_jitter: float = 0.5 ## Random offset in pixels
 @export var rot_jitter: float = 5.0 ## Random rotation in degrees
 @export var scale_jitter: float = 0.0 ## Random scale variation (e.g. 0.1 = +/- 10%)
+
+@export var wave_frequency: float = 0.8
+@export var wave_min_alpha: float = 0.4
+@export var flow_speed: float = 1.0
+var _time_accumulator: float
+
+var _time_from_last_step: float = 0.0
+const _TIMESTEP: float = 0.2
 
 class PathRender:
 	var points: PackedVector2Array
@@ -31,6 +34,7 @@ var _preview_path_cache: Array[PathRender]
 var _is_previewing: bool = false
 var _is_preview_blocked: bool = false
 
+
 func _ready() -> void:
 	scale = Vector2.ONE
 	
@@ -40,6 +44,14 @@ func _ready() -> void:
 	
 	Navigation.field_ready.connect(func(_goal, _ignore): _on_navigation_grid_updated())
 	_on_navigation_grid_updated()
+	
+func _process(_d: float) -> void:
+	_time_from_last_step += Clock.game_delta
+	_time_accumulator += Clock.game_delta
+	
+	if _time_from_last_step > _TIMESTEP:
+		queue_redraw()
+		_time_from_last_step = 0.0
 
 func update_preview(blocker_cells: Array[Vector2i]) -> void:
 	_is_previewing = true
@@ -166,8 +178,10 @@ func _draw_stamped_path(points: PackedVector2Array, color: Color) -> void:
 	# Seed based on start position so the "hand drawn" look doesn't jitter every frame
 	var rng = RandomNumberGenerator.new()
 	rng.seed = hash(points[0])
+	
+	var path_dist_traveled: float = 0.0
 
-	for i in range(points.size()):
+	for i in points.size():
 		var current_pos = points[i]
 		
 		# 1. Determine Directions
@@ -195,17 +209,20 @@ func _draw_stamped_path(points: PackedVector2Array, color: Color) -> void:
 				if cross < 0:
 					flip_corner = false
 					
-		
+		var stroke_color := color
+		stroke_color.a *= _calculate_path_alpha(path_dist_traveled)
 		# 3. Draw Node Stamp (Corner)
 		if is_corner and corner_texture:
 			# Calculate angle: Bisect the angle for the corner stamp? 
 			# Or just align to the incoming direction?
 			# Simple approach: Align to incoming, let texture handle the look.
-			_draw_single_stamp(current_pos, dir_prev.angle(), corner_texture, color, rng, flip_corner)
+			_draw_single_stamp(current_pos, dir_prev.angle(), corner_texture, stroke_color, rng, flip_corner)
 		
 		# 4. Draw Segment Strokes (Connecting to next point)
 		elif i < points.size() - 1:
-			_draw_single_stamp(current_pos, dir_next.angle(), stroke_texture, color, rng, false)
+			_draw_single_stamp(current_pos, dir_next.angle(), stroke_texture, stroke_color, rng, false)
+		
+		path_dist_traveled += 1.0
 
 func _draw_single_stamp(pos: Vector2, angle: float, tex: Texture2D, color: Color, rng: RandomNumberGenerator, flip_y: bool) -> void:
 	# Jitter calculations
@@ -230,6 +247,12 @@ func _draw_single_stamp(pos: Vector2, angle: float, tex: Texture2D, color: Color
 	
 	draw_set_transform_matrix(xform)
 	draw_texture_rect(tex, rect, false, color)
+
 	#
 	## Reset transform for next operations (though we reset it every loop iteration anyway)
 	#draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+func _calculate_path_alpha(distance: float) -> float:
+	var wave_phase: float = (distance * wave_frequency) - (_time_accumulator * flow_speed)
+	var sin_val = (sin(wave_phase) + 1.0) * 0.5
+	return lerp(wave_min_alpha, 1.0, sin_val)

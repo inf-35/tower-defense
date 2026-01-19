@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://xce2w3es51dx"]
+[gd_scene load_steps=3 format=3 uid="uid://xce2w3es51dx"]
 
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_oxcn6"]
+[ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="2_2xcvw"]
 
 [node name="InspectorActionButton" type="Button"]
-custom_minimum_size = Vector2(120, 40)
-offset_right = 40.0
-offset_bottom = 8.0
+custom_minimum_size = Vector2(240, 80)
+offset_right = 240.0
+offset_bottom = 80.0
 theme = ExtResource("1_oxcn6")
+script = ExtResource("2_2xcvw")

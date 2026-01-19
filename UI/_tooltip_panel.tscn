@@ -5,6 +5,9 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_fg2ep"]
 
 [node name="TooltipPanel" type="PanelContainer" node_paths=PackedStringArray("title_label", "description_label")]
+offset_right = 240.0
+offset_bottom = 134.0
+theme = ExtResource("2_t0qdu")
 theme_type_variation = &"simple_panel"
 script = ExtResource("1_c5s8d")
 title_label = NodePath("MarginContainer/VBoxContainer/title")
@@ -22,7 +25,7 @@ theme_type_variation = &"vbox_5"
 
 [node name="title" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
 clip_contents = false
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 mouse_filter = 1
 theme_type_variation = &"rt_s20"
@@ -35,7 +38,7 @@ metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="description" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
 clip_contents = false
-custom_minimum_size = Vector2(50, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 mouse_filter = 1
 theme_type_variation = &"rt_s20_descriptive"

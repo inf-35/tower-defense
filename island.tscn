@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene load_steps=20 format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://cimvwfmb6t2bf" path="res://Assets/brushstroke_multiply_04.png" id="14_cj5nf"]
 [ext_resource type="Script" uid="uid://b3n6ehcpq3nug" path="res://Scene Elements/nav_debugger.gd" id="15_ad6l7"]
 [ext_resource type="Script" uid="uid://ibj2mt03m5av" path="res://UnitComponents/range_indicator.gd" id="18_aibdv"]
+[ext_resource type="Texture2D" uid="uid://dykg0w6ijl6m" path="res://Assets/paper_background.png" id="19_uq18n"]
 
 [node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
 y_sort_enabled = true
@@ -26,7 +27,7 @@ terrain_renderer = NodePath("TerrainRenderer")
 preview_renderer = NodePath("PreviewRenderer")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(4, 4)
+zoom = Vector2(12, 12)
 script = ExtResource("2_04hb4")
 
 [node name="UI" parent="." instance=ExtResource("2_hdtfb")]
@@ -50,6 +51,7 @@ script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
 corner_texture = ExtResource("8_aibdv")
 stroke_spacing = 10.0
+flow_speed = 3.0
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 
 [node name="PreviewRenderer" type="Node2D" parent="."]
@@ -64,10 +66,11 @@ wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
 [node name="TerrainRenderer" type="Node2D" parent="."]
 script = ExtResource("7_b4opu")
 shader = ExtResource("9_8ervs")
-max_gradient_depth = 3.0
-background_stain_color = Color(1, 0.944, 0.84000003, 1)
-paint_color = Color(0.81722, 0.87, 0.7482, 0.77254903)
-wash_color = Color(0.7888, 0.87, 0.7482, 0.28235295)
+max_gradient_depth = 1.5
+draw_background = false
+background_stain_color = Color(0, 0, 0, 0)
+paint_color = Color(0.7647059, 0.84705883, 0.7137255, 1)
+wash_color = Color(0.94509804, 0.92156863, 0.8235294, 1)
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
 
 [node name="NavigationDebugger" type="Node2D" parent="."]
@@ -85,3 +88,13 @@ metadata/_custom_type_script = "uid://ibj2mt03m5av"
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 visible = false
+
+[node name="TextureRect" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.078431375)
+offset_left = -407.0
+offset_top = -226.0
+offset_right = 9372.999
+offset_bottom = 5783.9995
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("19_uq18n")
+stretch_mode = 1

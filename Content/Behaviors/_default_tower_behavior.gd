@@ -8,10 +8,14 @@ var _current_state: State = State.READY
 var _locked_target: Unit = null
 var _in_anticipation: bool = false ##whether the unit is in an anticipation state
 
+var _stagger: int = 0
+var _STAGGER_CYCLE: int = 5
+
 var predicted_target_pos: Vector2 
 var prediction_valid: bool = false
 
 func start() -> void:
+	_stagger = randi_range(0, _STAGGER_CYCLE)
 	if not is_instance_valid(animation_player):
 		return
 	
@@ -30,6 +34,9 @@ func start() -> void:
 
 # this is the main update loop, called by the unit's _process function
 func update(_delta: float) -> void:
+	_stagger += 1
+	if _stagger % _STAGGER_CYCLE != 0:
+		return
 	# ensure all required components are valid
 	if not is_instance_valid(attack_component) or not is_instance_valid(range_component):
 		return

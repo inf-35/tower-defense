@@ -17,7 +17,7 @@ func display_tower_type(tower_type : Towers.Type):
 	text = Towers.get_tower_name(tower_type)
 	if Towers.is_tower_rite(tower_type):
 		text += " (%s)" % Player.get_rite_count(tower_type)
-	text += "\n{FLUX|icon_size=18} " + str(Towers.get_tower_cost(tower_type)) + " {POPULATION|icon_size=18} " + str(Towers.get_tower_capacity(tower_type))
+	text += "\n{GOLD|icon_size=36} " + str(Towers.get_tower_cost(tower_type)) + " {POPULATION|icon_size=36} " + str(Towers.get_tower_capacity(tower_type))
 	tower_label.set_parsed_text(text)
 	
 func _on_hover(_hover : bool):

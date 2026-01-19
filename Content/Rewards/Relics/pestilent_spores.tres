@@ -17,6 +17,6 @@ id_name = "common_cold"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("3_mcmk5")
-base_weight = 150.0
+base_weight = 200.0
 bias_rules = Array[ExtResource("1_mcmk5")]([SubResource("Resource_rkgwf")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

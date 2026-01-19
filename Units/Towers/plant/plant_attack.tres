@@ -1,15 +1,18 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=6 format=3 uid="uid://c1duevi7jhs3q"]
+[gd_resource type="Resource" script_class="AttackData" load_steps=7 format=3 uid="uid://c1duevi7jhs3q"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_vhk5d"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_0vqd8"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_x20j3"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_700oj"]
+[ext_resource type="Texture2D" uid="uid://bptr3d8i0mrgf" path="res://Assets/plantball.png" id="5_w3vm4"]
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_700oj")
-vfx_type = 1
+texture = ExtResource("5_w3vm4")
 radius = 2.0
-rotation_mode = 1
+scale = 0.1
+rotation_mode = 2
+spin_speed = 10.0
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]

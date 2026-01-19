@@ -164,6 +164,7 @@ func _render_preview_stats() -> void:
 		
 		# Create RichTextLabel
 		var rtl := InteractiveRichTextLabel.new()
+		rtl.theme_type_variation = "rt_s20_descriptive"
 		rtl.bbcode_enabled = true
 		rtl.set_parsed_text(bbcode)
 		rtl.fit_content = true
@@ -319,7 +320,7 @@ func _create_status_widget(icon: Texture2D, title: String, desc: String, stacks:
 	else:
 		# Debug fallback
 		var p = PlaceholderTexture2D.new()
-		p.size = Vector2(32, 32)
+		p.size = Vector2(64, 64)
 		tex.texture = p
 		
 	if is_negative_state:

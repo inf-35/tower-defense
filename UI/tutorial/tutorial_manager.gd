@@ -3,8 +3,23 @@ class_name TutorialManager
 
 # --- Configuration ---
 @export var overlay_color_rect: ColorRect
-@export var instruction_label: InteractiveRichTextLabel
+@export var instruction_panel: TutorialPanel
 @export var advance_button: Button # Optional "Next" button for text-only steps
+
+@export var central_anchor: Control
+@export var tower_bar_anchor: Control
+@export var player_stats_anchor: Control
+@export var timeline_anchor: Control
+@export var start_wave_anchor: Control
+
+enum Anchor {
+	CENTRAL_ANCHOR,
+	TOWER_BAR_ANCHOR,
+	PLAYER_STATS_ANCHOR,
+	TIMELINE_ANCHOR,
+	START_WAVE_ANCHOR,
+	TARGET_OFFSET,
+}
 
 enum Reference { ##reference ids to control nodes
 	NONE,
@@ -13,6 +28,7 @@ enum Reference { ##reference ids to control nodes
 	START_WAVE_BUTTON,
 	WAVE_TIMELINE,
 	TUTORIAL_TEXT,
+	PLAYER_STATS,
 }
 
 # --- State ---
@@ -20,9 +36,13 @@ var _registered_ui_elements: Dictionary[Reference, Control] = {} # { "id": Contr
 var _current_step_index: int = -1
 var _active_sequence: Array[TutorialStep] = []
 var _target_node: Control = null # The currently highlighted node
+var _highlight_target: bool = true
+var _waiting_for_confirmation: bool = false
 
 var _monitor_start_val: Vector2 = Vector2.ZERO # Stores initial camera pos/zoom
 var _monitoring_active: bool = false ##are we currently monitoring for a camera pos/zoom threshold
+
+var _anchor_node: Control
 
 # --- Internal ---
 var _shader_mat: ShaderMaterial
@@ -31,7 +51,7 @@ func _ready() -> void:
 	# Setup Overlay
 	_shader_mat = overlay_color_rect.material as ShaderMaterial
 	overlay_color_rect.visible = false
-	instruction_label.visible = false
+	instruction_panel.visible = false
 	
 	_shader_mat.set_shader_parameter(&"is_active", false)
 
@@ -41,17 +61,26 @@ func _ready() -> void:
 	overlay_color_rect.gui_input.connect(_process_overlay_input)
 	# Register self to UI singleton so other scripts can find us
 	UI.tutorial_manager = self
-	register_element(Reference.TUTORIAL_TEXT, instruction_label)
+	register_element(Reference.TUTORIAL_TEXT, instruction_panel)
 
 func _process(_delta: float) -> void:
-	# Dynamic Tracking: If the UI element moves (e.g. animatable UI), follow it
-	if visible and is_instance_valid(_target_node):
+	if visible and is_instance_valid(_target_node) and _highlight_target:
 		_update_spotlight_position(_target_node)
+	
+	if is_instance_valid(instruction_panel) and instruction_panel.visible:
+		instruction_panel.position = _anchor_node.position
+		instruction_panel.size = _anchor_node.size
 		
 	if not _monitoring_active or _current_step_index == -1:
 		return
 		
 	_check_step_completion()
+	
+func _input(event: InputEvent) -> void:
+	# NEW: Handle Q confirmation
+	if _waiting_for_confirmation:
+		if event.is_action_pressed("interact"): # Map 'Q' to this action
+			_advance_step()
 
 func _process_overlay_input(input_event: InputEvent):
 	print(input_event)
@@ -68,12 +97,12 @@ func start_sequence(steps: Array[TutorialStep]) -> void:
 	_current_step_index = -1
 	visible = true
 	overlay_color_rect.visible = true
-	instruction_label.visible = true
+	instruction_panel.visible = true
 	_advance_step()
 
 func end_tutorial() -> void:
 	visible = false
-	instruction_label.visible = false
+	instruction_panel.visible = false
 	overlay_color_rect.visible = false
 	_current_step_index = -1
 	_target_node = null
@@ -81,6 +110,7 @@ func end_tutorial() -> void:
 	_shader_mat.set_shader_parameter("is_active", false)
 
 func _advance_step() -> void:
+	_waiting_for_confirmation = false
 	_current_step_index += 1
 	if _current_step_index >= _active_sequence.size():
 		end_tutorial()
@@ -89,10 +119,14 @@ func _advance_step() -> void:
 	var step := _active_sequence[_current_step_index]
 	if step.highlight_target != Reference.NONE:
 		_target_node = _registered_ui_elements[step.highlight_target]
+	else:
+		_target_node = null
+	
+	if step.highlight_target != Reference.NONE and step.highlight:
 		_shader_mat.set_shader_parameter(&"is_active", true)
 	else:
 		_shader_mat.set_shader_parameter(&"is_active", false)
-	instruction_label.text = step.instruction_text
+	instruction_panel.label.set_parsed_text(step.instruction_text)
 
 	_monitoring_active = true
 	var cam := References.camera
@@ -113,6 +147,19 @@ func _advance_step() -> void:
 			
 		TutorialStep.TriggerType.PRESS_ACTION:
 			pass
+	
+	match step.panel_anchor:
+		Anchor.CENTRAL_ANCHOR:
+			_anchor_node = central_anchor
+		Anchor.TOWER_BAR_ANCHOR:
+			_anchor_node = tower_bar_anchor
+		Anchor.PLAYER_STATS_ANCHOR:
+			_anchor_node = player_stats_anchor
+		Anchor.TIMELINE_ANCHOR:
+			_anchor_node = timeline_anchor
+		Anchor.START_WAVE_ANCHOR:
+			_anchor_node = start_wave_anchor
+			
 
 func _check_step_completion() -> void:
 	var step = _active_sequence[_current_step_index]
@@ -120,6 +167,9 @@ func _check_step_completion() -> void:
 	if not is_instance_valid(cam): return
 
 	match step.trigger_type:
+		TutorialStep.TriggerType.BEGIN_TRIGGERED:
+			_complete_step()
+		
 		TutorialStep.TriggerType.CAMERA_PAN:
 			# Check distance moved
 			var dist: float = _monitor_start_val.distance_to(cam.global_position)
@@ -150,10 +200,12 @@ func _complete_step() -> void:
 	if step.trigger_signal and step.trigger_signal.is_connected(_on_trigger_signal):
 		step.trigger_signal.disconnect(_on_trigger_signal)
 	
-	await get_tree().create_timer(0.2).timeout
-	print("Completed step!")
-	_advance_step()
-
+	if step.require_confirmation:
+		_waiting_for_confirmation = true
+		instruction_panel.label.set_parsed_text(step.success_text)
+	else:
+		_advance_step()
+	
 func _update_spotlight_position(node: Control) -> void:
 	# Convert node rect to Screen UV coordinates for the shader
 	var viewport_size = get_viewport().get_visible_rect().size

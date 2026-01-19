@@ -22,7 +22,12 @@ enum Type {
 var unit_stats: Dictionary[Type, UnitData] = {}
 var unit_prototypes: Dictionary[Type, Unit] = {}
 
-func _init():
+var _units_modified_by_difficulty: Dictionary[Type, bool] = {} #whether a unit type's stats has been modified by difficulty
+
+func start():
+	unit_stats.clear()
+	unit_prototypes.clear()
+	#dont clear units modified by difficulty, as unitdatas are persistent
 	_load_all_unit_stats()
 	
 func get_unit_prototype(unit_type: Type) -> Unit:
@@ -52,9 +57,15 @@ func get_unit_flux(unit: Type) -> float:
 func get_unit_scene(unit: Type) -> PackedScene:
 	return unit_stats[unit].unit_scene
 
-func create_unit(unit: Type) -> Unit:
-	var _unit: Unit = get_unit_scene(unit).instantiate()
-	_unit.flux_value = get_unit_flux(unit)
+func create_unit(unit_type: Type) -> Unit:
+	var _unit: Unit = get_unit_scene(unit_type).instantiate()
+	_unit.flux_value = get_unit_flux(unit_type)
+	
+	if Phases.current_game_difficulty == Phases.GameDifficulty.NORMAL and not _units_modified_by_difficulty.has(unit_type):
+		if _unit.health_component: _unit.health_component.health_data.max_health = round(_unit.health_component.health_data.max_health * 0.8)
+		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.75
+		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.2
+		_units_modified_by_difficulty[unit_type] = true
 	return _unit
 	
 func _load_all_unit_stats():

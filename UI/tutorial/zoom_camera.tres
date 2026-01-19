@@ -6,7 +6,9 @@
 script = ExtResource("1_pd3b0")
 instruction_text = "TUTORIAL
 Zoom in/out with the scroll wheel."
-highlight_target = 5
+success_text = "TUTORIAL
+Zoom in/out with the scroll wheel.
+Q to continue."
 trigger_type = 3
 trigger_amount = 0.1
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

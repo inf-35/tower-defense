@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://lslpxa2bdsbo"]
+
+[ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="1_sfu6v"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_v254a"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_00p38"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_tbggp"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_phdas"]
+[ext_resource type="PackedScene" uid="uid://bm78vrj240nqi" path="res://Units/Towers/rite_blood/rite_blood.tscn" id="6_4xqr7"]
+
+[resource]
+script = ExtResource("5_phdas")
+id = 46
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Blood"
+tower_description = "{RITE_LABEL}: Adjacent towers' attacks gain 1 stack of {BLEED}"
+icon = ExtResource("1_sfu6v")
+preview = ExtResource("1_sfu6v")
+tower_scene = ExtResource("6_4xqr7")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

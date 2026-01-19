@@ -48,7 +48,6 @@ metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
 script = ExtResource("2_3nlnt")
-ignore_walls = true
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
 [node name="MovementComponent" type="Node" parent="."]

@@ -104,7 +104,7 @@ func _update_preview_tooltip() -> void:
 				msg += "\n(Used to build villages)"
 		else:
 			msg = "Uncharted"
-		
+		msg += "\nLMB to place\nRMB to deselect\nR to rotate"
 		UI.cursor_info.display_message(msg, false)
 	else:
 		# If invalid, get the specific reason
@@ -114,6 +114,7 @@ func _update_preview_tooltip() -> void:
 			preview_tower_position, 
 			preview_tower_prototype
 		)
+		error_msg += "\nLMB to place\nRMB to deselect\nR to rotate"
 		UI.cursor_info.display_message(error_msg, true)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -182,6 +183,7 @@ func _enter_tower_selected_state(tower: Tower):
 	tower_was_selected.emit(selected_tower)
 	UI.update_inspector_bar.emit(selected_tower)
 	
+	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -5.0)
 	References.range_indicator.select(tower)
 	
 # input handlers
@@ -204,6 +206,7 @@ func _handle_idle_input(event: InputEvent) -> void:
 		#else do nothing
 
 func _handle_preview_input(event: InputEvent) -> void:
+	References.range_indicator.select(preview_tower_prototype)
 	# handle mouse motion to update the preview visuals
 	if event is InputEventMouseMotion:
 		_update_preview_visuals()
@@ -258,6 +261,7 @@ func _update_preview_visuals():
 	preview_tower_position = Island.position_to_cell(mouse_pos) - center_offset
 	
 	if preview_tower_position != preview_tower_prototype.tower_position or preview_tower_facing != preview_tower_prototype.facing:
+		Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -10.0, preview_tower_position)
 		preview_tower_prototype.tower_position = preview_tower_position
 		preview_tower_prototype.facing = preview_tower_facing
 		

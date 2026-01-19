@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://cr4mh1ou5mmw6"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_5aftf"]
+
+[resource]
+script = ExtResource("1_5aftf")
+instruction_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below."
+success_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below.
+Q to continue."
+panel_anchor = 1
+trigger_action = &"0"
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

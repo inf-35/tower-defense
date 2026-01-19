@@ -47,7 +47,8 @@ enum Type {
 	POISON_ACUTE,
 	POISON_CHRONIC,
 	ARC_CHAIN,
-	ARC_DAMAGE
+	ARC_DAMAGE,
+	RITE_BLOOD,
 }
 
 enum Element {

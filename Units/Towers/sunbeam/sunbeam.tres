@@ -30,7 +30,7 @@ upgrades_into = Dictionary[int, float]({
 39: 18.0
 })
 tower_name = "Sunbeam"
-tower_description = "An advanced laser-firing tower that tracks enemies over long range, continuously dealing damage and burning them."
+tower_description = "An advanced laser-firing tower that tracks enemies over long range, continuously dealing damage and {BURN|label=Burning} them."
 icon = ExtResource("1_jl5ad")
 preview = ExtResource("1_jl5ad")
 inspector_actions = Array[ExtResource("2_xqmxb")]([SubResource("Resource_74q3n"), SubResource("Resource_qp5fc"), SubResource("Resource_4ofox")])

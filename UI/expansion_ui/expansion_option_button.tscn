@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="2_a2c30"]
 
 [node name="ExpansionOptionButton" type="Button" node_paths=PackedStringArray("text_node")]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 80)
 offset_right = 200.0
 offset_bottom = 50.0
 script = ExtResource("1_86bau")

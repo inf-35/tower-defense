@@ -35,7 +35,8 @@ texture = ExtResource("5_o5vsp")
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
 z_index = 10
 z_as_relative = false
-position = Vector2(-5, 28)
+position = Vector2(3.170967e-05, 33.33337)
+scale = Vector2(1.047074, 1.0320516)
 texture = ExtResource("7_sklve")
 
 [node name="ModifiersComponent" type="Node" parent="."]

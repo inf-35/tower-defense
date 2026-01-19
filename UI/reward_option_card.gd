@@ -60,7 +60,7 @@ func _apply_visuals(reward: Reward) -> void:
 			var type: Towers.Type = reward.tower_type
 			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
-			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
+			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
 			desc_text = Towers.get_tower_description(type)
 			
 		Reward.Type.ADD_RELIC:
@@ -73,7 +73,7 @@ func _apply_visuals(reward: Reward) -> void:
 			var type: Towers.Type = reward.rite_type
 			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
-			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.Type.keys()[type].capitalize()
+			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
 			desc_text = Towers.get_tower_description(type)
 				
 		Reward.Type.ADD_FLUX:
@@ -95,10 +95,12 @@ func _apply_visuals(reward: Reward) -> void:
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -1.0)
 			selected.emit()
 
 # manually trigger the hover animations on the children wrappers
 func _on_mouse_entered() -> void:
+	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -5.0)
 	hovered.emit()
 	if is_instance_valid(_icon_target) and _icon_target.has_method("_on_mouse_entered"):
 		_icon_target._on_mouse_entered()

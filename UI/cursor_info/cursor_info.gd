@@ -2,7 +2,7 @@ extends Control
 class_name CursorInfo
 
 @export var label: InteractiveRichTextLabel
-const OFFSET: Vector2 = Vector2(10, 10) # Down-Right from mouse
+const OFFSET: Vector2 = Vector2(20, 20) # Down-Right from mouse
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE # Click-through

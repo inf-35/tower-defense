@@ -23,7 +23,7 @@ var hp: float:
 		hp = value
 		hp_changed.emit(hp)
 		
-		if hp <= 0.0:
+		if hp < 0.0 or is_zero_approx(hp):
 			if not Phases.is_game_over:
 				Phases.start_game_over(false)
 
@@ -55,6 +55,8 @@ var ruin_service: RuinService
 var global_event_service: GlobalEventService
 
 func _ready():
+	get_window().size = Vector2(1920, 1080)
+	get_window().move_to_center()
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -112,7 +114,6 @@ func _setup_state():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.MAGE: true,
 		#Towers.Type.SNOWBALL: true,
 		##Towers.Type.FROST_TOWER: true,
 		#Towers.Type.RITE_LIBERTY: true,
@@ -134,8 +135,8 @@ func _setup_state():
 	#reward.relic = Relics.EARLY_BIRD
 	#RewardService.apply_reward(reward)
 	
-	flux = 200.0
-	hp = 200.0
+	flux = 20.0
+	hp = 20.0
 	
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))
 	UI.update_relics.emit()
@@ -245,6 +246,7 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 	
 	# 3. If the Island confirms placement, deduct resources.
 	if success:
+		Audio.play_sound(ID.Sounds.TOWER_PLACED_SOUND, 0.0, Island.cell_to_position(cell))
 		self.flux -= Towers.get_tower_cost(tower_type)
 		
 		if Towers.is_tower_rite(tower_type):

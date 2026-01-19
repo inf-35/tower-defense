@@ -30,11 +30,13 @@ var tower_position: Vector2i = Vector2i.ZERO:
 	set(new_pos):
 		#if new_pos == tower_position:
 			#return
-
+		var old_pos := tower_position
 		tower_position = new_pos
 		movement_component.unit = self #evil circular dependency resolution
 		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
 		
+		if tower_position == old_pos:
+			return
 		# --- apply terrain modifiers ---
 		# after the tower is created and has its components, check the terrain it's on
 		# clear pre-existing terrain modifiers
@@ -80,8 +82,6 @@ var tower_position: Vector2i = Vector2i.ZERO:
 var _terrain_modifiers: Array[Modifier] = [] ## modifiers for terrain effects (i.e. high ground)
 var size: Vector2i = Vector2i.ONE ## this is inclusive of facing
 
-# --- new state transition functions ---
-
 # this function is called by 'sell()' or 'on_killed()'
 func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
@@ -98,6 +98,26 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	
 	# 2. update visuals
 	disabled = true
+	graphics.visible = false
+	
+	var rubble := Sprite2D.new()
+	rubble.texture = preload("res://Assets/rubble_grey.png")
+	rubble.scale = Vector2(0.06, 0.06) * Vector2(size)
+	rubble.z_as_relative = false
+	rubble.z_index = Layers.TERRAIN_EFFECTS
+	add_child.call_deferred(rubble)
+	
+	var outline := Sprite2D.new()
+	outline.texture = Towers.get_tower_preview(type)
+	outline.scale = Vector2(0.06, 0.06)
+	outline.self_modulate = Color(1,1,1,0.4)
+	outline.z_as_relative = false
+	outline.z_index = Layers.FLOATING_UI
+	add_child.call_deferred(outline)
+	
+	set_meta(&"rubble_sprite", rubble)
+	set_meta(&"rubble_outline", outline)
+
 	
 	# 3. become non-blocking for pathfinding
 	self.blocking = false
@@ -109,6 +129,10 @@ func enter_active_state() -> void:
 	current_state = State.ACTIVE
 	#restore visuals
 	disabled = false
+	graphics.visible = true
+	if get_meta(&"rubble_sprite"):
+		get_meta(&"rubble_sprite").queue_free()
+		get_meta(&"rubble_outline").queue_free()
 	#become blocking again
 	self.blocking = true
 	References.island.update_navigation_grid()
@@ -125,13 +149,15 @@ func resurrect() -> void:
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
 	# 3. restart behaviours
 	behavior.start()
-	# 4. reattach all effects
-	for effect_prototype: EffectPrototype in effect_prototypes:
+	# 4. reattach all (intrinsic) effects
+	for effect_prototype: EffectPrototype in intrinsic_effects:
+		print("apply: ", effect_prototype)
 		apply_effect(effect_prototype) #attach all effects
 
 func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
 	for effect_prototype: EffectPrototype in effect_prototypes:
+		print("remove: ", effect_prototype)
 		remove_effect(effect_prototype) #detach all effects
 
 func sell():

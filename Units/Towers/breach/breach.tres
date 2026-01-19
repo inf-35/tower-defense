@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://dnuriafc2j7gw"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=5 format=3 uid="uid://dnuriafc2j7gw"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_s778v"]
+[ext_resource type="Texture2D" uid="uid://bfxonhkv15vbk" path="res://Assets/breach.png" id="1_av2mb"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_utcy8"]
 [ext_resource type="PackedScene" uid="uid://ccf4np3sitvsx" path="res://Units/Towers/breach/breach.tscn" id="2_myhv2"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_n0le0"]
-[ext_resource type="Texture2D" uid="uid://qvs5b3q3htcn" path="res://Assets/enemy_camp.png" id="3_s778v"]
 
 [resource]
 script = ExtResource("1_utcy8")
@@ -14,7 +13,8 @@ required_capacity = 0.0
 element = 5
 tower_name = "Breach"
 tower_description = "Enemies spawn here."
-preview = ExtResource("3_s778v")
+icon = ExtResource("1_av2mb")
+preview = ExtResource("1_av2mb")
 inspector_actions = Array[ExtResource("2_n0le0")]([])
 tower_scene = ExtResource("2_myhv2")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

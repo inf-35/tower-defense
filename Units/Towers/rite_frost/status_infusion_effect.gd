@@ -3,7 +3,7 @@ class_name StatusInfusionEffect
 
 @export var status: Attributes.Status = Attributes.Status.FROST
 @export var bonus_stacks: float = 1.0
-@export var bonus_time: float = 3.0
+@export var bonus_time: float = 2.0
 
 func _init() -> void:
 	# intercept hits before they leave the tower

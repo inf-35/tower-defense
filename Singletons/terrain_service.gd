@@ -94,7 +94,7 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 	if not (tower_type == Towers.Type.GENERATOR and island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
 		var cap_cost = Towers.get_tower_capacity(tower_type)
 		if Player.used_capacity + cap_cost > Player.tower_capacity:
-			return "Not enough {POPULATION|icon_size=20|label=Population|color=red} (build more villages)"
+			return "Not enough {POPULATION|icon_size=20|label=Population|color=red} (build more {T_GENERATOR|icon_size=24|label=Villages|color=red}"
 
 	# 3. Check Limits
 	var limit = Player.get_tower_limit(tower_type)

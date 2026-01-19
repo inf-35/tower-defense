@@ -47,7 +47,7 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 	
 	func _on_timeout():
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, intercept_position)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, intercept_position)
 		var target : Unit = hit_data.target #NOTE: this might be null
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage 
@@ -246,7 +246,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 
 	func _apply_impact_vfx(pos: Vector2):
 		VFXManager.play_vfx(hit_data.vfx_on_impact, pos)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, pos)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, pos)
 	
 	func _on_destruct(target: Unit = null):
 		CombatManager.simulated_projectiles.erase(self)

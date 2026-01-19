@@ -92,6 +92,9 @@ func is_target_valid(target_unit) -> bool:
 	if target_unit.incorporeal:
 		return false
 		
+	if target_unit.abstractive:
+		return false
+		
 	return true
 
 #checks if priority (ie priority and non overkilled targets) are available

@@ -15,7 +15,7 @@ upgrades_into = Dictionary[int, float]({
 27: 1.0
 })
 tower_name = "Plant"
-tower_description = "Wild flora repurposed into killing machine, the plant starts off weak but grows stronger each wave."
+tower_description = "Wild flora repurposed into killing machine, the plant starts off weak but grows stronger (+10% initial {UNIT_DAMAGE}) each wave."
 icon = ExtResource("5_50urh")
 preview = ExtResource("5_50urh")
 tower_scene = ExtResource("3_huqpa")

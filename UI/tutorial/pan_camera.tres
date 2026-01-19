@@ -6,7 +6,9 @@
 script = ExtResource("1_wohyo")
 instruction_text = "TUTORIAL
 Pan the camera with WASD."
-highlight_target = 5
+success_text = "TUTORIAL
+Pan the camera with WASD.
+Q to continue."
 trigger_type = 2
 trigger_amount = 2.0
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

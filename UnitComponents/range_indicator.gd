@@ -15,7 +15,6 @@ func _ready() -> void:
 	z_as_relative = false
 
 func select(tower: Tower) -> void:
-	print("select: ", tower)
 	_on_tower_selected(tower)
 
 func _on_tower_selected(tower: Tower) -> void:

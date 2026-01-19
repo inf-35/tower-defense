@@ -13,13 +13,14 @@ signal combat_started(wave_number: int) #combat wave started
 signal wave_schedule_updated() ## wave schedule updated
 
 # --- game state variables ---
-
+enum GameDifficulty { NORMAL, HARD }
 enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
 enum DayEvent { NONE, EXPANSION, REWARD_TOWER, REWARD_RELIC}
 enum CombatVariant { NORMAL, BOSS, SURGE}
 
 var current_wave_number: int = 0
 var current_phase: GamePhase = GamePhase.IDLE
+var current_game_difficulty: GameDifficulty
 
 var is_game_over: bool = false
 
@@ -45,6 +46,7 @@ func start_game() -> void:
 	Clock.start()
 	References.start()
 	ClickHandler.start()
+	Units.start()
 	Player.start()
 	TowerNetworkManager.start()
 
@@ -69,13 +71,16 @@ func start_tutorial():
 		preload("res://UI/tutorial/zoom_camera.tres")
 	]
 	
-	var palisade: TutorialStep = preload("res://UI/tutorial/place_palisade.tres")
-	palisade.trigger_signal = UI.place_tower_requested
-	palisade.desired_parameters = [Towers.Type.PALISADE]
-	
+	var select: TutorialStep = preload("res://UI/tutorial/select_tower.tres")
+	select.trigger_signal = UI.tower_selected
+	select.desired_parameters = []
+
 	var turret: TutorialStep = preload("res://UI/tutorial/place_turret.tres")
 	turret.trigger_signal = UI.place_tower_requested
 	turret.desired_parameters = [Towers.Type.TURRET]
+	
+	var gold_population: TutorialStep = preload("res://UI/tutorial/gold_population_explanation.tres")
+	var hover_player_stats: TutorialStep = preload("res://UI/tutorial/hover_player_stats.tres")
 	
 	var timeline: TutorialStep = preload("res://UI/tutorial/hover_wave_timeline.tres")
 	
@@ -83,11 +88,13 @@ func start_tutorial():
 	start_wave.trigger_signal = UI.building_phase_ended
 	start_wave.desired_parameters = []
 	
-	steps.append(palisade)
+	steps.append(select)
 	steps.append(turret)
+	steps.append(gold_population)
+	steps.append(hover_player_stats)
 	steps.append(timeline)
 	steps.append(start_wave)
-	#UI.tutorial_manager.start_sequence(steps)
+	UI.tutorial_manager.start_sequence(steps)
 
 func _generate_wave_plan() -> void:
 	_report("generating wave plan.")

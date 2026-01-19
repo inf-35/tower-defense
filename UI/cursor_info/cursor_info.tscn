@@ -8,9 +8,9 @@
 
 [node name="CursorInfo" type="PanelContainer" node_paths=PackedStringArray("label")]
 clip_contents = true
-custom_minimum_size = Vector2(140, 0)
-offset_right = 140.0
-offset_bottom = 50.0
+custom_minimum_size = Vector2(280, 0)
+offset_right = 300.0
+offset_bottom = 84.0
 focus_mode = 3
 mouse_filter = 2
 theme = ExtResource("1_yjbtq")
@@ -23,8 +23,8 @@ label = NodePath("InteractiveRichTextLabel")
 layout_mode = 2
 theme_type_variation = &"rt_s15"
 theme_override_colors/default_color = Color(0.41568628, 0.3764706, 0.29803923, 1)
-theme_override_colors/font_outline_color = Color(1, 0.98039216, 0.94509804, 1)
-theme_override_constants/outline_size = 6
+theme_override_colors/font_outline_color = Color(0.99215686, 0.9372549, 0.84705883, 1)
+theme_override_constants/outline_size = 12
 bbcode_enabled = true
 text = "eaeae
 aeaeeaea"

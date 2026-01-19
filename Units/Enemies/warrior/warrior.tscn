@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://lvhut8mofy7k"]
+[gd_scene load_steps=23 format=3 uid="uid://lvhut8mofy7k"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_1marj"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_lb2at"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="13_nspst"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="14_mb2by"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="15_ffhjg"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="17_mb2by"]
 
 [sub_resource type="Resource" id="Resource_mb2by"]
 script = ExtResource("4_nspst")
@@ -82,6 +83,7 @@ scale = Vector2(0.10810186, 0.10810187)
 texture = ExtResource("7_lj1uh")
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
@@ -108,3 +110,11 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 script = ExtResource("12_qynf8")
 attack_data = SubResource("Resource_pineb")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="ContactShadow" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+position = Vector2(0, 2.5)
+script = ExtResource("17_mb2by")
+shadow_size = Vector2(6, 4.5)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"

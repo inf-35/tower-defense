@@ -1,21 +1,22 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://bfrry0ojjyk5f"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=9 format=3 uid="uid://bfrry0ojjyk5f"]
 
 [ext_resource type="Script" uid="uid://d4h1djnngjtxl" path="res://Content/Relics/early_bird/early_bird_effect.gd" id="2_0l13k"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_gubha"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_0l13k"]
 [ext_resource type="Texture2D" uid="uid://d1r0obkv5o1yn" path="res://Assets/early_bird_icon.png" id="3_gubha"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_0l13k"]
 
 [sub_resource type="Resource" id="Resource_gubha"]
 script = ExtResource("2_gubha")
 attribute = 8
-multiplicative = 0.667
+multiplicative = 0.556
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_0l13k"]
 script = ExtResource("2_gubha")
 attribute = 6
-multiplicative = 1.5
+multiplicative = 1.8
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -28,6 +29,6 @@ metadata/_custom_type_script = "uid://d4h1djnngjtxl"
 script = ExtResource("3_0l13k")
 global_effect = SubResource("Resource_1gyvc")
 title = "Early Bird"
-description = "The first tower to hit an enemy in a wave gains a +50% {UNIT_HITRATE} and {UNIT_DAMAGE} buff for that wave."
+description = "The first tower to hit an enemy in a wave gains a +80% {UNIT_HITRATE} and {UNIT_DAMAGE} buff for that wave."
 icon = ExtResource("3_gubha")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -4,8 +4,12 @@
 
 [resource]
 script = ExtResource("1_nof3e")
-instruction_text = "The wave timeline shows details of future events and waves, including the number and type of enemies. Hover over the timeline."
+instruction_text = "Hover over wave icons here to foresee events, including the number and type of enemies in future waves."
+success_text = "Hover over wave icons here to foresee events, including the number and type of enemies in future waves.
+Q to continue."
+panel_anchor = 3
 highlight_target = 4
+highlight = false
 trigger_type = 4
 trigger_action = &"0"
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

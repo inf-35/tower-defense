@@ -12,7 +12,7 @@ class AdjacencyState extends RefCounted:
 	var active_modifiers: Dictionary[Tower, Modifier] = {}
 
 func _init() -> void:
-	event_hooks = [GameEvent.EventType.ADJACENCY_UPDATED]
+	event_hooks = [GameEvent.EventType.ADJACENCY_UPDATED, GameEvent.EventType.TOWER_BUILT]
 	global = true
 
 # --- Instance Factory ---
@@ -43,9 +43,6 @@ func _handle_detach(instance: EffectInstance) -> void:
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	#if event.event_type == GameEvent.EventType.REPLACED:
 		#_handle_replace(instance, event)
-	
-	if event.event_type != GameEvent.EventType.ADJACENCY_UPDATED:
-		return
 
 	if not event.unit is Tower:
 		return
@@ -72,7 +69,6 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void:
 	var state := instance.state as AdjacencyState
-	
 	# check if this tower is a valid host
 	if not is_instance_valid(tower):
 		return

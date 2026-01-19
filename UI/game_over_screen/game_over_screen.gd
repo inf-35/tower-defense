@@ -81,7 +81,7 @@ func _populate_towers() -> void:
 		icon.texture = Towers.get_tower_icon(type)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(48, 48)
+		icon.custom_minimum_size = Vector2(96, 96)
 		icon.tooltip_text = Towers.get_tower_name(type)
 		tower_container.add_child(icon)
 

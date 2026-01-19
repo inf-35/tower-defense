@@ -5,9 +5,13 @@
 
 [node name="TimelinePip" type="Control" node_paths=PackedStringArray("animatable_wrapper", "icon_rect", "background_panel")]
 clip_contents = true
-custom_minimum_size = Vector2(25, 25)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 3
 anchors_preset = 0
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
 script = ExtResource("1_5qpod")
 animatable_wrapper = NodePath("animatable_wrapper")
 icon_rect = NodePath("animatable_wrapper/icon")

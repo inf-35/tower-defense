@@ -4,7 +4,10 @@
 
 [resource]
 script = ExtResource("1_wa6jf")
-instruction_text = "Place down a turret."
-highlight_target = 1
+instruction_text = "Selecting a turret, place down the turret with LMB."
+success_text = "You can also deselect with RMB, or rotate with R.
+Q to continue."
+panel_anchor = 1
+highlight = false
 trigger_action = &"0"
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

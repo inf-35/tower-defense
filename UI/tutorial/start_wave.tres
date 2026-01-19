@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1_40tdq")
 instruction_text = "Start the wave and face your enemies."
-highlight_target = 3
+panel_anchor = 4
+require_confirmation = false
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

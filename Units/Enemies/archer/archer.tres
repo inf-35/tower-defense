@@ -12,7 +12,7 @@
 [resource]
 script = ExtResource("1_i5oot")
 title = "Archer"
-description = "Shoots arrows from afar."
+description = "Shoots arrows from afar at the closest tower."
 stat_displays = Array[ExtResource("2_pi0cq")]([ExtResource("3_odjfi"), ExtResource("4_180bx"), ExtResource("5_7s8kf"), ExtResource("6_pqcdf"), ExtResource("7_uk7lt")])
 unit_scene = ExtResource("2_bv1r0")
 flux_value = 0.8

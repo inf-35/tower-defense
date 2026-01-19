@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://cd8qmlevmlejn"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_4p1h4"]
+
+[resource]
+script = ExtResource("1_4p1h4")
+instruction_text = "{GOLD} is used to build towers, and {POPULATION} is used to maintain them.
+"
+success_text = "{GOLD} is used to build towers, and {POPULATION} is used to operate them.
+Q to continue."
+panel_anchor = 2
+highlight_target = 6
+highlight = false
+trigger_type = 5
+trigger_action = &"0"
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bl12mn0bm7utq"]
+[gd_scene load_steps=14 format=3 uid="uid://bl12mn0bm7utq"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_y0lj0"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_l3ud4"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_xj78e"]
 [ext_resource type="Resource" uid="uid://n6i5h8a8hv0y" path="res://Units/Enemies/healer/healer_hp.tres" id="6_3u0om"]
 [ext_resource type="Texture2D" uid="uid://cflil6vcjb1y8" path="res://Assets/healer.png" id="7_8vdnj"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="7_k8dvw"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_ub73x"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_cg248"]
 [ext_resource type="Script" uid="uid://dwx63ohv786ew" path="res://Units/Enemies/healer/healer_behavior.gd" id="10_8vdnj"]
@@ -49,12 +50,22 @@ script = ExtResource("5_xj78e")
 health_data = ExtResource("6_3u0om")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
+[node name="ContactShadow" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+position = Vector2(0, 0.5)
+scale = Vector2(0.095833324, 0.095833324)
+script = ExtResource("7_k8dvw")
+shadow_size = Vector2(50, 30)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"
+
 [node name="Graphics" type="Sprite2D" parent="."]
-position = Vector2(-1.1920929e-07, 1.1920929e-07)
+position = Vector2(1, -3)
 scale = Vector2(0.095833324, 0.095833324)
 texture = ExtResource("7_8vdnj")
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("8_ub73x")

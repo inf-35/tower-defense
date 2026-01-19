@@ -296,8 +296,8 @@ func _spawn_brush_stroke(cell: Vector2i) -> void:
 	if _active_brush_strokes.has(cell):
 		return
 		
-	if not (cell.x % 2 == 0 and cell.y % 2 == 0):
-		return
+	#if not (cell.x % 2 == 0 and cell.y % 2 == 0):
+		#return
 	
 	var brush_tex: Texture2D = brush_textures.pick_random()
 	var sprite: Sprite2D = Sprite2D.new()
@@ -319,9 +319,9 @@ func _spawn_brush_stroke(cell: Vector2i) -> void:
 	# store the sprite to update its position later if we shift the grid
 	sprite.position = local_pos
 	# randomisation
-	sprite.rotation = randf() * TAU
+	sprite.rotation = 0.2 + randf() * TAU * 0.1
 	sprite.modulate = Color(1,1,1, randf_range(0.5, 1.0))
-	var s: float = (randf_range(0.5, 1.0)) * 0.4
+	var s: float = (randf_range(0.6, 1.0)) * 0.2
 	sprite.scale = Vector2(s, s)
 	
 	_brush_viewport.add_child(sprite)

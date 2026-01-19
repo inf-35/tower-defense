@@ -1,11 +1,11 @@
 extends Node
 
-var ICON_SIZE: int = 25
+var ICON_SIZE: int = 40
 #NOTE:
 #parameters: icon_size, color, label
 # master dictionary for static keywords
 const KEYWORDS: Dictionary[String, Dictionary] = {
-	"FLUX": {
+	"GOLD": {
 		"title": "Gold",
 		"display": "",
 		"description": "The primary currency used for building and upgrading towers.",
@@ -59,32 +59,22 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "How large the AOE of attacks are.",
 		"icon": preload("res://Assets/radius.png")
 	},
-	"BREACH": {
-		"title": "Breach",
-		"description": "An active enemy spawn point. Will close after a set number of waves.",
-		"icon": null
-	},
-	"REWARD": {
-		"title": "Anomaly",
-		"description": "A special Breach that will offer a choice of powerful rewards when its wave is cleared.",
-		"icon": null
-	},
 	"FROST": {
 		"title": "Frost",
 		"display": "",
-		"description": "This unit moves and attacks at a glacial rate.",
+		"description": "{STATUS_EFFECT_LABEL}. Frozen units move 33% slower per stack of frost.",
 		"icon": preload("res://Assets/frost_icon.png")
 	},
 	"BURN": {
 		"title": "Burn",
 		"display": "",
-		"description": "This unit is burning and takes 0.5 damage per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}. Burning units take 0.5 damage per second per stack",
 		"icon": preload("res://Assets/burn_icon.png")
 	},
 	"BLEED": {
 		"title": "Bleed",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 0.5 more extra flat damage per hit per stack of bleed",
+		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 0.5 more extra flat damage on hit per stack of bleed",
 		"icon": preload("res://Assets/bleed_icon.png")
 	},
 	"CURSED": {
@@ -108,7 +98,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"RITE_LABEL": {
 		"title": "Rite",
 		"display": "[Rite]",
-		"description": "Powerful, limited-use artifacts. Complements and enhances your towers' abilities on the field.",
+		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field.",
 		"icon": null,
 	}
 }
@@ -157,7 +147,7 @@ func parse_text_for_bbcode(text: String) -> String:
 	var processed_keys: Dictionary = {}
 	
 	for match_result in matches:
-		var full_placeholder: String = match_result.get_string(0) # e.g. {FLUX}
+		var full_placeholder: String = match_result.get_string(0) # e.g. {GOLD}
 		var content: String = match_result.get_string(1) # e.g. FLUX
 		
 		if processed_keys.has(full_placeholder):

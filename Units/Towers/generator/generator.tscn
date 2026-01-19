@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://y3fmjqd4dpgt"]
+[gd_scene load_steps=10 format=3 uid="uid://y3fmjqd4dpgt"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ein27"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="3_c84km"]
@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://bfougfx6aba1c" path="res://Content/Effects/capacity_generator.tres" id="4_v8yu7"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sxhhn"]
 [ext_resource type="Texture2D" uid="uid://cmdt8h3ekawqj" path="res://Assets/village.png" id="7_o38am"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="8_c84km"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
 
 [node name="Generator" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
@@ -32,6 +33,11 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("7_o38am")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("8_c84km")
+height_multiplier = 0.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("9_qtlu4")

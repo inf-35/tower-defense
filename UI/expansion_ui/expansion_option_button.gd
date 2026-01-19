@@ -1,4 +1,4 @@
-extends Button
+extends ClickyButton
 class_name ExpansionOptionButton
 
 @export var text_node: InteractiveRichTextLabel

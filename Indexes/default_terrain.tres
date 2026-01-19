@@ -1,16 +1,14 @@
-[gd_resource type="Resource" script_class="TerrainDatabase" load_steps=11 format=3 uid="uid://cshhypbo4uoaw"]
+[gd_resource type="Resource" script_class="TerrainDatabase" load_steps=10 format=3 uid="uid://cshhypbo4uoaw"]
 
 [ext_resource type="Script" uid="uid://bb5bm1s2h1ack" path="res://Objects/Indexes/terrain_database.gd" id="1_h065e"]
 [ext_resource type="Script" uid="uid://dk1gy0e6eorr2" path="res://Objects/Indexes/terrain_base_stat.gd" id="2_2st4k"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_u30vj"]
-[ext_resource type="Texture2D" uid="uid://dudjtany1tb0h" path="res://Assets/blank.svg" id="4_4wuia"]
 [ext_resource type="Texture2D" uid="uid://dd5gwksu38758" path="res://Assets/ruins_placeholder.png" id="5_4wuia"]
 [ext_resource type="Texture2D" uid="uid://pb6220cxxuje" path="res://Assets/highland_placeholder.png" id="6_0duxl"]
 
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
 color = Color(1, 1, 1, 1)
-texture = ExtResource("4_4wuia")
 navigable = true
 constructable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
