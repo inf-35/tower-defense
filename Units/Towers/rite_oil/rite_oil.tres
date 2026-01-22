@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://b0frhlmigdu1u"]
+
+[ext_resource type="Texture2D" uid="uid://dyjftycyg82fn" path="res://Assets/rite_oil.png" id="1_pbx7b"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_3vh64"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_aj7uu"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_a12va"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_6o3hh"]
+[ext_resource type="PackedScene" uid="uid://dhc3c40cimlnv" path="res://Units/Towers/rite_oil/rite_oil.tscn" id="6_pbx7b"]
+
+[resource]
+script = ExtResource("5_6o3hh")
+id = 49
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Rite of Oil"
+tower_description = "{RITE_LABEL}. {STATUS_EFFECT_LABEL|label=Status effects} inflicted by adjacent towers are prolonged by 2.5 seconds."
+icon = ExtResource("1_pbx7b")
+preview = ExtResource("1_pbx7b")
+tower_scene = ExtResource("6_pbx7b")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

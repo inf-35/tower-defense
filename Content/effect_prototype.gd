@@ -19,11 +19,14 @@ enum Schedule { #schedule categories, used to enforce determinstic ordering of e
 var attach_handler: Callable = _handle_attach
 var detach_handler: Callable = _handle_detach
 var event_handler: Callable = _handle_event
+var stack_update_handler: Callable = _handle_stack_update
 
 #event handlers; these are injected into EffectInstance at runtime
 @abstract func _handle_attach(instance: EffectInstance) -> void
 @abstract func _handle_detach(instance: EffectInstance) -> void
 @abstract func _handle_event(instance: EffectInstance, event: GameEvent) -> void
+func _handle_stack_update(instance: EffectInstance) -> void:
+	pass
 
 func on_tick(instance: EffectInstance, delta: float) -> void:
 	pass

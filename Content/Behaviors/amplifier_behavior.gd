@@ -4,12 +4,20 @@ class_name AmplifierBehavior
 
 # --- configuration ---
 # assign a ModifierDataPrototype resource in the inspector to define the buff this amplifier provides.
-@export var modifier_prototype: ModifierDataPrototype ##modifier that will be applied to adjacent towers (per adjacent amplifier)
+@export var modifier_prototypes: Array[ModifierDataPrototype] ##modifier that will be applied to adjacent towers (per adjacent amplifier)
 
 # --- private state ---
 # this dictionary tracks the modifiers this specific amplifier has applied to other towers.
-# format: { Tower -> Modifier }
-var _applied_modifiers: Dictionary[Tower, Modifier] = {}
+# format: { Tower -> Array[Modifier] }
+var _applied_modifiers: Dictionary[Tower, Array] = {}
+
+func detach():
+	# revoke our contribution from all current neighbors
+	for t in _applied_modifiers:
+		_remove_modifier_from_tower(t)
+		
+func attach():
+	_on_adjacency_updated(unit.get_adjacent_towers())
 
 # called by the unit chassis after all components are ready.
 func start() -> void:
@@ -26,14 +34,12 @@ func start() -> void:
 	
 	# perform an initial check in case the tower is spawned next to existing towers.
 	# we need to wait a frame for the island to settle its adjacency calculations.
-	await get_tree().process_frame
-	if is_instance_valid(tower):
-		_on_adjacency_updated(tower.get_adjacent_towers())
+	attach()
 
 # this is the main logic, triggered whenever the host tower's neighbors change.
 func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:
 	# fail gracefully if no modifier is defined for this amplifier.
-	if not is_instance_valid(modifier_prototype):
+	if modifier_prototypes.is_empty():
 		_clear_all_modifiers() # clear any existing effects and stop
 		return
 
@@ -50,7 +56,7 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 
 	# --- 2. apply modifiers to newly adjacent towers ---
 	for tower: Tower in current_adjacent_towers:
-		if not _applied_modifiers.has(tower):
+		if (not _applied_modifiers.has(tower)) or _applied_modifiers[tower].is_empty():
 			_apply_modifier_to_tower(tower)
 
 # this is the canonical cleanup function, called automatically when the tower is destroyed.
@@ -63,20 +69,24 @@ func _apply_modifier_to_tower(target_tower: Tower) -> void:
 	if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
 		return
 	
-	var new_modifier := modifier_prototype.generate_modifier()
-	# brand the modifier with our host unit's ID for clear source tracking.
-	new_modifier.source_id = unit.unit_id
-	
-	target_tower.modifiers_component.add_modifier(new_modifier)
-	_applied_modifiers[target_tower] = new_modifier # track the applied modifier
+	for modifier_prototype: ModifierDataPrototype in modifier_prototypes:
+		var new_modifier := modifier_prototype.generate_modifier()
+		# brand the modifier with our host unit's ID for clear source tracking.
+		new_modifier.source_id = unit.unit_id
+		
+		target_tower.modifiers_component.add_modifier(new_modifier)
+		if not _applied_modifiers.has(target_tower):
+			_applied_modifiers[target_tower] = []
+		_applied_modifiers[target_tower].append(new_modifier) # track the applied modifier
 
 func _remove_modifier_from_tower(target_tower: Tower) -> void:
 	if not _applied_modifiers.has(target_tower):
 		return
 		
 	if is_instance_valid(target_tower) and is_instance_valid(target_tower.modifiers_component):
-		var modifier_to_remove: Modifier = _applied_modifiers[target_tower]
-		target_tower.modifiers_component.remove_modifier(modifier_to_remove)
+		var modifiers_to_remove: Array = _applied_modifiers[target_tower]
+		for modifier_to_remove: Modifier in modifiers_to_remove:
+			target_tower.modifiers_component.remove_modifier(modifier_to_remove)
 	
 	_applied_modifiers.erase(target_tower)
 
@@ -86,8 +96,18 @@ func _clear_all_modifiers() -> void:
 	for tower: Tower in towers_to_clear:
 		_remove_modifier_from_tower(tower)
 
-func get_display_data() -> Dictionary:
-	# we use StringNames (&) for performance and to avoid typos.
-	return {
-		ID.UnitState.AMPLIFIER_MODIFIER : modifier_prototype
-	}
+func draw_visuals(canvas: RangeIndicator) -> void:
+	var tower := unit as Tower
+	if not is_instance_valid(tower): return
+	
+	var margin: int = 2
+	var cell_size := Island.CELL_SIZE - margin
+	var half_size := Vector2(cell_size, cell_size) * 0.5
+
+	var adj_cells: Array[Vector2i] = tower.get_adjacent_cells()
+	
+	for cell: Vector2i in adj_cells:
+		var pos = Island.cell_to_position(cell)
+		var rect = Rect2(pos - half_size, Vector2(cell_size, cell_size))
+
+		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)

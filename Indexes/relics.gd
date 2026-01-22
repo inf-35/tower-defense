@@ -19,5 +19,6 @@ static var EARLY_BIRD: RelicData = load("res://Content/Relics/early_bird/early_b
 static var MACUAHUITL: RelicData = load("res://Content/Relics/macuahuitl/macuahuitl.tres")
 static var MOKA_POT: RelicData = load("res://Content/Relics/moka_pot/moka_pot.tres")
 static var PAPER_UMBRELLA: RelicData = load("res://Content/Relics/paper_umbrella/paper_umbrella.tres")
+static var PAWN_STRUCTURE: RelicData = load("res://Content/Relics/pawn_structure/pawn_structure.tres")
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {} ## relics indexed by type, loaded by reward_service

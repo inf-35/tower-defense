@@ -39,6 +39,8 @@ enum Type {
 	MACUAHUITL,
 	MOKA_POT,
 	PAPER_UMBRELLA,
+	PAWN_STRUCTURE,
+	TURPID_IDOL,
 }
 
 @export var type: Type

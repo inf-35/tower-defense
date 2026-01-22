@@ -12,7 +12,7 @@
 [resource]
 script = ExtResource("1_t4jdu")
 title = "Troll"
-description = "Massive unit that pathfinds directly to your keep, smashing walls in its path."
+description = "Massive unit that pathfinds directly to your keep, smashing towers in its path."
 stat_displays = Array[ExtResource("2_34ncb")]([ExtResource("3_ie7yu"), ExtResource("4_ewk0k"), ExtResource("5_3ghmx"), ExtResource("6_etyv3"), ExtResource("7_ei6jt")])
 unit_scene = ExtResource("2_7o2a8")
 flux_value = 1.0

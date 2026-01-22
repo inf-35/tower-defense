@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dmddglpsgrkis"]
+
+[ext_resource type="Texture2D" uid="uid://gxq5eeakbnxf" path="res://Assets/rite_rampage.png" id="1_cseyc"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vhbba"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_tceil"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_doxbg"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_bjmag"]
+[ext_resource type="PackedScene" uid="uid://duma30d518rya" path="res://Units/Towers/rite_rampage/rite_rampage.tscn" id="6_cseyc"]
+
+[resource]
+script = ExtResource("5_bjmag")
+id = 48
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Rampage"
+tower_description = "{RITE_LABEL}. When adjacent towers kill enemies, they have a 50% chance to immediately attack again."
+icon = ExtResource("1_cseyc")
+preview = ExtResource("1_cseyc")
+tower_scene = ExtResource("6_cseyc")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

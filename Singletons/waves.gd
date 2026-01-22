@@ -15,7 +15,7 @@ var _enemies_planned: Array[Array] = []
 
 # --- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
-const EXPANSION_BLOCK_SIZE: int = 18
+const EXPANSION_BLOCK_SIZE: int = 16
 const WAVES_PER_EXPANSION_CHOICE: int = 2 #testing
 const EXPANSION_CHOICES_COUNT: int = 4
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
@@ -23,6 +23,7 @@ const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
 # --- reconciliation system ---
 const ENEMY_GROUP: StringName = &"active_enemies"
 var _reconciliation_timer: Timer
+
 
 func _ready() -> void:
 	wave_started.connect(func(wave: int):
@@ -53,7 +54,6 @@ func _ready() -> void:
 	_reconciliation_timer.autostart = true
 	_reconciliation_timer.start(3.0)
 	_reconciliation_timer.timeout.connect(_reconcile_enemy_count)
-
 
 # main function called by Phases.gd to start a combat wave
 func start_combat_wave(wave_num_to_spawn: int) -> void:
@@ -92,6 +92,7 @@ func _spawn_enemies_for_current_wave() -> void:
 	var enemies_to_spawn: Array = _enemies_planned
 	var enemy_stagger: float = 5.0 / _total_enemies_planned
 	var spawn_point_index: int = 0
+	
 	
 	for enemy_stack: Array in enemies_to_spawn:
 		var unit_type: Units.Type = enemy_stack[0]

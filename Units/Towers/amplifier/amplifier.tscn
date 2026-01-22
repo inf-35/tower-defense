@@ -15,7 +15,6 @@
 script = ExtResource("3_wqpev")
 attribute = 8
 multiplicative = 0.714
-override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [node name="Amplifier" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
@@ -32,7 +31,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="AmplifierBehavior" type="Node" parent="."]
 script = ExtResource("2_686l8")
-modifier_prototype = SubResource("Resource_hpk50")
+modifier_prototypes = Array[ExtResource("3_wqpev")]([SubResource("Resource_hpk50")])
 metadata/_custom_type_script = "uid://bdhsnunw7upow"
 
 [node name="MovementComponent" type="Node" parent="."]

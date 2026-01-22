@@ -10,6 +10,7 @@ signal choice_hovered(choice_id: int) #generic choice ui handlers
 signal choice_unhovered(choice_id: int)
 signal choice_focused(choice_id: int) #used by expansion_ui
 signal choice_selected(choice_id: int) #called by expansion_ui and reward_ui
+signal reward_rerolled() #called by reward_ui
 signal building_phase_ended() #called by sidebar_ui
 #ClickHandler/UI -> Player
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
@@ -25,7 +26,8 @@ signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()
 signal display_expansion_confirmation(pending_choice_id: int)
 signal hide_expansion_confirmation()
-signal display_reward_choices(choices: Array[Reward]) #the frontend isnt actually done yet
+signal display_reward_choices(choices: Array[Reward])
+signal update_reroll_cost(reroll_cost: float) #from rewardservice
 signal hide_reward_choices()
 signal show_building_ui()
 signal hide_building_ui()
@@ -47,3 +49,4 @@ signal update_inspector_bar(tower: Tower)
 
 static var tutorial_manager: TutorialManager
 static var cursor_info: CursorInfo
+static var floating_text_manager: FloatingTextManager

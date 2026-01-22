@@ -224,9 +224,24 @@ func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
 		apply_effect(effect_prototype)
 
-func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void:
-	effect_prototypes.append(effect_prototype)
+func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void: ##negative for removing without clearing
+	if stacks < 0:
+		if not get_effect_instance_by_prototype(effect_prototype):
+			return
+
+		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
+		effect_instance.stacks += stacks
+
+		if effect_instance.stacks <= 0:
+			remove_effect(effect_prototype)
+			
+		return
+
+	if get_effect_instance_by_prototype(effect_prototype):
+		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
+		return
 	
+	effect_prototypes.append(effect_prototype)
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	effects[effect_prototype.schedule].append(effect_instance)
 	effect_instance.stacks = stacks
@@ -238,7 +253,7 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void:
 
 	effects_by_type[type].append(effect_instance)
 
-func remove_effect(effect_prototype: EffectPrototype) -> void:
+func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effects, regardless of number
 	var effects_to_remove: Array[EffectInstance] = []
 	
 	for effect_instance: EffectInstance in effects[effect_prototype.schedule]: #remove all child EffectInstances

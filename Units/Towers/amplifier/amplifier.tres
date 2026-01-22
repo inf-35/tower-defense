@@ -12,9 +12,10 @@
 script = ExtResource("1_y5gus")
 id = 8
 cost = 8.0
+required_capacity = 0.8
 element = 5
 tower_name = "Workshop"
-tower_description = "Adjacent towers gain 40% {UNIT_HITRATE} (stacks)."
+tower_description = "Adjacent towers attack 40% faster. {UNIT_HITRATE} (stacks)."
 icon = ExtResource("1_7qglk")
 preview = ExtResource("5_7qglk")
 tower_scene = ExtResource("2_12f5q")

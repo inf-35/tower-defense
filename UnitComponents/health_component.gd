@@ -55,6 +55,7 @@ func take_damage(damage: float, breaking: bool = false):
 	#health phase
 	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
 		health -= damage
+		UI.floating_text_manager.show_value(damage, unit.global_position)
 
 func _ready():
 	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
@@ -62,13 +63,24 @@ func _ready():
 	#_STAGGER_CYCLE = 5
 	#_stagger = randi_range(0, _STAGGER_CYCLE)
 	
-func _process(delta : float) -> void:
+const _TICK_INTERVAL: float = 0.25
+func _process(_d : float) -> void:
+	_accumulated_delta += Clock.game_delta
+	if _accumulated_delta > _TICK_INTERVAL:
+		_tick(_accumulated_delta)
+		_accumulated_delta = 0.0
+	
+func _tick(delta: float) -> void:
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
 	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
 	if is_zero_approx(regeneration) and is_zero_approx(regen_percent):
 		return
-
+	
+	var benchmark = health
 	health += regeneration * delta + regen_percent * max_health * delta
+	var difference = benchmark - health
+	if difference > 0.1:
+		UI.floating_text_manager.show_value(difference, unit.global_position, Color.WHITE, 0.8)
 	
 	if is_zero_approx(health): #we die due to a status effect
 		unit.died.emit(HitReportData.blank_hit_report)

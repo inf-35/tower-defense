@@ -1,7 +1,6 @@
-[gd_scene load_steps=20 format=3 uid="uid://dycu3x8f8w1wp"]
+[gd_scene load_steps=18 format=3 uid="uid://dycu3x8f8w1wp"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_eqypi"]
-[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_k5wd1"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="3_sjjme"]
 [ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="4_4swbb"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_207df"]
@@ -11,12 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://bve6w360ouk63" path="res://Assets/poison_rite.png" id="9_ttmr5"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_4uneu"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_msd7q"]
-
-[sub_resource type="Resource" id="Resource_p6ncc"]
-script = ExtResource("2_k5wd1")
-attribute = 0
-label = "HP"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_4swbb")
@@ -99,7 +92,6 @@ _data = {
 z_index = 100
 script = ExtResource("1_eqypi")
 type = 29
-stat_displays = Array[ExtResource("2_k5wd1")]([SubResource("Resource_p6ncc")])
 behavior = NodePath("EffectDistributorBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

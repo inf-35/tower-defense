@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://b77axsvk4six"]
+
+[ext_resource type="Texture2D" uid="uid://dpmsiiym8s3rg" path="res://Assets/rite_wheel.png" id="1_nk3c6"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_c2tuf"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_x83pt"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_7crot"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_ln8v8"]
+[ext_resource type="PackedScene" uid="uid://bieg6e0ktps8r" path="res://Units/Towers/rite_wheel/rite_wheel.tscn" id="6_2qwfq"]
+
+[resource]
+script = ExtResource("5_ln8v8")
+id = 50
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Wheel Rite"
+tower_description = "{RITE_LABEL}. Adjacent towers have +400% {UNIT_HITRATE}, but deal no direct damage."
+icon = ExtResource("1_nk3c6")
+preview = ExtResource("1_nk3c6")
+tower_scene = ExtResource("6_2qwfq")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

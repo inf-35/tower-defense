@@ -56,6 +56,9 @@ func initialise(host_unit: Unit): ##his function is called by the unit to give t
 
 func detach(): ##function called when the unit wants to detach this behavior (i.e. upon death)
 	pass
+	
+func attach(): ##function called when the unit wants to reattach this handler (i.e. tower resurrection)
+	pass
 
 func transfer_state(new_behavior: Behavior): ##called when we want to transfer state to another behavior (i.e. upgrading)
 	new_behavior._cooldown = _cooldown

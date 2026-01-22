@@ -49,6 +49,10 @@ enum Type {
 	ARC_CHAIN,
 	ARC_DAMAGE,
 	RITE_BLOOD,
+	RITE_CLUBS,
+	RITE_RAMPAGE,
+	RITE_OIL,
+	RITE_WHEEL,
 }
 
 enum Element {

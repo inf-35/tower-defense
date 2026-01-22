@@ -63,8 +63,8 @@ func create_unit(unit_type: Type) -> Unit:
 	
 	if Phases.current_game_difficulty == Phases.GameDifficulty.NORMAL and not _units_modified_by_difficulty.has(unit_type):
 		if _unit.health_component: _unit.health_component.health_data.max_health = round(_unit.health_component.health_data.max_health * 0.8)
-		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.75
-		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.2
+		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.8
+		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.1
 		_units_modified_by_difficulty[unit_type] = true
 	return _unit
 	

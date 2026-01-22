@@ -42,6 +42,8 @@ func _process(_delta: float) -> void:
 		State.PREVIEWING:
 			_update_preview_tooltip()
 		State.TOWER_SELECTED:
+			if Input.is_action_just_pressed("interact"):
+				selected_tower.died.emit(HitReportData.blank_hit_report)
 			# Hide tooltip if a tower is selected (cleaner UI)
 			UI.cursor_info.display_message("")
 

@@ -110,6 +110,7 @@ func end_tutorial() -> void:
 	_shader_mat.set_shader_parameter("is_active", false)
 
 func _advance_step() -> void:
+	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND)
 	_waiting_for_confirmation = false
 	_current_step_index += 1
 	if _current_step_index >= _active_sequence.size():
@@ -201,6 +202,7 @@ func _complete_step() -> void:
 		step.trigger_signal.disconnect(_on_trigger_signal)
 	
 	if step.require_confirmation:
+		Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND)
 		_waiting_for_confirmation = true
 		instruction_panel.label.set_parsed_text(step.success_text)
 	else:

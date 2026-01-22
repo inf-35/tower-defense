@@ -33,6 +33,9 @@ const FINAL_WAVE: int = 16
 class Wave: ## internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL
+	
+# tutorial tracking system
+var _troll_spawned: bool = false
 
 const DEBUG_PRINT_REPORTS: bool = true
 
@@ -68,7 +71,7 @@ func start_game() -> void:
 func start_tutorial():
 	var steps: Array[TutorialStep] = [
 		preload("res://UI/tutorial/pan_camera.tres"),
-		preload("res://UI/tutorial/zoom_camera.tres")
+		preload("res://UI/tutorial/zoom_camera.tres"),
 	]
 	
 	var select: TutorialStep = preload("res://UI/tutorial/select_tower.tres")
@@ -105,10 +108,10 @@ func _generate_wave_plan() -> void:
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave.day_events.append(DayEvent.EXPANSION)
 			
-		if i % 3 == 0:
+		if i % 2 == 0:
 			wave.day_events.append(DayEvent.REWARD_RELIC)
 			
-		if i % 4 == 0:
+		if i % 5 == 0:
 			wave.day_events.append(DayEvent.REWARD_TOWER)
 			
 		## rewards on specific day
@@ -160,12 +163,20 @@ func _prepare_for_next_wave_cycle() -> void:
 				add_choice_to_queue(ChoiceType.REWARD_TOWER)
 			DayEvent.REWARD_RELIC:
 				add_choice_to_queue(ChoiceType.REWARD_RELIC)
-
+	
+	var enemies_planned := WaveEnemies.get_enemies_for_wave(current_wave_number)
+	for enemy_stack: Array in enemies_planned:
+		var type : Units.Type = enemy_stack[0]
+		if type == Units.Type.TROLL and not _troll_spawned:
+			_troll_spawned = true
+			UI.tutorial_manager.start_sequence([preload("res://UI/tutorial/troll_warning.tres")])
+			
 	if not choice_queue.is_empty():
 		var next_choice: ChoiceType = choice_queue.pop_front()
 		_start_choice_phase(next_choice)
 	else:
 		_start_building_phase()
+		
 	
 func add_choice_to_queue(type: ChoiceType) -> void:
 	choice_queue.append(type)

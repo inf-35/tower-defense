@@ -9,7 +9,11 @@ var effect_type: Effects.Type ##id of this type of effect
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 ##negative = permanent
 
-var stacks: int = 0 ##how many stacks of this effect (mainly used for bookkeeping)
+var stacks: int = 0: ##how many stacks of this effect (mainly used for bookkeeping)
+	set(ns):
+		stacks = ns
+		effect_prototype.stack_update_handler.call(self)
+var enabled: bool = true
 
 var state: RefCounted ##strategy delegate class that stores state information
 #NOTE: all queryable information about the information should be stored within state
@@ -31,18 +35,15 @@ func attach_to(_host: Unit) -> void:
 	detach()
 	host = _host
 	
-	if is_instance_valid(host) and not host.disabled: #reject if host is disabled
+	if is_instance_valid(host):
 		effect_prototype.attach_handler.call(self)
 
 func attach_global() -> void: ##for attaching as a global effect
 	effect_prototype.attach_handler.call(self)
 
-func handle_event_unfiltered(event: GameEvent) -> void: #called by Unit in setup_event_bus
+func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit in setup_event_bus
 	if not global:
-		if not is_instance_valid(host): #reject if host is dead
-			return
-		
-		if host.disabled: #reject if host is disabled
+		if not is_instance_valid(host):
 			return
 	
 	effect_prototype.event_handler.call(self, event)

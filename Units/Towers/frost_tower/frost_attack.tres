@@ -13,7 +13,6 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 script = ExtResource("2_7up7a")
 delivery_method = 3
 range = 12.0
-cooldown = 0.5
 damage = 0.2
 status_effects = Array[ExtResource("3_7up7a")]([SubResource("Resource_h67ia")])
 cone_angle = 360.0

@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_on2je")
-base_capacity = 10.0
+base_capacity = 8.0
 effect_type = 2
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

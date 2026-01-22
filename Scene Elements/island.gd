@@ -30,7 +30,6 @@ const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1),
 #configuration
 const _DEBUG_SHOW_NAVCOST: bool = false
 
-
 func _ready():
 	Phases.start_game()
 	#register self with services that need references
@@ -117,7 +116,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	add_child(tower)
 
 	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
-	_update_adjacencies_around_tower(tower)
+	update_adjacencies_around_tower(tower)
 	update_navigation_grid()
 			
 	#insert the new tower in the lookup table
@@ -263,14 +262,14 @@ func _on_tower_destroyed(tower: Tower):
 		if not tower_grid[local_cell] == tower: #dont clear other towers' cells (i.e. upgrades)
 			continue
 		tower_grid.erase(local_cell)
-	_update_adjacencies_around_tower(tower)
+	update_adjacencies_around_tower(tower)
 	#update capacity, caches, navigation
 	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
 	update_navigation_grid()
 	_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
 	
-func _update_adjacencies_around_tower(tower: Tower):
+func update_adjacencies_around_tower(tower: Tower):
 	var adjacencies: Array[Vector2i] = tower.get_adjacent_cells()
 	for adjacency: Vector2i in adjacencies:
 		if tower_grid.has(adjacency):

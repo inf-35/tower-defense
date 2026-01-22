@@ -50,7 +50,7 @@ func _init():
 	
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
 	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.06))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.07))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -378,7 +378,7 @@ func _trigger_camera_overview(island: Island) -> void:
 	# 4. calculate the required zoom level
 	var longest_distance: float = max(island_bounds.size.x, island_bounds.size.y)
 	# the final zoom must be the larger of the two ratios to ensure everything fits
-	var required_zoom_level: float = 4.0 / (longest_distance * 0.01) #this is derived from the camera's default zoom and the island's intiial size (1/100)
+	var required_zoom_level: float = 10.0 / (longest_distance * 0.01) #this is derived from the camera's default zoom and the island's intiial size (1/100)
 
 	var target_zoom: Vector2 = Vector2.ONE * required_zoom_level
 	
@@ -415,7 +415,7 @@ func _trigger_camera_focus_on_choice(_island: Island, choice_id: int) -> void:
 
 	# 3. reuse the zoom formula to frame the selection
 	var longest_distance: float = max(world_bounds.size.x, world_bounds.size.y)
-	var required_zoom_level: float = 4.0 / (longest_distance * 0.01)
+	var required_zoom_level: float = 10.0 / (longest_distance * 0.01)
 	var target_zoom: Vector2 = Vector2.ONE * required_zoom_level
 	
 	# 4. calculate the target position (see above, but this time for the selection in particular)

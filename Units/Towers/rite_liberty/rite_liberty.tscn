@@ -20,7 +20,7 @@ metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_ph75r"]
 script = ExtResource("4_ph75r")
-fire_rate_bonus_per_empty = 0.4
+fire_rate_bonus_per_empty = 0.5
 schedule = 0
 metadata/_custom_type_script = "uid://benhmk7lyo4r0"
 

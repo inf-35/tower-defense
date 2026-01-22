@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_wa6jf")
 instruction_text = "Selecting a turret, place down the turret with LMB."
-success_text = "You can also deselect with RMB, or rotate with R.
+success_text = "Selecting a tower, you can also deselect with RMB, or rotate with R.
 Q to continue."
 panel_anchor = 1
 highlight = false

@@ -3,6 +3,7 @@ extends Panel
 # --- Config ---
 @export var card_list: VBoxContainer ## The container where cards are spawned
 @export var card_scene: PackedScene ## Must contain RewardOptionCard script
+@export var reroll_button: Button
 
 var active_cards: Array[RewardOptionCard] = []
 
@@ -12,6 +13,12 @@ func _ready() -> void:
 	# connect to UI Bus
 	UI.display_reward_choices.connect(_present_options)
 	UI.hide_reward_choices.connect(_hide_options)
+	UI.update_reroll_cost.connect(_update_reroll_cost)
+	reroll_button.pressed.connect(func():
+		UI.reward_rerolled.emit()
+	)
+	
+	_update_reroll_cost(RewardService.get_reroll_cost())
 
 func _present_options(choices: Array[Reward]) -> void:
 	_clear_options()
@@ -25,6 +32,13 @@ func _present_options(choices: Array[Reward]) -> void:
 func _hide_options() -> void:
 	visible = false
 	_clear_options()
+	
+func _update_reroll_cost(reroll_cost: float) -> void:
+	reroll_button.text = "Reroll (%s)" % str(snappedf(reroll_cost, 0.1))
+	if Player.flux < reroll_cost:
+		reroll_button.disabled = true
+	else:
+		reroll_button.disabled = false
 
 func _instantiate_card(data: Reward, index: int) -> void:
 	if not card_scene:

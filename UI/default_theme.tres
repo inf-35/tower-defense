@@ -10,10 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://bjgdunmp1dvg" path="res://Assets/simple_banner.png" id="6_xew0t"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_iilnk"]
-content_margin_left = 5.0
-content_margin_top = 5.0
-content_margin_right = 5.0
-content_margin_bottom = 5.0
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
 texture = ExtResource("1_iilnk")
 texture_margin_left = 30.0
 texture_margin_top = 30.0
@@ -21,10 +21,10 @@ texture_margin_right = 30.0
 texture_margin_bottom = 30.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_au85v"]
-content_margin_left = 5.0
-content_margin_top = 5.0
-content_margin_right = 5.0
-content_margin_bottom = 5.0
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
 texture = ExtResource("1_iilnk")
 texture_margin_left = 30.0
 texture_margin_top = 30.0

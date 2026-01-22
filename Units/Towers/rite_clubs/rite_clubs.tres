@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://b63us7cwur7fh"]
+
+[ext_resource type="Texture2D" uid="uid://bjaoaduvww58n" path="res://Assets/rite_clubs.png" id="1_22r0h"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_rxrti"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_y7bay"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_i36s0"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_1m3s8"]
+[ext_resource type="PackedScene" uid="uid://cktn1vahgwy8g" path="res://Units/Towers/rite_clubs/rite_clubs.tscn" id="6_rxrti"]
+
+[resource]
+script = ExtResource("5_1m3s8")
+id = 47
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Rite of Clubs"
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks have a 20% chance to stun enemies for 1 second."
+icon = ExtResource("1_22r0h")
+preview = ExtResource("1_22r0h")
+tower_scene = ExtResource("6_rxrti")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

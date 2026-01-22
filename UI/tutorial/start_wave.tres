@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_40tdq")
-instruction_text = "Start the wave and face your enemies."
+instruction_text = "Start the wave when you're ready. Towers can still be built mid-battle."
 panel_anchor = 4
 require_confirmation = false
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

@@ -12,6 +12,7 @@
 script = ExtResource("1_dhi2e")
 id = 4
 cost = 12.0
+required_capacity = 1.2
 tower_name = "Cannon"
 tower_description = "Slow, yet a powerful heavy-hitter."
 icon = ExtResource("1_vcib8")

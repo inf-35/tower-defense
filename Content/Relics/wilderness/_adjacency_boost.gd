@@ -43,7 +43,6 @@ func _handle_detach(instance: EffectInstance) -> void:
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	#if event.event_type == GameEvent.EventType.REPLACED:
 		#_handle_replace(instance, event)
-
 	if not event.unit is Tower:
 		return
 		
@@ -53,26 +52,13 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	# NOTE: Island.gd usually emits adjacency updates for neighbors too, 
 	# so we don't need to manually scan neighbors of the target here
 	_evaluate_tower(instance, target_tower)
-#NOTE: this is unneccessary, when replacement happens the same bonuses will apply naturally anyways.
-#func _handle_replace(instance: EffectInstance, event: GameEvent) -> void:
-	#var state := instance.state as AdjacencyState
-	#var data := event.data as UnitReplacedData
-	#
-	#var old_tower := data.old_unit as Tower
-	#if not old_tower:
-		#return
-	#
-	#if state.active_modifiers.has(old_tower):
-		#var clone_modifier: Modifier = state.active_modifiers[old_tower].duplicate()
-		#data.new_unit.modifiers_component.add_modifier(clone_modifier)
-		#
 
 func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void:
 	var state := instance.state as AdjacencyState
 	# check if this tower is a valid host
 	if not is_instance_valid(tower):
 		return
-		
+
 	# if host_tower_type is set, ignore towers that don't match
 	if host_tower_type != Towers.Type.VOID and tower.type != host_tower_type:
 		_remove_buff_from_tower(state, tower)

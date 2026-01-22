@@ -59,6 +59,7 @@ movie_writer/movie_file="C:/Users/admin/Downloads/projects/tower-defense/movies/
 
 [gui]
 
+common/snap_controls_to_pixels=false
 theme/custom="uid://d1gcsqycnxqwm"
 theme/custom_font="uid://b1g536c04mk3e"
 

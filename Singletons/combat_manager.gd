@@ -274,6 +274,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 		DeliveryData.DeliveryMethod.HITSCAN:
 			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
 			#TODO: implement visuals
+			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, intercept_position)
 			target.take_hit(hit_data)
 			if source:
 				hit_data.velocity = (target.global_position - source.global_position).normalized()

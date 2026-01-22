@@ -12,12 +12,17 @@ var reward_pool: Array[Reward] = []
 # --- state ---
 var is_choosing_reward: bool = false
 var _current_reward_options_by_id: Dictionary[int, Reward] = {}
+var rerolls_this_phase: int = 0:
+	set(nr):
+		rerolls_this_phase = nr
+		UI.update_reroll_cost.emit(get_reroll_cost())
+
+var _last_choice_count: int
+var _last_type_filter: Array[Reward.Type]
 
 func _ready():
 	_load_all_rewards()
 	set_process(false)
-
-# --- loading logic ---
 
 func _load_all_rewards() -> void:
 	reward_pool.clear()
@@ -57,44 +62,6 @@ func _scan_directory_recursive(path: String) -> void:
 	
 	dir.list_dir_end()
 
-# --- public api ---
-#
-#func generate_and_present_choices(choice_count: int, filter = null) -> void: ##where filter is the Reward.Type being selected for
-	#if reward_pool.is_empty():
-		#push_warning("RewardService: Reward pool is empty. Cannot generate choices.")
-		#reward_process_complete.emit()
-		#return
-#
-	#_current_reward_options_by_id.clear()
-	#var available_rewards: Array[Reward] = get_rewards_by_type(filter) if filter else reward_pool.duplicate()
-	#available_rewards.shuffle()
-	#
-	#var chosen_rewards: int = 0
-	#var i: int = 0
-	#while chosen_rewards < choice_count:
-		#if available_rewards.size() - 1 < i:
-			#break
-		#
-		#var current_reward: Reward = available_rewards[i]
-		##reject towers, relics and rites already held by the player
-		#if current_reward.type == Reward.Type.UNLOCK_TOWER and Player.unlocked_towers.has(current_reward.tower_type):
-			#i += 1
-			#continue
-		#elif current_reward.type == Reward.Type.ADD_RELIC and Player.active_relics.has(current_reward.relic):
-			#i += 1
-			#continue
-		#elif current_reward.type == Reward.Type.ADD_RITE and Player.get_tower_limit(current_reward.rite_type) > 0:
-			#i += 1
-			#continue
-#
-		#_current_reward_options_by_id[chosen_rewards] = available_rewards[i]
-		#chosen_rewards += 1
-		#i += 1
-		#
-	#is_choosing_reward = true
-	#
-	#UI.display_reward_choices.emit(_current_reward_options_by_id.values())
-
 func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.Type] = []) -> void:
 	var rewards: Array[Reward] = get_rewards(choice_count, type_filter)
 	
@@ -102,9 +69,16 @@ func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.T
 		_current_reward_options_by_id[i] = rewards[i]
 
 	is_choosing_reward = true
+	
+	_last_choice_count = choice_count
+	_last_type_filter = type_filter
 	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
+	
+func reroll() -> void:
+	generate_and_present_choices(_last_choice_count, _last_type_filter)
+	rerolls_this_phase += 1
 
-func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Array[Reward]:
+func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Array[Reward]: 
 	var rewards: Array[Reward] = []
 	
 	var candidates: Array[Reward] = []
@@ -142,6 +116,9 @@ func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Arr
 func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
 	
+func get_reroll_cost() -> float:
+	return pow(2, rerolls_this_phase) + 2.0
+	
 func _calculate_reward_weight(reward: Reward) -> float:
 	var final_weight: float = reward.base_weight
 	
@@ -166,7 +143,7 @@ func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
 	push_warning("Reward service: roll failed!")
 	return weights.size() - 1 # fallback
 
-func select_reward(choice_id: int) -> void:
+func select_reward(choice_id: int) -> void: #concludes reward phase
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
 		reward_process_complete.emit()
@@ -177,6 +154,7 @@ func select_reward(choice_id: int) -> void:
 	
 	_current_reward_options_by_id.clear() 
 	is_choosing_reward = false
+	rerolls_this_phase = 0
 	
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()

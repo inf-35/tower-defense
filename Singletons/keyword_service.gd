@@ -100,6 +100,18 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"display": "[Rite]",
 		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field.",
 		"icon": null,
+	},
+	"KEYWORD_TUTORIAL": {
+		"title": "Keyword",
+		"display": "keywords",
+		"description": "Like this one!",
+		"icon": null,
+	},
+	"SETTLEMENT": {
+		"title": "Settlement",
+		"display": "Settlement",
+		"description": "Terrain type on which {T_GENERATOR|label=Villages} are built.",
+		"icon": preload("res://Assets/ruins_placeholder.png"),
 	}
 }
 var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")

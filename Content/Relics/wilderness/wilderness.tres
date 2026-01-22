@@ -8,14 +8,12 @@
 
 [sub_resource type="Resource" id="Resource_w8u05"]
 script = ExtResource("1_465g7")
-attribute = 8
-multiplicative = 0.714
-override = null
+attribute = 6
+multiplicative = 1.4
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_0dc4p"]
 script = ExtResource("2_7sn2y")
-host_tower_type = 15
 adjacent_tower_type = 19
 modifier_prototype = SubResource("Resource_w8u05")
 schedule = 0
@@ -25,6 +23,6 @@ metadata/_custom_type_script = "uid://b74ug56sj02f0"
 script = ExtResource("2_8phli")
 type = 15
 global_effect = SubResource("Resource_0dc4p")
-title = "Wilderness"
-description = "All nature towers (plant, poison) gain +40% {UNIT_HITRATE} per adjacent {T_FOREST}."
+title = "Mandrake"
+description = "All towers gain +40% {UNIT_DAMAGE} per adjacent {T_FOREST}."
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

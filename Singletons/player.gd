@@ -55,12 +55,14 @@ var ruin_service: RuinService
 var global_event_service: GlobalEventService
 
 func _ready():
-	get_window().size = Vector2(1920, 1080)
-	get_window().move_to_center()
+	if not OS.has_feature("web"): # web builds are automatically resized
+		get_window().size = DisplayServer.screen_get_size() * 0.8
+		get_window().move_to_center()
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
 	UI.upgrade_tower_requested.connect(_on_upgrade_tower_requested)
+	UI.reward_rerolled.connect(_on_reward_reroll_requested)
 	#couple playerside logic signals with UI output signals
 	flux_changed.connect(UI.update_flux.emit)
 	capacity_changed.connect(UI.update_capacity.emit)
@@ -114,22 +116,15 @@ func _setup_state():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		#Towers.Type.SNOWBALL: true,
-		##Towers.Type.FROST_TOWER: true,
-		#Towers.Type.RITE_LIBERTY: true,
-		#Towers.Type.FIREWALL: true,
-		#Towers.Type.MAGE: true,
 	}
-#
-	#add_rite(Towers.Type.RITE_CURSES, 20)
-	#add_rite(Towers.Type.RITE_POISONS, 20)
+	add_rite(Towers.Type.RITE_LIBERTY, 20)
 	#add_rite(Towers.Type.RITE_FLAME, 20)
 	#add_rite(Towers.Type.RITE_FROST, 20)
-	
-	#var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.PAPER_UMBRELLA
-	#RewardService.apply_reward(reward)
+	#
+	var reward := Reward.new()
+	reward.type = Reward.Type.ADD_RELIC
+	reward.relic = Relics.PAWN_STRUCTURE
+	RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EARLY_BIRD
@@ -261,10 +256,17 @@ func _on_sell_tower_requested(tower):
 		
 func _on_upgrade_tower_requested(old_tower: Tower, upgrade_type: Towers.Type):
 	var cost: float = Towers.get_tower_upgrade_cost(old_tower.type, upgrade_type)
-	if Player.flux < cost:
+	if self.flux < cost:
 		return
 	
 	var success: bool = References.island.request_upgrade(old_tower, upgrade_type)
 	
 	if success:
 		self.flux -= cost
+
+func _on_reward_reroll_requested():
+	var cost: float = RewardService.get_reroll_cost()
+	if self.flux < cost:
+		return
+	self.flux -= cost
+	RewardService.reroll()

@@ -6,16 +6,24 @@ class_name EffectDistributorBehavior
 
 var _buffed_neighbors: Array[Tower] = []
 
-func start() -> void:
+func detach():
+	# revoke our contribution from all current neighbors
+	for t in _buffed_neighbors:
+		_modify_stack(t, -1)
+		
+func attach():
+	_on_adjacency_updated(unit.get_adjacent_towers())
+
+func start():
 	if not buff_effect:
 		push_warning(self, " - EffectDistributorBehavior: No effect assigned!")
 		return
-		
+	
 	var tower := unit as Tower
 	tower.adjacency_updated.connect(_on_adjacency_updated)
-	tower.died.connect(_on_death)
-	tower.tree_exiting.connect(_on_death)
-	_on_adjacency_updated(tower.get_adjacent_towers())
+	tower.tree_exiting.connect(_on_exit)
+	
+	attach()
 
 # logic to sync buffs with current grid state
 func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
@@ -60,32 +68,29 @@ func _is_local_direction_allowed(host_facing: Tower.Facing, grid_dir: Vector2i) 
 func _modify_stack(target: Tower, amount: int) -> void:
 	if not is_instance_valid(target):
 		return
-	# check if target already has effect
-	var instance: EffectInstance = target.get_effect_instance_by_prototype(buff_effect)
-
-	if amount > 0:
-		if instance:
-			instance.stacks += amount #add stacks
-		else:
-			target.apply_effect(buff_effect) #apply new buff
-	else: #removing stacks
-		if instance:
-			instance.stacks += amount #decrease stack
-			# if stacks hit 0, remove the effect entirely
-			if instance.stacks <= 0:
-				target.remove_effect(buff_effect)
+		
+	target.apply_effect(buff_effect, amount)
+	## check if target already has effect
+	#var instance: EffectInstance = target.get_effect_instance_by_prototype(buff_effect)
+#
+	#if amount > 0:
+		#if instance:
+			#instance.stacks += amount #add stacks
+		#else:
+			#target.apply_effect(buff_effect) #apply new buff
+	#else: #removing stacks
+		#if instance:
+			#instance.stacks += amount #decrease stack
+			## if stacks hit 0, remove the effect entirely
+			#if instance.stacks <= 0:
+				#target.remove_effect(buff_effect)
 
 # cleanup: when this tower is sold/destroyed/upgraded
-func _on_death(_hit_report_data: HitReportData = null) -> void:
-	# revoke our contribution from all current neighbors
-	for t in _buffed_neighbors:
-		_modify_stack(t, -1)
-	_buffed_neighbors.clear()
-	
+func _on_exit(_hit_report_data: HitReportData = null) -> void:
+	#detach is called when the tower dies by default
 	var tower := unit as Tower
 	tower.adjacency_updated.disconnect(_on_adjacency_updated)
-	tower.died.disconnect(_on_death)
-	tower.tree_exiting.disconnect(_on_death)
+	tower.tree_exiting.disconnect(_on_exit)
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var tower := unit as Tower

@@ -6,7 +6,7 @@
 script = ExtResource("1_71rhf")
 instruction_text = "Hover over the {GOLD} and {POPULATION} icons to see an explanation. 
 "
-success_text = "All icons and keywords in the game can be hovered over to reveal more information.
+success_text = "All icons ({UNIT_HITRATE}, {UNIT_DAMAGE}, etc.) and {KEYWORD_TUTORIAL} in the game can be hovered over to reveal more information.
 Q to continue."
 panel_anchor = 2
 highlight_target = 6

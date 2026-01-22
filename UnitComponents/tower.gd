@@ -118,7 +118,6 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	set_meta(&"rubble_sprite", rubble)
 	set_meta(&"rubble_outline", outline)
 
-	
 	# 3. become non-blocking for pathfinding
 	self.blocking = false
 	References.island.update_navigation_grid()
@@ -148,17 +147,21 @@ func resurrect() -> void:
 	if is_instance_valid(health_component):
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
 	# 3. restart behaviours
-	behavior.start()
-	# 4. reattach all (intrinsic) effects
-	for effect_prototype: EffectPrototype in intrinsic_effects:
-		print("apply: ", effect_prototype)
-		apply_effect(effect_prototype) #attach all effects
+	behavior.attach()
+	# 4. reattach all effects
+	for effect_prototype: EffectPrototype in effect_prototypes:
+		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
+		effect_instance.attach_to(self)
+		
+	References.island.update_adjacencies_around_tower(self)
 
 func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
+	behavior.detach()
 	for effect_prototype: EffectPrototype in effect_prototypes:
-		print("remove: ", effect_prototype)
-		remove_effect(effect_prototype) #detach all effects
+		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
+		effect_instance.detach()
+	References.island.update_adjacencies_around_tower(self)
 
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
@@ -176,7 +179,6 @@ func _create_hitbox():
 	hitbox.collision_mask = 0
 	hitbox.collision_layer = Hitbox.get_mask(hostile)
 	hitbox.unit = self
-
 	
 	hitbox.add_child(collision_shape)
 	add_child.call_deferred(hitbox)
@@ -221,6 +223,7 @@ func _ready():
 	var evt := GameEvent.new()
 	evt.event_type = GameEvent.EventType.TOWER_BUILT
 	evt.data = build_data
+	evt.unit = self
 	
 	if not abstractive:
 		Player.on_event.emit(null, evt) #fire global event (that we just got built)
@@ -264,6 +267,21 @@ func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 			adjacencies[cell] = tower
 			
 	return adjacencies
+	
+func get_diagonal_towers() -> Dictionary[Vector2i, Tower]: #ONLY WORKS ON 1x1
+	var diagonals: Array[Vector2i] = [
+		Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)
+	]
+	var results: Dictionary[Vector2i, Tower] = {}
+	var island = References.island
+	
+	for dir in diagonals:
+		var check_pos := tower_position + dir
+		var tower = island.get_tower_on_tile(check_pos)
+		if tower:
+			results[dir] = tower
+			
+	return results
 	
 static func get_side_from_offset(tower_size: Vector2i, rel_offset: Vector2i) -> Facing:
 	# 1. Check Vertical Sides (Top/Bottom)
