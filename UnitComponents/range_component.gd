@@ -236,3 +236,8 @@ func _find_best_candidate(candidates: Array[Unit]) -> Unit:
 			best_unit = candidate
 			
 	return best_unit
+	
+func get_save_data() -> Dictionary:
+	return {
+		"targeting_mode" = targeting_mode,
+	}

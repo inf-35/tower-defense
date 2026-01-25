@@ -89,10 +89,10 @@ func _on_restart_pressed() -> void:
 	# unpause before changing scenes or the new scene will start paused
 	get_tree().paused = false
 	# reload the main game scene
-	# TODO: ensure _ready of phases actually resets things
 	get_tree().reload_current_scene()
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
 	# return to main menu
+	Phases.in_game = false
 	get_tree().change_scene_to_file("res://main_menu.tscn")

@@ -1,0 +1,622 @@
+[gd_scene load_steps=16 format=3 uid="uid://dycu3x8f8w1wp"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_eqypi"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_k5wd1"]
+[ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="3_sjjme"]
+[ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="4_4swbb"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_p3qie"]
+[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="9_rvfhl"]
+
+[sub_resource type="Resource" id="Resource_p6ncc"]
+script = ExtResource("2_k5wd1")
+attribute = 0
+label = "HP"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_ga7jw"]
+script = ExtResource("4_4swbb")
+status = 4
+metadata/_custom_type_script = "uid://c0tqsk2lv2qho"
+
+[sub_resource type="GDScript" id="GDScript_ptigq"]
+script/source = "extends UnitComponent
+class_name MovementComponent
+
+signal movement_to_cell(origin: Vector2i, destination: Vector2i)
+
+var _modifiers_component: ModifiersComponent
+
+@export var face_towards_movement: bool = true
+@export var movement_data: MovementData = preload(\"res://Content/Movement/default_mvmt.tres\")
+
+@export var jiggle_enabled: bool = true
+@export var jiggle_speed: float = 12.0 ## how fast the cycle runs
+@export var jiggle_angle: float = 8.0 ## max rotation in degrees (Waddle)
+@export var bounce_amount: float = 0.1 ## scale stretch amount (Bounce)
+
+var graphics: Node2D
+var _walk_cycle_time: float = 0.0
+
+const _ERROR_SQUARED: float = 2.0 ** 2  #allowable error for units from target position
+
+var position: Vector2:
+	set(new_position):
+		position = new_position
+		unit.position = position
+		
+		if _stagger % 8 == 0:
+			cell_position = Island.position_to_cell(position)
+
+var direction: Vector2
+var cell_position: Vector2i:
+	set(new_cell_position):
+		if cell_position == new_cell_position:
+			return
+			
+		movement_to_cell.emit(cell_position, new_cell_position)
+		cell_position = new_cell_position
+
+var target_position: Vector2
+var target_direction: Vector2:
+	set(ntd):
+		target_direction = ntd.normalized()
+
+var velocity: Vector2
+var speed_control: float = 1.0 #goes from 0 to 1, how fast this unit is deciding to move at
+
+func inject_components(n_graphics: Node2D, modifiers_component = null):
+	graphics = n_graphics
+	if modifiers_component == null:
+		return
+
+	_modifiers_component = modifiers_component
+	_modifiers_component.register_data(movement_data)
+	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
+	
+func _ready():
+	_STAGGER_CYCLE = 3
+	_stagger = randi_range(0, _STAGGER_CYCLE)
+	position = position #trigger setter functions, esp. cell
+	cell_position = Island.position_to_cell(position)
+	unit.position = position
+
+func _physics_process(_delta: float) -> void:
+	_stagger += 1
+	
+	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)
+	var local_acceleration: float = get_stat(_modifiers_component, movement_data, Attributes.id.ACCELERATION)
+	
+	if movement_data == null:
+		return  # no data → do nothing
+
+	if not movement_data.mobile:
+		return
+
+	if target_position:
+		if (target_position - position).length_squared() > _ERROR_SQUARED:
+			target_direction = (target_position - position) #recalculate target direction
+		else:
+			target_direction = Vector2.ZERO
+
+	velocity = target_direction * local_max_speed * speed_control
+	
+	if face_towards_movement and velocity.length_squared() > 0.01:
+		unit.rotation = velocity.angle()
+
+	position += velocity * Clock.physics_game_delta
+	_update_walk_cycle(Clock.physics_game_delta)
+	#_accumulated_delta = 0.0 #reset accumulated delta
+	
+func _update_walk_cycle(delta: float) -> void:
+	if not jiggle_enabled or not is_instance_valid(graphics):
+		return
+		
+	# Check if we are moving significantly
+	if velocity.length_squared() > 5.0:
+		_walk_cycle_time += delta * jiggle_speed
+		
+		# A. Rotation Waddle (Left <-> Right)
+		# We use Sine for smooth oscillation
+		var rot_rads = deg_to_rad(jiggle_angle)
+		var waddle = sin(_walk_cycle_time) * rot_rads
+		
+		# Since 'unit.rotation' handles the facing direction, 
+		# we just set the child graphics rotation relative to it.
+		graphics.rotation = waddle
+		
+		# B. Scale Bounce (Squash/Stretch)
+		# We use abs(sin) or sin(2x) to make it bounce twice per waddle cycle (each step)
+		# Adding 1.0 ensures we oscillate around normal size
+		var bounce = abs(sin(_walk_cycle_time)) * bounce_amount
+		
+		# Stretch Y slightly, Squash X slightly to preserve apparent volume
+		graphics.scale = Vector2(1.0 - (bounce * 0.3), 1.0 + bounce) * Vector2(0.096, 0.096)
+		
+	else:
+		# Return to neutral pose when stopped
+		var return_speed = delta * 10.0
+		graphics.rotation = lerp_angle(graphics.rotation, 0.0, return_speed)
+		graphics.scale = graphics.scale.lerp(Vector2.ONE * Vector2(0.096, 0.096), return_speed)
+		
+		# Reset timer logic to keep phase consistent on restart
+		if graphics.scale.is_equal_approx(Vector2.ONE * Vector2(0.096, 0.096)):
+			_walk_cycle_time = 0.0
+"
+
+[sub_resource type="GDScript" id="GDScript_vqfng"]
+script/source = "extends UnitComponent
+class_name HealthComponent
+signal health_changed(new_health: float)
+
+@export var health_data: HealthData = preload(\"res://Content/Health/tower_default.tres\")
+
+var _modifiers_component: ModifiersComponent
+
+var max_health: float #updated by health setter
+var health: float:
+	set(new_health):
+		if health_data == null:
+			return
+		max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
+		new_health = clampf(new_health, 0.0, max_health)
+		if new_health == health:
+			return
+		health = new_health
+		health_changed.emit(health)
+		UI.update_unit_health.emit(unit, max_health, health)
+		
+		#NOTE: unit.died is now executed on unit.take_hit (after it calls take_damage)
+
+var shield: float = health_data.max_shield ##not linked to a attribute, simple counter
+#NOTE: shield does not support fancy effects, like boosts to shield as it is not linked to the modifiers component system
+
+func inject_components(modifiers_component: ModifiersComponent):
+	if modifiers_component != null:
+		_modifiers_component = modifiers_component
+		
+		_modifiers_component.stat_changed.connect(func(attr: Attributes.id):
+			if not attr == Attributes.id.MAX_HEALTH:
+				return
+				
+			health = health #this triggers the health setter function, which clamps to maxhp
+		)
+		
+		_modifiers_component.register_data(health_data)
+		create_stat_cache(_modifiers_component, [Attributes.id.MAX_HEALTH, Attributes.id.REGENERATION, Attributes.id.REGEN_PERCENT])
+
+	shield = health_data.max_shield
+	UI.update_unit_health.emit(unit, max_health, health)
+
+func take_damage(input_damage: float, breaking: bool = false):
+	var absorbed_damage: float = 0 #damage absorbed by shield
+	var damage: float = input_damage * get_stat(_modifiers_component, health_data, Attributes.id.DAMAGE_TAKEN) as float
+	damage += get_stat(_modifiers_component, health_data, Attributes.id.FLAT_DAMAGE_TAKEN) as float
+	#shield phase
+	if breaking:
+		absorbed_damage = min(damage, shield)
+		shield -= absorbed_damage
+		damage -= absorbed_damage
+	#health phase
+	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
+		health -= damage
+
+func _ready():
+	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
+	print(get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH),\" \",health_data.max_health)
+	health = max_health
+	#_STAGGER_CYCLE = 5
+	#_stagger = randi_range(0, _STAGGER_CYCLE)
+	
+func _process(delta : float) -> void:
+	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
+	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
+	if is_zero_approx(regeneration) and is_zero_approx(regen_percent):
+		return
+
+	health += regeneration * delta + regen_percent * max_health * delta
+	
+	if is_zero_approx(health): #we die due to a status effect
+		unit.died.emit(HitReportData.blank_hit_report)
+	
+	_accumulated_delta = 0.0
+"
+
+[sub_resource type="GDScript" id="GDScript_mur26"]
+script/source = "extends UnitComponent
+class_name ModifiersComponent
+
+signal stat_changed(attribute: Attributes.id)
+#base stats
+var base_stats: Dictionary[Attributes.id, float] = {}
+# internal storage of modifiers
+var _permanent_modifiers: Array[Modifier] = [] #meant for permanent effects (ie local stat changes)
+var _modifiers: Array[Modifier] = [] #meant for transient effects (all status effects's effects automatically fall here)
+var _status_effects: Dictionary[Attributes.Status, StatusEffect] = {}
+# cache of computed effective stats
+var _effective_cache: Dictionary[Attributes.id, float] = {}
+
+func _ready():
+	stat_changed.connect(func(_stat): #couple stat changes with ui changes
+		UI.update_unit_state.emit(unit)
+	)
+	Player.relics_changed.connect(_on_global_modifiers_changed)
+	set_process(false)
+	
+# called by the signal from player (indicating relic/global modifier change)
+func _on_global_modifiers_changed() -> void:
+	# clear the entire cache, as any stat could now be different
+	_effective_cache.clear()
+	
+	# re-emit stat_changed for all stats this unit possesses to update ui
+	for attribute: Attributes.id in base_stats:
+		stat_changed.emit(attribute)
+
+# add a permanent buff/debuff (for level-ups, skill choices, etc.)
+func add_permanent_modifier(mod: Modifier) -> void:
+	_permanent_modifiers.append(mod)
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+
+# remove a permanent buff/debuff (for respecs, etc.)
+func remove_permanent_modifier(mod: Modifier) -> void:
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+	_permanent_modifiers.erase(mod)
+
+# add a buff/debuff
+func add_modifier(mod: Modifier) -> void:
+	_modifiers.append(mod)
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+	
+	if mod.source_id == null:
+		push_warning(\"modifier \", self, \" has no source id!\")
+
+	if mod.cooldown >= 0.0: #TODO: make this editable in change modifier.
+		Clock.await_game_time(mod.cooldown).connect(func():
+			remove_modifier(mod)
+		)
+
+#change modifier notification NOTE: mainly used for external modifier modification, simply notifies that there is a change
+func change_modifier(mod: Modifier) -> void:
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute)
+
+# remove a buff/debuff
+func remove_modifier(mod: Modifier) -> void:
+	_modifiers.erase(mod)
+	_effective_cache.erase(mod.attribute)
+	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
+	
+func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
+	_modifiers.erase(mod)
+	_effective_cache.erase(replacement.attribute)
+	add_modifier(replacement) #this calls stat_changed
+
+# add a status effect with new precedence rules
+func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int = 0) -> void:
+	#NOTE: 0 by default refers to the player core
+	# if a status of this type already exists, refresh it
+	if _status_effects.has(type):
+		var existing_status: StatusEffect = _status_effects[type]
+		# delegate the refresh logic to the status effect object itself
+		existing_status.refresh(stack, cooldown)
+		# apply the updated state
+		update_status(existing_status)
+		check_reactions_for_status(type)
+		return
+
+	# if it's a new status, create and configure it
+	var status := StatusEffect.new(type, stack, cooldown, source_id)
+	_status_effects[type] = status
+	
+	# create and manage a dedicated timer for this new status if it's not permanent
+	if cooldown > 0.0:
+		var new_timer := Clock.create_game_timer(cooldown)
+		# link the timer and the status object
+		status.timer = new_timer
+		# connect the timer's timeout to the status object's handler
+		status.timer.timeout.connect(func():
+			status.on_timeout()
+			update_status(status) # tell the component to process the change
+		)
+		#gametimers automatically start
+	update_status(status)
+	check_reactions_for_status(type)
+
+# update a status effect
+func update_status(status: StatusEffect) -> void:
+	# if the status has no stacks left, remove it from tracking
+	if status.stack <= 0.0:
+		status.cleanup() # tell the status to clean up its timer
+		remove_modifier(status._modifier)
+		if _status_effects.has(status.type):
+			_status_effects.erase(status.type)
+		
+		_recalculate_overlay_color()
+		return
+
+	# create a new modifier that reflects the current state of the status effect
+	var old_modifier: Modifier = status._modifier
+	var new_modifier: Modifier = create_underlying_modifier(status)
+	status._modifier = new_modifier
+	if old_modifier != null:
+		replace_modifier(old_modifier, new_modifier)
+	else:
+		add_modifier(new_modifier)
+		
+		
+	_recalculate_overlay_color()
+	
+#helper function to recalculate the visual overlay of units when under status effects
+func _recalculate_overlay_color() -> void:
+	if not is_instance_valid(unit) or not is_instance_valid(unit.graphics) or not is_instance_valid(unit.graphics.material):
+		return
+		
+	var material: ShaderMaterial = unit.graphics.material as ShaderMaterial
+	var best_overlay: Color = Color.TRANSPARENT
+	
+	# find the dominant status effect to display visually
+	for status_type: Attributes.Status in _status_effects:
+		var status_color: Color = Attributes.status_effects[status_type].overlay_color
+		# prioritize the overlay with the highest alpha (intensity)
+		if status_color.a > best_overlay.a:
+			best_overlay = status_color
+			
+	# push the calculated color to the shader uniform
+	material.set_shader_parameter(&\"overlay_color\", best_overlay)
+
+# checks all reactions that involve the newly updated status type to see if any have been triggered.
+func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
+	for reaction: Attributes.ReactionData in Attributes.reactions:
+		# there's no way this update could have triggered it. skip the check entirely.
+		if not reaction.requisites.has(updated_status_type):
+			continue
+
+		var all_requisites_met: bool = true
+		var reaction_stack: int = 10
+		for required_status: Attributes.Status in reaction.requisites:
+			var required_stacks: float = reaction.requisites[required_status]
+			
+			# Check if the unit has the status and if the stacks are sufficient.
+			if not _status_effects.has(required_status) or _status_effects[required_status].stack < required_stacks:
+				all_requisites_met = false
+				break # A requisite is not met, no need to check others for this reaction.
+			else:
+				var possible_reaction_stack: int = floor(_status_effects[required_status].stack / required_stacks)
+				if possible_reaction_stack < reaction_stack:
+					reaction_stack = possible_reaction_stack
+		
+		# if, after checking all requisites, the flag is still true, the reaction triggers.
+		if all_requisites_met:
+			reaction.effect.call(unit)
+			#consume effect
+			for status_to_consume in reaction.requisites:
+				_status_effects[status_to_consume].stack -= reaction.requisites[status_to_consume] * reaction_stack
+				update_status(_status_effects[status_to_consume])
+
+func create_underlying_modifier(status: StatusEffect) -> Modifier:
+	# Look up the definition of this status type from our central Attributes store.
+	var status_data = Attributes.status_effects[status.type]
+	# Calculate the total effect based on the number of stacks.
+	var total_additive = status_data.additive_per_stack * status.stack
+	var total_multiplicative = pow(status_data.multiplicative_per_stack, status.stack)
+
+	# Create a new Modifier instance. Note that we don't handle cooldowns here,
+	# as the status effect's cooldown is managed by the add_status function's timer logic.
+	# The source_id should be carried over if needed, assuming StatusEffect has one.
+	var new_mod = Modifier.new(
+		status_data.attribute,
+		total_multiplicative,
+		total_additive,
+		-1.0, #cooldown is permanent, as we handle expiration manually
+		null, # Status effects generally don't use override.
+		status.source_id #doesnt actually work rn
+	)
+	new_mod.cooldown = -1.0 #status-modifiers are ALWAYS permanent
+	#they are manually removed when their parent status runs out
+	return new_mod
+
+func register_stat(attr: Attributes.id, value: float) -> void: #registers a stat
+	if value == null:
+		return
+	base_stats[attr] = value #overwrites if neccessary
+	_effective_cache.erase(attr)  # ensure clean first read
+	stat_changed.emit(attr)
+		
+func register_data(data: Data) -> void: #registers any arbitrary data resource; polymorphic
+	if not data:
+		push_warning(\"no data found in \", self)
+		return
+
+	for attr: Attributes.id in Attributes.id.values():
+		var value = data.resolve(attr) #try and get all attributes from data
+		if value == null: #attribute does not exist
+			continue
+		
+		register_stat(attr, value)
+	
+	data.value_changed.connect(func(attribute: Attributes.id): #re-register base stat if changed
+		register_stat(attribute, data.resolve(attribute))
+	)
+
+func has_stat(attr: Attributes.id) -> bool:
+	return base_stats.has(attr)
+
+func pull_stat(attr: Attributes.id) -> Variant:
+	if _effective_cache.has(attr):
+		return _effective_cache[attr] #return cache
+	
+	if not has_stat(attr):
+		return null #unregistered stat!
+
+	var upgraded_value := base_stats[attr]
+	var perm_sum_add := 0.0
+	var perm_product_mult := 1.0
+	var perm_override = null
+	
+	for modifier: Modifier in _permanent_modifiers:
+		if modifier.attribute != attr:
+			continue
+		
+		perm_sum_add += modifier.additive
+		perm_product_mult *= modifier.multiplicative
+		if modifier.override != null:
+			perm_override = modifier.override
+	
+	upgraded_value = upgraded_value * perm_product_mult + perm_sum_add if perm_override == null else perm_override
+
+	# --- STAGE 2: apply transient modifiers to the upgraded stat ---
+	var sum_add := 0.0
+	var product_mult := 1.0
+	var override = null
+	
+	for modifier: Modifier in _modifiers:
+		if modifier.attribute != attr:
+			continue
+			
+		#if attr == Attributes.id.REGEN_PERCENT:
+			#print(modifier, \" found!\")
+	
+		sum_add += modifier.additive
+		product_mult *= modifier.multiplicative
+		if modifier.override != null:
+			override = modifier.override
+	
+	var transient_value: float = upgraded_value * product_mult + sum_add if override == null else override
+	
+	# --- STAGE 3: apply global (relic) modifiers ---
+	var final_value: float = transient_value # start with the result of stage 2
+	var global_modifiers: Array[Modifier] = Player.get_modifiers_for_unit(self.unit)
+
+	if not global_modifiers.is_empty():
+		var global_sum_add: float = 0.0
+		var global_product_mult: float = 1.0
+		var global_override = null # global overrides are powerful, use with care
+
+		for modifier: Modifier in global_modifiers:
+			if modifier.attribute != attr:
+				continue
+			
+			global_sum_add += modifier.additive
+			global_product_mult *= modifier.multiplicative
+			if modifier.override != null:
+				global_override = modifier.override
+		
+		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
+
+	return final_value
+
+#data retrieval functions
+func has_status(status: Attributes.Status, threshold: float = 0.0) -> bool:
+	if not _status_effects.has(status):
+		return false
+	return _status_effects[status].stack > threshold
+"
+
+[sub_resource type="Animation" id="Animation_uhk0q"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_i3qpa"]
+resource_name = "attack"
+length = 0.3
+
+[sub_resource type="Animation" id="Animation_yr17l"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uhk0q"]
+_data = {
+&"RESET": SubResource("Animation_uhk0q"),
+&"attack": SubResource("Animation_i3qpa"),
+&"hit": SubResource("Animation_yr17l")
+}
+
+[node name="Rite Curses" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_eqypi")
+type = 28
+stat_displays = Array[ExtResource("2_k5wd1")]([SubResource("Resource_p6ncc")])
+behavior = NodePath("EffectDistributorBehavior")
+graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="EffectDistributorBehavior" type="Node" parent="."]
+script = ExtResource("3_sjjme")
+buff_effect = SubResource("Resource_ga7jw")
+metadata/_custom_type_script = "uid://dnjc1qtsra5h2"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = SubResource("GDScript_ptigq")
+face_towards_movement = null
+movement_data = ExtResource("6_p3qie")
+jiggle_enabled = null
+jiggle_speed = null
+jiggle_angle = null
+bounce_amount = null
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = SubResource("GDScript_vqfng")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("9_rvfhl")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = SubResource("GDScript_mur26")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_uhk0q")
+}

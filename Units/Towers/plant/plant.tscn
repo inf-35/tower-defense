@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bskb6vypbmgoc"]
+[gd_scene load_steps=18 format=3 uid="uid://bskb6vypbmgoc"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_670td"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_k6lwd"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://ohkn5aw1hsmc" path="res://Assets/pot_base.png" id="10_670td"]
 [ext_resource type="Texture2D" uid="uid://d0inxbw00dht6" path="res://Assets/gourd_turret.png" id="11_k6lwd"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_ft41b"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_c1n2m"]
 
 [node name="Plant" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
@@ -69,6 +70,10 @@ offset = Vector2(28, 0)
 
 [node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
 position = Vector2(51.0289, 0)
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("16_c1n2m")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("12_ft41b")

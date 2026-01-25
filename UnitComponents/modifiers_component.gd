@@ -298,3 +298,6 @@ func get_status_count(status: Attributes.Status) -> float:
 	if not _status_effects.has(status):
 		return 0.0
 	return _status_effects[status].stack
+	
+func get_save_data() -> Dictionary:
+	return {} #TODO

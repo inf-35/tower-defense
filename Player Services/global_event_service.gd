@@ -63,6 +63,13 @@ func remove_effect_by_prototype(prototype: EffectPrototype) -> void:
 		var instance: EffectInstance = _active_instances[i]
 		if instance.effect_prototype == prototype:
 			deregister_effect(instance)
+			
+func get_effect_instance_by_prototype(prototype: EffectPrototype) -> EffectInstance:
+	for active_instance: EffectInstance in _active_instances:
+		if active_instance.effect_prototype == prototype:
+			return active_instance
+				
+	return null
 
 func _handle_event(_unit: Unit, game_event: GameEvent) -> void:
 	var event_type: GameEvent.EventType = game_event.event_type

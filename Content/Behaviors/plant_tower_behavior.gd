@@ -12,16 +12,16 @@ var _current_bonus_damage: float = 0.0
 var _current_bonus_multiplicative_damage: float = 0.0:
 	set(nec):
 		_current_bonus_multiplicative_damage = nec
-		print(unit, " ", _current_bonus_multiplicative_damage)
 var _growth_modifier: Modifier = null
 
 # this function is called by the unit's initialize() method
-func _ready() -> void:
+func start() -> void:
 	# connect to the global signal that announces a new wave cycle
 	Phases.wave_ended.connect(_on_wave_cycle_started)
 	# apply the initial state (which is no bonus damage)
+	attach()
 
-func start():
+func attach():
 	_apply_damage_modifier()
 	
 func transfer_state(untyped_new_behavior: Behavior):
@@ -58,3 +58,20 @@ func _apply_damage_modifier() -> void:
 
 # this behavior uses the standard attack logic in the unit's _process loop
 # so no custom update loop
+
+func get_save_data() -> Dictionary:
+	return {
+		"additive_damage_per_wave": additive_damage_per_wave,
+		"multiplicative_damage_per_wave": multiplicative_damage_per_wave,
+		"current_bonus_damage": _current_bonus_damage,
+		"current_bonus_multiplicative_damage": _current_bonus_multiplicative_damage,
+	}
+
+func load_save_data(save_data: Dictionary) -> void:
+	additive_damage_per_wave = save_data.additive_damage_per_wave
+	multiplicative_damage_per_wave = save_data.multiplicative_damage_per_wave
+	_current_bonus_damage = save_data.current_bonus_damage
+	_current_bonus_multiplicative_damage = save_data.current_bonus_multiplicative_damage
+	
+	attach()
+	

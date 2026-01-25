@@ -233,3 +233,6 @@ func fast_get_position_in_future(t: float) -> Vector2: #returns predicted positi
 	var direction_of_final_segment = (next_waypoint_pos - last_safe_waypoint_pos).normalized()
 
 	return last_safe_waypoint_pos + direction_of_final_segment * total_distance_to_travel
+
+func get_save_data() -> Dictionary:
+	return {} #nothing to save!

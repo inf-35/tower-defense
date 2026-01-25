@@ -45,3 +45,9 @@ func apply_generics(effect_instance: EffectInstance) -> void: ##helper for creat
 	effect_instance.event_hooks = event_hooks
 	#effect_instance.duration = duration
 	effect_instance.effect_prototype = self as EffectPrototype
+	
+func get_save_data(effect_instance: EffectInstance) -> Dictionary:
+	return {}
+
+func load_save_data(effect_instance: EffectInstance, save_data: Dictionary) -> void:
+	return

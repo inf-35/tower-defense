@@ -9,7 +9,7 @@ class_name SummonerBehavior
 func start() -> void:
 	super.start()
 
-func update(delta: float) -> void:
+func update(_delta: float) -> void:
 	#this tower doesnt attack in the usual way
 	if attack_component.current_cooldown <= 0.0:
 		#bypass attack()

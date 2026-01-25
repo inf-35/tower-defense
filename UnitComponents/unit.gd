@@ -52,7 +52,8 @@ var blocked: bool #whether this unit is currently blocked by a tower
 var abstractive: bool: #fathis unit is not an actual unit (see prototypes, Towers)
 	set(na):
 		abstractive = na
-		disabled = true
+		if abstractive:
+			disabled = true
 var disabled: bool:
 	set(nd):
 		disabled = nd
@@ -231,14 +232,15 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void: #
 
 		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
 		effect_instance.stacks += stacks
-
+		print(effect_instance.stacks)
 		if effect_instance.stacks <= 0:
 			remove_effect(effect_prototype)
-			
+
 		return
 
 	if get_effect_instance_by_prototype(effect_prototype):
 		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
+		print(get_effect_instance_by_prototype(effect_prototype).stacks)
 		return
 	
 	effect_prototypes.append(effect_prototype)

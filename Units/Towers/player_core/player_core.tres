@@ -10,6 +10,7 @@
 script = ExtResource("1_8vupa")
 id = 1
 size = Vector2i(2, 2)
+required_capacity = 0.0
 element = 5
 navcost = 1
 tower_name = "The Keep"

@@ -1,3 +1,4 @@
+@abstract
 extends Node
 class_name UnitComponent
 #abstract class for all unit components
@@ -37,3 +38,5 @@ func get_stat_raw(modifiers_component: ModifiersComponent, data: Data, attribute
 		push_warning("no data found in ", self, ", unit: ", unit)
 		return 0.0
 	return data.get(Data.get_stringname(attribute)) if (modifiers_component == null or modifiers_component.pull_stat(attribute) == null) else modifiers_component.pull_stat(attribute) 
+
+@abstract func get_save_data()

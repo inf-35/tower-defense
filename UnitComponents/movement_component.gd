@@ -123,3 +123,6 @@ func _update_walk_cycle(delta: float) -> void:
 		# Reset timer logic to keep phase consistent on restart
 		if graphics.scale.is_equal_approx(Vector2.ONE * Vector2(0.096, 0.096)):
 			_walk_cycle_time = 0.0
+
+func get_save_data() -> Dictionary:
+	return {} #everything here thats persistent is typically run by modifiers component

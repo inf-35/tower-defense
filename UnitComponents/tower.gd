@@ -307,3 +307,42 @@ func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for
 	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour
 		return behavior.get_navcost_for_cell(_cell)
 	return Towers.get_tower_navcost(self.type)
+	
+func get_save_data() -> Dictionary:
+	var unit_save_data: Dictionary = {
+		"unit_id": unit_id,
+		"type": type,
+		"tower_position_x": tower_position.x,
+		"tower_position_y": tower_position.y,
+		"level": level,
+		"facing": facing,
+		"blocking": blocking,
+		"hostile": hostile,
+		"abstractive": abstractive
+	}
+	
+	var component_names: Array[String] = [
+		"movement_component",
+		"navigation_component",
+		"health_component",
+		"modifiers_component",
+		"attack_component",
+		"range_component",
+		"behavior"
+	]
+	
+	for component_name in component_names:
+		if self.get(component_name) and is_instance_valid(self[component_name]):
+			unit_save_data[component_name] = self[component_name].get_save_data()
+	
+	return unit_save_data
+	
+func load_save_data(save_data: Dictionary) -> void:
+	unit_id = save_data.unit_id
+	#type, position, facing already recreated in construction
+	level = save_data.level
+	blocking = save_data.blocking
+	hostile = save_data.hostile
+	abstractive = save_data.abstractive
+	behavior.load_save_data(save_data.behavior)
+	

@@ -8,5 +8,5 @@ script = ExtResource("2_8jbpc")
 id_name = "blood_rite"
 description = "this is a relic reward description"
 type = 3
-rite_type = 50
+rite_type = 51
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

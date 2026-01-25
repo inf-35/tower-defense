@@ -83,7 +83,29 @@ func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 		return
 	canvas.draw_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
 	
-# a helper function for safe animation playback
+func draw_visuals_adjacent_tiles(canvas: RangeIndicator) -> void:
+	var tower := unit as Tower
+	if not is_instance_valid(tower): return
+	
+	var margin: int = 2
+	var cell_size := Island.CELL_SIZE - margin
+	var half_size := Vector2(cell_size, cell_size) * 0.5
+
+	var adj_cells: Array[Vector2i] = tower.get_adjacent_cells()
+	
+	for cell: Vector2i in adj_cells:
+		var dir_vec: Vector2i = cell - tower.tower_position
+		
+		if self.has_method(&"_is_local_direction_allowed"): #for EffectDistributorBehavior
+			if not self.call(&"_is_local_direction_allowed", tower.facing, dir_vec):
+				continue
+
+		var pos = Island.cell_to_position(cell)
+		var rect = Rect2(pos - half_size, Vector2(cell_size, cell_size))
+
+		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+	
+#a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):
 		animation_player.play(anim_name, -1, custom_speed * Clock.speed_multiplier, custom_speed < 0.0)
@@ -126,3 +148,9 @@ func _attempt_navigate_to_origin() -> bool:
 	
 	navigation_component.goal = Vector2i.ZERO
 	return true
+	
+func get_save_data() -> Dictionary:
+	return {}
+
+func load_save_data(save_data: Dictionary) -> void:
+	attach()

@@ -31,10 +31,13 @@ const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1),
 const _DEBUG_SHOW_NAVCOST: bool = false
 
 func _ready():
+	_clear_island_state()
 	Phases.start_game()
 	#register self with services that need references
 	PowerService.register_island(self)
-	
+	#generate_new_island called by Phases
+
+func generate_new_island() -> void:
 	# initial terrain generation
 	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 50)
 	# delegate application of the block to the TerrainService
@@ -86,7 +89,7 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 		if tower_type == Towers.Type.VOID:
 			tower_grid[cell].sell()
 			return true
-		return true
+		return false
 	
 	if TerrainService.is_area_constructable(self, facing, cell, tower_type):
 		construct_tower_at(cell, tower_type, facing)
@@ -266,7 +269,8 @@ func _on_tower_destroyed(tower: Tower):
 	#update capacity, caches, navigation
 	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
 	update_navigation_grid()
-	_towers_by_type[tower.type].erase(tower)
+	if _towers_by_type.has(tower.type):
+		_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
 	
 func update_adjacencies_around_tower(tower: Tower):
@@ -320,6 +324,100 @@ func get_island_bounds() -> Rect2:
 	var size_in_pixels: Vector2 = Vector2(size_in_cells) * CELL_SIZE
 	
 	return Rect2(top_left_pos, size_in_pixels)
+	
+func get_save_data() -> Dictionary:
+	var data: Dictionary = {}
+	#serialise terrain grid
+	var terrain_export: Dictionary = {}
+	for cell: Vector2i in terrain_base_grid:
+		var key = "%d,%d" % [cell.x, cell.y]
+		terrain_export[key] = terrain_base_grid[cell] # enum int
+	data["terrain"] = terrain_export
+		
+	data["maximum_unit_id"] = References.current_unit_id
+	data["maximum_stat_id"] = References.current_stat_id
+		
+	var tower_list: Dictionary[int, Dictionary] = {}
+	var processed_towers: Dictionary[Tower, bool] = {}
+	
+	for cell: Vector2i in tower_grid:
+		var tower: Tower = tower_grid[cell]
+		if not is_instance_valid(tower): continue
+		if processed_towers.has(tower): continue
+		
+		processed_towers[tower] = true
+		
+		#delegate to Tower for its specific state
+		var t_data = tower.get_save_data()
+		tower_list[tower.unit_id] = t_data
+		
+	data["towers"] = tower_list
+
+	return data
+	
+func load_save_data(data: Dictionary) -> void:
+	# clear existing world
+	_clear_island_state()
+	
+	# restore terrain
+	var terrain_import: Dictionary = data.get("terrain", {})
+	var edits: Dictionary[Vector2i, Terrain.CellData] = {}
+	for key: String in terrain_import:
+		var parts = key.split(",")
+		if parts.size() == 2:
+			var cell = Vector2i(int(parts[0]), int(parts[1]))
+			var type = int(terrain_import[key])
+			edits[cell] = Terrain.CellData.new(type, Towers.Type.VOID)
+	TerrainService.expand_island(self, edits)
+	# update visuals for terrain (batch update)
+	var changes: Dictionary[Vector2i, bool] = {}
+	for cell in terrain_base_grid: 
+		changes[cell] = true
+	if is_instance_valid(terrain_renderer):
+		terrain_renderer.apply_terrain_changes(changes)
+		
+	var tower_list: Dictionary = data.get("towers", [])
+	var sorted_unit_ids: Array[int] = []
+	for unit_id in tower_list.keys():
+		sorted_unit_ids.append(int(unit_id))
+	sorted_unit_ids.sort()
+	
+	for unit_id: int in sorted_unit_ids:
+		var t_data: Dictionary = tower_list[str(unit_id)]
+		var type = int(t_data.get("type", Towers.Type.VOID))
+		var pos_x = int(t_data.get("tower_position_x", 0))
+		var pos_y = int(t_data.get("tower_position_y", 0))
+		var facing = int(t_data.get("facing", 0))
+		var level = int(t_data.get("level", 0))
+		var cell = Vector2i(pos_x, pos_y)
+		# construct the base tower
+		var tower = construct_tower_at(cell, type, facing)
+		
+		if is_instance_valid(tower):
+			tower.level = level
+			tower.load_save_data(t_data)
+			
+	References.current_unit_id = data["maximum_unit_id"]
+	References.current_stat_id = data["maximum_stat_id"]
+
+	#finalize
+	update_shore_boundary()
+	update_navigation_grid()
+	
+func _clear_island_state() -> void:
+	#wipe grid
+	terrain_base_grid.clear()
+	tower_grid.clear()
+	_towers_by_type.clear()
+	
+	#wipe nodes
+	for tower in get_tree().get_nodes_in_group(References.TOWER_GROUP):
+		tower.queue_free()
+		
+	#clear terrain visuals
+	if is_instance_valid(terrain_renderer):
+		#reset the grid data in renderer
+		terrain_renderer.reset_grid([])
 
 # static position helpers
 static func position_to_cell(_position: Vector2) -> Vector2i:

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://c8xge7seldljk"]
+
+[ext_resource type="Texture2D" uid="uid://dgjwrg2hlraqj" path="res://Assets/curses_rite.png" id="1_w5usq"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_laah0"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_titnn"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_cjeqs"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_43jgv"]
+[ext_resource type="PackedScene" uid="uid://dla8slnqltee" path="res://Units/Towers/rite_drums/rite_drums.tscn" id="6_fiknr"]
+
+[resource]
+script = ExtResource("5_43jgv")
+id = 51
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Drums"
+tower_description = "{RITE_LABEL}: Whenever any adjacent tower attacks, there is a 20% chance for all other adjacent towers to also attack immediately."
+icon = ExtResource("1_w5usq")
+preview = ExtResource("1_w5usq")
+tower_scene = ExtResource("6_fiknr")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

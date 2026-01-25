@@ -6,16 +6,15 @@ class_name BreachBehavior
 @export var active_duration_waves: int = Waves.WAVES_PER_EXPANSION_CHOICE * 4 #this ensures we dont accidentally create a scenario where there are no active breaches
 
 enum State { SEED, ACTIVE, CLOSING }
-var _current_state: State
+var _current_state: State = State.SEED
 var _waves_left_in_state: int
 
 func start() -> void:
 	# connect to the game-wide signal to track wave progression
 	Phases.wave_cycle_started.connect(_on_wave_cycle_started)
-	# start in the initial state
-	if seed_duration_waves > 0:
-		_enter_state(State.SEED)
-	else:
+
+func attach() -> void:
+	if _current_state == State.SEED and seed_duration_waves <= 0: #check for maturation immediately
 		_enter_state(State.ACTIVE)
 
 func _enter_state(new_state: State) -> void:
@@ -63,3 +62,29 @@ func get_display_data() -> Dictionary:
 	return {
 		ID.UnitState.WAVES_LEFT_IN_PHASE: _waves_left_in_state
 	}
+
+func get_save_data() -> Dictionary:
+	return {
+		"seed_duration_waves": seed_duration_waves,
+		"active_duration_waves": active_duration_waves,
+		"state": _current_state,
+		"waves_left_in_state": _waves_left_in_state,
+	}
+	
+func load_save_data(save_data: Dictionary) -> void:
+	seed_duration_waves = save_data.seed_duration_waves
+	active_duration_waves = save_data.active_duration_waves
+	_current_state = save_data.state
+	_waves_left_in_state = save_data.waves_left_in_state
+	
+	#perform state transitions without side effects if needed
+	if _current_state == State.ACTIVE:
+		SpawnPointService.register_breach(unit, false)
+		
+	elif _current_state == State.CLOSING:
+		unit.died.emit(HitReportData.blank_hit_report)
+		
+	else:
+		SpawnPointService.register_breach(unit, true)
+	
+	attach()

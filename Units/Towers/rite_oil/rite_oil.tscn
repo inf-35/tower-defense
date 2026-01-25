@@ -15,6 +15,7 @@
 
 [sub_resource type="Resource" id="Resource_d711j"]
 script = ExtResource("5_c4spf")
+duration_bonus = 3.0
 schedule = 1
 metadata/_custom_type_script = "uid://cpikvw3wnikmp"
 

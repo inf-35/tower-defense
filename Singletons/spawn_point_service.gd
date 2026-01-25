@@ -5,6 +5,10 @@ extends Node
 var _breach_seeds: Array[Tower] = []
 var _active_breaches: Array[Tower] = []
 
+func start():
+	_breach_seeds.clear()
+	_active_breaches.clear()
+
 # called by Island when a breach tower is constructed
 func register_breach(breach_tower: Tower, seed: bool = true) -> void:
 	if breach_tower.type == Towers.Type.BREACH:

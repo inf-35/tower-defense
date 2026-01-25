@@ -98,7 +98,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"RITE_LABEL": {
 		"title": "Rite",
 		"display": "[Rite]",
-		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field.",
+		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field. Cannot be moved once placed.",
 		"icon": null,
 	},
 	"KEYWORD_TUTORIAL": {

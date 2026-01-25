@@ -19,20 +19,28 @@ var current_preview: TowerPreview
 signal tower_was_selected(tower: Tower)
 signal tower_was_deselected()
 
+func _ready():
+	await References.references_ready
+	
+	UI.tower_selected.connect(_on_build_tower_selected)
+	UI.update_flux.connect(func(_flux: float): _update_preview_visuals())
+	UI.update_capacity.connect(func(_used: float, _total: float): _update_preview_visuals())
+
 func start():
-	# Connect to UI signal for when the player picks a tower from the build bar.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	current_state = State.IDLE
+	preview_tower_prototype = null
+	selected_tower = null
+	_ghost_unit_for_inspection = null
 	
 	current_preview = References.tower_preview
 	enabled = true
 	
-	await References.references_ready
-	
-	UI.tower_selected.connect(_on_build_tower_selected, CONNECT_REFERENCE_COUNTED)
-	UI.update_flux.connect(func(_flux: float): _update_preview_visuals(), CONNECT_REFERENCE_COUNTED)
-	UI.update_capacity.connect(func(_used: float, _total: float): _update_preview_visuals(), CONNECT_REFERENCE_COUNTED)
 
 func _process(_delta: float) -> void:
+	if not Phases.in_game:
+		return
 	if not enabled or not is_instance_valid(UI.cursor_info):
 		return
 		
@@ -42,8 +50,6 @@ func _process(_delta: float) -> void:
 		State.PREVIEWING:
 			_update_preview_tooltip()
 		State.TOWER_SELECTED:
-			if Input.is_action_just_pressed("interact"):
-				selected_tower.died.emit(HitReportData.blank_hit_report)
 			# Hide tooltip if a tower is selected (cleaner UI)
 			UI.cursor_info.display_message("")
 
@@ -211,7 +217,15 @@ func _handle_preview_input(event: InputEvent) -> void:
 	References.range_indicator.select(preview_tower_prototype)
 	# handle mouse motion to update the preview visuals
 	if event is InputEventMouseMotion:
-		_update_preview_visuals()
+		var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
+		var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
+		var effective_size: Vector2i = base_size
+		if int(preview_tower_facing) % 2 != 0:
+			effective_size = Vector2i(base_size.y, base_size.x)
+		var center_offset: Vector2i = effective_size * 0.5
+		preview_tower_position = Island.position_to_cell(mouse_pos) - center_offset
+		if preview_tower_position != preview_tower_prototype.tower_position or preview_tower_facing != preview_tower_prototype.facing:
+			_update_preview_visuals()
 
 	# handle clicks to place or cancel
 	if event is InputEventMouseButton and event.is_pressed():
@@ -253,35 +267,26 @@ func _update_preview_visuals():
 		
 	if current_state != State.PREVIEWING:
 		return
+
+	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -10.0, preview_tower_position)
+	preview_tower_prototype.tower_position = preview_tower_position
+	preview_tower_prototype.facing = preview_tower_facing
 	
-	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
-	var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
-	var effective_size: Vector2i = base_size
-	if int(preview_tower_facing) % 2 != 0:
-		effective_size = Vector2i(base_size.y, base_size.x)
-	var center_offset: Vector2i = effective_size * 0.5
-	preview_tower_position = Island.position_to_cell(mouse_pos) - center_offset
-	
-	if preview_tower_position != preview_tower_prototype.tower_position or preview_tower_facing != preview_tower_prototype.facing:
-		Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -10.0, preview_tower_position)
-		preview_tower_prototype.tower_position = preview_tower_position
-		preview_tower_prototype.facing = preview_tower_facing
+	var occupied_cells: Array[Vector2i] = []
+	var size := preview_tower_prototype.size
+
+	for x in size.x:
+		for y in size.y:
+			var navcost: float = preview_tower_prototype.get_navcost_for_cell(preview_tower_position + Vector2i(x,y))
+			if not is_equal_approx(navcost, Navigation.BASE_COST): #filter out cells marked as transparent
+				occupied_cells.append(preview_tower_position + Vector2i(x, y))
+
+	# send to path renderer
+	if is_instance_valid(References.path_renderer):
+		References.path_renderer.update_preview(occupied_cells)
 		
-		var occupied_cells: Array[Vector2i] = []
-		var size := preview_tower_prototype.size
-
-		for x in size.x:
-			for y in size.y:
-				var navcost: float = preview_tower_prototype.get_navcost_for_cell(preview_tower_position + Vector2i(x,y))
-				if not is_equal_approx(navcost, Navigation.BASE_COST): #filter out cells marked as transparent
-					occupied_cells.append(preview_tower_position + Vector2i(x, y))
-
-		# send to path renderer
-		if is_instance_valid(References.path_renderer):
-			References.path_renderer.update_preview(occupied_cells)
-			
-		preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_facing, preview_tower_position, preview_tower_prototype.type, true)
-		current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
+	preview_is_valid = TerrainService.is_area_constructable(References.island, preview_tower_facing, preview_tower_position, preview_tower_prototype.type, true)
+	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)
 
 	
 # new helper to create and manage the temporary inspection unit

@@ -107,34 +107,30 @@ func start():
 	ruin_service = RuinService.new()
 	add_child(ruin_service)
 	ruin_service.initialise()
-	
-	References.references_ready.connect(_setup_state, CONNECT_ONE_SHOT)
 
-func _setup_state():
+func begin_new_game():
 	#initial state setup
 	self.unlocked_towers = {
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
+		Towers.Type.PLANT: true,
 	}
-	add_rite(Towers.Type.RITE_LIBERTY, 20)
-	#add_rite(Towers.Type.RITE_FLAME, 20)
 	#add_rite(Towers.Type.RITE_FROST, 20)
 	#
 	var reward := Reward.new()
 	reward.type = Reward.Type.ADD_RELIC
-	reward.relic = Relics.PAWN_STRUCTURE
+	reward.relic = Relics.WILDERNESS
 	RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EARLY_BIRD
 	#RewardService.apply_reward(reward)
 	
-	flux = 20.0
+	flux = 200.0
 	hp = 20.0
 	
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))
-	UI.update_relics.emit()
 	UI.update_flux.emit(flux)
 	UI.update_health.emit(hp)
 
@@ -270,3 +266,57 @@ func _on_reward_reroll_requested():
 		return
 	self.flux -= cost
 	RewardService.reroll()
+	
+func get_save_data() -> Dictionary:
+	var save_data: Dictionary = {
+		"gold": flux,
+		"hp": hp,
+		"unlocked_towers": unlocked_towers,
+		"rite_inventory": rite_inventory,
+	}
+	
+	var relics_data: Array[Dictionary] = []
+	for active_relic: RelicData in active_relics:
+		relics_data.append(active_relic.get_save_data()) #see this for relic/effect serialisation
+	
+	save_data["relics"] = relics_data
+	return save_data
+	
+func load_save_data(save_data: Dictionary) -> void:
+	flux = float(save_data.gold)
+	hp = int(save_data.hp)
+	
+	for unlocked_tower_type in save_data.unlocked_towers:
+		unlocked_towers[int(unlocked_tower_type)] = bool(save_data.unlocked_towers[unlocked_tower_type])
+	for unlocked_rite_type in save_data.rite_inventory:
+		rite_inventory[int(unlocked_rite_type)] = int(save_data.rite_inventory[unlocked_rite_type])
+	#readd relics in the sequence in which they were originally added
+	for active_relic: Dictionary in save_data.relics:
+		load_relic(active_relic)
+	
+	UI.update_relics.emit()
+	UI.update_flux.emit(flux)
+	UI.update_health.emit(hp)
+	UI.update_tower_types.emit(unlocked_towers, rite_inventory)
+	
+func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
+	var relic: RelicData = load(active_relic.resource_path) as RelicData
+	if not is_instance_valid(relic):
+		return
+	active_relics.append(relic)
+	
+	if relic.global_effect:
+		var effect_instance := global_event_service.register_effect(relic.global_effect)
+		effect_instance.effect_prototype.load_save_data(effect_instance, active_relic)
+	
+	if relic.active_effect_scene: #WARNING: this doesnt actually work
+		# instantiate the logic node for the active relic
+		var effect_node: Node = relic.active_effect_scene.instantiate()
+		# add it to our container so it becomes part of the scene tree
+		_active_effects_container.add_child(effect_node)
+		print("Added relic global effect: ", effect_node)
+		# initialize it with its own data
+		effect_node.initialise()
+
+	# announce that the global state has changed
+	relics_changed.emit()

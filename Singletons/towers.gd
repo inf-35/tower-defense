@@ -53,6 +53,7 @@ enum Type {
 	RITE_RAMPAGE,
 	RITE_OIL,
 	RITE_WHEEL,
+	RITE_DRUMS,
 }
 
 enum Element {

@@ -30,7 +30,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var status_vector: Vector2 = hit_data.status_effects.get(status, Vector2.ZERO)
 	
-	status_vector.x += bonus_stacks
+	status_vector.x += bonus_stacks * instance.stacks
 	status_vector.y = maxf(status_vector.y, bonus_time)
 
 	hit_data.status_effects[status] = status_vector

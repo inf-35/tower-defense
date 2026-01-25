@@ -2,7 +2,6 @@ extends UnitComponent
 class_name HealthComponent
 signal health_changed(new_health: float)
 
-@export var aes: float
 @export var health_data: Data = load("res://Content/Health/tower_default.tres") ##CANNOT BE FURTHER SPECIFIED - WILL CAUSE BUG
 
 var _modifiers_component: ModifiersComponent
@@ -86,3 +85,10 @@ func _tick(delta: float) -> void:
 		unit.died.emit(HitReportData.blank_hit_report)
 	
 	_accumulated_delta = 0.0
+	
+func get_save_data() -> Dictionary:
+	return {
+		"max_health": max_health,
+		"health": health,
+		"shield": shield,
+	}

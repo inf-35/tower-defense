@@ -22,6 +22,7 @@ var current_wave_number: int = 0
 var current_phase: GamePhase = GamePhase.IDLE
 var current_game_difficulty: GameDifficulty
 
+var in_game: bool = false
 var is_game_over: bool = false
 
 enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
@@ -51,7 +52,19 @@ func start_game() -> void:
 	ClickHandler.start()
 	Units.start()
 	Player.start()
+	SpawnPointService.start()
 	TowerNetworkManager.start()
+	
+	if SaveLoad.has_save_file():
+		_report("Starting from save file.")
+		SaveLoad.load_game()
+	else:
+		await References.references_ready
+		begin_new_game()
+		Player.begin_new_game()
+
+func begin_new_game():
+	References.island.generate_new_island()
 
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
@@ -61,7 +74,7 @@ func start_game() -> void:
 	
 	is_game_over = false
 	
-	_report("starting game flow.")
+	_report("New game: Starting game flow.")
 	_generate_wave_plan()
 	
 	start_tutorial()
@@ -256,7 +269,7 @@ func _on_choice_applied() -> void:
 	else:
 		_advance_phase()
 
-# --- Building Phase Logic ---
+# --- Building Phase Logic --- #TODO: implement end of game signal disconnections
 func _start_building_phase() -> void:
 	current_phase = GamePhase.BUILDING
 	_report("starting building phase for wave " + str(current_wave_number))
@@ -305,6 +318,65 @@ func start_game_over(is_victory: bool) -> void:
 	
 	UI.display_game_over.emit(is_victory)
 	_report("Game over!")
+	
+func get_save_data() -> Dictionary:
+	var data: Dictionary = {}
+	
+	data["current_wave_number"] = current_wave_number
+	data["current_phase"] = current_phase # saves as int (Enum)
+
+	# Dictionary[int, WaveData] -> Dictionary[str(int), Dictionary]
+	var plan_export: Dictionary = {}
+	for wave_num: int in wave_plan:
+		var wave_data: Wave = wave_plan[wave_num]
+		var entry: Dictionary = {}
+		
+		# convert DayEvent enums to int
+		entry["day_events"] = wave_data.day_events # array of ints
+		entry["combat_variant"] = wave_data.combat_variant # int
+		
+		plan_export[str(wave_num)] = entry
+		
+	data["wave_plan"] = plan_export
+	
+	return data
+
+func load_save_data(data: Dictionary) -> void:
+	current_wave_number = int(data.get("current_wave_number", 0))
+	current_phase = int(data.get("current_phase", GamePhase.IDLE))
+	
+	# reconstruct wave plan
+	wave_plan.clear()
+	var plan_import: Dictionary = data.get("wave_plan", {})
+	
+	for key: String in plan_import:
+		var wave_num = int(key)
+		var entry: Dictionary = plan_import[key]
+		
+		var new_data = Wave.new()
+		
+		# restore combat variant
+		new_data.combat_variant = int(entry.get("combat_variant", CombatVariant.NORMAL))
+		
+		# restore day events (Array of Ints)
+		# JSON arrays load as Array[float], cast back
+		var events_raw = entry.get("day_events", [])
+		for evt in events_raw:
+			new_data.day_events.append(int(evt))
+			
+		wave_plan[wave_num] = new_data
+	
+	match current_phase:
+		GamePhase.BUILDING:
+			_start_building_phase()
+		GamePhase.COMBAT_WAVE:
+			_start_combat_wave()
+		_:
+			push_warning("Phases: Loading save, but non-building and non-combat wave phase detected!")
+	
+	# UI Refresh
+	UI.update_wave_schedule.emit()
+	UI.start_wave.emit(current_wave_number) #TODO: synchronise the wave system
 
 func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:

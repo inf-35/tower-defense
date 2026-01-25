@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://wk1embr7b0fo"]
+
+[ext_resource type="Script" uid="uid://cnpliuoex413q" path="res://Content/Relics/signal_flag/signal_wall_effect.gd" id="1_jcq77"]
+[ext_resource type="Script" uid="uid://chjx55eww4tnp" path="res://Content/Relics/pawn_structure/global_distributor_effect.gd" id="2_bpbfs"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="3_3cngc"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_s71vq"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="5_jrkxk"]
+
+[sub_resource type="Resource" id="Resource_iudbq"]
+script = ExtResource("1_jcq77")
+metadata/_custom_type_script = "uid://cnpliuoex413q"
+
+[sub_resource type="Resource" id="Resource_y8oq8"]
+script = ExtResource("2_bpbfs")
+effect_to_grant = SubResource("Resource_iudbq")
+tower_type_filter = 6
+metadata/_custom_type_script = "uid://chjx55eww4tnp"
+
+[resource]
+script = ExtResource("5_jrkxk")
+type = 28
+global_effect = SubResource("Resource_y8oq8")
+title = "Signal Flag"
+description = "Whenever {T_PALISADE|label=Walls} are hit, adjacent towers attack immediately (ignoring their natural hitrate)."
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

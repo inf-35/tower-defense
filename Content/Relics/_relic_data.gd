@@ -41,6 +41,7 @@ enum Type {
 	PAPER_UMBRELLA,
 	PAWN_STRUCTURE,
 	TURPID_IDOL,
+	SIGNAL_FLAG,
 }
 
 @export var type: Type
@@ -53,3 +54,19 @@ enum Type {
 @export var title: String
 @export_multiline var description: String
 @export var icon: Texture2D = preload("res://Assets/troll.png")
+#
+func get_save_data() -> Dictionary:
+	var save_data: Dictionary = {}
+	save_data["type"] = type
+	save_data["resource_path"] = resource_path
+	#modifier prototypes and TODO: active effect scene are stateless and can be recreated from type
+	if global_effect:
+		var effect_instance: EffectInstance = Player.global_event_service.get_effect_instance_by_prototype(global_effect)
+		var effect_data: Dictionary = effect_instance.effect_prototype.get_save_data(effect_instance)
+		
+		save_data["global_effect"] = effect_data
+	return save_data
+	
+func load_save_data(save_data: Dictionary) -> void:
+	#TODO
+	pass

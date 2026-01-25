@@ -13,10 +13,12 @@ func _ready() -> void:
 	
 	normal_difficulty.pressed.connect(func():
 		Phases.current_game_difficulty = Phases.GameDifficulty.NORMAL
+		Phases.in_game = true
 		get_tree().change_scene_to_file("res://island.tscn")
 	)
 	
 	hard_difficulty.pressed.connect(func():
 		Phases.current_game_difficulty = Phases.GameDifficulty.HARD
+		Phases.in_game = true
 		get_tree().change_scene_to_file("res://island.tscn")
 	)

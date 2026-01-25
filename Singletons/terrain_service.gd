@@ -19,7 +19,6 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 
 
 	island.update_shore_boundary()
-	
 	island.update_navigation_grid()
 	island.terrain_changed.emit()
 	island.terrain_renderer.apply_terrain_changes(terrain_changes)

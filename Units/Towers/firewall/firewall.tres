@@ -13,7 +13,7 @@ script = ExtResource("3_h0mnq")
 id = 23
 size = Vector2i(3, 1)
 cost = 18.0
-required_capacity = 1.5
+required_capacity = 1.8
 element = 2
 tower_name = "Firewall"
 tower_description = "Sets alight enemies passing through the middle, briefly inflicting severe {BURN|label=Burn}."

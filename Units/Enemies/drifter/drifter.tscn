@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bhpgyu3tdyuh6"]
+[gd_scene load_steps=20 format=3 uid="uid://bhpgyu3tdyuh6"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_0kato"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_74j81"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_5dfik"]
 [ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="8_oxo2e"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="9_2gn4h"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="9_5dfik"]
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="10_ayagf"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_mt1ix"]
 [ext_resource type="Script" uid="uid://c8ywoutwp4wvt" path="res://UnitComponents/behavior_component.gd" id="13_mt1ix"]
@@ -73,7 +74,16 @@ position = Vector2(-0.11199999, -2.3999999)
 scale = Vector2(0.096, 0.096)
 texture = ExtResource("8_oxo2e")
 
+[node name="ContactShadow" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+position = Vector2(-0.2, 0)
+script = ExtResource("9_5dfik")
+shadow_size = Vector2(5, 2.5)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"
+
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("7_oxo2e")

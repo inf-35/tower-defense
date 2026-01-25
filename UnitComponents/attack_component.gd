@@ -107,3 +107,7 @@ static func predict_intercept_position(source_unit: Unit, target_unit: Unit, pro
 		previous_estimate = future_enemy_pos #save current estimate into previous estimate
 	#after a few iterations we should converge to a fairly accurate answer
 	return enemy_nav_comp.get_position_in_future(estimated_travel_time) if not fast else enemy_nav_comp.fast_get_position_in_future(estimated_travel_time)
+
+func get_save_data() -> Dictionary:
+	return {} #everything here thats persistent is typically run by modifiers component
+	
