@@ -15,9 +15,19 @@ func _input(event):
 		if _current_menu_instance.visible:
 			_current_menu_instance.back()
 		else:
-			_current_menu_instance.open_menu()
-			
-			if Phases.in_game:
-				_current_menu_instance.enter_state(SettingsMenu.State.PAUSE)
-			else:
-				_current_menu_instance.enter_state(SettingsMenu.State.SETTINGS)
+			open_menu()
+
+func open_menu():
+	if not is_instance_valid(_current_menu_instance):
+		_current_menu_instance = menu_scene.instantiate()
+		add_child(_current_menu_instance)
+		
+	_current_menu_instance.open_menu()
+	
+	if Phases.in_game:
+		_current_menu_instance.enter_state(SettingsMenu.State.PAUSE)
+	else:
+		_current_menu_instance.enter_state(SettingsMenu.State.SETTINGS)
+	
+func enter_state(state: SettingsMenu.State):
+	_current_menu_instance.enter_state(state)

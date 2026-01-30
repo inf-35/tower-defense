@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://cdgwf65nwokpo"]
 
 [ext_resource type="Script" uid="uid://c1ydyvx8fvx8g" path="res://Content/Relics/common_cold/status_linkage_effect.gd" id="1_xr361"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="2_4q4qk"]
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_8042h"]
+[ext_resource type="Texture2D" uid="uid://bmjalswq0t1kp" path="res://Assets/common_cold.png" id="2_4q4qk"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_4q4qk"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_8px1t"]
 
 [sub_resource type="Resource" id="Resource_xr361"]

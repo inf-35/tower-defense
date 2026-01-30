@@ -3,6 +3,7 @@ extends RichTextLabel
 class_name InteractiveRichTextLabel
 
 var _tooltip_instance: TooltipPanel
+var _enabled: bool = false
 
 func _init() -> void:
 	# ensure bbcode is enabled
@@ -11,6 +12,10 @@ func _init() -> void:
 	# connect to our own signals to handle hovering
 	self.meta_hover_started.connect(_on_meta_hover_started)
 	self.meta_hover_ended.connect(_on_meta_hover_ended)
+	
+func _ready():
+	await get_tree().process_frame
+	_enabled = true
 
 # this is the new, clean public API for this component
 # all scripts MUST CALL THIS for text modification
@@ -20,6 +25,9 @@ func set_parsed_text(_text: String) -> void:
 		self.text = KeywordService.parse_text_for_bbcode(_text)
 
 func _on_meta_hover_started(meta: Variant) -> void:
+	if not _enabled:
+		return
+		
 	var keyword: String = str(meta)
 	var keyword_data: Dictionary = KeywordService.get_keyword_data(keyword)
 	

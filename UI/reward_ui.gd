@@ -14,6 +14,7 @@ func _ready() -> void:
 	UI.display_reward_choices.connect(_present_options)
 	UI.hide_reward_choices.connect(_hide_options)
 	UI.update_reroll_cost.connect(_update_reroll_cost)
+	UI.update_flux.connect(func(flux): _update_reroll_cost(RewardService.get_reroll_cost()))
 	reroll_button.pressed.connect(func():
 		UI.reward_rerolled.emit()
 	)

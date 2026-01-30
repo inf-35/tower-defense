@@ -232,7 +232,6 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void: #
 
 		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
 		effect_instance.stacks += stacks
-		print(effect_instance.stacks)
 		if effect_instance.stacks <= 0:
 			remove_effect(effect_prototype)
 
@@ -240,7 +239,6 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void: #
 
 	if get_effect_instance_by_prototype(effect_prototype):
 		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
-		print(get_effect_instance_by_prototype(effect_prototype).stacks)
 		return
 	
 	effect_prototypes.append(effect_prototype)
@@ -339,6 +337,8 @@ func take_hit(hit: HitData):
 		
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
 	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
+	
+	hit.damage = maxf(hit.damage, 0.0)
 	
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED

@@ -5,9 +5,11 @@
 [ext_resource type="FontFile" uid="uid://b1g536c04mk3e" path="res://Fonts/Skranji-Regular.ttf" id="3_fu7sn"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
 
-[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
-play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/Button")
+play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_gmae")
+settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
+continue_button = NodePath("UI/MarginContainer/Control/VBoxContainer/continue")
 difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
 normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
 hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
@@ -42,33 +44,38 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 69.0
+offset_left = 90.0
 offset_top = -664.0
-offset_right = 787.0
-offset_bottom = -81.0
+offset_right = 784.0
+offset_bottom = -185.0
 grow_vertical = 0
 theme_type_variation = &"vbox_20"
+alignment = 2
 
-[node name="Button" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="continue" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
-text = "Play"
+text = "Continue"
 script = ExtResource("4_jix8l")
 
-[node name="Button2" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="new_gmae" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
+text = "New Game"
 script = ExtResource("4_jix8l")
 
-[node name="Button3" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="settings" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
+text = "Settings"
 script = ExtResource("4_jix8l")
 
 [node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

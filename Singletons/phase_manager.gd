@@ -5,15 +5,16 @@ extends Node
 # --- signals ---
 # this is the authoritative signal that a new wave cycle has begun.
 # UI and other systems should listen to this.
-signal wave_cycle_started(wave_number: int) #wave cycle started (beginning of day)
-signal wave_ended(wave_number: int) #combat wave ended
+signal wave_cycle_started(wave_number: int) ##wave cycle started (beginning of day). towers resurrect with this signal
+signal wave_ended(wave_number: int) ##combat wave ended (end of night). towers have not yet resurrected. succeeded by wave_cycle_started.
 
-signal combat_started(wave_number: int) #combat wave started
+signal combat_started(wave_number: int) ##combat wave started
 
 signal wave_schedule_updated() ## wave schedule updated
 
 # --- game state variables ---
 enum GameDifficulty { NORMAL, HARD }
+enum GameEnvironment { WOODS, WINTER }
 enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
 enum DayEvent { NONE, EXPANSION, REWARD_TOWER, REWARD_RELIC}
 enum CombatVariant { NORMAL, BOSS, SURGE}
@@ -21,6 +22,8 @@ enum CombatVariant { NORMAL, BOSS, SURGE}
 var current_wave_number: int = 0
 var current_phase: GamePhase = GamePhase.IDLE
 var current_game_difficulty: GameDifficulty
+var current_game_scaling: float = 1.0
+var current_game_environment: GameEnvironment
 
 var in_game: bool = false
 var is_game_over: bool = false
@@ -46,6 +49,10 @@ func _ready() -> void:
 	wave_ended.connect(UI.end_wave.emit)
 	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
 	
+	wave_ended.connect(func(_wave):
+		Phases.current_game_scaling = clampf(Phases.current_game_scaling - 0.1, 1.0, 2.0)
+	)
+	
 func start_game() -> void:
 	Clock.start()
 	References.start()
@@ -54,6 +61,9 @@ func start_game() -> void:
 	Player.start()
 	SpawnPointService.start()
 	TowerNetworkManager.start()
+	
+	current_game_scaling = 1.0
+	current_game_environment = GameEnvironment.WOODS
 	
 	if SaveLoad.has_save_file():
 		_report("Starting from save file.")
@@ -65,7 +75,6 @@ func start_game() -> void:
 
 func begin_new_game():
 	References.island.generate_new_island()
-
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
 	
@@ -203,7 +212,6 @@ func _advance_phase():
 		GamePhase.CHOICE:
 			_start_building_phase()
 		GamePhase.BUILDING:
-			UI.day_event_ended.emit()
 			_start_combat_wave()
 		GamePhase.COMBAT_WAVE:
 			current_phase = GamePhase.IDLE
@@ -216,6 +224,8 @@ func _start_choice_phase(type: ChoiceType) -> void:
 	current_phase = GamePhase.CHOICE
 	current_choice_type = type
 	_report("starting choice phase of type: " + str(ChoiceType.keys()[type]))
+	UI.start_phase.emit(current_wave_number, false, current_choice_type + 1)
+	#current_choice_type and day_event (which is the desired output type) are offset by 1, since NONE is the first entry of DayEvent
 
 	# connect to the generic UI signal for when the player clicks an option
 	UI.choice_selected.connect(_on_player_made_choice, CONNECT_ONE_SHOT)
@@ -224,11 +234,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 		ChoiceType.EXPANSION:
 			# delegate the entire expansion process to the ExpansionService.
 			# phases.gd should not know how expansions are generated or presented.
-			ExpansionService.generate_and_present_choices(
-				References.island,
-				Waves.EXPANSION_BLOCK_SIZE,
-				Waves.EXPANSION_CHOICES_COUNT
-			)
+			References.island.expansion_service.start_expansion_phase()
 
 		ChoiceType.REWARD_TOWER:
 			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER])
@@ -247,8 +253,8 @@ func _on_player_made_choice(choice_id: int) -> void:
 		ChoiceType.EXPANSION:
 			# delegate the selection logic to the ExpansionService.
 			# we then wait for the service to tell us when the entire process is finished.
-			ExpansionService.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
-			ExpansionService.select_expansion(References.island, choice_id)
+			References.island.expansion_service.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
+			#References.island.expansion_service.select_expansion(References.island, choice_id)
 
 		ChoiceType.REWARD_TOWER, ChoiceType.REWARD_RELIC:
 			# likewise
@@ -272,6 +278,7 @@ func _on_choice_applied() -> void:
 # --- Building Phase Logic --- #TODO: implement end of game signal disconnections
 func _start_building_phase() -> void:
 	current_phase = GamePhase.BUILDING
+	UI.start_phase.emit(current_wave_number, false, DayEvent.NONE)
 	_report("starting building phase for wave " + str(current_wave_number))
 	UI.show_building_ui.emit()
 	UI.building_phase_ended.connect(_on_player_ended_building_phase, CONNECT_ONE_SHOT)
@@ -281,12 +288,14 @@ func _on_player_ended_building_phase() -> void:
 		return
 	_report("player ended building phase for wave " + str(current_wave_number) + ".")
 	UI.hide_building_ui.emit()
+	SaveLoad.save_game()
 	await get_tree().create_timer(Waves.DELAY_AFTER_BUILDING_PHASE_ENDS).timeout
 	_advance_phase()
 
 # --- Combat Wave Logic ---
 func _start_combat_wave() -> void:
 	combat_started.emit(current_wave_number)
+	UI.start_phase.emit(current_wave_number, true, -1)
 	current_phase = GamePhase.COMBAT_WAVE
 	_report("ordering Waves.gd to start combat for wave " + str(current_wave_number))
 	
@@ -369,14 +378,13 @@ func load_save_data(data: Dictionary) -> void:
 	match current_phase:
 		GamePhase.BUILDING:
 			_start_building_phase()
-		GamePhase.COMBAT_WAVE:
-			_start_combat_wave()
 		_:
+			_start_building_phase()
 			push_warning("Phases: Loading save, but non-building and non-combat wave phase detected!")
 	
 	# UI Refresh
 	UI.update_wave_schedule.emit()
-	UI.start_wave.emit(current_wave_number) #TODO: synchronise the wave system
+	UI.start_wave.emit(current_wave_number)
 
 func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:

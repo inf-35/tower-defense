@@ -12,6 +12,9 @@ signal navigation_grid_updated
 @export var terrain_renderer: TerrainRenderer
 @export var preview_renderer: TerrainRenderer
 
+# --- services ---
+var expansion_service: ExpansionService
+
 # --- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
@@ -31,15 +34,22 @@ const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1),
 const _DEBUG_SHOW_NAVCOST: bool = false
 
 func _ready():
-	_clear_island_state()
+	Phases.in_game = true
+	
+	expansion_service = ExpansionService.new()
+	add_child.call_deferred(expansion_service)
+	
 	Phases.start_game()
 	#register self with services that need references
 	PowerService.register_island(self)
 	#generate_new_island called by Phases
 
 func generate_new_island() -> void:
+	terrain_renderer.start()
+	_setup_preview_renderer()
+	_clear_island_state()
 	# initial terrain generation
-	var starting_block: Dictionary = ExpansionService.generate_initial_island_block(self, 50)
+	var starting_block: Dictionary = expansion_service.generate_initial_island_block(self, 50)
 	# delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
 	
@@ -57,12 +67,11 @@ func _setup_preview_renderer() -> void:
 	preview_renderer.draw_background = false # we just want the outline overlay
 	
 	# add to scene (z-index higher so it draws on top)
-	add_child(preview_renderer)
 	preview_renderer.z_index = 10 
 	
 	# manually override the material to use the sketch shader
 	# wait for the node to be ready or force setup
-	preview_renderer._setup_visuals()
+	preview_renderer.start()
 	
 	var sketch_mat := ShaderMaterial.new()
 	sketch_mat.shader = preload("res://Shaders/sketch_terrain.gdshader")
@@ -213,7 +222,7 @@ func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	preview_renderer.set_color_param("outline_color", Color(0, 0, 0, 0.4)) # gray/faint
 	preview_renderer.set_color_param("fill_color", Color(1, 1, 1, 0.1))
 
-# called by ExpansionService to tell the island which choice to highlight
+# called by expansion_service to tell the island which choice to highlight
 func set_highlighted_choice(choice_id: int = -1) -> void:
 	if _highlighted_choice_id == choice_id:
 		return
@@ -356,9 +365,10 @@ func get_save_data() -> Dictionary:
 	return data
 	
 func load_save_data(data: Dictionary) -> void:
+	terrain_renderer.start()
+	_setup_preview_renderer()
 	# clear existing world
 	_clear_island_state()
-	
 	# restore terrain
 	var terrain_import: Dictionary = data.get("terrain", {})
 	var edits: Dictionary[Vector2i, Terrain.CellData] = {}

@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://kiqqpyvi5e1s"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://kiqqpyvi5e1s"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_2oild"]
-[ext_resource type="Texture2D" uid="uid://cmdt8h3ekawqj" path="res://Assets/village.png" id="1_mpnj5"]
+[ext_resource type="Texture2D" uid="uid://b4ymi0q7wgfg" path="res://Assets/town.png" id="1_7j6cm"]
 [ext_resource type="PackedScene" uid="uid://y3fmjqd4dpgt" path="res://Units/Towers/generator/generator.tscn" id="2_2oild"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_ctjw1"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_eb5jw"]
 [ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_a0644"]
-[ext_resource type="Texture2D" uid="uid://cpgbvdodd48j3" path="res://Assets/village_icon.png" id="5_ctjw1"]
 
 [resource]
 script = ExtResource("1_2oild")
@@ -17,7 +16,7 @@ element = 5
 allowed_terrain = Array[int]([1])
 tower_name = "Village"
 tower_description = "A humble, defenseless village. Produces {POPULATION}, but can only be placed on {SETTLEMENT} tiles."
-icon = ExtResource("1_mpnj5")
-preview = ExtResource("5_ctjw1")
+icon = ExtResource("1_7j6cm")
+preview = ExtResource("1_7j6cm")
 tower_scene = ExtResource("2_2oild")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -152,5 +152,5 @@ func _attempt_navigate_to_origin() -> bool:
 func get_save_data() -> Dictionary:
 	return {}
 
-func load_save_data(save_data: Dictionary) -> void:
+func load_save_data(_save_data: Dictionary) -> void:
 	attach()

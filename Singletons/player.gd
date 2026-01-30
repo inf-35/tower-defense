@@ -70,9 +70,9 @@ func _ready():
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	relics_changed.connect(UI.update_relics.emit)
 	
-	Phases.wave_ended.connect(func(_wave):
-		Player.flux += 6
-	)
+	#Phases.wave_ended.connect(func(_wave):
+		#Player.flux += 6
+	#)
 
 func start():
 	for unit: Unit in get_tree().get_nodes_in_group(References.TOWER_GROUP):
@@ -114,20 +114,22 @@ func begin_new_game():
 		Towers.Type.PALISADE: true,
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
-		Towers.Type.PLANT: true,
+		Towers.Type.FARM: true,
+		Towers.Type.CANNON: true,
+		Towers.Type.FIREWALL: true,
 	}
 	#add_rite(Towers.Type.RITE_FROST, 20)
 	#
 	var reward := Reward.new()
 	reward.type = Reward.Type.ADD_RELIC
-	reward.relic = Relics.WILDERNESS
+	reward.relic = Relics.WHITE_HOT_IRON
 	RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EARLY_BIRD
 	#RewardService.apply_reward(reward)
 	
-	flux = 200.0
+	flux = 400.0
 	hp = 20.0
 	
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))

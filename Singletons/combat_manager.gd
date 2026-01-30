@@ -47,7 +47,7 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 	
 	func _on_timeout():
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, intercept_position)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, intercept_position)
 		var target : Unit = hit_data.target #NOTE: this might be null
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage 
@@ -189,7 +189,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 	# returns TRUE if projectile should be destroyed
 	func _handle_collision(hitbox: Hitbox, impact_pos: Vector2) -> bool:
 		if not is_instance_valid(hitbox) or not is_instance_valid(hitbox.unit):
-			return false # Hit something weird, ignore
+			return false # hit non-hitbox?, ignore
 			
 		var unit: Unit  = hitbox.unit as Unit
 		var stop_on_walls = delivery_data.stop_on_walls
@@ -246,7 +246,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 
 	func _apply_impact_vfx(pos: Vector2):
 		VFXManager.play_vfx(hit_data.vfx_on_impact, pos)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, pos)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, pos)
 	
 	func _on_destruct(target: Unit = null):
 		CombatManager.simulated_projectiles.erase(self)
@@ -274,7 +274,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 		DeliveryData.DeliveryMethod.HITSCAN:
 			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
 			#TODO: implement visuals
-			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, 0.0, intercept_position)
+			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, intercept_position)
 			target.take_hit(hit_data)
 			if source:
 				hit_data.velocity = (target.global_position - source.global_position).normalized()
@@ -304,13 +304,10 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			var intersecting_colliders : Array[Dictionary] = space_state.intersect_shape(query_params)
 			for collider_data : Dictionary in intersecting_colliders:
 				var hitbox = collider_data.collider as Hitbox
-				if not is_instance_valid(hitbox):
-					continue
 				
 				var unit : Unit = hitbox.unit
 				if delivery_data.excluded_units.has(unit):
 					continue
-				# Create a deep copy of the hit data for each target.
 				#NOTE: we CANNOT pass by reference here, otherwise different units getting hit
 				#would affect each other.
 				var hit_copy: HitData = hit_data.duplicate()

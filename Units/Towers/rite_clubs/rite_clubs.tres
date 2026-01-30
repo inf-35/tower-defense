@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of Clubs"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks have a 20% chance to stun enemies for 1 second."
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks have a 25% chance to stun enemies for 1 second."
 icon = ExtResource("1_22r0h")
 preview = ExtResource("1_22r0h")
 tower_scene = ExtResource("6_rxrti")

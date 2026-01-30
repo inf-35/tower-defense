@@ -4,6 +4,7 @@ class_name WhiteHotIronEffect
 @export var damage_threshold: float = 6.0 ##damage threshold (in a single hit) needed to trigger the effect
 @export var spark_count: int = 3 ##number of sparks fired
 @export var stack_transfer_ratio: float = 0.5 ## 50% transfer
+@export var search_radius: float = 20.0 ##maximum distance at which units will be sparked upon
 @export var required_status: Attributes.Status = Attributes.Status.BURN
 @export var spark_attack_data: AttackData ## defines the spark projectile
 
@@ -71,32 +72,68 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		CONNECT_ONE_SHOT
 	)
 
+#func _spawn_sparks(stacks: int, duration: float, original_hit_data: HitData) -> void:
+	#if spark_attack_data == null: return
+	#
+	#var victim: Unit = original_hit_data.target
+	#var source: Unit = original_hit_data.source
+	#
+	#var origin: Vector2 = victim.global_position
+	#
+	#for i in spark_count:
+		#var dir = Vector2.UP.rotated(randf() * TAU)
+		#
+		#var hit_data := spark_attack_data.generate_generic_hit_data()
+		#hit_data.recursion = original_hit_data.recursion + 1
+		#hit_data.source = source
+		#hit_data.target = null
+		#hit_data.target_affiliation = victim.hostile
+		#hit_data.status_effects[required_status] = Vector2(stacks, duration)
+#
+		#var delivery := spark_attack_data.generate_generic_delivery_data()
+		#delivery.delivery_method = DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED
+		#delivery.excluded_units = [victim]
+		#delivery.use_source_position_override = true
+		#delivery.source_position = origin
+		#delivery.use_initial_velocity_override = true
+		#delivery.initial_velocity = dir * spark_attack_data.projectile_speed
+		#
+		#CombatManager.resolve_hit(hit_data, delivery)
+		
 func _spawn_sparks(stacks: int, duration: float, original_hit_data: HitData) -> void:
 	if spark_attack_data == null: return
 	
 	var victim: Unit = original_hit_data.target
 	var source: Unit = original_hit_data.source
-	
 	var origin: Vector2 = victim.global_position
+
+	var potential_targets: Array[Unit] = CombatManager.get_units_in_radius(
+		search_radius,
+		origin,
+		victim.hostile, #target affiliation
+		[victim] #exclude self
+	)
 	
-	for i in spark_count:
-		var dir = Vector2.UP.rotated(randf() * TAU)
-		
+	# shuffle to target random enemies
+	potential_targets.shuffle()
+	
+	var targets_to_hit: int = min(spark_count, potential_targets.size())
+	for i in targets_to_hit:
+		var target_unit: Unit = potential_targets[i]
+
 		var hit_data := spark_attack_data.generate_generic_hit_data()
 		hit_data.recursion = original_hit_data.recursion + 1
 		hit_data.source = source
-		hit_data.target = null
+		hit_data.target = target_unit
 		hit_data.target_affiliation = victim.hostile
 		hit_data.status_effects[required_status] = Vector2(stacks, duration)
 
 		var delivery := spark_attack_data.generate_generic_delivery_data()
-		delivery.delivery_method = DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED
-		delivery.excluded_units = [victim]
+		delivery.delivery_method = DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT
 		delivery.use_source_position_override = true
 		delivery.source_position = origin
-		delivery.use_initial_velocity_override = true
-		delivery.initial_velocity = dir * spark_attack_data.projectile_speed
-		
+		delivery.intercept_position = target_unit.global_position
+
 		CombatManager.resolve_hit(hit_data, delivery)
 
 func on_tick(instance: EffectInstance, delta: float) -> void:

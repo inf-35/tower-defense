@@ -1,26 +1,32 @@
-[gd_scene load_steps=10 format=3 uid="uid://c2k2jhnis5ddh"]
+[gd_scene load_steps=11 format=3 uid="uid://c2k2jhnis5ddh"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_pacpt"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_t117n"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_dsu77"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_sklve"]
+[ext_resource type="Script" uid="uid://ca7k6buc7otof" path="res://Units/Towers/forest/forest_behavior.gd" id="4_o5vsp"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_sklve"]
-[ext_resource type="Texture2D" uid="uid://dwha3anjlqofr" path="res://Assets/trees.png" id="5_o5vsp"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="6_36tck"]
-[ext_resource type="Texture2D" uid="uid://lycsyol0gttf" path="res://Assets/forest_shadow.png" id="7_sklve"]
+[ext_resource type="Texture2D" uid="uid://b3vk8hysr1tik" path="res://Assets/pines.png" id="6_sklve"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_t117n"]
+[ext_resource type="Texture2D" uid="uid://8kcpw4bfiyvq" path="res://Assets/pine_shadows.png" id="8_36tck"]
 
-[node name="Forest" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Forest" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_pacpt")
 type = 10
 incorporeal = true
 stat_displays = Array[ExtResource("2_t117n")]([ExtResource("3_sklve")])
+behavior = NodePath("ForestBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="ForestBehavior" type="Node" parent="."]
+script = ExtResource("4_o5vsp")
+metadata/_custom_type_script = "uid://ca7k6buc7otof"
 
 [node name="MovementComponent" type="Node" parent="."]
 script = ExtResource("3_dsu77")
@@ -30,14 +36,14 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 [node name="Graphics" type="Sprite2D" parent="."]
 position = Vector2(-1.9073486e-06, -1.9073486e-06)
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("5_o5vsp")
+texture = ExtResource("6_sklve")
 
-[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+[node name="Shadows" type="Sprite2D" parent="Graphics"]
 z_index = 10
 z_as_relative = false
-position = Vector2(3.170967e-05, 33.33337)
+position = Vector2(0, 25)
 scale = Vector2(1.047074, 1.0320516)
-texture = ExtResource("7_sklve")
+texture = ExtResource("8_36tck")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("6_36tck")

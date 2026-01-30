@@ -74,6 +74,7 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void:
 			if adjacent_tower_type == Towers.Type.VOID or neighbor.type == adjacent_tower_type:
 				adjacent_stacks += 1
 	
+	#print(tower, " evaluated at ", adjacent_stacks)
 	# apply or update modifier
 	if adjacent_stacks > 0:
 		_apply_buff_to_tower(state, tower, adjacent_stacks)
@@ -96,14 +97,16 @@ func _apply_buff_to_tower(state: AdjacencyState, tower: Tower, stacks: int) -> v
 			mod.multiplicative = new_mult
 			mod.additive = new_add
 			tower.modifiers_component.change_modifier(mod)
+			#print("edited modifier, strength: ", mod.multiplicative)
 	else:
 		# create new modifier
 		var new_mod: Modifier = modifier_prototype.generate_modifier()
-		new_mod.multiplicative = modifier_prototype.multiplicative * stacks
-		new_mod.additive = modifier_prototype.additive * stacks
+		new_mod.multiplicative = 1.0 + (new_mod.multiplicative - 1.0) * stacks
+		new_mod.additive *= stacks
 		
 		tower.modifiers_component.add_modifier(new_mod)
 		state.active_modifiers[tower] = new_mod
+		#print("applied new modifier, strength: ", new_mod.multiplicative)
 
 func _remove_buff_from_tower(state: AdjacencyState, tower: Tower) -> void:
 	if state.active_modifiers.has(tower):

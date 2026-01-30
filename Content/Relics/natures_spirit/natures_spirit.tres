@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://cc6y0hr2pgsep"]
 
-[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="1_1c5fl"]
+[ext_resource type="Texture2D" uid="uid://catq6keljj554" path="res://Assets/natures_spirit.png" id="1_1c5fl"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_1c5fl"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_5fhhv"]
 
@@ -19,4 +19,5 @@ type = 9
 modifier_prototypes = Array[ExtResource("2_5fhhv")]([SubResource("Resource_txqd2")])
 title = "Nature's Spirit"
 description = "Increases the damage of all nature towers (plant, poison) by 30%"
+icon = ExtResource("1_1c5fl")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

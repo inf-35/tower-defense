@@ -1,5 +1,5 @@
-# expansion_service.gd (Autoload Singleton)
 extends Node
+class_name ExpansionService
 
 signal expansion_process_complete
 
@@ -37,6 +37,12 @@ var _choices_by_id: Dictionary[int, ExpansionChoice] = {}
 var _hovered_choice_id: int = -1 # -1 means no choice is hovered
 var _pending_choice_id: int = -1 # the choice waiting for confirmation
 
+var expansions_this_phase: int = 0
+var minimum_expansions: int = 1
+var maximum_expansions: int = 3
+
+var _terrain_pity_counters: Dictionary[Terrain.Base, float] = {}
+
 var STANDARD_EXPANSION_PARAMS: GenerationParameters #see _init for definition
 
 # --- terrain generation ---
@@ -50,16 +56,15 @@ func _init():
 	
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
 	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.07))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.015))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
 	breach_rule.seed_placement = PlacementLogic.EDGE
 	breach_rule.tower_initial_state = {ID.TerrainGen.SEED_DURATION_WAVES: 0}
 	
-	var artifact_rule := PlacementRule.new()
-	artifact_rule.tower_type = Towers.Type.ARTIFACT
-	artifact_rule.seed_placement = PlacementLogic.ANYWHERE
+	var rite_rule := PlacementRule.new()
+	rite_rule.seed_placement = PlacementLogic.ANYWHERE
 	
 	var forest_rule := PlacementRule.new()
 	forest_rule.tower_type = Towers.Type.FOREST
@@ -70,7 +75,7 @@ func _init():
 	forest_rule.max_seeds = 1
 	
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(breach_rule)
-	#STANDARD_EXPANSION_PARAMS.placement_rules.append(artifact_rule)
+	STANDARD_EXPANSION_PARAMS.placement_rules.append(rite_rule)
 	STANDARD_EXPANSION_PARAMS.placement_rules.append(forest_rule)
 
 func _ready():
@@ -82,6 +87,7 @@ func _ready():
 	UI.choice_focused.connect(_on_expansion_option_clicked)
 	# the confirmation button press triggers the final selection
 	UI.choice_selected.connect(_on_expansion_confirmed)
+	UI.expansion_finished.connect(_on_exit)
 
 #helper function for creating the initial island
 func generate_initial_island_block(island: Island, block_size: int) -> Dictionary:
@@ -94,18 +100,19 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	breach_rule.tower_type = Towers.Type.BREACH
 	breach_rule.seed_placement = PlacementLogic.EDGE
 	breach_rule.tower_initial_state = {"seed_duration_waves": 0} # 0 = active immediately
-	
-	var anomaly_rule := PlacementRule.new()
-	anomaly_rule.tower_type = Towers.Type.ARTIFACT
-	anomaly_rule.seed_placement = PlacementLogic.ANYWHERE
-	anomaly_rule.tower_initial_state[&"reward"] = RewardService.get_rewards(1, [Reward.Type.ADD_RELIC])[0]
+
 	#NOTE: no special terrain
 	initial_params.placement_rules.append(breach_rule)
-	#initial_params.placement_rules.append(anomaly_rule)
 	
 	return _generate_block(island, block_size, initial_params)
 
-# the main public API called by Phases.gd
+func start_expansion_phase() -> void: #entry point called by phases
+	generate_and_present_choices(References.island, 12, 4)
+	expansions_this_phase = 0
+	if expansions_this_phase < minimum_expansions:
+		UI.hide_expansion_exit.emit()
+		
+
 func generate_and_present_choices(island: Island, block_size: int, choice_count: int) -> void:
 	_choices_by_id.clear()
 	_hovered_choice_id = -1
@@ -113,12 +120,12 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	_current_state = State.CHOOSING #set initial state
 	
 	var options: Array[ExpansionChoice] = []
-	var rewards: Array[Reward] = RewardService.get_rewards(choice_count, [Reward.Type.ADD_RELIC])
+	
 	for i: int in range(choice_count):
 		# generate the block data, which may now include a breach seed
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
-		#var artifact_rule: PlacementRule = expansion_params.placement_rules[1]
-		#artifact_rule.tower_initial_state[&"reward"] = rewards[i]
+		var rite_rule: PlacementRule = expansion_params.placement_rules[1]
+		rite_rule.tower_type = RewardService.get_rewards(1, [Reward.Type.ADD_RITE])[0].rite_type
 
 		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():
@@ -137,7 +144,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	UI.display_expansion_choices.emit(options) #now await choice_focused -> _on_expansion_option_clicked
 	_trigger_camera_overview(island) #initial overview of all choices
 
-# applies the chosen expansion, called by PhaseManager
+# applies the chosen expansion
 func select_expansion(island: Island, choice_id: int) -> void:
 	if not _choices_by_id.has(choice_id):
 		expansion_process_complete.emit()
@@ -147,9 +154,14 @@ func select_expansion(island: Island, choice_id: int) -> void:
 	TerrainService.expand_island(island, chosen_option.block_data)
 	
 	_clear_expansion_state(island)
-	expansion_process_complete.emit()
-	UI.hide_expansion_choices.emit()
-	UI.hide_expansion_confirmation.emit()
+	
+	expansions_this_phase += 1
+	if expansions_this_phase > 1:
+		Phases.current_game_scaling += 0.4
+	
+	generate_and_present_choices(References.island, 12, 4)
+	if expansions_this_phase >= minimum_expansions:
+		UI.display_expansion_exit.emit()
 	
 # returns the CellData for a previewed tile, or null if no preview exists there.
 func get_preview_data_at_cell(cell: Vector2i) -> Terrain.CellData:
@@ -195,7 +207,8 @@ func _on_expansion_option_clicked(choice_id: int) -> void:
 	_trigger_camera_focus_on_choice(References.island, choice_id)
 	
 	# command the UI to show the confirmation button
-	UI.display_expansion_confirmation.emit(choice_id) #now await _on_expansion_confirmed()
+	if expansions_this_phase < maximum_expansions:
+		UI.display_expansion_confirmation.emit(choice_id) #now await _on_expansion_confirmed()
 
 # called when the player clicks the separate "confirm" button
 func _on_expansion_confirmed(_choice_id: int) -> void:
@@ -205,6 +218,12 @@ func _on_expansion_confirmed(_choice_id: int) -> void:
 		
 	# execute the selection using the stored pending choice ID
 	select_expansion(References.island, _pending_choice_id)
+	
+func _on_exit() -> void:
+	_clear_expansion_state(References.island)
+	expansion_process_complete.emit()
+	UI.hide_expansion_choices.emit()
+	UI.hide_expansion_confirmation.emit()
 	
 func _clear_expansion_state(island: Island) -> void:
 	_current_state = State.IDLE
@@ -251,32 +270,58 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	
 	# Now apply procedural terrain rules (Ruins, Highlands, Gold Veins, etc.)
 	# We shuffle coords to prevent "top-left" bias
-	var coords_pool_for_terrain = generated_coords.duplicate()
+	var coords_pool_for_terrain := generated_coords.duplicate()
 	coords_pool_for_terrain.shuffle()
 	
-	for rule: TerrainGenRule in params.terrain_gen_rules:
-		# Determine how many "seeds" of this terrain to plant
-		var target_count: int = int(generated_coords.size() * rule.probability) #pseudorandom
-		if target_count <= 0: continue
-		
-		var placed_count: int = 0
-		for i in range(coords_pool_for_terrain.size()):
-			if placed_count >= target_count: break
-			
-			var center: Vector2i = coords_pool_for_terrain[i]
-			# Check requirements (e.g. only on Earth)
+	for check_cell: Vector2i in coords_pool_for_terrain:
+		var current_base = block_data[check_cell].terrain
+		for rule: TerrainGenRule in params.terrain_gen_rules:
 			if not rule.allowed_on.is_empty():
-				if not block_data[center].terrain in rule.allowed_on:
+				if not current_base in rule.allowed_on:
 					continue
+					
+			if not _terrain_pity_counters.has(rule.terrain_type):
+				_terrain_pity_counters[rule.terrain_type] = randf_range(-0.2, 0.4) #randomise phases
+			print(rule.terrain_type, " pity: ", _terrain_pity_counters[rule.terrain_type])
+			var current_pity = _terrain_pity_counters[rule.terrain_type]
+			var roll: float = randf()
 			
-			# Grow the cluster
+			if roll > (rule.probability * (1.0 + current_pity)):
+				#failure!
+				_terrain_pity_counters[rule.terrain_type] += 0.05
+				continue
+			#success!
+			_terrain_pity_counters[rule.terrain_type] = -0.5
 			var cluster_size: int = randi_range(rule.cluster_size_min, rule.cluster_size_max)
-			var cluster_cells: Array[Vector2i] = _grow_blob_in_block(center, cluster_size, block_data)
+			var cluster_cells: Array[Vector2i] = _grow_blob_in_block(check_cell, cluster_size, block_data)
 			
 			for cell: Vector2i in cluster_cells:
 				block_data[cell].terrain = rule.terrain_type
 			
-			placed_count += 1
+	#
+	#for rule: TerrainGenRule in params.terrain_gen_rules:
+		## Determine how many "seeds" of this terrain to plant
+		#var target_count: int = int(generated_coords.size() * rule.probability) #pseudorandom
+		#if target_count <= 0: continue
+		#
+		#var placed_count: int = 0
+		#for i in range(coords_pool_for_terrain.size()):
+			#if placed_count >= target_count: break
+			#
+			#var center: Vector2i = coords_pool_for_terrain[i]
+			## Check requirements (e.g. only on Earth)
+			#if not rule.allowed_on.is_empty():
+				#if not block_data[center].terrain in rule.allowed_on:
+					#continue
+			#
+			## Grow the cluster
+			#var cluster_size: int = randi_range(rule.cluster_size_min, rule.cluster_size_max)
+			#var cluster_cells: Array[Vector2i] = _grow_blob_in_block(center, cluster_size, block_data)
+			#
+			#for cell: Vector2i in cluster_cells:
+				#block_data[cell].terrain = rule.terrain_type
+			#
+			#placed_count += 1
 
 	# 3. FEATURE PLACEMENT (Towers / Groves)
 	var available_cells: Array[Vector2i] = generated_coords.duplicate()

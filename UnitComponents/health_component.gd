@@ -63,6 +63,7 @@ func _ready():
 	#_stagger = randi_range(0, _STAGGER_CYCLE)
 	
 const _TICK_INTERVAL: float = 0.25
+
 func _process(_d : float) -> void:
 	_accumulated_delta += Clock.game_delta
 	if _accumulated_delta > _TICK_INTERVAL:
@@ -72,11 +73,12 @@ func _process(_d : float) -> void:
 func _tick(delta: float) -> void:
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
 	var regen_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_PERCENT)
-	if is_zero_approx(regeneration) and is_zero_approx(regen_percent):
+	var regen_remainder_percent: float = get_stat(_modifiers_component, health_data, Attributes.id.REGEN_REMAINDER_PERCENT)
+	if is_zero_approx(regeneration) and is_zero_approx(regen_percent) and is_zero_approx(regen_remainder_percent):
 		return
 	
 	var benchmark = health
-	health += regeneration * delta + regen_percent * max_health * delta
+	health += regeneration * delta + regen_percent * max_health * delta + regen_remainder_percent * max_health * delta
 	var difference = benchmark - health
 	if difference > 0.1:
 		UI.floating_text_manager.show_value(difference, unit.global_position, Color.WHITE, 0.8)

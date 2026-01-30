@@ -36,7 +36,6 @@ func start():
 	
 	current_preview = References.tower_preview
 	enabled = true
-	
 
 func _process(_delta: float) -> void:
 	if not Phases.in_game:
@@ -136,13 +135,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		State.TOWER_SELECTED:
 			_handle_tower_selected_input(event)
 
-	# Rotation can be handled universally if a preview is active
+	# rotation can be handled universally if a preview is active
 	if current_state == State.PREVIEWING and event.is_action_pressed("rotate_preview"):
 		preview_tower_facing = (preview_tower_facing + 1) % Tower.Facing.size() as Tower.Facing
-		var rotated_size: Vector2 = Towers.get_tower_size(preview_tower_prototype.type)
-		if (preview_tower_facing as int) % 2 != 0:
-			rotated_size = Vector2(rotated_size.y, rotated_size.x)
-			preview_tower_prototype.size = rotated_size
+		var base_size: Vector2 = Towers.get_tower_size(preview_tower_prototype.type)
+		preview_tower_prototype.size = Tower.get_rotated_size(base_size, preview_tower_facing)
+		preview_tower_position = _recalculate_preview_position()
 		_update_preview_visuals()
 
 func _enter_idle_state():
@@ -202,7 +200,7 @@ func _handle_idle_input(event: InputEvent) -> void:
 		var cell_pos : Vector2i = Island.position_to_cell(mouse_pos)
 		
 		# check for a previewed feature from the ExpansionService
-		var preview_data: Terrain.CellData = ExpansionService.get_preview_data_at_cell(cell_pos)
+		var preview_data: Terrain.CellData = References.island.expansion_service.get_preview_data_at_cell(cell_pos)
 		if is_instance_valid(preview_data) and preview_data.feature != Towers.Type.VOID:
 			# preview found! create a temporary "ghost" unit for inspection.
 			_create_and_inspect_ghost_unit(preview_data, cell_pos)
@@ -217,13 +215,7 @@ func _handle_preview_input(event: InputEvent) -> void:
 	References.range_indicator.select(preview_tower_prototype)
 	# handle mouse motion to update the preview visuals
 	if event is InputEventMouseMotion:
-		var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
-		var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
-		var effective_size: Vector2i = base_size
-		if int(preview_tower_facing) % 2 != 0:
-			effective_size = Vector2i(base_size.y, base_size.x)
-		var center_offset: Vector2i = effective_size * 0.5
-		preview_tower_position = Island.position_to_cell(mouse_pos) - center_offset
+		preview_tower_position = _recalculate_preview_position()
 		if preview_tower_position != preview_tower_prototype.tower_position or preview_tower_facing != preview_tower_prototype.facing:
 			_update_preview_visuals()
 
@@ -243,13 +235,20 @@ func _handle_preview_input(event: InputEvent) -> void:
 			# Right-click cancels the preview.
 			_enter_idle_state()
 
+func _recalculate_preview_position() -> Vector2i:
+	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
+	var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
+	var effective_size: Vector2i = Tower.get_rotated_size(base_size, preview_tower_facing)
+	var center_offset: Vector2i = effective_size * 0.5
+	return Island.position_to_cell(mouse_pos) - center_offset
+	
 func _handle_tower_selected_input(event: InputEvent) -> void:
 	# Any click while a tower is selected will deselect it.
-	if event is InputEventMouseButton and event.is_pressed():
+	if References.camera and event is InputEventMouseButton and event.is_pressed():
 		var cell_pos : Vector2i = Island.position_to_cell(References.camera.get_global_mouse_position())
 		
 		# check for previews first
-		var preview_data: Terrain.CellData = ExpansionService.get_preview_data_at_cell(cell_pos)
+		var preview_data: Terrain.CellData = References.island.expansion_service.get_preview_data_at_cell(cell_pos)
 		if is_instance_valid(preview_data) and preview_data.feature != Towers.Type.VOID:
 			_create_and_inspect_ghost_unit(preview_data, cell_pos)
 			return
@@ -271,6 +270,7 @@ func _update_preview_visuals():
 	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -10.0, preview_tower_position)
 	preview_tower_prototype.tower_position = preview_tower_position
 	preview_tower_prototype.facing = preview_tower_facing
+	preview_tower_prototype.size = Tower.get_rotated_size(Towers.get_tower_size(preview_tower_prototype.type), preview_tower_prototype.facing)
 	
 	var occupied_cells: Array[Vector2i] = []
 	var size := preview_tower_prototype.size

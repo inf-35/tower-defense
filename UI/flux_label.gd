@@ -7,6 +7,7 @@ var total_capacity: float = 0.0
 var health: float = 0.0
 
 func _ready() -> void:
+	super._ready()
 	UI.update_flux.connect(_update_flux)
 	UI.update_capacity.connect(_update_capacity)
 	UI.update_health.connect(_update_health)

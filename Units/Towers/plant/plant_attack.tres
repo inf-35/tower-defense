@@ -18,10 +18,9 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_0vqd8")
 delivery_method = 1
-range = 30.0
 cooldown = 2.0
 radius = 4.0
-damage = 1.0
+damage = 0.8
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_465g7"]
 [ext_resource type="Script" uid="uid://b74ug56sj02f0" path="res://Content/Relics/wilderness/_adjacency_boost.gd" id="2_7sn2y"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_8phli"]
-[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="3_7sn2y"]
+[ext_resource type="Texture2D" uid="uid://cto2y37uvdlth" path="res://Assets/carnyx.png" id="3_w8u05"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_w8u05"]
 
 [sub_resource type="Resource" id="Resource_w8u05"]
 script = ExtResource("1_465g7")
 attribute = 6
-multiplicative = 1.4
+multiplicative = 1.25
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_0dc4p"]
@@ -23,6 +23,7 @@ metadata/_custom_type_script = "uid://b74ug56sj02f0"
 script = ExtResource("2_8phli")
 type = 15
 global_effect = SubResource("Resource_0dc4p")
-title = "Mandrake"
-description = "All towers gain +40% {UNIT_DAMAGE} per adjacent {T_FOREST}."
+title = "Carnyx"
+description = "All towers gain +25% {UNIT_DAMAGE} per adjacent {T_FOREST}."
+icon = ExtResource("3_w8u05")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cjvaovkw35ifg"]
+
+[ext_resource type="Texture2D" uid="uid://dshq28wkpjwq" path="res://Assets/hamlet.png" id="1_4d2o5"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_yeqs5"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_lspdu"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_racan"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_mulcf"]
+[ext_resource type="PackedScene" uid="uid://cpbglnjon3xp6" path="res://Units/Towers/hamlet/hamlet.tscn" id="6_gigfl"]
+
+[resource]
+script = ExtResource("5_mulcf")
+id = 52
+cost = 6.0
+required_capacity = 0.0
+element = 5
+tower_name = "Hamlet"
+tower_description = "A small settlement. Produces 1 {POPULATION}, but can only be placed adjacent to {T_GENERATOR|label=Villages}"
+icon = ExtResource("1_4d2o5")
+preview = ExtResource("1_4d2o5")
+tower_scene = ExtResource("6_gigfl")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

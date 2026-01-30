@@ -19,6 +19,7 @@ enum id { #trackable value
 	#NOTE: new effects are appended ad hoc to prevent disordering of exports
 	DAMAGE_TAKEN, ##damage_taken (as a proportion from 0.0 to 1.0) (health component)
 	FLAT_DAMAGE_TAKEN, ##flat damage additionally taken per hit
+	REGEN_REMAINDER_PERCENT, ##regen taken as a percentage of remainder health
 }
 
 enum Status { #diegetic statuses
@@ -63,16 +64,16 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.REGENERATION, -0.5, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.5 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_PERCENT, -0.05, 0.0, true, Color(0, 1, 0, 0.5) # -5% max hp every second
+		id.REGEN_REMAINDER_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5) # -10% remaining hp per second
 	),
 	Status.HEAT: StatusEffectData.new(
 		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST 
 	),
 	Status.CURSED: StatusEffectData.new(
-		id.DAMAGE_TAKEN, 0.0, 1.2, true, Color(0.446, 0.002, 0.768, 0.5)
+		id.DAMAGE_TAKEN, 0.0, 1.25, true, Color(0.446, 0.002, 0.768, 0.5)
 	),
 	Status.BLEED: StatusEffectData.new(
-		id.FLAT_DAMAGE_TAKEN, 0.5, 0.0, true, Color(1,0,0,0.5),
+		id.FLAT_DAMAGE_TAKEN, 1.0, 0.0, true, Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.0, false, Color(1, 1, 0.5) #completely stops enemies
@@ -85,7 +86,7 @@ const status_effect_icons: Dictionary[Status, Texture2D] = {
 	Status.CURSED: preload("res://Assets/cursed_icon.png"),
 	Status.BLEED: preload("res://Assets/bleed_icon.png"),
 	Status.POISON: preload("res://Assets/poison_icon.png"),
-	Status.STUN: preload("res://Assets/frost_icon.png")
+	Status.STUN: preload("res://Assets/stun_icon.png")
 }
 
 var reactions: Array[ReactionData] = [

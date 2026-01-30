@@ -10,6 +10,7 @@ class_name TimelinePip
 @export var boss_color: Color = Color("bf6868") # Reddish
 
 var target_slot: Control # the anchor node we should follow
+var entry_id: String
 var _entry: WaveTimeline.TimelineEntry
 var _active_tooltip: TooltipPanel
 

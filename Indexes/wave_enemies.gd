@@ -18,12 +18,12 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	5 : [
 		[Units.Type.BASIC, 4],
-		[Units.Type.DRIFTER, 6],
+		[Units.Type.DRIFTER, 8],
 	],
 	6 : [
-		[Units.Type.BASIC, 3],
-		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 4],
+		[Units.Type.HEALER, 3],
+		[Units.Type.BASIC, 5],
 	],
 	7 : [
 		[Units.Type.BUFF, 3],
@@ -52,9 +52,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BUFF, 6],
 	],
 	12 : [
-		[Units.Type.WARRIOR, 10],
-		[Units.Type.HEALER, 3],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 8],
+		[Units.Type.HEALER, 2],
+		[Units.Type.WARRIOR, 6],
 		[Units.Type.HEALER, 2],
 	],
 	13 : [
@@ -68,14 +68,15 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.WARRIOR, 5],
 	],
 	15 : [
-		[Units.Type.TROLL, 10],
+		[Units.Type.TROLL, 7],
+		[Units.Type.HEALER, 2],
 	],
 	16 : [
-		[Units.Type.TROLL, 5],
+		[Units.Type.TROLL, 4],
 		[Units.Type.DRIFTER, 8],
-		[Units.Type.GIANT, 5],
-		[Units.Type.HEALER, 4],
-		[Units.Type.WARRIOR, 14],
+		[Units.Type.GIANT, 4],
+		[Units.Type.HEALER, 3],
+		[Units.Type.WARRIOR, 10],
 	]
 }
 # --- unit catalog ---
@@ -105,8 +106,12 @@ const QUADRATIC_BUDGET_SCALING: float = 1.8
 # the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array[Array]:
 	if SCRIPTED_WAVES.has(wave):
-		var output: Array[Array]
-		output.assign(SCRIPTED_WAVES[wave])
+		var output: Array[Array] = []
+		output.append_array(SCRIPTED_WAVES[wave].duplicate(true))
+		
+		for i in output.size():
+			output[i][1] = int(output[i][1] * Phases.current_game_scaling)
+			
 		return output
 
 	# 1. get the wave modifier from the central game director

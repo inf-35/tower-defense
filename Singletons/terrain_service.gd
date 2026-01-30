@@ -16,8 +16,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 		# this function (in TerrainRenderer) checks Terrain.get_icon(type)
 		# and spawns a sprite if a texture exists.
 		island.terrain_renderer.update_decoration(cell, cell_data.terrain)
-
-
+	
 	island.update_shore_boundary()
 	island.update_navigation_grid()
 	island.terrain_changed.emit()
@@ -55,6 +54,10 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 		size = Vector2i(size.y, size.x)
 		
 	# fetch specific restrictions for this tower
+	var validity: Dictionary = Towers.get_tower_prototype(tower_type).check_placement_validity(island, tower_position, tower_facing)
+	if not (validity.has("valid") and validity.valid):
+		return false
+	
 	var allowed_terrains: Array[Terrain.Base] = Towers.get_tower_allowed_terrains(tower_type)
 	for x: int in size.x:
 		for y: int in size.y:
@@ -106,6 +109,10 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 	# (Rotation logic should be applied to size before calling this if dynamic, 
 	# but for error checking base size is usually okay unless fitting in a tight spot)
 	var allowed_terrains: Array[Terrain.Base] = Towers.get_tower_allowed_terrains(tower_type)
+	# BUG: this logic doesnt care about rotation?
+	var validity: Dictionary = Towers.get_tower_prototype(tower_type).check_placement_validity(island, cell, tower.facing)
+	if validity.has("valid") and not validity.valid:
+		return validity.error
 	
 	for x in range(size.x):
 		for y in range(size.y):

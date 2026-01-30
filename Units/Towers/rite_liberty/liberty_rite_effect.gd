@@ -56,8 +56,6 @@ func _update_bonus(instance: EffectInstance) -> void:
 		if not is_equal_approx(state.modifier.multiplicative, cooldown_mult):
 			state.modifier.multiplicative = cooldown_mult
 			tower.modifiers_component.change_modifier(state.modifier)
-		else:
-			print("ba")
 	else:
 		# create new modifier
 		var mod := Modifier.new(Attributes.id.COOLDOWN, cooldown_mult, 0.0, -1.0)

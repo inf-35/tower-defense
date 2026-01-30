@@ -51,7 +51,7 @@ func inject_components(n_graphics: Node2D, modifiers_component = null):
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(movement_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
-	
+
 func _ready():
 	_STAGGER_CYCLE = 3
 	_stagger = randi_range(0, _STAGGER_CYCLE)

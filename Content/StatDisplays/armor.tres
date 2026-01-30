@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" load_steps=2 format=3 uid="uid://irjol15uv6x6"]
+
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="1_l5by2"]
+
+[resource]
+script = ExtResource("1_l5by2")
+attribute = 12
+label = "{UNIT_ARMOR}"
+special_modifier = 6
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"

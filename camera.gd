@@ -4,6 +4,8 @@ class_name Camera
 
 #configuration
 const RETURN_FROM_OVERRIDE_TIME: float = 0.5 # how long it takes for the camera to snap back to position from override
+
+var _target_position : Vector2
 # --- private state for the override system ---
 # this flag will disable manual controls when true
 var _is_overridden: bool = false
@@ -27,8 +29,8 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("zoom_out"):
 		zoom /= 0.9
 
-	position += get_viewport_rect().size / zoom * Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down") * delta * 0.5
-
+	_target_position += get_viewport_rect().size / zoom * Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down") * delta * 0.8
+	position = lerp(position, _target_position, 12.0 * delta)
 # --- public api for the override system ---
 
 # this is the main function to trigger the override.
@@ -62,7 +64,7 @@ func release_override() -> void:
 		_active_tween.kill()
 	# the cleanup function is called directly to ensure state is reset
 	_on_override_finished()
-	
+	_target_position = camera_state_cache[0]
 	_active_tween = create_tween()
 	_active_tween.set_parallel(true) # allow position and zoom to animate simultaneously
 	_active_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE) # for a smooth slowdown

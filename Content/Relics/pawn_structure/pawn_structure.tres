@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://dr8mpmdmof5yg"]
 
-[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="1_8jhxp"]
 [ext_resource type="Script" uid="uid://bo2f1cf2sspji" path="res://Content/Relics/pawn_structure/pawn_structure_effect.gd" id="1_byv6u"]
 [ext_resource type="Script" uid="uid://chjx55eww4tnp" path="res://Content/Relics/pawn_structure/global_distributor_effect.gd" id="2_1pgfs"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_irhoh"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_37b5j"]
+[ext_resource type="Texture2D" uid="uid://dc5664xj27k8j" path="res://Assets/pawn_structure.png" id="3_gh8al"]
 
 [sub_resource type="Resource" id="Resource_gh8al"]
 script = ExtResource("1_byv6u")
@@ -24,4 +24,5 @@ type = 26
 global_effect = SubResource("Resource_1pgfs")
 title = "Pawn Structure"
 description = "{T_TURRET|label=Turrets} gain +30% {UNIT_DAMAGE} for every active, diagonally adjacent {T_TURRET|label=Turret}."
+icon = ExtResource("3_gh8al")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

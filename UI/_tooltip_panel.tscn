@@ -5,8 +5,8 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_fg2ep"]
 
 [node name="TooltipPanel" type="PanelContainer" node_paths=PackedStringArray("title_label", "description_label")]
-offset_right = 240.0
-offset_bottom = 134.0
+offset_right = 500.0
+offset_bottom = 160.0
 theme = ExtResource("2_t0qdu")
 theme_type_variation = &"simple_panel"
 script = ExtResource("1_c5s8d")

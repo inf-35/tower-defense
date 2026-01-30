@@ -12,6 +12,7 @@ var _waves_left_in_state: int
 func start() -> void:
 	# connect to the game-wide signal to track wave progression
 	Phases.wave_cycle_started.connect(_on_wave_cycle_started)
+	attach()
 
 func attach() -> void:
 	if _current_state == State.SEED and seed_duration_waves <= 0: #check for maturation immediately

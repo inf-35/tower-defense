@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=13 format=3 uid="uid://debfwlmcaoe8a"]
+[gd_resource type="Resource" script_class="RelicData" load_steps=14 format=3 uid="uid://debfwlmcaoe8a"]
 
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_h2x6u"]
 [ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="2_jshgk"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="4_spi7d"]
 [ext_resource type="Script" uid="uid://3lu2wbjjq6fd" path="res://Content/Relics/ice_shards/ice_shards_effect.gd" id="4_ts0q3"]
 [ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="5_q83lv"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="8_g17n0"]
 
 [sub_resource type="Resource" id="Resource_0t730"]
 script = ExtResource("3_6csym")

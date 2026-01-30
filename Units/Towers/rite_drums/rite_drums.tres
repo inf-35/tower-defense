@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://c8xge7seldljk"]
 
-[ext_resource type="Texture2D" uid="uid://dgjwrg2hlraqj" path="res://Assets/curses_rite.png" id="1_w5usq"]
+[ext_resource type="Texture2D" uid="uid://dqlm0jgcnr56t" path="res://Assets/rite_drums.png" id="1_w5usq"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_laah0"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_titnn"]
 [ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_cjeqs"]

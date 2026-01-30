@@ -59,6 +59,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "How large the AOE of attacks are.",
 		"icon": preload("res://Assets/radius.png")
 	},
+	"UNIT_ARMOR": {
+		"title": "Armor",
+		"display": "",
+		"description": "A flat reduction on damage taken by this unit",
+		"icon": preload("res://Assets/armor_icon.png"),
+	},
 	"FROST": {
 		"title": "Frost",
 		"display": "",
@@ -74,20 +80,26 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"BLEED": {
 		"title": "Bleed",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 0.5 more extra flat damage on hit per stack of bleed",
+		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 1 more extra flat damage on hit per stack of bleed",
 		"icon": preload("res://Assets/bleed_icon.png")
 	},
 	"CURSED": {
 		"title": "Cursed",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 20% more damage per stack of curse.",
+		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 25% more damage per stack of curse.",
 		"icon": preload("res://Assets/cursed_icon.png")
 	},
 	"POISON": {
 		"title": "Poison",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 5% max HP of damage per second per stack.",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 10% remaining HP per second per stack",
 		"icon": preload("res://Assets/poison_icon.png"),
+	},
+	"STUN": {
+		"title": "Stun",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}. Stunned units cannot move.",
+		"icon": preload("res://Assets/stun_icon.png"),
 	},
 	"STATUS_EFFECT_LABEL": {
 		"title": "Status",

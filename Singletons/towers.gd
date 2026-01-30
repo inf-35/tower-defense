@@ -54,6 +54,10 @@ enum Type {
 	RITE_OIL,
 	RITE_WHEEL,
 	RITE_DRUMS,
+	HAMLET,
+	FARM,
+	BRICKLAYER,
+	
 }
 
 enum Element {

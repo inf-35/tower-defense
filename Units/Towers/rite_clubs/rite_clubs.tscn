@@ -20,15 +20,13 @@ metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_oas6b"]
 script = ExtResource("4_0p114")
-chance = 0.2
+chance = 0.25
 schedule = 1
 metadata/_custom_type_script = "uid://duw85e4c21moh"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("8_g5kbx")
 max_health = 20.0
-regeneration = null
-regen_percent = null
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]

@@ -12,7 +12,7 @@ var _ruined_cells: Dictionary[Vector2i, bool] = {}
 #initialise is the _ready substitute
 func initialise() -> void:
 	# this service is the only thing that needs to listen for the end of a wave
-	Phases.wave_ended.connect(_on_wave_ended)
+	Phases.wave_cycle_started.connect(_on_wave_ended)
 
 # the main public API for towers to register themselves as ruined
 func register_ruin(tower: Tower, reason: RuinReason) -> void:

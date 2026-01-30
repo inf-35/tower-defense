@@ -12,6 +12,7 @@ extends Panel
 var option_buttons: Array[Button]
 var _pending_choice_id: int
 var _confirmation_button: Button
+var _finish_button: Button
 
 func _ready():
 	visible = false
@@ -21,6 +22,8 @@ func _ready():
 	UI.hide_expansion_choices.connect(_hide_options)
 	UI.display_expansion_confirmation.connect(_present_confirmation)
 	UI.hide_expansion_confirmation.connect(_hide_confirmation)
+	UI.display_expansion_exit.connect(_present_exit)
+	UI.hide_expansion_exit.connect(_hide_exit)
 	
 func _present_options(data: Array[ExpansionChoice]):
 	_populate_buttons(data)
@@ -34,14 +37,21 @@ func _present_confirmation(pending_choice_id: int):
 		return
 		
 	self._pending_choice_id = pending_choice_id
-	_confirmation_button.modulate = Color.WHITE
 	_confirmation_button.disabled = false
 
 func _hide_confirmation():
 	if not is_instance_valid(_confirmation_button):
 		return
-	_confirmation_button.modulate = Color.TRANSPARENT
 	_confirmation_button.disabled = true
+	
+func _present_exit():
+	_finish_button.disabled = false
+	_confirmation_button.text = "Apply expansion (more enemies will spawn)"
+	
+func _hide_exit():
+	_finish_button.disabled = true
+	_confirmation_button.text = "Apply expansion"
+
 	
 func _populate_buttons(data: Array[ExpansionChoice]):
 	for button: Node in _vbox.get_children():
@@ -68,9 +78,14 @@ func _populate_buttons(data: Array[ExpansionChoice]):
 	_confirmation_button = Button.new()
 	_confirmation_button.text = "Apply expansion."
 	_confirmation_button.pressed.connect(_on_confirmation_pressed)
-	_confirmation_button.modulate = Color.TRANSPARENT 
 	_confirmation_button.disabled = true
 	_vbox.add_child(_confirmation_button)
+	
+	_finish_button = Button.new()
+	_finish_button.text = "Finish expansions (exit)."
+	_finish_button.pressed.connect(_on_finish_pressed)
+	_finish_button.disabled = true
+	_vbox.add_child(_finish_button)
 
 func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 	var text: String = "Option %d" % (index + 1)
@@ -167,3 +182,6 @@ func _on_choice_unhovered(choice_id: int):
 
 func _on_confirmation_pressed():
 	UI.choice_selected.emit(_pending_choice_id)
+
+func _on_finish_pressed():
+	UI.expansion_finished.emit()

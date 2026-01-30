@@ -110,6 +110,7 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	var outline := Sprite2D.new()
 	outline.texture = Towers.get_tower_preview(type)
 	outline.scale = Vector2(0.06, 0.06)
+	outline.rotation = graphics.rotation
 	outline.self_modulate = Color(1,1,1,0.4)
 	outline.z_as_relative = false
 	outline.z_index = Layers.FLOATING_UI
@@ -302,11 +303,22 @@ static func get_side_from_offset(tower_size: Vector2i, rel_offset: Vector2i) -> 
 
 	# 3. Fallback (Diagonal corner or Inside tower)
 	return 10
+	
+static func get_rotated_size(input_size: Vector2i, input_facing: Facing) -> Vector2i:
+	if (input_facing as int) % 2 != 0:
+		return Vector2i(input_size.y, input_size.x)
+	else:
+		return input_size
 
 func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for a specific tile occupied by this tower
 	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour
 		return behavior.get_navcost_for_cell(_cell)
 	return Towers.get_tower_navcost(self.type)
+	
+func check_placement_validity(island: Island, cell: Vector2i, input_facing: Facing) -> Dictionary:
+	if behavior.has_method(&"check_placement_validity"):
+		return behavior.check_placement_validity(island, cell, input_facing)
+	return { "valid": true, "error": "" }
 	
 func get_save_data() -> Dictionary:
 	var unit_save_data: Dictionary = {

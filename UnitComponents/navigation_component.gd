@@ -91,13 +91,12 @@ func is_valid_blocker(tower: Tower) -> bool:
 	return is_instance_valid(tower) and tower.blocking and tower.hostile != unit.hostile
 
 func _handle_blocked_state() -> void:
-	# stop the unit physically
-	movement_component.target_direction = Vector2.ZERO
 	# visual adjustment: nudge slightly towards the wall so it looks like they are hitting it
 	var tower_pos = blocking_tower.global_position
 	var my_pos = unit.global_position
-	var nudge = (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.1
-	movement_component.velocity += nudge 
+	#var nudge = (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.1
+	#movement_component.velocity += nudge
+	movement_component.target_position = Island.cell_to_position(Island.position_to_cell(unit.global_position)) + (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.3
 
 func _handle_moving_state() -> void:
 	# standard path following

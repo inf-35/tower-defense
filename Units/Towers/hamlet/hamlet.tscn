@@ -1,0 +1,57 @@
+[gd_scene load_steps=12 format=3 uid="uid://cpbglnjon3xp6"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_y12hn"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="2_xow1n"]
+[ext_resource type="Script" uid="uid://bigp8gkrdqok7" path="res://Content/Effects/_capacity_generator.gd" id="3_e03kd"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_oknhp"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_hwhiv"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_d0144"]
+[ext_resource type="Texture2D" uid="uid://dshq28wkpjwq" path="res://Assets/hamlet.png" id="7_e03kd"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="8_msksl"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_3ha4j"]
+[ext_resource type="Script" uid="uid://3mj54dg3x2tl" path="res://Units/Towers/hamlet/hamlet_behavior.gd" id="10_drdql"]
+
+[sub_resource type="Resource" id="Resource_drdql"]
+script = ExtResource("3_e03kd")
+base_capacity = 1.0
+effect_type = 2
+schedule = 1
+metadata/_custom_type_script = "uid://bigp8gkrdqok7"
+
+[node name="Hamlet" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_y12hn")
+type = 52
+behavior = NodePath("HamletBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+intrinsic_effects = Array[ExtResource("2_xow1n")]([SubResource("Resource_drdql")])
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="HamletBehavior" type="Node" parent="."]
+script = ExtResource("10_drdql")
+metadata/_custom_type_script = "uid://3mj54dg3x2tl"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("4_oknhp")
+movement_data = ExtResource("5_hwhiv")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("6_d0144")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_e03kd")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("8_msksl")
+height_multiplier = 0.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_3ha4j")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

@@ -1,6 +1,7 @@
 extends Node2D
 class_name TerrainRenderer
 
+@export var is_main_terrain_renderer: bool = false
 # config
 @export var shader: Shader
 @export var max_gradient_depth: float = 5.0
@@ -11,6 +12,9 @@ class_name TerrainRenderer
 @export var paint_color: Color
 @export var wash_color: Color
 @export var brush_textures: Array[Texture2D]
+
+@export var paper_rect: TextureRect
+@export var color_rect: ColorRect
 
 var cell_size: float = Island.CELL_SIZE
 
@@ -34,8 +38,10 @@ var _active_brush_strokes: Dictionary[Vector2i, Sprite2D]
 # we track the top-left coordinate of the current image grid
 var _min_coord: Vector2i = Vector2i.ZERO
 var _size_cells: Vector2i = Vector2i(1, 1)
-
-func _ready() -> void:
+	
+func start() -> void:
+	if is_main_terrain_renderer:
+		_setup_configuration()
 	_setup_visuals()
 	
 	if show_debug_texture:
@@ -50,12 +56,25 @@ func _create_debug_view() -> void:
 	var c = CanvasLayer.new()
 	c.add_child(dr)
 	add_child(c)
+	
+func _setup_configuration() -> void:
+	match Phases.current_game_environment:
+		Phases.GameEnvironment.WINTER:
+			RenderingServer.set_default_clear_color(Color(0.867, 0.871, 0.867))
+			color_rect.color = Color(0.87, 0.87, 0.87, 1.0)
+			paint_color = Color(0.988, 0.988, 0.988)
+			wash_color = Color(0.99, 0.99, 0.99, 0.553)
+			
+		Phases.GameEnvironment.WOODS:
+			RenderingServer.set_default_clear_color(Color(0.992, 0.937, 0.847))
+			color_rect.color = Color(0.992, 0.937, 0.847)
+			paint_color = Color(0.765, 0.847, 0.714)
+			wash_color = Color(0.765, 0.851, 0.714, 0.259)
 
 func _setup_visuals() -> void:
 	# initialize with a small empty grid
 	_grid_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_grid_texture = ImageTexture.create_from_image(_grid_image)
-	
 	_brush_viewport = SubViewport.new()
 	_brush_viewport.name = "BrushMaskViewport"
 	_brush_viewport.disable_3d = true
@@ -211,10 +230,10 @@ func update_decoration(cell: Vector2i, type: Terrain.Base) -> void:
 func clear_decorations() -> void:
 	for cell: Vector2i in _active_decorations:
 		if is_instance_valid(_active_decorations[cell]):
-			_active_decorations[cell].queue_free()
+			_active_decorations[cell].free()
 	for cell: Vector2i in _active_previews:
 		if is_instance_valid(_active_previews[cell]):
-			_active_previews[cell].queue_free()
+			_active_previews[cell].free()
 	
 	_active_decorations.clear()
 	_active_previews.clear()
@@ -254,7 +273,6 @@ func reset_grid(new_land_tiles: Array[Vector2i]) -> void:
 	_grid_data.clear()
 	# clear image (make it all water)
 	_grid_image.fill(Color.BLACK)
-	
 	# 2. apply new tiles
 	var active_cells: Dictionary = {}
 	
@@ -339,7 +357,6 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	_grid_image = new_img
 	_min_coord = new_origin
 	_size_cells = new_size
-	
 	# update visual rect
 	_update_rect_transform()
 

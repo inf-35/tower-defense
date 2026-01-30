@@ -10,6 +10,7 @@ signal choice_hovered(choice_id: int) #generic choice ui handlers
 signal choice_unhovered(choice_id: int)
 signal choice_focused(choice_id: int) #used by expansion_ui
 signal choice_selected(choice_id: int) #called by expansion_ui and reward_ui
+signal expansion_finished() #called by expansion_ui
 signal reward_rerolled() #called by reward_ui
 signal building_phase_ended() #called by sidebar_ui
 #ClickHandler/UI -> Player
@@ -20,12 +21,15 @@ signal upgrade_tower_requested(tower: Tower, upgrade_type: Towers.Type)
 signal update_wave_schedule()
 signal start_wave(wave : int)
 signal end_wave(wave: int)
+signal start_phase(wave: int, combat: bool, subtype: int)
 signal day_event_ended() ##when any day event, including NONE, ends.
 signal start_combat(wave: int)
 signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
 signal hide_expansion_choices()
 signal display_expansion_confirmation(pending_choice_id: int)
 signal hide_expansion_confirmation()
+signal display_expansion_exit()
+signal hide_expansion_exit()
 signal display_reward_choices(choices: Array[Reward])
 signal update_reroll_cost(reroll_cost: float) #from rewardservice
 signal hide_reward_choices()

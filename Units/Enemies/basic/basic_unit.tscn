@@ -94,7 +94,6 @@ metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_urfjf")
-aes = 250.0
 health_data = ExtResource("13_j01gd")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 

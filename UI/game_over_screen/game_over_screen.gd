@@ -86,13 +86,17 @@ func _populate_towers() -> void:
 		tower_container.add_child(icon)
 
 func _on_restart_pressed() -> void:
+	#delete the current save (which just died)
+	SaveLoad.delete_save()
 	# unpause before changing scenes or the new scene will start paused
 	get_tree().paused = false
 	# reload the main game scene
-	get_tree().reload_current_scene()
+	get_tree().reload_current_scene.call_deferred()
 
 func _on_quit_pressed() -> void:
+	#delete the current save (which just died)
+	SaveLoad.delete_save()
 	get_tree().paused = false
 	# return to main menu
 	Phases.in_game = false
-	get_tree().change_scene_to_file("res://main_menu.tscn")
+	get_tree().change_scene_to_file.call_deferred("res://main_menu.tscn")

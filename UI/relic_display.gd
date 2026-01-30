@@ -2,7 +2,7 @@ extends GridContainer
 class_name RelicDisplay
 
 # --- configuration ---
-@export var icon_size: Vector2 = Vector2(60, 60)
+@export var icon_size: Vector2 = Vector2(70, 70)
 @export var icon_stretch_mode: TextureRect.StretchMode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _ready() -> void:

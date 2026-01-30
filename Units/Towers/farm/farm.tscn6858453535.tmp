@@ -1,0 +1,51 @@
+[gd_scene load_steps=11 format=3 uid="uid://c8grn8x6m1kta"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5gwp7"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="2_7c8ug"]
+[ext_resource type="Resource" uid="uid://bfougfx6aba1c" path="res://Content/Effects/capacity_generator.tres" id="3_c0bwh"]
+[ext_resource type="Script" uid="uid://djqe37wfw77og" path="res://Units/Towers/farm/farm_behavior.gd" id="4_7c8ug"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_88tye"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_b344s"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_7835c"]
+[ext_resource type="Texture2D" uid="uid://dshq28wkpjwq" path="res://Assets/hamlet.png" id="7_agrk8"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="8_gsk4i"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_yamgq"]
+
+[node name="Farm" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_5gwp7")
+type = 52
+behavior = NodePath("FarmBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+intrinsic_effects = Array[ExtResource("2_7c8ug")]([ExtResource("3_c0bwh")])
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="FarmBehavior" type="Node" parent="."]
+script = ExtResource("4_7c8ug")
+income_per_wave = 50
+metadata/_custom_type_script = "uid://djqe37wfw77og"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("4_88tye")
+movement_data = ExtResource("5_b344s")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("6_7835c")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_agrk8")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("8_gsk4i")
+height_multiplier = 0.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9_yamgq")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
