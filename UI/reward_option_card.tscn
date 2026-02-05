@@ -3,7 +3,7 @@
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_7mbds"]
 [ext_resource type="Script" uid="uid://d4fw7qteemt5e" path="res://UI/reward_option_card.gd" id="2_qxoyj"]
 [ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="3_soafu"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="4_3qqsp"]
+[ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="4_7mbds"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_opmj4"]
 
 [node name="card" type="Control" node_paths=PackedStringArray("_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "description")]
@@ -19,7 +19,7 @@ _icon_target = NodePath("HBoxContainer/icon_target")
 _panel_target = NodePath("HBoxContainer/panel_target")
 _real_icon_panel = NodePath("HBoxContainer/icon_target/real_icon_panel")
 _real_description_panel = NodePath("HBoxContainer/panel_target/real_description_panel")
-icon = NodePath("HBoxContainer/icon_target/real_icon_panel/MarginContainer/icon")
+icon = NodePath("HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioContainer/icon")
 title = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/Title/inspector_title")
 description = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer/description")
 metadata/_custom_type_script = "uid://d4fw7qteemt5e"
@@ -51,6 +51,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -105.5
+offset_right = 105.5
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
@@ -58,12 +60,16 @@ mouse_filter = 1
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/icon_target/real_icon_panel"]
 layout_mode = 2
 theme = ExtResource("1_7mbds")
-theme_type_variation = &"MarginMinor"
+theme_type_variation = &"MarginMajor"
 
-[node name="icon" type="TextureRect" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer"]
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer"]
 layout_mode = 2
-texture = ExtResource("4_3qqsp")
+
+[node name="icon" type="TextureRect" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioContainer"]
+layout_mode = 2
+texture = ExtResource("4_7mbds")
 expand_mode = 1
+stretch_mode = 5
 
 [node name="panel_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
 layout_mode = 2

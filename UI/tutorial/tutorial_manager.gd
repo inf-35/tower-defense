@@ -12,27 +12,8 @@ class_name TutorialManager
 @export var timeline_anchor: Control
 @export var start_wave_anchor: Control
 
-enum Anchor {
-	CENTRAL_ANCHOR,
-	TOWER_BAR_ANCHOR,
-	PLAYER_STATS_ANCHOR,
-	TIMELINE_ANCHOR,
-	START_WAVE_ANCHOR,
-	TARGET_OFFSET,
-}
-
-enum Reference { ##reference ids to control nodes
-	NONE,
-	TURRET_BUTTON,
-	PALISADE_BUTTON,
-	START_WAVE_BUTTON,
-	WAVE_TIMELINE,
-	TUTORIAL_TEXT,
-	PLAYER_STATS,
-}
-
 # --- State ---
-var _registered_ui_elements: Dictionary[Reference, Control] = {} # { "id": ControlNode }
+var _registered_ui_elements: Dictionary[TutorialStep.Reference, Control] = {} # { "id": ControlNode }
 var _current_step_index: int = -1
 var _active_sequence: Array[TutorialStep] = []
 var _target_node: Control = null # The currently highlighted node
@@ -61,7 +42,7 @@ func _ready() -> void:
 	overlay_color_rect.gui_input.connect(_process_overlay_input)
 	# Register self to UI singleton so other scripts can find us
 	UI.tutorial_manager = self
-	register_element(Reference.TUTORIAL_TEXT, instruction_panel)
+	register_element(TutorialStep.Reference.TUTORIAL_TEXT, instruction_panel)
 
 func _process(_delta: float) -> void:
 	if visible and is_instance_valid(_target_node) and _highlight_target:
@@ -88,7 +69,7 @@ func _process_overlay_input(input_event: InputEvent):
 # --- Public API: Registration ---
 # UI elements call this in their _ready(): 
 # UI.tutorial_manager.register_element("build_cannon_btn", self)
-func register_element(id: Reference, node: Control) -> void:
+func register_element(id: TutorialStep.Reference, node: Control) -> void:
 	_registered_ui_elements[id] = node
 
 # --- Public API: Sequences ---
@@ -118,12 +99,12 @@ func _advance_step() -> void:
 		return
 		
 	var step := _active_sequence[_current_step_index]
-	if step.highlight_target != Reference.NONE:
+	if step.highlight_target != TutorialStep.Reference.NONE:
 		_target_node = _registered_ui_elements[step.highlight_target]
 	else:
 		_target_node = null
 	
-	if step.highlight_target != Reference.NONE and step.highlight:
+	if step.highlight_target != TutorialStep.Reference.NONE and step.highlight:
 		_shader_mat.set_shader_parameter(&"is_active", true)
 	else:
 		_shader_mat.set_shader_parameter(&"is_active", false)
@@ -150,15 +131,15 @@ func _advance_step() -> void:
 			pass
 	
 	match step.panel_anchor:
-		Anchor.CENTRAL_ANCHOR:
+		TutorialStep.Anchor.CENTRAL_ANCHOR:
 			_anchor_node = central_anchor
-		Anchor.TOWER_BAR_ANCHOR:
+		TutorialStep.Anchor.TOWER_BAR_ANCHOR:
 			_anchor_node = tower_bar_anchor
-		Anchor.PLAYER_STATS_ANCHOR:
+		TutorialStep.Anchor.PLAYER_STATS_ANCHOR:
 			_anchor_node = player_stats_anchor
-		Anchor.TIMELINE_ANCHOR:
+		TutorialStep.Anchor.TIMELINE_ANCHOR:
 			_anchor_node = timeline_anchor
-		Anchor.START_WAVE_ANCHOR:
+		TutorialStep.Anchor.START_WAVE_ANCHOR:
 			_anchor_node = start_wave_anchor
 			
 

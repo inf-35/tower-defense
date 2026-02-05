@@ -148,7 +148,7 @@ visible = false
 texture = SubResource("PlaceholderTexture2D_p6ncc")
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.06, 0.06)
+scale = Vector2(0.07, 0.07)
 texture = ExtResource("15_vubbs")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]
@@ -171,6 +171,7 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="SunbeamBehavior" type="Node" parent="."]
 script = ExtResource("14_d4rmn")
+max_targets = 1
 laser_width = 1.5
 laser_color = Color(1, 0.56666666, 0, 0.49803922)
 metadata/_custom_type_script = "uid://de7t1kfa4c2yb"

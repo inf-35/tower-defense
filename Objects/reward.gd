@@ -20,5 +20,7 @@ enum Type {
 @export var base_weight: float = 100.0 ## higher = more common, 0 = disabled.
 @export var bias_rules: Array[RewardBiasRule] = []
 
+@export var price: float = 0.0 ## in gold!
+
 @export var title: String = "dappled things" #used for terrain expansion previews and such
 @export_multiline var description: String = "Reward description"

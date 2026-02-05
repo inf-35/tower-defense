@@ -13,6 +13,21 @@ var _effective_cache: Dictionary[Attributes.id, float] = {}
 
 signal status_changed(type: Attributes.Status, stacks: float, duration: float)
 
+#dynamic attribute system
+static var _next_dynamic_id: int = 10000
+static var _dynamic_id_registry: Dictionary[StringName, int] = {}
+static func register_dynamic_attribute(key: StringName):
+	if _dynamic_id_registry.has(key):
+		return #already registered!
+	_dynamic_id_registry[key] = _next_dynamic_id
+	_next_dynamic_id += 1
+
+static func get_dynamic_id(key: StringName) -> int: ##return 0 -> error/unregistered!
+	if not _dynamic_id_registry.has(key):
+		push_warning("ModifiersComponent: Unregistered dynamic attribute: ", key)
+		return 0 #error
+	return _dynamic_id_registry[key]
+
 func _ready():
 	stat_changed.connect(func(_stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
@@ -204,6 +219,9 @@ func register_stat(attr: Attributes.id, value: float) -> void: #registers a stat
 	base_stats[attr] = value #overwrites if neccessary
 	_effective_cache.erase(attr)  # ensure clean first read
 	stat_changed.emit(attr)
+	
+func register_dynamic_stat(key: StringName, value: float) -> void:
+	register_stat(get_dynamic_id(key), value)
 		
 func register_data(data: Data) -> void: #registers any arbitrary data resource; polymorphic
 	if not data:
@@ -223,6 +241,9 @@ func register_data(data: Data) -> void: #registers any arbitrary data resource; 
 
 func has_stat(attr: Attributes.id) -> bool:
 	return base_stats.has(attr)
+	
+func has_dynamic_stat(key: StringName) -> bool:
+	return base_stats.has(get_dynamic_id(key))
 
 func pull_stat(attr: Attributes.id) -> Variant:
 	if _effective_cache.has(attr):
@@ -287,6 +308,9 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
 
 	return final_value
+
+func pull_dynamic_stat(key: StringName) -> Variant:
+	return pull_stat(get_dynamic_id(key))
 
 #data retrieval functions
 func has_status(status: Attributes.Status, threshold: float = 0.0) -> bool:

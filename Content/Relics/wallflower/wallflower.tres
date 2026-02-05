@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=10 format=3 uid="uid://c72rkivkjygay"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_3dy2h"]
+[ext_resource type="Script" uid="uid://chjx55eww4tnp" path="res://Content/Relics/pawn_structure/global_distributor_effect.gd" id="1_q4fwq"]
+[ext_resource type="Texture2D" uid="uid://rsg540d5fnct" path="res://Assets/wallflower.png" id="2_a3j5j"]
+[ext_resource type="Script" uid="uid://6jt1v42va25f" path="res://Content/Relics/wallflower/wallflower_effect.gd" id="2_j17rg"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_q4fwq"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_a3j5j"]
+
+[sub_resource type="Resource" id="Resource_0ufni"]
+script = ExtResource("1_3dy2h")
+attribute = 8
+multiplicative = 0.667
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_pctud"]
+script = ExtResource("2_j17rg")
+modifier_prototype = SubResource("Resource_0ufni")
+schedule = 0
+metadata/_custom_type_script = "uid://6jt1v42va25f"
+
+[sub_resource type="Resource" id="Resource_3dy2h"]
+script = ExtResource("1_q4fwq")
+effect_to_grant = SubResource("Resource_pctud")
+metadata/_custom_type_script = "uid://chjx55eww4tnp"
+
+[resource]
+script = ExtResource("3_a3j5j")
+type = 31
+global_effect = SubResource("Resource_3dy2h")
+title = "Wallflower"
+description = "Towers gain 50% {UNIT_HITRATE} if they have no adjacent neighbour"
+icon = ExtResource("2_a3j5j")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

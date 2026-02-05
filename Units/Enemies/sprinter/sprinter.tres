@@ -1,10 +1,13 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://drhwn8nkwoiep"]
+[gd_resource type="Resource" script_class="UnitData" load_steps=4 format=3 uid="uid://drhwn8nkwoiep"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_mf7or"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3ypsr"]
 [ext_resource type="PackedScene" uid="uid://kdo8nuuiowl5" path="res://Units/Enemies/sprinter/sprinter.tscn" id="2_ceu77"]
 
 [resource]
 script = ExtResource("1_mf7or")
+title = "Sprinter"
+description = "Footsoldier that gets faster and faster as time passes."
 unit_scene = ExtResource("2_ceu77")
 flux_value = 0.7
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

@@ -3,6 +3,7 @@ class_name SidebarUI
 
 @export var towers_bar: VBoxContainer
 @export var start_wave_button: Button
+@export var trade_button: Button
 
 var tower_option_prototype : PackedScene = preload("res://UI/tower_option.tscn")
 
@@ -24,6 +25,10 @@ func _ready() -> void:
 	start_wave_button.pressed.connect(func():
 		UI.building_phase_ended.emit()
 	)
+	
+	trade_button.pressed.connect(func():
+		Player.trader_service.open_menu()
+	)
 
 	# Request initial state if Player might have initialized before UI connected
 	# (though with autoload order or call_deferred this might not be strictly necessary,
@@ -33,7 +38,7 @@ func _ready() -> void:
 	else:
 		_clear_towers_bar() # Ensure it's empty if no towerss initially
 		
-	UI.tutorial_manager.register_element(TutorialManager.Reference.START_WAVE_BUTTON, start_wave_button)
+	UI.tutorial_manager.register_element(TutorialStep.Reference.START_WAVE_BUTTON, start_wave_button)
 
 
 func _clear_towers_bar() -> void:
@@ -59,9 +64,9 @@ func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type
 		towers_bar.add_child(tower_option)
 		
 		if unlocked_tower_type == Towers.Type.PALISADE:
-			UI.tutorial_manager.register_element(TutorialManager.Reference.PALISADE_BUTTON, tower_option)
+			UI.tutorial_manager.register_element(TutorialStep.Reference.PALISADE_BUTTON, tower_option)
 		elif unlocked_tower_type == Towers.Type.TURRET:
-			UI.tutorial_manager.register_element(TutorialManager.Reference.TURRET_BUTTON, tower_option)
+			UI.tutorial_manager.register_element(TutorialStep.Reference.TURRET_BUTTON, tower_option)
 
 func _on_tower_button_pressed(type_id: Towers.Type) -> void:
 	UI.tower_selected.emit(Towers.get_tower_prototype(type_id)) #update click handler

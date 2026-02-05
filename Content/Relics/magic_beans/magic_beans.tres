@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://bq68qak5xnobj"]
+
+[ext_resource type="Texture2D" uid="uid://ddvnt278gnlct" path="res://Assets/magic_beans.png" id="1_174ix"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_jvvh1"]
+[ext_resource type="Script" uid="uid://b74ug56sj02f0" path="res://Content/Relics/wilderness/_adjacency_boost.gd" id="2_rlf37"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_ymxbn"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_jvvh1"]
+
+[sub_resource type="Resource" id="Resource_k2f0l"]
+script = ExtResource("1_jvvh1")
+attribute = 9
+additive = 2.0
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_j7w75"]
+script = ExtResource("2_rlf37")
+host_tower_type = 18
+adjacent_tower_type = 53
+modifier_prototype = SubResource("Resource_k2f0l")
+metadata/_custom_type_script = "uid://b74ug56sj02f0"
+
+[resource]
+script = ExtResource("3_jvvh1")
+type = 29
+global_effect = SubResource("Resource_j7w75")
+title = "Magic Beans"
+description = "{T_MAGE|label=Mages} gain +2 {UNIT_RADIUS} for each adjacent {T_FARM}."
+icon = ExtResource("1_174ix")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

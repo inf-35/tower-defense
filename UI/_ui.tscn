@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://bbh3fi3s5ng5p"]
+[gd_scene load_steps=28 format=3 uid="uid://bbh3fi3s5ng5p"]
 
 [ext_resource type="Script" uid="uid://b2rapnlk0entl" path="res://Singletons/terrain_service.gd" id="1_8wg1j"]
 [ext_resource type="PackedScene" uid="uid://d0k84g7agsotx" path="res://UI/building_bar.tscn" id="1_dajm1"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://qxeqvauli3my" path="res://UI/tutorial/tutorial_panel.gd" id="5_npsim"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_x42ai"]
 [ext_resource type="Script" uid="uid://dox8o0gii8kg3" path="res://UI/wave_counter.gd" id="6_b5f40"]
+[ext_resource type="PackedScene" uid="uid://ma7sw3g58j4t" path="res://UI/trade_menu/trade_menu.tscn" id="6_gphxq"]
 [ext_resource type="Script" uid="uid://cauusuod0mrq8" path="res://UI/time_control_buttons.gd" id="9_doea8"]
 [ext_resource type="Script" uid="uid://brbwle80gvof" path="res://UI/wave_timeline/wave_timeline.gd" id="9_x42ai"]
 [ext_resource type="Script" uid="uid://cusv1l6vww08n" path="res://UI/relic_display.gd" id="10_aasu8"]
@@ -64,6 +65,79 @@ visible = false
 offset_right = 74.0
 offset_bottom = 34.0
 
+[node name="Expansion" type="Panel" parent="." node_paths=PackedStringArray("_vbox")]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_dajm1")
+_vbox = NodePath("OptionsContainer")
+
+[node name="OptionsContainer" type="VBoxContainer" parent="Expansion"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.35
+anchor_right = 0.75
+anchor_bottom = 0.65
+theme_type_variation = &"vbox_5"
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Trade" parent="." instance=ExtResource("6_gphxq")]
+
+[node name="Reward" type="Panel" parent="." node_paths=PackedStringArray("card_list", "reroll_button")]
+visible = false
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_q3aj2")
+card_list = NodePath("CenterContainer/main_container/card_list")
+card_scene = ExtResource("5_m8qfw")
+reroll_button = NodePath("CenterContainer/main_container/reroll")
+
+[node name="CenterContainer" type="CenterContainer" parent="Reward"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="main_container" type="VBoxContainer" parent="Reward/CenterContainer"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="title" type="RichTextLabel" parent="Reward/CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"rt_s20"
+theme_override_colors/default_color = Color(1, 0.98039216, 0.95686275, 1)
+bbcode_enabled = true
+text = "Choose a reward"
+fit_content = true
+horizontal_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="card_list" type="VBoxContainer" parent="Reward/CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="reroll" type="Button" parent="Reward/CenterContainer/main_container"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Reroll (0)"
+
 [node name="Margin" type="MarginContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,7 +182,7 @@ custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
-text = "Tutorial
+text = "[b]Tutorial[/b]
 Press akgggggggggggggggggggggggg"
 fit_content = true
 scroll_active = false
@@ -334,82 +408,6 @@ offset_right = 201.0
 offset_bottom = 300.0
 grow_vertical = 2
 size_flags_horizontal = 0
-
-[node name="Expansion" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("_vbox")]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 45.0
-offset_top = 72.0
-offset_right = 45.0
-offset_bottom = 72.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("2_dajm1")
-_vbox = NodePath("OptionsContainer")
-
-[node name="OptionsContainer" type="VBoxContainer" parent="Margin/ui_space/Expansion"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.35
-anchor_right = 0.75
-anchor_bottom = 0.65
-theme_type_variation = &"vbox_5"
-alignment = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="Reward" type="Panel" parent="Margin/ui_space" node_paths=PackedStringArray("card_list", "reroll_button")]
-visible = false
-z_index = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("4_q3aj2")
-card_list = NodePath("CenterContainer/main_container/card_list")
-card_scene = ExtResource("5_m8qfw")
-reroll_button = NodePath("CenterContainer/main_container/reroll")
-
-[node name="CenterContainer" type="CenterContainer" parent="Margin/ui_space/Reward"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="main_container" type="VBoxContainer" parent="Margin/ui_space/Reward/CenterContainer"]
-custom_minimum_size = Vector2(600, 0)
-layout_mode = 2
-theme_type_variation = &"vbox_20"
-
-[node name="title" type="RichTextLabel" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
-layout_mode = 2
-theme_type_variation = &"rt_s20"
-theme_override_colors/default_color = Color(1, 0.98039216, 0.95686275, 1)
-bbcode_enabled = true
-text = "Choose a reward"
-fit_content = true
-horizontal_alignment = 1
-script = ExtResource("5_x42ai")
-metadata/_custom_type_script = "uid://bf2quvi78ybbq"
-
-[node name="card_list" type="VBoxContainer" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
-layout_mode = 2
-theme_type_variation = &"vbox_20"
-
-[node name="reroll" type="Button" parent="Margin/ui_space/Reward/CenterContainer/main_container"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Reroll (0)"
 
 [node name="Stats" type="Control" parent="Margin/ui_space"]
 layout_mode = 1

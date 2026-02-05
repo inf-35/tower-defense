@@ -64,7 +64,7 @@ func _evaluate_unit_position(state: RuinedGroundState, unit: Unit, cell: Vector2
 			state.slowed_units[unit] = mod
 			
 	# left ruins (remove)
-	elif not is_on_ruin and is_currently_slowed:
+	elif (not is_on_ruin) and is_currently_slowed:
 		if is_instance_valid(unit.modifiers_component):
 			var mod: Modifier = state.slowed_units[unit]
 			unit.modifiers_component.remove_modifier(mod)

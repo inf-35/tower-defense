@@ -56,7 +56,7 @@ func _init():
 	
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
 	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.015))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.025))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -282,13 +282,12 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 					
 			if not _terrain_pity_counters.has(rule.terrain_type):
 				_terrain_pity_counters[rule.terrain_type] = randf_range(-0.2, 0.4) #randomise phases
-			print(rule.terrain_type, " pity: ", _terrain_pity_counters[rule.terrain_type])
 			var current_pity = _terrain_pity_counters[rule.terrain_type]
 			var roll: float = randf()
 			
 			if roll > (rule.probability * (1.0 + current_pity)):
 				#failure!
-				_terrain_pity_counters[rule.terrain_type] += 0.05
+				_terrain_pity_counters[rule.terrain_type] += 0.2
 				continue
 			#success!
 			_terrain_pity_counters[rule.terrain_type] = -0.5

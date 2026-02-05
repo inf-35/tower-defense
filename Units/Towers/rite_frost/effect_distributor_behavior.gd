@@ -5,14 +5,17 @@ class_name EffectDistributorBehavior
 @export_flags("Up", "Right", "Down", "Left") var active_directions: int = 0b1111 ##bitmask to configure adjacencies
 
 var _buffed_neighbors: Array[Tower] = []
+var attached: bool = false
 
 func detach():
+	attached = false
 	# revoke our contribution from all current neighbors
 	for t in _buffed_neighbors:
 		_modify_stack(t, -1)
 	_buffed_neighbors.clear()
 		
 func attach():
+	attached = true
 	_on_adjacency_updated(unit.get_adjacent_towers())
 
 func start():
@@ -28,6 +31,9 @@ func start():
 
 # logic to sync buffs with current grid state
 func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
+	if not attached:
+		return
+	
 	var current_neighbors: Array[Tower] = []
 	var host_tower := unit as Tower
 
@@ -69,21 +75,10 @@ func _is_local_direction_allowed(host_facing: Tower.Facing, grid_dir: Vector2i) 
 func _modify_stack(target: Tower, amount: int) -> void:
 	if not is_instance_valid(target):
 		return
-	target.apply_effect(buff_effect, amount)
-	## check if target already has effect
-	#var instance: EffectInstance = target.get_effect_instance_by_prototype(buff_effect)
-#
-	#if amount > 0:
-		#if instance:
-			#instance.stacks += amount #add stacks
-		#else:
-			#target.apply_effect(buff_effect) #apply new buff
-	#else: #removing stacks
-		#if instance:
-			#instance.stacks += amount #decrease stack
-			## if stacks hit 0, remove the effect entirely
-			#if instance.stacks <= 0:
-				#target.remove_effect(buff_effect)
+
+	var effect_instance := target.apply_effect(buff_effect, amount)
+	if effect_instance:
+		effect_instance.source = unit
 
 # cleanup: when this tower is sold/destroyed/upgraded
 func _on_exit(_hit_report_data: HitReportData = null) -> void:

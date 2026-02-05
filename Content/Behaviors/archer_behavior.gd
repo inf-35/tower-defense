@@ -49,4 +49,4 @@ func _move_towards_keep() -> void:
 
 func _hold_position() -> void:
 	if is_instance_valid(navigation_component) and is_instance_valid(movement_component):
-		movement_component.speed_control = 0.4 #the archer slows down immensely (hold in place)
+		movement_component.speed_control = 0.5 #the archer slows down immensely (hold in place)

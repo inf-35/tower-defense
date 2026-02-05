@@ -129,6 +129,7 @@ texture = ExtResource("10_c4spf")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]
 script = ExtResource("11_qdu16")
+height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]

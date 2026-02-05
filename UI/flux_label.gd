@@ -12,7 +12,7 @@ func _ready() -> void:
 	UI.update_capacity.connect(_update_capacity)
 	UI.update_health.connect(_update_health)
 	
-	UI.tutorial_manager.register_element(TutorialManager.Reference.PLAYER_STATS, self)
+	UI.tutorial_manager.register_element(TutorialStep.Reference.PLAYER_STATS, self)
 	
 	if Player:
 		_update_capacity(Player.used_capacity, Player.tower_capacity)

@@ -3,7 +3,7 @@ class_name FloatingTextManager
 
 # --- Configuration ---
 @export var text_scene: PackedScene
-@export var initial_pool_size: int = 30
+@export var initial_pool_size: int = 20
 
 @export_group("Physics Defaults")
 @export var default_velocity_min: Vector2 = Vector2(-2, -5)
@@ -34,6 +34,25 @@ func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, sc
 
 func show_text(text: String, world_pos: Vector2, color: Color) -> void:
 	_spawn_text(text, world_pos, color, 1.0)
+
+func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0) -> void:
+	if not icon: return
+
+	var instance: FloatingText
+	if _pool.is_empty():
+		instance = _create_new_text()
+	else:
+		instance = _pool.pop_back()
+	
+	_active_count += 1
+	
+	# float up
+	var vel = Vector2(0, -7.0) 
+	instance.scale = Vector2(0.06, 0.06) * scale_mod
+	
+	var lifetime = 0.5 if Phases.current_phase == Phases.GamePhase.COMBAT_WAVE else 1.2
+	var color = Color(1,1,1,0.5) if Phases.current_phase == Phases.GamePhase.COMBAT_WAVE else Color.WHITE
+	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self) # 0 gravity
 
 func _spawn_text(txt: String, pos: Vector2, col: Color, scale_mod: float) -> void:
 	var instance: FloatingText

@@ -8,6 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_iudbq"]
 script = ExtResource("1_jcq77")
+icon = ExtResource("3_jcq77")
 metadata/_custom_type_script = "uid://cnpliuoex413q"
 
 [sub_resource type="Resource" id="Resource_y8oq8"]

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=7 format=3 uid="uid://bd56f02huvtvd"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_b53ag"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_jbgac"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_wj7lg"]
+[ext_resource type="Resource" uid="uid://irjol15uv6x6" path="res://Content/StatDisplays/armor.tres" id="4_5ux23"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_m5du8"]
+[ext_resource type="PackedScene" uid="uid://v46gqptl5gwb" path="res://Units/Enemies/hulk/hulk.tscn" id="5_72mit"]
+
+[resource]
+script = ExtResource("1_b53ag")
+title = "Hulk"
+description = "Very tanky, and very armoured"
+stat_displays = Array[ExtResource("2_jbgac")]([ExtResource("3_wj7lg"), ExtResource("4_5ux23"), ExtResource("4_m5du8")])
+unit_scene = ExtResource("5_72mit")
+flux_value = 0.6
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

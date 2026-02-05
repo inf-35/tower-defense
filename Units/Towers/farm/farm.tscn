@@ -1,6 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8grn8x6m1kta"]
+[gd_scene load_steps=12 format=3 uid="uid://c8grn8x6m1kta"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5gwp7"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_7c8ug"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_c0bwh"]
 [ext_resource type="Script" uid="uid://djqe37wfw77og" path="res://Units/Towers/farm/farm_behavior.gd" id="4_7c8ug"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_88tye"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_b344s"]
@@ -14,6 +16,7 @@
 z_index = 100
 script = ExtResource("1_5gwp7")
 type = 53
+stat_displays = Array[ExtResource("2_7c8ug")]([ExtResource("3_c0bwh")])
 behavior = NodePath("FarmBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -23,7 +26,6 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="FarmBehavior" type="Node" parent="."]
 script = ExtResource("4_7c8ug")
-income_per_wave = 1
 metadata/_custom_type_script = "uid://djqe37wfw77og"
 
 [node name="MovementComponent" type="Node" parent="."]

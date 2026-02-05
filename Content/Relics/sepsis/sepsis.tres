@@ -15,7 +15,7 @@ script = ExtResource("3_hou0f")
 type = 11
 global_effect = SubResource("Resource_3khoc")
 title = "Sepsis"
-description = "All {POISON} on already bleeding enemies last 300% longer.
+description = "All {POISON} on already {BLEED|label=Bleeding} enemies last 300% longer.
 "
 icon = ExtResource("2_3khoc")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

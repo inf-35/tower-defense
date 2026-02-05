@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_y4ar2"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_ym64a"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="3_a25br"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_v674q"]
 [ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="4_cn8jh"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_wt5ct"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_6ie21"]
@@ -11,12 +12,6 @@
 [ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="9_0yltl"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_yveou"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_j7x2b"]
-
-[sub_resource type="Resource" id="Resource_p6ncc"]
-script = ExtResource("2_ym64a")
-attribute = 0
-label = "HP"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_cn8jh")
@@ -99,7 +94,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_y4ar2")
 type = 46
-stat_displays = Array[ExtResource("2_ym64a")]([SubResource("Resource_p6ncc")])
+stat_displays = Array[ExtResource("2_ym64a")]([ExtResource("3_v674q")])
 behavior = NodePath("EffectDistributorBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -133,6 +128,7 @@ texture = ExtResource("9_0yltl")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]
 script = ExtResource("10_yveou")
+height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]

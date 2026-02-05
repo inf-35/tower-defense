@@ -37,3 +37,4 @@ func _trigger_neighbors(wall: Tower) -> void:
 
 		if is_instance_valid(neighbor.attack_component):
 			neighbor.attack_component.current_cooldown = 0.0
+			UI.floating_text_manager.show_icon(icon, neighbor.position)

@@ -28,7 +28,7 @@ func register_effect(prototype: EffectPrototype) -> EffectInstance:
 		_global_effects[schedule] = {}
 	
 	# sort the instance into buckets based on the events it listens to
-	for event_type: GameEvent.EventType in instance.event_hooks:
+	for event_type: GameEvent.EventType in prototype.event_hooks:
 		if not _global_effects[schedule].has(event_type):
 			_global_effects[schedule][event_type] = [] as Array[EffectInstance]
 			

@@ -376,7 +376,8 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 		DisplayStatModifier.CAPACITY: return Towers.get_tower_capacity(tower.type)
 		DisplayStatModifier.LINE_BREAK: return null
 		DisplayStatModifier.CAPACITY_GENERATION: 
-			return tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation")
+			#return tower.get_intrinsic_effect_attribute(Effects.Type.CAPACITY_GENERATOR, &"last_capacity_generation")
+			return null
 		DisplayStatModifier.WAVES_LEFT_IN_PHASE:
 			return tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 		DisplayStatModifier.ANOMALY_REWARD_PREVIEW:

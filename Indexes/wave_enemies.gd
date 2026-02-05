@@ -6,78 +6,126 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 3],
 	],
 	2: [
-		[Units.Type.BASIC, 6],
-	],
-	3: [
-		[Units.Type.BASIC, 4],
-		[Units.Type.BUFF, 2],
-	],
-	4: [
-		[Units.Type.BASIC, 4],
-		[Units.Type.BUFF, 4],
-	],
-	5 : [
-		[Units.Type.BASIC, 4],
-		[Units.Type.DRIFTER, 8],
-	],
-	6 : [
-		[Units.Type.BASIC, 4],
-		[Units.Type.HEALER, 3],
 		[Units.Type.BASIC, 5],
 	],
-	7 : [
-		[Units.Type.BUFF, 3],
+	3: [
+		[Units.Type.BASIC, 3],
+		[Units.Type.BUFF, 1],
+	],
+	4: [
+		[Units.Type.BASIC, 3],
+		[Units.Type.BUFF, 2],
+	],
+	5 : [
+		[Units.Type.BASIC, 3],
+		[Units.Type.DRIFTER, 2],
+	],
+	6 : [
+		[Units.Type.BASIC, 2],
 		[Units.Type.HEALER, 2],
-		[Units.Type.BASIC, 8],
+		[Units.Type.BASIC, 2],
+	],
+	7 : [
+		[Units.Type.BUFF, 2],
+		[Units.Type.HEALER, 2],
+		[Units.Type.BASIC, 4],
 	],
 	8 : [
-		[Units.Type.BUFF, 4],
+		[Units.Type.BUFF, 2],
 		[Units.Type.DRIFTER, 4],
 		[Units.Type.HEALER, 2],
-		[Units.Type.BASIC, 8],
+		[Units.Type.BASIC, 6],
 	],
 	9 : [
-		[Units.Type.DRIFTER, 6],
+		[Units.Type.DRIFTER, 4],
 		[Units.Type.BASIC, 10],
 		[Units.Type.HEALER, 2],
-		[Units.Type.BUFF, 8],
+		[Units.Type.BUFF, 6],
 	],
 	10 : [
 		[Units.Type.TROLL, 2],
-		[Units.Type.BASIC, 10],
+		[Units.Type.BASIC, 15],
 	],
 	11 : [
-		[Units.Type.TROLL, 3],
-		[Units.Type.BASIC, 10],
+		[Units.Type.TROLL, 4],
+		[Units.Type.BASIC, 12],
 		[Units.Type.BUFF, 6],
 	],
 	12 : [
-		[Units.Type.WARRIOR, 8],
+		[Units.Type.WARRIOR, 10],
 		[Units.Type.HEALER, 2],
-		[Units.Type.WARRIOR, 6],
+		[Units.Type.WARRIOR, 10],
 		[Units.Type.HEALER, 2],
 	],
 	13 : [
 		[Units.Type.GIANT, 8],
 	],
 	14 : [
-		[Units.Type.TROLL, 3],
-		[Units.Type.DRIFTER, 4],
-		[Units.Type.GIANT, 3],
-		[Units.Type.HEALER, 4],
-		[Units.Type.WARRIOR, 5],
+		[Units.Type.GIANT, 6],
+		[Units.Type.ARCHER, 5],
 	],
 	15 : [
-		[Units.Type.TROLL, 7],
-		[Units.Type.HEALER, 2],
+		[Units.Type.TROLL, 6],
+		[Units.Type.HEALER, 3],
 	],
 	16 : [
 		[Units.Type.TROLL, 4],
-		[Units.Type.DRIFTER, 8],
+		[Units.Type.DRIFTER, 12],
 		[Units.Type.GIANT, 4],
+		[Units.Type.HEALER, 4],
+		[Units.Type.WARRIOR, 12],
+	],
+	17 : [
+		[Units.Type.SPRINTER, 10],
+		[Units.Type.HEALER, 4],
+		[Units.Type.SPRINTER, 10],
+	],
+	18 : [
+		[Units.Type.TROLL, 8],
+		[Units.Type.SPRINTER, 8],
+		[Units.Type.WARRIOR, 20],
+		[Units.Type.HEALER, 6],
+		[Units.Type.WARRIOR, 20],
+		[Units.Type.ARCHER, 8],
+	],
+	19 : [
+		[Units.Type.GIANT, 6],
 		[Units.Type.HEALER, 3],
-		[Units.Type.WARRIOR, 10],
-	]
+		[Units.Type.GIANT, 6],
+		[Units.Type.ARCHER, 3],
+	],
+	20 : [
+		[Units.Type.HULK, 7],
+	],
+	21 : [
+		[Units.Type.HULK, 5],
+		[Units.Type.SPRINTER, 12],
+		[Units.Type.HEALER, 5],
+		[Units.Type.WARRIOR, 24],
+		[Units.Type.ARCHER, 8],
+	],
+	22 : [
+		[Units.Type.HULK, 6],
+		[Units.Type.TROLL, 6],
+		[Units.Type.SPRINTER, 16],
+		[Units.Type.HEALER, 7],
+		[Units.Type.WARRIOR, 30],
+		[Units.Type.ARCHER, 12],
+	],
+	23 : [
+		[Units.Type.WARRIOR, 45],
+		[Units.Type.HEALER, 4],
+		[Units.Type.WARRIOR, 45],
+		[Units.Type.ARCHER, 10],
+	],
+	24 : [
+		[Units.Type.HULK, 8],
+		[Units.Type.TROLL, 6],
+		[Units.Type.SPRINTER, 16],
+		[Units.Type.HEALER, 7],
+		[Units.Type.WARRIOR, 30],
+		[Units.Type.ARCHER, 12],
+	],
 }
 # --- unit catalog ---
 # this is the master data definition for all spawnable units.

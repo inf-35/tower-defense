@@ -9,6 +9,7 @@
 script = ExtResource("1_3apu2")
 bleed_duration = 0.8
 schedule = 1
+icon = ExtResource("2_3apu2")
 metadata/_custom_type_script = "uid://bkh1iolpvnhku"
 
 [resource]

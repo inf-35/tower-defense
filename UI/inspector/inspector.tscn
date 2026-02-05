@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cr8iyxr7mn4kd" path="res://UI/inspector/inspector.gd" id="1_kvbly"]
 [ext_resource type="Script" uid="uid://bxcpffjdkujg" path="res://UI/aspect_ratio_container.gd" id="2_6mo1h"]
 [ext_resource type="PackedScene" uid="uid://xce2w3es51dx" path="res://UI/inspector/inspector_action_button.tscn" id="3_l0dwj"]
-[ext_resource type="Texture2D" uid="uid://dpo3wfp1e8jhy" path="res://Assets/default_icon.svg" id="4_2ber5"]
+[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="5_l0dwj"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_re0sn"]
 
 [node name="inspector" type="Control" node_paths=PackedStringArray("tower_overview", "inspector_icon", "healthbar", "inspector_title", "subtitle", "status_container", "button_container", "stats", "description")]
@@ -61,14 +61,13 @@ metadata/_custom_type_script = "uid://bxcpffjdkujg"
 
 [node name="TextureRect" type="TextureRect" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid"]
 layout_mode = 2
-texture = ExtResource("4_2ber5")
+texture = ExtResource("5_l0dwj")
 expand_mode = 1
 
 [node name="HealthBar" type="ProgressBar" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 theme_type_variation = &"healthbar"
-value = 50.0
 show_percentage = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector"]
@@ -86,13 +85,13 @@ theme_type_variation = &"hbox_5"
 [node name="inspector_title" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
 layout_mode = 2
 theme_type_variation = &"LabelHeader"
-text = "FLAMETHROWER"
+text = "Inspector"
 vertical_alignment = 2
 
 [node name="subtitle" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
 layout_mode = 2
 theme_type_variation = &"LabelInlineheader"
-text = "mk 7"
+text = "mk "
 vertical_alignment = 2
 
 [node name="status_container" type="HBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title"]
@@ -125,7 +124,6 @@ size_flags_stretch_ratio = 0.5
 theme = ExtResource("1_2ber5")
 theme_type_variation = &"rt_s20_descriptive"
 bbcode_enabled = true
-text = "Inflicts flame to multiple enemies in a large cone.aaaaaaaaaaaaaaaaa"
 fit_content = true
 script = ExtResource("5_re0sn")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"

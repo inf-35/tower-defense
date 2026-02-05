@@ -42,7 +42,7 @@ script = ExtResource("6_nhso7")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.06, 0.06)
+scale = Vector2(0.065, 0.065)
 texture = ExtResource("7_jmo6j")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]

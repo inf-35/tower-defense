@@ -37,14 +37,11 @@ static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 var flux_value: float #how much flux this unit drops when killed / sold
 #effect-related state
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
-var effects: Dictionary[EffectPrototype.Schedule, Array] = {
-	EffectPrototype.Schedule.MULTIPLICATIVE: [],
-	EffectPrototype.Schedule.ADDITIVE: [],
-	EffectPrototype.Schedule.REACTIVE: [],
-} #sorted by Schedule, see EffectPrototype. each array contains EffectInstances
-var effects_by_type: Dictionary[Effects.Type, Array] = {
-	#each array contains EffectInstances
-} # for lookup by type
+var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x][y] -> Array[EffectInstance] where x is schedule and y is event hook.
+	EffectPrototype.Schedule.MULTIPLICATIVE: {},
+	EffectPrototype.Schedule.ADDITIVE: {},
+	EffectPrototype.Schedule.REACTIVE: {},
+} 
 #unit state
 var unit_id: int = References.assign_unit_id()
 var blocked: bool #whether this unit is currently blocked by a tower
@@ -204,8 +201,10 @@ func _setup_event_bus() -> void:
 		event.unit = self
 		#execute local effects
 		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
-			var scheduled_effects: Array = effects[schedule_class] #multiplicative -> additive -> reactive
-			for effect_instance: EffectInstance in scheduled_effects:
+			var scheduled_effects: Dictionary = effects[schedule_class] #multiplicative -> additive -> reactive
+			if not scheduled_effects.has(event.event_type):
+				continue #no scheduled effects of correct event type
+			for effect_instance: EffectInstance in scheduled_effects[event.event_type]:
 				effect_instance.handle_event_unfiltered(event)
 		#exectue global effects
 		if event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
@@ -225,51 +224,40 @@ func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
 		apply_effect(effect_prototype)
 
-func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> void: ##negative for removing without clearing
+func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectInstance: ##negative for removing without clearing
 	if stacks < 0:
 		if not get_effect_instance_by_prototype(effect_prototype):
-			return
+			return null
 
 		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
 		effect_instance.stacks += stacks
 		if effect_instance.stacks <= 0:
 			remove_effect(effect_prototype)
 
-		return
+		return null
 
 	if get_effect_instance_by_prototype(effect_prototype):
 		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
-		return
+		return get_effect_instance_by_prototype(effect_prototype)
 	
-	effect_prototypes.append(effect_prototype)
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
-	effects[effect_prototype.schedule].append(effect_instance)
+	var schedule := effect_instance.schedule
+	for event_hook: GameEvent.EventType in effect_instance.event_hooks:
+		if not effects[schedule].has(event_hook):
+			effects[schedule][event_hook] = []
+		effects[schedule][event_hook].append(effect_instance)
 	effect_instance.stacks = stacks
 	effect_instance.attach_to(self)
-	
-	var type = effect_prototype.effect_type
-	if not effects_by_type.has(type):
-		effects_by_type[type] = [] # Create an array for this type if it's the first one.
-
-	effects_by_type[type].append(effect_instance)
+	effect_prototypes.append(effect_prototype)
+	return effect_instance
 
 func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effects, regardless of number
-	var effects_to_remove: Array[EffectInstance] = []
-	
-	for effect_instance: EffectInstance in effects[effect_prototype.schedule]: #remove all child EffectInstances
-		if effect_instance.effect_prototype == effect_prototype:
-			effects_to_remove.append(effect_instance)
+	var effects_to_remove: Array[EffectInstance] = get_effect_instances_by_prototype(effect_prototype)
 			
 	for effect in effects_to_remove:
 		effect.detach() #trigger effect's detach handler
-		effects[effect_prototype.schedule].erase(effect)
-		
-		var type : Effects.Type = effect.effect_type
-		if effects_by_type.has(type):
-			effects_by_type[type].erase(effect)
-			# If this was the last effect of its type, clean up the key.
-			if effects_by_type[type].is_empty():
-				effects_by_type.erase(type)
+		for event_hook in effect.event_hooks:
+			effects[effect.schedule][event_hook].erase(effect)
 		
 		effect.free()
 #
@@ -278,27 +266,37 @@ func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effe
 # helper to find a specific running instance of a prototype on this unit
 func get_effect_instance_by_prototype(proto: EffectPrototype) -> EffectInstance:
 	# iterate through all schedules to find the instance
-	for schedule_list: Array in effects.values():
-		for instance: EffectInstance in schedule_list:
+	for instance_array: Array in effects[proto.schedule].values():
+		for instance: EffectInstance in instance_array:
 			if instance.effect_prototype == proto:
-				return instance
+					return instance
 	return null
-
-func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant: ##access properties of intrinsic effects, mainly for UI
-	if not effects_by_type.has(effect_type):
-		return null
-		
-	var instances = effects_by_type[effect_type]
-	if instances.is_empty():
-		return null
-		
-	# for intrinsic effects, we usually only care about the first one.
-	var first_instance: EffectInstance = instances[0]
-	# using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
-	if first_instance.effect_prototype.get(attribute_name): #first check effect prototype parameters
-		return first_instance.effect_prototype.get(attribute_name)
-	else: #fallback to checking effect instance state
-		return first_instance.state.get(attribute_name)
+	
+func get_effect_instances_by_prototype(proto: EffectPrototype) -> Array[EffectInstance]:
+	var output: Array[EffectInstance] = []
+	# iterate through all schedules to find the instance
+	for schedule_dictionary: Dictionary in effects.values():
+		for instance_array: Array in schedule_dictionary.values():
+			for instance: EffectInstance in instance_array:
+				if instance.effect_prototype == proto and not output.has(instance):
+					output.append(instance)
+	return output
+#
+#func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant: ##access properties of intrinsic effects, mainly for UI
+	#if not effects_by_type.has(effect_type):
+		#return null
+		#
+	#var instances = effects_by_type[effect_type]
+	#if instances.is_empty():
+		#return null
+		#
+	## for intrinsic effects, we usually only care about the first one.
+	#var first_instance: EffectInstance = instances[0]
+	## using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
+	#if first_instance.effect_prototype.get(attribute_name): #first check effect prototype parameters
+		#return first_instance.effect_prototype.get(attribute_name)
+	#else: #fallback to checking effect instance state
+		#return first_instance.state.get(attribute_name)
 
 func get_behavior_attribute(attribute_name: StringName) -> Variant: ##accesses properties for units, mainly for UI
 	if not is_instance_valid(behavior):
@@ -411,7 +409,7 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Player.flux += hit_report_data.flux_value * 0.25 #reward player with flux
+	Player.flux += hit_report_data.flux_value * 0.1 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
 	behavior.detach() #disable behavior

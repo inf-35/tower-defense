@@ -22,7 +22,7 @@ signal unhovered()
 var _reward_data: Reward
 
 func _ready() -> void:
-	# Ensure the container itself can catch mouse events
+	# ensure the container itself can catch mouse events
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	mouse_entered.connect(_on_mouse_entered)
@@ -61,7 +61,7 @@ func _apply_visuals(reward: Reward) -> void:
 			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
-			desc_text = Towers.get_tower_description(type)
+			desc_text = KeywordService.resolve_tower_description_from_type(type)
 			
 		Reward.Type.ADD_RELIC:
 			var relic: RelicData = reward.relic
@@ -74,7 +74,7 @@ func _apply_visuals(reward: Reward) -> void:
 			# fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
-			desc_text = Towers.get_tower_description(type)
+			desc_text = KeywordService.resolve_tower_description_from_type(type)
 				
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount

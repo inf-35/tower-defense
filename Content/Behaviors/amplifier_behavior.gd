@@ -10,13 +10,15 @@ class_name AmplifierBehavior
 # this dictionary tracks the modifiers this specific amplifier has applied to other towers.
 # format: { Tower -> Array[Modifier] }
 var _applied_modifiers: Dictionary[Tower, Array] = {}
+var attached: bool = false
 
 func detach():
+	attached = false
 	# revoke our contribution from all current neighbors
-	for t in _applied_modifiers:
-		_remove_modifier_from_tower(t)
+	_clear_all_modifiers()
 		
 func attach():
+	attached = true
 	_on_adjacency_updated(unit.get_adjacent_towers())
 
 # called by the unit chassis after all components are ready.
@@ -38,6 +40,8 @@ func start() -> void:
 
 # this is the main logic, triggered whenever the host tower's neighbors change.
 func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:
+	if not attached:
+		return
 	# fail gracefully if no modifier is defined for this amplifier.
 	if modifier_prototypes.is_empty():
 		_clear_all_modifiers() # clear any existing effects and stop
@@ -52,7 +56,7 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 			towers_to_unmodify.append(affected_tower)
 	
 	for tower: Tower in towers_to_unmodify:
-		_remove_modifier_from_tower(tower)
+		_remove_modifiers_from_tower(tower)
 
 	# --- 2. apply modifiers to newly adjacent towers ---
 	for tower: Tower in current_adjacent_towers:
@@ -63,12 +67,9 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 func _exit_tree() -> void:
 	_clear_all_modifiers()
 
-# --- private helper functions ---
-
 func _apply_modifier_to_tower(target_tower: Tower) -> void:
 	if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
 		return
-	
 	for modifier_prototype: ModifierDataPrototype in modifier_prototypes:
 		var new_modifier := modifier_prototype.generate_modifier()
 		# brand the modifier with our host unit's ID for clear source tracking.
@@ -79,10 +80,10 @@ func _apply_modifier_to_tower(target_tower: Tower) -> void:
 			_applied_modifiers[target_tower] = []
 		_applied_modifiers[target_tower].append(new_modifier) # track the applied modifier
 
-func _remove_modifier_from_tower(target_tower: Tower) -> void:
+func _remove_modifiers_from_tower(target_tower: Tower) -> void:
 	if not _applied_modifiers.has(target_tower):
 		return
-		
+
 	if is_instance_valid(target_tower) and is_instance_valid(target_tower.modifiers_component):
 		var modifiers_to_remove: Array = _applied_modifiers[target_tower]
 		for modifier_to_remove: Modifier in modifiers_to_remove:
@@ -94,7 +95,8 @@ func _clear_all_modifiers() -> void:
 	# create a copy of the keys because we will be modifying the dictionary while iterating
 	var towers_to_clear: Array[Tower] = _applied_modifiers.keys()
 	for tower: Tower in towers_to_clear:
-		_remove_modifier_from_tower(tower)
+		_remove_modifiers_from_tower(tower)
+	_applied_modifiers.clear()
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var tower := unit as Tower

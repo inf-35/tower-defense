@@ -16,3 +16,9 @@ theme_override_font_sizes/font_size = 40
 text = "34343"
 script = ExtResource("2_wir02")
 metadata/_custom_type_script = "uid://dl8cx61h25xj"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 55.0
+offset_bottom = 55.0
+expand_mode = 5

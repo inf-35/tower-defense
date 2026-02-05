@@ -5,7 +5,7 @@ class_name EffectPrototype #used for cause-and-effect structures -> this is the 
 
 @export var effect_type: Effects.Type ##id of this type of effect
 var global: bool = false ##whether this effect is a local(unit-wise) or global effect
-var event_hooks: Array[GameEvent.EventType] #just for information, the event hooks can be found in per-handler behaviour
+var event_hooks: Array[GameEvent.EventType] ##all effects must have at least one, if NA put NONE
 
 enum Schedule { #schedule categories, used to enforce determinstic ordering of effects
 	MULTIPLICATIVE,
@@ -21,6 +21,7 @@ var detach_handler: Callable = _handle_detach
 var event_handler: Callable = _handle_event
 var stack_update_handler: Callable = _handle_stack_update
 
+@export var icon: Texture2D ##icon that plays when this effectprototype is "triggered"
 #event handlers; these are injected into EffectInstance at runtime
 @abstract func _handle_attach(instance: EffectInstance) -> void
 @abstract func _handle_detach(instance: EffectInstance) -> void
@@ -43,6 +44,7 @@ func apply_generics(effect_instance: EffectInstance) -> void: ##helper for creat
 	effect_instance.global = global
 	effect_instance.effect_type = effect_type
 	effect_instance.event_hooks = event_hooks
+	effect_instance.schedule = schedule
 	#effect_instance.duration = duration
 	effect_instance.effect_prototype = self as EffectPrototype
 	

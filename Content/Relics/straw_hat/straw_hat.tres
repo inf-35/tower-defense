@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://wilx6e67j6un"]
+
+[ext_resource type="Texture2D" uid="uid://coyux68csxk8e" path="res://Assets/straw_hat.png" id="1_ili8f"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_fd2sd"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="5_joo2b"]
+
+[sub_resource type="Resource" id="Resource_nrgp3"]
+script = ExtResource("4_fd2sd")
+target_filter = 3
+required_type = 53
+key = &"farm_adjacent_bonus"
+additive = 0.25
+metadata/_custom_type_script = "uid://cyc5vw8sicomn"
+
+[resource]
+script = ExtResource("5_joo2b")
+type = 30
+modifier_prototypes = Array[ExtResource("4_fd2sd")]([SubResource("Resource_nrgp3")])
+title = "Straw Hat"
+description = "{T_FARM|label=Farms} earn 0.25 {GOLD} more for each adjacent farm."
+icon = ExtResource("1_ili8f")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

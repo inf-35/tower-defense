@@ -54,3 +54,4 @@ func _apply_bonus(hit_data: HitData) -> void:
 	current.y = max(current.y, bleed_duration)
 		
 	hit_data.status_effects[Attributes.Status.BLEED] = current
+	UI.floating_text_manager.show_icon(icon, hit_data.source.global_position)

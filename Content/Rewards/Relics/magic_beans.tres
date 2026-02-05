@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://c7lro5ngcgsb3"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_8ests"]
+[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_rgsqs"]
+[ext_resource type="Resource" uid="uid://bq68qak5xnobj" path="res://Content/Relics/magic_beans/magic_beans.tres" id="3_0n4p4"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_iipg4"]
+
+[sub_resource type="Resource" id="Resource_wdjo4"]
+script = ExtResource("2_rgsqs")
+tower_types = Array[int]([18])
+operation = 1
+metadata/_custom_type_script = "uid://7k2jlkybgih"
+
+[resource]
+script = ExtResource("3_iipg4")
+id_name = "ambush"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("3_0n4p4")
+bias_rules = Array[ExtResource("1_8ests")]([SubResource("Resource_wdjo4")])
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -20,6 +20,8 @@ enum EventType {
 	
 	ADJACENCY_UPDATED, ##for towers only
 	TOWER_BUILT, ##for when a tower is first built (attached with BuildTowerData)
+	
+	NONE, ##for effects with no hooks
 }
 
 var event_type: EventType

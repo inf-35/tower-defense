@@ -172,7 +172,7 @@ func _ready() -> void:
 	UI.start_phase.connect(func(wave, combat, subtype): _jump_to_wave(wave, combat, subtype))
 	UI.update_wave_schedule.connect(_rebuild_full_schedule)
 	
-	UI.tutorial_manager.register_element(TutorialManager.Reference.WAVE_TIMELINE, self)
+	UI.tutorial_manager.register_element(TutorialStep.Reference.WAVE_TIMELINE, self)
 
 # --- Data Generation ---
 

@@ -21,5 +21,9 @@ static var MOKA_POT: RelicData = load("res://Content/Relics/moka_pot/moka_pot.tr
 static var PAPER_UMBRELLA: RelicData = load("res://Content/Relics/paper_umbrella/paper_umbrella.tres")
 static var PAWN_STRUCTURE: RelicData = load("res://Content/Relics/pawn_structure/pawn_structure.tres")
 static var SIGNAL_FLAG: RelicData = load("res://Content/Relics/signal_flag/signal_flag.tres")
+static var MAGIC_BEANS: RelicData = load("res://Content/Relics/magic_beans/magic_beans.tres")
+static var STRAW_HAT: RelicData = load("res://Content/Relics/straw_hat/straw_hat.tres")
+static var WALLFLOWER: RelicData = load("res://Content/Relics/wallflower/wallflower.tres")
+
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {} ## relics indexed by type, loaded by reward_service

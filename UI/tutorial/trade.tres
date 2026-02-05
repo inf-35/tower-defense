@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://dk1tas04x5ba4"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_tnhaf"]
+
+[resource]
+script = ExtResource("1_tnhaf")
+instruction_text = "Open the trader menu to view and purchase upgrades and towers."
+success_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below.
+Q to continue."
+panel_anchor = 2
+trigger_action = &"0"
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

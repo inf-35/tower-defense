@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cgk03k5hmm2tg"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://cgk03k5hmm2tg"]
 
 [ext_resource type="Texture2D" uid="uid://dgjwrg2hlraqj" path="res://Assets/curses_rite.png" id="1_gomyy"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cu7js"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_1kge3"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_avhhg"]
-[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_lqs4e"]
 [ext_resource type="PackedScene" uid="uid://dw4c3by6twkb7" path="res://Units/Towers/rite_curses/rite_curses.tscn" id="4_3swcv"]
-[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_4ttw6"]
 
 [resource]
 script = ExtResource("3_avhhg")
@@ -18,5 +17,6 @@ tower_name = "Curses Rite"
 tower_description = "{RITE_LABEL}: Adjacent towers' attacks gain 1 stack of {CURSED}."
 icon = ExtResource("1_gomyy")
 preview = ExtResource("1_gomyy")
+inspector_actions = Array[ExtResource("2_cu7js")]([ExtResource("3_1kge3")])
 tower_scene = ExtResource("4_3swcv")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

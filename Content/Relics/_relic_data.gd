@@ -42,6 +42,9 @@ enum Type {
 	PAWN_STRUCTURE,
 	TURPID_IDOL,
 	SIGNAL_FLAG,
+	MAGIC_BEANS,
+	STRAW_HAT,
+	WALLFLOWER
 }
 
 @export var type: Type

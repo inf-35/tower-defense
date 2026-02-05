@@ -1,6 +1,8 @@
 extends Label
 class_name FloatingText
 
+@onready var icon_rect: TextureRect = $TextureRect
+
 # --- State ---
 var _velocity: Vector2
 var _gravity: float
@@ -9,10 +11,27 @@ var _age: float
 var _manager_ref: FloatingTextManager
 
 func setup(text_val: String, pos: Vector2, color: Color, velocity: Vector2, gravity: float, lifetime: float, manager) -> void:
+	icon_rect.visible = false
 	text = text_val
 	position = pos
 	modulate = color
 	
+	_velocity = velocity
+	_gravity = gravity
+	_lifetime = lifetime
+	_age = 0.0
+	_manager_ref = manager
+	
+	visible = true
+	set_process(true)
+	
+func setup_icon(icon: Texture2D, pos: Vector2, color: Color, velocity: Vector2, gravity: float, lifetime: float, manager) -> void:
+	icon_rect.visible = true
+	icon_rect.texture = icon
+	text = ""
+	modulate = color
+	
+	global_position = pos
 	_velocity = velocity
 	_gravity = gravity
 	_lifetime = lifetime

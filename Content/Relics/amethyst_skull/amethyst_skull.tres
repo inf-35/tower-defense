@@ -37,6 +37,7 @@ script = ExtResource("6_058vl")
 search_radius = 40.0
 damage_multiplier = 0.15
 projectile_data = SubResource("Resource_wyw1l")
+delay = 0.4
 metadata/_custom_type_script = "uid://bp6do8b78pj4k"
 
 [resource]

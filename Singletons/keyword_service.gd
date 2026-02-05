@@ -69,7 +69,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"title": "Frost",
 		"display": "",
 		"description": "{STATUS_EFFECT_LABEL}. Frozen units move 33% slower per stack of frost.",
-		"icon": preload("res://Assets/frost_icon.png")
+		"icon": preload("res://Assets/frost_effect_icon.png")
 	},
 	"BURN": {
 		"title": "Burn",
@@ -240,17 +240,7 @@ func _resolve_tower_data(tower_id_str: String) -> Dictionary:
 		return {}
 		
 	var type: Towers.Type = Towers.Type.get(tower_id_str)
-	var prototype: Tower = Towers.get_tower_prototype(type)
-	
-	var desc: String = "" 
-	if prototype and not prototype.stat_displays.is_empty():
-		for stat_display: StatDisplayInfo in prototype.stat_displays:
-			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_instance(prototype, stat_display), stat_display)
-			desc += stat_display.label + " " + str(value) + stat_display.suffix
-			desc += "\n"
-		
-	desc += Towers.get_tower_description(type)
-	
+	var desc: String = resolve_tower_description_from_type(type)
 	# build dictionary to match standard keyword format
 	return {
 		"title": Towers.get_tower_name(type),
@@ -259,6 +249,19 @@ func _resolve_tower_data(tower_id_str: String) -> Dictionary:
 		"icon": Towers.get_tower_icon(type)
 	}
 	
+func resolve_tower_description_from_type(type: Towers.Type) -> String:
+	var prototype: Tower = Towers.get_tower_prototype(type)
+	var desc: String = "" 
+	if prototype and not prototype.stat_displays.is_empty():
+		for stat_display: StatDisplayInfo in prototype.stat_displays:
+			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_instance(prototype, stat_display), stat_display)
+			desc += stat_display.label + " " + str(value) + stat_display.suffix
+			desc += " "
+			
+	desc += "\n"
+	desc += Towers.get_tower_description(type)
+	return desc
+	
 func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 	# convert string ID (e.g. "CANNON") to enum value
 	if not Units.Type.has(unit_id_str):
@@ -266,14 +269,7 @@ func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 		
 	var type: Units.Type = Units.Type.get(unit_id_str)
 	var prototype: Unit = Units.get_unit_prototype(type)
-	var desc: String = ""
-	if prototype and not Units.get_stat_displays(type).is_empty():
-		for stat_display: StatDisplayInfo in Units.get_stat_displays(type):
-			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_unit(prototype, stat_display), stat_display)
-			desc += stat_display.label + " " + str(value) + stat_display.suffix
-			desc += "\n"
-		
-	desc += Units.get_unit_description(type)
+	var desc: String = resolve_unit_description_from_type(type)
 	
 	# build dictionary to match standard keyword format
 	return {
@@ -282,6 +278,18 @@ func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 		"description": desc,
 		"icon": null,
 	}
+	
+func resolve_unit_description_from_type(type: Units.Type) -> String:
+	var prototype: Unit = Units.get_unit_prototype(type)
+	var desc: String = ""
+	if prototype and not Units.get_stat_displays(type).is_empty():
+		for stat_display: StatDisplayInfo in Units.get_stat_displays(type):
+			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_unit(prototype, stat_display), stat_display)
+			desc += stat_display.label + " " + str(value) + stat_display.suffix
+			desc += "\n"
+	
+	desc += Units.get_unit_description(type)
+	return desc
 
 # helper to fetch relic info
 func _resolve_relic_data(relic_id_str: String) -> Dictionary:

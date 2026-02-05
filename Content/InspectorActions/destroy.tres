@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InspectorAction" load_steps=2 format=3 uid="uid://dqfraqb7purj7"]
+
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="1_6ypna"]
+
+[resource]
+script = ExtResource("1_6ypna")
+type = 1
+label = "Destroy"
+metadata/_custom_type_script = "uid://do6qrosup8u56"

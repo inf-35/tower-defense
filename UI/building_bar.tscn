@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://f6bwjb8pybpm" path="res://UI/tower_option.tscn" id="3_uep1a"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_tkmsn"]
 
-[node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button")]
+[node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button", "trade_button")]
 custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
 anchor_top = 0.2
@@ -18,6 +18,7 @@ theme = ExtResource("1_uep1a")
 script = ExtResource("1_08diq")
 towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
 start_wave_button = NodePath("HBoxContainer/start_wave")
+trade_button = NodePath("HBoxContainer/trade")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -27,7 +28,16 @@ anchor_bottom = 1.0
 offset_bottom = 6.60004
 grow_horizontal = 2
 grow_vertical = 2
-theme_type_variation = &"vbox_20"
+theme_type_variation = &"vbox_10"
+
+[node name="trade" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+text = "Trade (T)"
+autowrap_mode = 2
+script = ExtResource("4_tkmsn")
 
 [node name="Panel" type="PanelContainer" parent="HBoxContainer"]
 layout_mode = 2

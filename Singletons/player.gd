@@ -53,6 +53,7 @@ var _active_effects_container: Node
 #various services (which are children of this node)
 var ruin_service: RuinService
 var global_event_service: GlobalEventService
+var trader_service: TraderService
 
 func _ready():
 	if not OS.has_feature("web"): # web builds are automatically resized
@@ -69,7 +70,6 @@ func _ready():
 	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	relics_changed.connect(UI.update_relics.emit)
-	
 	#Phases.wave_ended.connect(func(_wave):
 		#Player.flux += 6
 	#)
@@ -107,6 +107,11 @@ func start():
 	ruin_service = RuinService.new()
 	add_child(ruin_service)
 	ruin_service.initialise()
+	
+	trader_service = TraderService.new()
+	add_child(trader_service)
+	trader_service.initialise()
+
 
 func begin_new_game():
 	#initial state setup
@@ -115,27 +120,28 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
-		Towers.Type.CANNON: true,
-		Towers.Type.FIREWALL: true,
 	}
 	#add_rite(Towers.Type.RITE_FROST, 20)
 	#
-	var reward := Reward.new()
-	reward.type = Reward.Type.ADD_RELIC
-	reward.relic = Relics.WHITE_HOT_IRON
-	RewardService.apply_reward(reward)
+	#var reward := Reward.new()
+	#reward.type = Reward.Type.ADD_RELIC
+	#reward.relic = Relics.WALLFLOWER
+	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EARLY_BIRD
 	#RewardService.apply_reward(reward)
 	
-	flux = 400.0
+	flux = 30.0
 	hp = 20.0
 	
-	UI.update_inspector_bar.emit(Towers.get_tower_prototype(Towers.Type.TURRET))
+	trader_service.start_game()
+	
 	UI.update_flux.emit(flux)
 	UI.update_health.emit(hp)
-
+	UI.update_relics.emit()
+	UI.update_tower_types.emit(unlocked_towers, rite_inventory)
+	
 #capacity helper functions
 func add_to_used_capacity(amount: float):
 	self.used_capacity += amount
@@ -282,12 +288,13 @@ func get_save_data() -> Dictionary:
 		relics_data.append(active_relic.get_save_data()) #see this for relic/effect serialisation
 	
 	save_data["relics"] = relics_data
+	save_data["trader"] = trader_service.get_save_data()
 	return save_data
 	
 func load_save_data(save_data: Dictionary) -> void:
 	flux = float(save_data.gold)
 	hp = int(save_data.hp)
-	
+
 	for unlocked_tower_type in save_data.unlocked_towers:
 		unlocked_towers[int(unlocked_tower_type)] = bool(save_data.unlocked_towers[unlocked_tower_type])
 	for unlocked_rite_type in save_data.rite_inventory:
@@ -295,6 +302,8 @@ func load_save_data(save_data: Dictionary) -> void:
 	#readd relics in the sequence in which they were originally added
 	for active_relic: Dictionary in save_data.relics:
 		load_relic(active_relic)
+		
+	trader_service.load_save_data(save_data.trader)
 	
 	UI.update_relics.emit()
 	UI.update_flux.emit(flux)
@@ -319,6 +328,7 @@ func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
 		print("Added relic global effect: ", effect_node)
 		# initialize it with its own data
 		effect_node.initialise()
+
 
 	# announce that the global state has changed
 	relics_changed.emit()

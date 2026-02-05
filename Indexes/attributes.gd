@@ -81,7 +81,7 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 }
 
 const status_effect_icons: Dictionary[Status, Texture2D] = {
-	Status.FROST: preload("res://Assets/frost_icon.png"),
+	Status.FROST: preload("res://Assets/frost_effect_icon.png"),
 	Status.BURN: preload("res://Assets/burn_icon.png"),
 	Status.CURSED: preload("res://Assets/cursed_icon.png"),
 	Status.BLEED: preload("res://Assets/bleed_icon.png"),

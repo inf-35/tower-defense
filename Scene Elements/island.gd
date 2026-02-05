@@ -283,13 +283,11 @@ func _on_tower_destroyed(tower: Tower):
 	tower_changed.emit(cell)
 	
 func update_adjacencies_around_tower(tower: Tower):
-	var adjacencies: Array[Vector2i] = tower.get_adjacent_cells()
-	for adjacency: Vector2i in adjacencies:
-		if tower_grid.has(adjacency):
-			tower_grid[adjacency].adjacency_updated.emit(tower_grid[adjacency].get_adjacent_towers())
+	var adjacencies := tower.get_adjacent_towers()
+	for adjacent_tower: Tower in adjacencies.values():
+		adjacent_tower.adjacency_updated.emit(adjacent_tower.get_adjacent_towers())
 
 func _update_adjacencies_around(cell: Vector2i):
-	# ... (Function retained as is)
 	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
 	for tower: Tower in adjacent_towers.values():
 		var local_adjacencies: Dictionary[Vector2i, Tower] = tower.get_adjacent_towers()

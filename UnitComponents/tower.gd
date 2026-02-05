@@ -86,19 +86,24 @@ var size: Vector2i = Vector2i.ONE ## this is inclusive of facing
 func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
 		return
+		
+	current_state = State.RUINED
+		
+	disabled = true
+	graphics.visible = false
 
+	behavior.detach()
+	for effect_prototype: EffectPrototype in effect_prototypes:
+		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
+		effect_instance.detach()
+
+	References.island.update_adjacencies_around_tower(self)
+	
 	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
 		queue_free()
 		return
-		
-	current_state = State.RUINED
 	
-	# 1. register with the service
 	Player.ruin_service.register_ruin(self, reason)
-	
-	# 2. update visuals
-	disabled = true
-	graphics.visible = false
 	
 	var rubble := Sprite2D.new()
 	rubble.texture = preload("res://Assets/rubble_grey.png")
@@ -158,15 +163,14 @@ func resurrect() -> void:
 
 func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
-	behavior.detach()
-	for effect_prototype: EffectPrototype in effect_prototypes:
-		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
-		effect_instance.detach()
-	References.island.update_adjacencies_around_tower(self)
 
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
 		Player.flux += flux_value #full refund!
+		
+		#if Towers.is_tower_rite(type):
+			#Player.add_rite(type, 1)
+			
 		enter_ruin_state(RuinService.RuinReason.SOLD)
 		died.emit(HitReportData.blank_hit_report)
 

@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dxcwdjh4dma3e"]
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://dxcwdjh4dma3e"]
 
 [ext_resource type="Texture2D" uid="uid://5jvbyn2rc8yf" path="res://Assets/liberty_rite.png" id="1_ob68q"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_qlphn"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_3pncg"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_mtbe3"]
-[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_wyq48"]
-[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_0883x"]
 [ext_resource type="PackedScene" uid="uid://rvm1pqpxpkfp" path="res://Units/Towers/rite_liberty/rite_liberty.tscn" id="4_iipgr"]
 
 [resource]
@@ -21,5 +20,6 @@ tower_name = "Liberty Rite"
 tower_description = "{RITE_LABEL}. All adjacent towers gain 50% {UNIT_HITRATE} per empty adjacent tile."
 icon = ExtResource("1_ob68q")
 preview = ExtResource("1_ob68q")
+inspector_actions = Array[ExtResource("2_qlphn")]([ExtResource("3_3pncg")])
 tower_scene = ExtResource("4_iipgr")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

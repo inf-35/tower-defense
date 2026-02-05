@@ -85,6 +85,7 @@ func get_tower_prototype(tower_type: Type) -> Tower:
 	if not tower_prototypes.has(tower_type): #if no prototype
 		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
 		tower_prototypes[tower_type].abstractive = true #disable all effects and events
+		tower_prototypes[tower_type].visible = false
 		add_child.call_deferred(tower_prototypes[tower_type]) #trigger _ready() calls
 
 		tower_prototypes[tower_type].tower_position = Vector2i(1915 * tower_type * tower_prototypes[tower_type].unit_id, 5823 * tower_type * tower_prototypes[tower_type].unit_id) #somewhere extremely far away

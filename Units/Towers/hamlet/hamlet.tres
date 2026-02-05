@@ -10,7 +10,7 @@
 [resource]
 script = ExtResource("5_mulcf")
 id = 52
-cost = 6.0
+cost = 4.0
 required_capacity = 0.0
 element = 5
 tower_name = "Hamlet"

@@ -49,3 +49,5 @@ func _trigger_ambush_explosion(source_tower: Tower) -> void:
 	delivery_data.intercept_position = source_tower.global_position # explode exactly where the tower was built
 
 	CombatManager.resolve_hit(hit_data, delivery_data)
+	UI.floating_text_manager.show_icon(icon, source_tower.global_position)
+	push_warning("ae")

@@ -1,15 +1,16 @@
-[gd_scene load_steps=18 format=3 uid="uid://dfaw7qc5m52dy"]
+[gd_scene load_steps=20 format=3 uid="uid://dfaw7qc5m52dy"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_7fnq5"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_3nlnt"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_76mx4"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="4_24hok"]
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_p55ow"]
-[ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="5_cntf5"]
 [ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="6_2p8sv"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="6_vxs4v"]
 [ext_resource type="Texture2D" uid="uid://cnrv2tyylnxyv" path="res://Assets/archer.png" id="7_rdnp1"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_4os7w"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_67p6l"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="9_vxs4v"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="10_11dmw"]
 [ext_resource type="Resource" uid="uid://1m4t2038xrpo" path="res://Units/Enemies/archer/archer_attack.tres" id="11_jlbxp"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_0hl68"]
@@ -17,10 +18,15 @@
 
 [sub_resource type="Resource" id="Resource_vxs4v"]
 script = ExtResource("4_p55ow")
-max_speed = 10.0
+max_speed = 16.0
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="Resource" id="Resource_dvcwc"]
+script = ExtResource("6_vxs4v")
+max_health = 5.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mt1ix"]
 shader = ExtResource("6_2p8sv")
@@ -58,11 +64,20 @@ metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("4_24hok")
-health_data = ExtResource("5_cntf5")
+health_data = SubResource("Resource_dvcwc")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="ContactShadow" type="Node2D" parent="."]
+z_index = 10
+z_as_relative = false
+position = Vector2(0.2, 0.8)
+script = ExtResource("9_vxs4v")
+shadow_size = Vector2(6, 3)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_mt1ix")
+position = Vector2(1, -3)
 scale = Vector2(0.13014705, 0.13014705)
 texture = ExtResource("7_rdnp1")
 
@@ -72,6 +87,7 @@ collision_mask = 0
 script = ExtResource("8_4os7w")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
 position = Vector2(0, 1.1368684e-13)
 scale = Vector2(0.9999995, 0.9999995)
 shape = SubResource("RectangleShape2D_anqll")

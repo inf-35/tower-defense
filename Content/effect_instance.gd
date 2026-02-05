@@ -6,6 +6,7 @@ var effect_prototype: EffectPrototype ##effect prototype we're based off.
 
 var source_id: int ##id of who spawned this
 var effect_type: Effects.Type ##id of this type of effect
+var schedule: EffectPrototype.Schedule
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 ##negative = permanent
 
@@ -22,6 +23,7 @@ var state: RefCounted ##strategy delegate class that stores state information
 const GLOBAL_RECURSION_LIMIT: int = 5 ##limit for effect recursion; see Unit effect parsing
 
 var host: Unit ##to which unit does this effect apply onto
+var source: Unit ##to which unit does this effect come from (may be null)
 var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect
 
 func _init():

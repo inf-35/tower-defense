@@ -10,11 +10,30 @@ enum TriggerType {
 	BEGIN_TRIGGERED,
 }
 
+enum Anchor {
+	CENTRAL_ANCHOR,
+	TOWER_BAR_ANCHOR,
+	PLAYER_STATS_ANCHOR,
+	TIMELINE_ANCHOR,
+	START_WAVE_ANCHOR,
+	TARGET_OFFSET,
+}
+
+enum Reference { ##reference ids to control nodes
+	NONE,
+	TURRET_BUTTON,
+	PALISADE_BUTTON,
+	START_WAVE_BUTTON,
+	WAVE_TIMELINE,
+	TUTORIAL_TEXT,
+	PLAYER_STATS,
+}
+
 @export_multiline var instruction_text: String
 @export_multiline var success_text: String ##text shown when condition is met.
 
-@export var panel_anchor: TutorialManager.Anchor
-@export var highlight_target: TutorialManager.Reference
+@export var panel_anchor: Anchor
+@export var highlight_target: Reference
 @export var highlight: bool = true
 
 @export_group("Completion Logic")

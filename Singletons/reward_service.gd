@@ -29,6 +29,12 @@ func _load_all_rewards() -> void:
 	print("RewardService: Loading rewards from ", REWARD_DIRECTORY)
 	_scan_directory_recursive(REWARD_DIRECTORY)
 	print("RewardService: Loaded ", reward_pool.size(), " rewards.")
+	
+	for reward in reward_pool:
+		if reward.type == Reward.Type.UNLOCK_TOWER:
+			reward.price = snappedf(randf_range(8.0, 14.0), 0.1)
+		else:
+			reward.price = snappedf(randf_range(4.0, 8.0), 0.1)
 
 func _scan_directory_recursive(path: String) -> void:
 	var dir := DirAccess.open(path)

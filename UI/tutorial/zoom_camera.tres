@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_pd3b0")
-instruction_text = "TUTORIAL
+instruction_text = "[b]Tutorial[/b]
 Zoom in/out with the scroll wheel."
-success_text = "TUTORIAL
+success_text = "[b]Tutorial[/b]
 Zoom in/out with the scroll wheel.
 Q to continue."
 trigger_type = 3

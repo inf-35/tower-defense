@@ -1,0 +1,88 @@
+[gd_scene load_steps=5 format=3 uid="uid://ma7sw3g58j4t"]
+
+[ext_resource type="Script" uid="uid://hd7wcoaqa7od" path="res://UI/trade_menu/trade_panel.gd" id="1_o3owd"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_xhnm1"]
+[ext_resource type="PackedScene" uid="uid://daqxrw1i4lig0" path="res://UI/trade_menu/shop_option_card.tscn" id="4_egd4h"]
+[ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_xhnm1"]
+
+[node name="Trade" type="Panel" node_paths=PackedStringArray("wave_text", "exit_button", "card_list", "reroll_button")]
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_o3owd")
+wave_text = NodePath("CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer/InteractiveRichTextLabel")
+exit_button = NodePath("CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer/exit")
+card_list = NodePath("CenterContainer/main_container/card_list")
+card_scene = ExtResource("4_egd4h")
+reroll_button = NodePath("CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer/reroll")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="main_container" type="VBoxContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(1200, 0)
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="title" type="RichTextLabel" parent="CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"rt_s20"
+theme_override_colors/default_color = Color(1, 0.98039216, 0.95686275, 1)
+bbcode_enabled = true
+text = "Trader"
+fit_content = true
+horizontal_alignment = 1
+script = ExtResource("3_xhnm1")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="card_list" type="VBoxContainer" parent="CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer/main_container"]
+layout_mode = 2
+theme_type_variation = &"simple_panel"
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/main_container/PanelContainer"]
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/main_container/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(1200, 0)
+layout_mode = 2
+theme_type_variation = &"hbox_5"
+alignment = 2
+
+[node name="exit" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Exit"
+script = ExtResource("4_xhnm1")
+
+[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
+text = "Restocks naturally every wave."
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_xhnm1")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="reroll" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Restock (0)"
+script = ExtResource("4_xhnm1")

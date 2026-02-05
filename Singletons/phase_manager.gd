@@ -19,7 +19,12 @@ enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
 enum DayEvent { NONE, EXPANSION, REWARD_TOWER, REWARD_RELIC}
 enum CombatVariant { NORMAL, BOSS, SURGE}
 
-var current_wave_number: int = 0
+var current_wave_number: int = 0:
+	set(ncwm):
+		current_wave_number = ncwm
+		var goal: float = 1.0 + (max(current_wave_number - 12, 0) * 0.05)
+		Phases.current_game_scaling = max(Phases.current_game_scaling - 0.1, goal)
+		
 var current_phase: GamePhase = GamePhase.IDLE
 var current_game_difficulty: GameDifficulty
 var current_game_scaling: float = 1.0
@@ -33,7 +38,7 @@ var choice_queue: Array[ChoiceType] = []
 var current_choice_type: ChoiceType
 
 var wave_plan: Dictionary[int, Wave] = {}
-const FINAL_WAVE: int = 16
+const FINAL_WAVE: int = 24
 class Wave: ## internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL
@@ -48,10 +53,6 @@ func _ready() -> void:
 	combat_started.connect(UI.start_combat.emit)
 	wave_ended.connect(UI.end_wave.emit)
 	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
-	
-	wave_ended.connect(func(_wave):
-		Phases.current_game_scaling = clampf(Phases.current_game_scaling - 0.1, 1.0, 2.0)
-	)
 	
 func start_game() -> void:
 	Clock.start()
@@ -92,24 +93,26 @@ func begin_new_game():
 	
 func start_tutorial():
 	var steps: Array[TutorialStep] = [
-		preload("res://UI/tutorial/pan_camera.tres"),
-		preload("res://UI/tutorial/zoom_camera.tres"),
+		load("res://UI/tutorial/pan_camera.tres"),
+		load("res://UI/tutorial/zoom_camera.tres"),
 	]
 	
-	var select: TutorialStep = preload("res://UI/tutorial/select_tower.tres")
+	var select: TutorialStep = load("res://UI/tutorial/select_tower.tres")
 	select.trigger_signal = UI.tower_selected
 	select.desired_parameters = []
 
-	var turret: TutorialStep = preload("res://UI/tutorial/place_turret.tres")
+	var turret: TutorialStep = load("res://UI/tutorial/place_turret.tres")
 	turret.trigger_signal = UI.place_tower_requested
 	turret.desired_parameters = [Towers.Type.TURRET]
 	
-	var gold_population: TutorialStep = preload("res://UI/tutorial/gold_population_explanation.tres")
-	var hover_player_stats: TutorialStep = preload("res://UI/tutorial/hover_player_stats.tres")
+	var gold_population: TutorialStep = load("res://UI/tutorial/gold_population_explanation.tres")
+	var hover_player_stats: TutorialStep = load("res://UI/tutorial/hover_player_stats.tres")
+	var trade: TutorialStep = load("res://UI/tutorial/trade.tres")
+	trade.trigger_signal = UI.trader_open
+	trade.desired_parameters = []
+	var timeline: TutorialStep = load("res://UI/tutorial/hover_wave_timeline.tres")
 	
-	var timeline: TutorialStep = preload("res://UI/tutorial/hover_wave_timeline.tres")
-	
-	var start_wave: TutorialStep = preload("res://UI/tutorial/start_wave.tres")
+	var start_wave: TutorialStep = load("res://UI/tutorial/start_wave.tres")
 	start_wave.trigger_signal = UI.building_phase_ended
 	start_wave.desired_parameters = []
 	
@@ -117,6 +120,7 @@ func start_tutorial():
 	steps.append(turret)
 	steps.append(gold_population)
 	steps.append(hover_player_stats)
+	steps.append(trade)
 	steps.append(timeline)
 	steps.append(start_wave)
 	UI.tutorial_manager.start_sequence(steps)
@@ -129,12 +133,12 @@ func _generate_wave_plan() -> void:
 		# determine day event(s)
 		if i % Waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave.day_events.append(DayEvent.EXPANSION)
+			#
+		#if i % 2 == 0:
+			#wave.day_events.append(DayEvent.REWARD_RELIC)
 			
-		if i % 2 == 0:
-			wave.day_events.append(DayEvent.REWARD_RELIC)
-			
-		if i % 5 == 0:
-			wave.day_events.append(DayEvent.REWARD_TOWER)
+		#if i % 5 == 0:
+			#wave.day_events.append(DayEvent.REWARD_TOWER)
 			
 		## rewards on specific day
 		#if i == 1:
@@ -191,7 +195,7 @@ func _prepare_for_next_wave_cycle() -> void:
 		var type : Units.Type = enemy_stack[0]
 		if type == Units.Type.TROLL and not _troll_spawned:
 			_troll_spawned = true
-			UI.tutorial_manager.start_sequence([preload("res://UI/tutorial/troll_warning.tres")])
+			UI.tutorial_manager.start_sequence([load("res://UI/tutorial/troll_warning.tres")])
 			
 	if not choice_queue.is_empty():
 		var next_choice: ChoiceType = choice_queue.pop_front()

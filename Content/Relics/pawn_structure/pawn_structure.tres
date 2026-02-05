@@ -10,6 +10,7 @@
 script = ExtResource("1_byv6u")
 damage_bonus = 0.3
 schedule = 0
+icon = ExtResource("3_gh8al")
 metadata/_custom_type_script = "uid://bo2f1cf2sspji"
 
 [sub_resource type="Resource" id="Resource_1pgfs"]

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cyoynq2rsxj6c"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_6qowr"]
-[ext_resource type="Texture2D" uid="uid://dp45rs1pb7wf5" path="res://Assets/frost_tower_base.png" id="1_85ooh"]
+[ext_resource type="Texture2D" uid="uid://ees0hpsumlrt" path="res://Assets/frost_icon.png" id="1_85ooh"]
 [ext_resource type="PackedScene" uid="uid://b5w56jjx8pany" path="res://Units/Towers/frost_tower/frost_tower.tscn" id="2_6qowr"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_icbvn"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_2t0kx"]

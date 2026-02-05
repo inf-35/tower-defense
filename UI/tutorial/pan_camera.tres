@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_wohyo")
-instruction_text = "TUTORIAL
+instruction_text = "[b]Tutorial[/b]
 Pan the camera with WASD."
-success_text = "TUTORIAL
+success_text = "[b]Tutorial[/b]
 Pan the camera with WASD.
 Q to continue."
 trigger_type = 2

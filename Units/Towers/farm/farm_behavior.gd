@@ -1,10 +1,16 @@
 extends Behavior
 class_name FarmBehavior
 
-@export var income_per_wave: int = 25
-@export var adjacent_bonus: int = 0 ## extra income per adjacent tower
+@export var income_per_wave: float = 1.0
+@export var adjacent_bonus: float = 0 ## extra income per adjacent tower
+
+static func _static_init() -> void:
+	ModifiersComponent.register_dynamic_attribute(&"farm_income_per_wave")
+	ModifiersComponent.register_dynamic_attribute(&"farm_adjacent_bonus")
 
 func start() -> void:
+	unit.modifiers_component.register_dynamic_stat(&"farm_income_per_wave", income_per_wave)
+	unit.modifiers_component.register_dynamic_stat(&"farm_adjacent_bonus", adjacent_bonus)
 	Phases.wave_ended.connect(_on_wave_ended)
 
 func check_placement_validity(island: Island, cell: Vector2i, facing: int) -> Dictionary:
@@ -21,16 +27,19 @@ func _on_wave_ended(_wave: int) -> void:
 	if (unit as Tower).current_state != Tower.State.ACTIVE:
 		return
 	
-	var total = income_per_wave
+	var total = unit.modifiers_component.pull_dynamic_stat(&"farm_income_per_wave")
 	
-	# Calculate Adjacency Bonus
-	var adj_count = (unit as Tower).get_adjacent_towers().size()
-	total += adj_count * adjacent_bonus
+	var adj_count: int = 0
+	for tower: Tower in (unit as Tower).get_adjacent_towers().values():
+		if tower.type == Towers.Type.FARM:
+			adj_count += 1
+	total += adj_count * unit.modifiers_component.pull_dynamic_stat(&"farm_adjacent_bonus")
 	
 	Player.flux += total
+	print(total)
 	
 	if is_instance_valid(UI.floating_text_manager):
-		UI.floating_text_manager.show_text("+%d" % total, unit.global_position, Color.GOLD)
+		UI.floating_text_manager.show_text("+%.2f" % total, unit.global_position, Color.GOLD)
 
 func get_display_data() -> Dictionary:
 	return {

@@ -17,6 +17,14 @@ signal building_phase_ended() #called by sidebar_ui
 signal place_tower_requested(tower_type: Towers.Type, position: Vector2i, facing: Tower.Facing)
 signal sell_tower_requested(tower: Tower)
 signal upgrade_tower_requested(tower: Tower, upgrade_type: Towers.Type)
+#Trader
+signal trader_open()
+signal trader_close()
+signal trader_update_restock_cost(restock_cost: float)
+signal trader_update_stock(current_stock: Array[Reward])
+signal trader_update_waves_to_next_restock(waves: int)
+signal trader_choice_selected(choice_id: int) ##called by trader ui
+signal trader_force_restock_requested() ##..
 #Phases -> UI
 signal update_wave_schedule()
 signal start_wave(wave : int)

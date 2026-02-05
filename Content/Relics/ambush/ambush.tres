@@ -25,6 +25,7 @@ metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 [sub_resource type="Resource" id="Resource_erbbk"]
 script = ExtResource("4_2yjpv")
 attack_data = SubResource("Resource_meiml")
+icon = ExtResource("5_2yjpv")
 metadata/_custom_type_script = "uid://ce5bynwct2hta"
 
 [resource]

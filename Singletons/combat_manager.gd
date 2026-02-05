@@ -47,7 +47,7 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 	
 	func _on_timeout():
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, intercept_position)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
 		var target : Unit = hit_data.target #NOTE: this might be null
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage 
@@ -246,7 +246,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 
 	func _apply_impact_vfx(pos: Vector2):
 		VFXManager.play_vfx(hit_data.vfx_on_impact, pos)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, pos)
+		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), pos)
 	
 	func _on_destruct(target: Unit = null):
 		CombatManager.simulated_projectiles.erase(self)
@@ -274,7 +274,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 		DeliveryData.DeliveryMethod.HITSCAN:
 			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
 			#TODO: implement visuals
-			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, -2.0, intercept_position)
+			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
 			target.take_hit(hit_data)
 			if source:
 				hit_data.velocity = (target.global_position - source.global_position).normalized()

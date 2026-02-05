@@ -21,6 +21,7 @@ func _handle_attach(instance: EffectInstance) -> void:
 		_update_bonus(instance)
 
 func _handle_detach(instance: EffectInstance) -> void:
+	print("hmm...")
 	var state := instance.state as LibertyState
 	if is_instance_valid(state.modifier) and is_instance_valid(instance.host.modifiers_component):
 		instance.host.modifiers_component.remove_modifier(state.modifier)

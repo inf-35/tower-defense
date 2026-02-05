@@ -45,3 +45,4 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	# take the duration from the incoming hit to keep it consistent with the attack
 	var incoming_duration: float = hit_data.status_effects[status_type].y
 	victim.modifiers_component.add_status(status_type, stacks, incoming_duration)
+	UI.floating_text_manager.show_icon(icon, victim.global_position)

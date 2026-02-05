@@ -1,4 +1,5 @@
 extends Panel
+class_name RewardPanel
 
 # --- Config ---
 @export var card_list: VBoxContainer ## The container where cards are spawned
