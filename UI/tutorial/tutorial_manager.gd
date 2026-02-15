@@ -203,6 +203,7 @@ func _update_spotlight_position(node: Control) -> void:
 func _on_trigger_signal(...args) -> void:
 	# generic handler that accepts many arguments to be compatible with any signal signature
 	var desired_parameters: Array = _active_sequence[_current_step_index].desired_parameters
+	print(args, " / ", desired_parameters)
 	var valid: bool = true
 	for i: int in len(desired_parameters):
 		if (not args.has(i)) or desired_parameters[i] != args[i]:

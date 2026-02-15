@@ -54,6 +54,9 @@ func get_stat_displays(unit: Type) -> Array[StatDisplayInfo]:
 
 func get_unit_flux(unit: Type) -> float:
 	return unit_stats[unit].flux_value * 1.5
+	
+func get_unit_strength(unit: Type) -> float:
+	return unit_stats[unit].strength_value
 
 func get_unit_scene(unit: Type) -> PackedScene:
 	return unit_stats[unit].unit_scene
@@ -61,11 +64,12 @@ func get_unit_scene(unit: Type) -> PackedScene:
 func create_unit(unit_type: Type) -> Unit:
 	var _unit: Unit = get_unit_scene(unit_type).instantiate()
 	_unit.flux_value = get_unit_flux(unit_type)
+	_unit.strength = get_unit_strength(unit_type)
 	
 	if Phases.current_game_difficulty == Phases.GameDifficulty.NORMAL and not _units_modified_by_difficulty.has(unit_type):
-		if _unit.health_component: _unit.health_component.health_data.max_health = round(_unit.health_component.health_data.max_health * 0.8)
-		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.8
-		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.1
+		if _unit.health_component: _unit.health_component.health_data.max_health = snappedf(_unit.health_component.health_data.max_health * 0.85, 0.1)
+		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.7
+		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.25
 		_units_modified_by_difficulty[unit_type] = true
 	return _unit
 	

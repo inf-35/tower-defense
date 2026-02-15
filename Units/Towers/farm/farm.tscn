@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8grn8x6m1kta"]
+[gd_scene load_steps=13 format=3 uid="uid://c8grn8x6m1kta"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5gwp7"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_7c8ug"]
-[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_c0bwh"]
 [ext_resource type="Script" uid="uid://djqe37wfw77og" path="res://Units/Towers/farm/farm_behavior.gd" id="4_7c8ug"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_88tye"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_b344s"]
@@ -12,11 +11,23 @@
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="8_gsk4i"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_yamgq"]
 
+[sub_resource type="Resource" id="Resource_7c8ug"]
+script = ExtResource("2_7c8ug")
+dynamic_attribute = &"farm_income_per_wave"
+label = "{FARM_BASE_INCOME}"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_c0bwh"]
+script = ExtResource("2_7c8ug")
+dynamic_attribute = &"farm_adjacent_bonus"
+label = "{FARM_ADJACENT_BONUS}"
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
 [node name="Farm" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_5gwp7")
 type = 53
-stat_displays = Array[ExtResource("2_7c8ug")]([ExtResource("3_c0bwh")])
+stat_displays = Array[ExtResource("2_7c8ug")]([SubResource("Resource_7c8ug"), SubResource("Resource_c0bwh")])
 behavior = NodePath("FarmBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -42,7 +53,7 @@ scale = Vector2(0.06, 0.06)
 texture = ExtResource("6_5gwp7")
 
 [node name="Graphics2" type="Sprite2D" parent="Graphics"]
-z_index = -1
+z_index = -3
 scale = Vector2(0.99999994, 0.99999994)
 texture = ExtResource("7_5gwp7")
 

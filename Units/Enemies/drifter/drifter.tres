@@ -13,4 +13,5 @@ description = "Very fast"
 stat_displays = Array[ExtResource("2_cs1ho")]([ExtResource("3_bsfb6"), ExtResource("4_pafox")])
 unit_scene = ExtResource("2_mvn4i")
 flux_value = 0.6
+strength_value = 1.05
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

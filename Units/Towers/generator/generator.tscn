@@ -1,19 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://y3fmjqd4dpgt"]
+[gd_scene load_steps=13 format=3 uid="uid://y3fmjqd4dpgt"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ein27"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_v8yu7"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="3_c84km"]
+[ext_resource type="Resource" uid="uid://j0r1sgyiwb0f" path="res://Content/StatDisplays/population.tres" id="3_iwloq"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_p4o20"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="4_0fd6n"]
 [ext_resource type="Resource" uid="uid://bfougfx6aba1c" path="res://Content/Effects/capacity_generator.tres" id="4_v8yu7"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_sxhhn"]
-[ext_resource type="Texture2D" uid="uid://b4ymi0q7wgfg" path="res://Assets/town.png" id="7_c84km"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="8_c84km"]
+[ext_resource type="Texture2D" uid="uid://b8l087an1ntco" path="res://Assets/town_houses.png" id="9_e5w4x"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
+[ext_resource type="Texture2D" uid="uid://hgq763rjsuls" path="res://Assets/town_floor.png" id="11_hfdks"]
 
-[node name="Generator" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Town" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_ein27")
 type = 5
+stat_displays = Array[ExtResource("2_v8yu7")]([ExtResource("3_iwloq")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
@@ -32,11 +36,17 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("7_c84km")
+texture = ExtResource("9_e5w4x")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]
 script = ExtResource("8_c84km")
+height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+z_index = 50
+z_as_relative = false
+texture = ExtResource("11_hfdks")
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("9_qtlu4")

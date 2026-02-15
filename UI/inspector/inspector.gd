@@ -205,7 +205,7 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 			else:
 				var next_type: Towers.Type = upgrades[action.upgrade_index]
 				var cost := Towers.get_tower_upgrade_cost(tower.type, next_type)
-				btn.text += " (%d)" % cost
+				btn.text += " (%.2f)" % cost
 				if Player.flux < cost:
 					is_disabled = true
 					
@@ -235,7 +235,7 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 				
 		InspectorAction.ActionType.SELL:
 			var sell_value: float = roundi(tower.flux_value * 10) * 0.1
-			btn.text += " (%d)" % sell_value
+			btn.text += " (%.2f)" % sell_value
 			btn.pressed.connect(UI.sell_tower_requested.emit.bind(tower))
 			
 	btn.disabled = is_disabled
@@ -308,7 +308,7 @@ func _update_status_display(tower: Tower) -> void:
 
 func _create_status_widget(icon: Texture2D, title: String, desc: String, stacks: float, is_negative_state: bool = false) -> void:
 	var wrapper = Control.new()
-	wrapper.custom_minimum_size = Vector2(32, 32) # Standard Icon Size
+	wrapper.custom_minimum_size = Vector2(64, 64) # Standard Icon Size
 	
 	var tex = TextureRect.new()
 	tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -400,13 +400,18 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 			var data: AttackData = tower.attack_component.attack_data
 			return _format_status_effects(data)
 			
+			
 	# if we're still here, we didnt hit any overrides
-	if tower.modifiers_component and tower.modifiers_component.has_stat(info.attribute):
-		value = tower.modifiers_component.pull_stat(info.attribute)
+	if tower.modifiers_component:
+		if tower.modifiers_component.has_stat(info.attribute):
+			value = tower.modifiers_component.pull_stat(info.attribute)
+		if info.dynamic_attribute != &"" and tower.modifiers_component.has_dynamic_stat(info.dynamic_attribute):
+			value = tower.modifiers_component.pull_dynamic_stat(info.dynamic_attribute)
 	else:
 		value =  tower.get_stat(info.attribute)
 	#elif Towers.get_tower_stat(tower.type, info.attribute):
 		#value = Towers.get_tower_stat(tower.type, info.attribute)
+	if not value: value = 0.0
 		
 	return value
 	

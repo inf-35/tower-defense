@@ -48,7 +48,7 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="RangeComponent" type="Node" parent="."]
 script = ExtResource("10_pkx8d")
-targeting_mode = 1
+targeting_mode = 4
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
 [node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]

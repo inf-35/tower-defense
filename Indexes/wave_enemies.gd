@@ -18,26 +18,26 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	5 : [
 		[Units.Type.BASIC, 3],
-		[Units.Type.DRIFTER, 2],
+		[Units.Type.DRIFTER, 6],
 	],
 	6 : [
-		[Units.Type.BASIC, 2],
-		[Units.Type.HEALER, 2],
-		[Units.Type.BASIC, 2],
-	],
-	7 : [
-		[Units.Type.BUFF, 2],
+		[Units.Type.BASIC, 4],
 		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 4],
 	],
-	8 : [
-		[Units.Type.BUFF, 2],
-		[Units.Type.DRIFTER, 4],
+	7 : [
+		[Units.Type.BUFF, 3],
 		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 6],
 	],
+	8 : [
+		[Units.Type.BUFF, 3],
+		[Units.Type.DRIFTER, 5],
+		[Units.Type.HEALER, 2],
+		[Units.Type.BASIC, 8],
+	],
 	9 : [
-		[Units.Type.DRIFTER, 4],
+		[Units.Type.DRIFTER, 5],
 		[Units.Type.BASIC, 10],
 		[Units.Type.HEALER, 2],
 		[Units.Type.BUFF, 6],
@@ -47,9 +47,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 15],
 	],
 	11 : [
-		[Units.Type.TROLL, 4],
-		[Units.Type.BASIC, 12],
-		[Units.Type.BUFF, 6],
+		[Units.Type.TROLL, 3],
+		[Units.Type.BASIC, 10],
+		[Units.Type.BUFF, 3],
 	],
 	12 : [
 		[Units.Type.WARRIOR, 10],
@@ -92,7 +92,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.GIANT, 6],
 		[Units.Type.HEALER, 3],
 		[Units.Type.GIANT, 6],
-		[Units.Type.ARCHER, 3],
+		[Units.Type.ARCHER, 5],
 	],
 	20 : [
 		[Units.Type.HULK, 7],
@@ -106,25 +106,25 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	22 : [
 		[Units.Type.HULK, 6],
-		[Units.Type.TROLL, 6],
-		[Units.Type.SPRINTER, 16],
-		[Units.Type.HEALER, 7],
-		[Units.Type.WARRIOR, 30],
-		[Units.Type.ARCHER, 12],
+		[Units.Type.TROLL, 4],
+		[Units.Type.SPRINTER, 14],
+		[Units.Type.HEALER, 5],
+		[Units.Type.WARRIOR, 25],
+		[Units.Type.ARCHER, 8],
 	],
 	23 : [
-		[Units.Type.WARRIOR, 45],
+		[Units.Type.WARRIOR, 38],
 		[Units.Type.HEALER, 4],
-		[Units.Type.WARRIOR, 45],
+		[Units.Type.WARRIOR, 38],
 		[Units.Type.ARCHER, 10],
 	],
 	24 : [
-		[Units.Type.HULK, 8],
+		[Units.Type.HULK, 6],
 		[Units.Type.TROLL, 6],
 		[Units.Type.SPRINTER, 16],
 		[Units.Type.HEALER, 7],
 		[Units.Type.WARRIOR, 30],
-		[Units.Type.ARCHER, 12],
+		[Units.Type.ARCHER, 10],
 	],
 }
 # --- unit catalog ---
@@ -158,7 +158,7 @@ static func get_enemies_for_wave(wave: int) -> Array[Array]:
 		output.append_array(SCRIPTED_WAVES[wave].duplicate(true))
 		
 		for i in output.size():
-			output[i][1] = int(output[i][1] * Phases.current_game_scaling)
+			output[i][1] = round(float(output[i][1]) * Phases.current_game_scaling)
 			
 		return output
 

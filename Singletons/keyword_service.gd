@@ -80,7 +80,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"BLEED": {
 		"title": "Bleed",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 1 more extra flat damage on hit per stack of bleed",
+		"description": "{STATUS_EFFECT_LABEL}: Bleeding units take 0.5 more extra flat damage on hit per stack of bleed",
 		"icon": preload("res://Assets/bleed_icon.png")
 	},
 	"CURSED": {
@@ -92,7 +92,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"POISON": {
 		"title": "Poison",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 10% remaining HP per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 10% remaining HP as damage per second per stack",
 		"icon": preload("res://Assets/poison_icon.png"),
 	},
 	"STUN": {
@@ -124,7 +124,19 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"display": "Settlement",
 		"description": "Terrain type on which {T_GENERATOR|label=Villages} are built.",
 		"icon": preload("res://Assets/ruins_placeholder.png"),
-	}
+	},
+	"FARM_BASE_INCOME": {
+		"title": "Base Income",
+		"display": "",
+		"description": "Amount of base {GOLD} earned by this structure every wave.",
+		"icon": preload("res://Assets/gold_icon.png"),
+	},
+	"FARM_ADJACENT_BONUS": {
+		"title": "Adjacent Bonus",
+		"display": "",
+		"description": "Amount of extra {GOLD} earned by this structure for each adjacent structure every wave.",
+		"icon": preload("res://Assets/gold_icon.png"),
+	},
 }
 var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://cyaj7rvduguql"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_e0nke"]
+
+[resource]
+script = ExtResource("1_e0nke")
+instruction_text = "Similarly, place down a {T_FARM}"
+success_text = "It's important to invest in one's economy.
+Q to continue."
+panel_anchor = 1
+highlight = false
+trigger_action = &"0"
+metadata/_custom_type_script = "uid://d1grmccg0j1e0"

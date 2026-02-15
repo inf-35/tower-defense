@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dmocf3fpr05a7"]
+
+[ext_resource type="Texture2D" uid="uid://d13kdblr7tiub" path="res://Assets/watchtower.png" id="1_mvyqj"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_jmqr0"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_5d2wt"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_8ie1t"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_eq7h6"]
+[ext_resource type="PackedScene" uid="uid://beqpgbnw7an3v" path="res://Units/Towers/watchtower/watchtower.tscn" id="6_eveuo"]
+
+[resource]
+script = ExtResource("6_eq7h6")
+id = 55
+cost = 4.5
+required_capacity = 0.8
+element = 5
+tower_name = "Watchtower"
+tower_description = "Adjacent towers gain +15 {UNIT_RANGE} (stacks)."
+icon = ExtResource("1_mvyqj")
+preview = ExtResource("1_mvyqj")
+tower_scene = ExtResource("6_eveuo")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

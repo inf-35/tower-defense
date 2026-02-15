@@ -9,8 +9,10 @@ class_name ShadowComponent
 @export var is_dynamic: bool = false 
 
 var shadow_sprite: Sprite2D
+var height_sprite: Sprite2D
 var parent_sprite: Sprite2D
 var shadow_material: ShaderMaterial
+var height_material: ShaderMaterial
 
 func _ready():
 	# 1. Find the parent sprite to copy
@@ -30,14 +32,24 @@ func _ready():
 	# 2. Create the Shadow Sprite
 	shadow_sprite = Sprite2D.new()
 	# Draw behind the parent
-	shadow_sprite.z_index = -1
+	shadow_sprite.z_index = -2
 	shadow_sprite.z_as_relative = true
 	add_child.call_deferred(shadow_sprite)
 	
+	height_sprite = Sprite2D.new()
+	height_sprite.z_index = -1
+	height_sprite.z_as_relative = true
+	add_child.call_deferred(height_sprite)
+
 	# 3. Apply the Silhouette Shader
 	shadow_material = ShaderMaterial.new()
 	shadow_material.shader = load("res://Shaders/silhouette.gdshader") # UPDATE THIS PATH
 	shadow_sprite.material = shadow_material
+	
+	height_material = ShaderMaterial.new()
+	height_material.shader = load("res://Shaders/silhouette.gdshader") # UPDATE THIS PATH
+	
+	height_sprite.material = height_material
 	
 	# 4. Connect to Sun changes
 	Sun.sun_changed.connect(_update_appearance)
@@ -60,10 +72,21 @@ func _sync_texture_data():
 	shadow_sprite.flip_h = parent_sprite.flip_h
 	shadow_sprite.offset = parent_sprite.offset
 	shadow_sprite.texture = parent_sprite.texture
+	height_sprite.visible = true
+	
+	height_sprite.texture = parent_sprite.texture
+	height_sprite.hframes = parent_sprite.hframes
+	height_sprite.vframes = parent_sprite.vframes
+	height_sprite.frame = parent_sprite.frame
+	height_sprite.flip_h = parent_sprite.flip_h
+	height_sprite.offset = parent_sprite.offset
+	height_sprite.texture = parent_sprite.texture
 
 func _update_appearance():
 	# Update Shader Color
 	shadow_material.set_shader_parameter("shadow_color", Sun.shadow_color)
+	height_material.set_shader_parameter("shadow_color", Color(0.412, 0.373, 0.294))
 	# Update Position Offset (The "Height" Logic)
 	# The shadow is a child of the parent, so position is local relative to parent
-	shadow_sprite.position = (Sun.global_offset * height_multiplier).rotated(-parent_sprite.rotation)
+	shadow_sprite.position = (Sun.global_offset * height_multiplier).rotated(-parent_sprite.global_rotation)
+	height_sprite.position = (Vector2(0,Sun.global_offset.y) * 0.4 * height_multiplier).rotated(-parent_sprite.global_rotation)

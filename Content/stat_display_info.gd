@@ -5,6 +5,7 @@ class_name StatDisplayInfo
 
 # The data to fetch.
 @export var attribute: Attributes.id = Attributes.id.NULL
+@export var dynamic_attribute: StringName = &""
 
 # How to display it.
 @export var label: String = "" # e.g., "DMG", "RNG"

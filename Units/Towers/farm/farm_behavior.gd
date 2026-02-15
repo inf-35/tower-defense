@@ -7,6 +7,10 @@ class_name FarmBehavior
 static func _static_init() -> void:
 	ModifiersComponent.register_dynamic_attribute(&"farm_income_per_wave")
 	ModifiersComponent.register_dynamic_attribute(&"farm_adjacent_bonus")
+	
+func display_start() -> void:
+	unit.modifiers_component.register_dynamic_stat(&"farm_income_per_wave", income_per_wave)
+	unit.modifiers_component.register_dynamic_stat(&"farm_adjacent_bonus", adjacent_bonus)
 
 func start() -> void:
 	unit.modifiers_component.register_dynamic_stat(&"farm_income_per_wave", income_per_wave)
@@ -22,7 +26,6 @@ func check_placement_validity(island: Island, cell: Vector2i, facing: int) -> Di
 			
 	return { "valid": false, "error": "Must touch a Structure" }
 
-# --- Gameplay Logic ---
 func _on_wave_ended(_wave: int) -> void:
 	if (unit as Tower).current_state != Tower.State.ACTIVE:
 		return
@@ -36,8 +39,7 @@ func _on_wave_ended(_wave: int) -> void:
 	total += adj_count * unit.modifiers_component.pull_dynamic_stat(&"farm_adjacent_bonus")
 	
 	Player.flux += total
-	print(total)
-	
+
 	if is_instance_valid(UI.floating_text_manager):
 		UI.floating_text_manager.show_text("+%.2f" % total, unit.global_position, Color.GOLD)
 

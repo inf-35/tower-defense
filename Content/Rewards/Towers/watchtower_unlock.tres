@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://berqfydjkmflu"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_kqp3q"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_yybt0"]
+
+[resource]
+script = ExtResource("2_yybt0")
+id_name = "amplifier"
+description = "relic tower unlock"
+tower_type = 55
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

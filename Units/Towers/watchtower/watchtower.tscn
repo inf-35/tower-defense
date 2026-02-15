@@ -1,0 +1,88 @@
+[gd_scene load_steps=16 format=3 uid="uid://beqpgbnw7an3v"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_kquuy"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_kkahb"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_qfl1w"]
+[ext_resource type="Script" uid="uid://bdhsnunw7upow" path="res://Content/Behaviors/amplifier_behavior.gd" id="4_f60pv"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="5_pe7kn"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bduef"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_qmgf2"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_dkcg7"]
+[ext_resource type="Texture2D" uid="uid://rr4mh5ivom5u" path="res://Assets/watchtower_floor.png" id="9_qfl1w"]
+[ext_resource type="Texture2D" uid="uid://cqh585tq2c0fw" path="res://Assets/watchtower_terrain.png" id="10_kkahb"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_sqs83"]
+[ext_resource type="Texture2D" uid="uid://de3dgvvh1lqjx" path="res://Assets/watchtower_decor.png" id="11_f5ll1"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_d6e4w"]
+[ext_resource type="Texture2D" uid="uid://c6gsq57rd3y8o" path="res://Assets/watchtower_roof.png" id="12_f60pv"]
+
+[sub_resource type="Resource" id="Resource_hpk50"]
+script = ExtResource("5_pe7kn")
+attribute = 7
+additive = 15.0
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[node name="Watchtower" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_kquuy")
+type = 55
+stat_displays = Array[ExtResource("2_kkahb")]([ExtResource("3_qfl1w")])
+behavior = NodePath("AmplifierBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="AmplifierBehavior" type="Node" parent="."]
+script = ExtResource("4_f60pv")
+modifier_prototypes = Array[ExtResource("5_pe7kn")]([SubResource("Resource_hpk50")])
+metadata/_custom_type_script = "uid://bdhsnunw7upow"
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("6_bduef")
+movement_data = ExtResource("7_qmgf2")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("8_dkcg7")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("9_qfl1w")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+scale = Vector2(0.9999999, 0.9999999)
+script = ExtResource("10_sqs83")
+height_multiplier = 1.2
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="poles" type="Sprite2D" parent="Graphics"]
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("11_f5ll1")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/poles"]
+script = ExtResource("10_sqs83")
+height_multiplier = 0.2
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="roof" type="Sprite2D" parent="Graphics"]
+z_index = 2
+position = Vector2(-3, 1.792)
+scale = Vector2(0.8672839, 0.8672839)
+texture = ExtResource("12_f60pv")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/roof"]
+script = ExtResource("10_sqs83")
+height_multiplier = 0.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="Terrain" type="Sprite2D" parent="Graphics"]
+z_index = 10
+z_as_relative = false
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("10_kkahb")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("12_d6e4w")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

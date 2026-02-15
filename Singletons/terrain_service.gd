@@ -46,7 +46,7 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 			used_capacity -= Towers.get_tower_capacity(exclude_tower.type) # exclude excluded tower from capacity computation
 		
 		if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(tower_position) == Terrain.Base.SETTLEMENT): #TODO: fix this for non-1x1 generators
-			if used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity: #and make this non-hardcoded
+			if used_capacity + Towers.get_tower_capacity(tower_type) > Player.tower_capacity and not is_zero_approx(Towers.get_tower_capacity(tower_type)): #and make this non-hardcoded
 				return false
 				
 	var size: Vector2i = Towers.get_tower_size(tower_type)
@@ -81,7 +81,7 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 			
 			if not Terrain.is_constructable(island.terrain_base_grid[cell]):
 				return false
-	
+	print("true!")
 	return true
 
 # Returns an empty string if valid, or an error description if invalid
@@ -95,7 +95,7 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 	# Skip capacity check for Generators usually, or if limit logic applies
 	if not (tower_type == Towers.Type.GENERATOR and island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
 		var cap_cost = Towers.get_tower_capacity(tower_type)
-		if Player.used_capacity + cap_cost > Player.tower_capacity:
+		if Player.used_capacity + cap_cost > Player.tower_capacity and not is_zero_approx(cap_cost):
 			return "Not enough {POPULATION|icon_size=20|label=Population|color=red} (build more {T_GENERATOR|icon_size=24|label=Villages|color=red}"
 
 	# 3. Check Limits

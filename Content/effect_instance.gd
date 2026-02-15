@@ -37,8 +37,11 @@ func attach_to(_host: Unit) -> void:
 	detach()
 	host = _host
 	
-	if is_instance_valid(host) and not host.abstractive:
-		effect_prototype.attach_handler.call(self)
+	if is_instance_valid(host):
+		if host.abstractive:
+			effect_prototype._handle_display_attach(self)
+		else:
+			effect_prototype.attach_handler.call(self)
 
 func attach_global() -> void: ##for attaching as a global effect
 	effect_prototype.attach_handler.call(self)

@@ -54,6 +54,8 @@ func _ready() -> void:
 	settings_button.pressed.connect(func(): enter_state(State.SETTINGS))
 	save_and_quit_button.pressed.connect(func(): _on_save_and_quit())
 	
+	Phases.phase_advanced.connect(_evaluate_save_validity)
+	
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Start hidden
 	visible = false
@@ -75,6 +77,7 @@ func back() -> void:
 		
 	close_menu()
 	
+	
 func enter_state(input_state: State) -> void:
 	match input_state:
 		State.SETTINGS:
@@ -86,6 +89,15 @@ func enter_state(input_state: State) -> void:
 	
 	state = input_state
 # --- Internal Logic ---
+
+func _evaluate_save_validity():
+	if not state == State.PAUSE:
+		return
+		
+	if Phases.current_phase == Phases.GamePhase.BUILDING:
+		save_and_quit_button.disabled = false
+	else:
+		save_and_quit_button.disabled = true
 
 func _load_current_settings() -> void:
 	# Volume (Convert DB to 0-1 linear if your sliders are 0-1, or 0-100)

@@ -42,7 +42,10 @@ func _handle_event(_i: EffectInstance, event: GameEvent) -> void:
 	
 	# proc chance
 	if randf() <= spawn_chance:
+		print("success")
 		_spawn_cloud(dying_unit.global_position, dying_unit, killer_unit)
+	else:
+		print("failure")
 
 func _spawn_cloud(pos: Vector2, _dead_unit: Unit, killer_unit: Unit) -> void:
 	if not hazard_scene: return

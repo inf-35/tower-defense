@@ -35,6 +35,7 @@ static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 
 var flux_value: float #how much flux this unit drops when killed / sold
+var strength: float ## how "strong" this unit is, used for targeting
 #effect-related state
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
 var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x][y] -> Array[EffectInstance] where x is schedule and y is event hook.
@@ -409,7 +410,7 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Player.flux += hit_report_data.flux_value * 0.1 #reward player with flux
+	Player.flux += hit_report_data.flux_value * 0.25 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
 	behavior.detach() #disable behavior

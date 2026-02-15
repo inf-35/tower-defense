@@ -10,4 +10,5 @@ title = "Sprinter"
 description = "Footsoldier that gets faster and faster as time passes."
 unit_scene = ExtResource("2_ceu77")
 flux_value = 0.7
+strength_value = 1.1
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

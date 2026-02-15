@@ -10,7 +10,7 @@
 [resource]
 script = ExtResource("1_6qowr")
 id = 3
-cost = 9.0
+cost = 14.0
 element = 1
 tower_name = "Frost Tower"
 tower_description = "Inflicts mild frost to nearby enemies."

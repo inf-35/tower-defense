@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_sdvyp")
-max_health = 52.0
-flat_damage_taken = -1.2
+max_health = 55.0
+flat_damage_taken = -1.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"

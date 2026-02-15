@@ -94,6 +94,7 @@ func _handle_blocked_state() -> void:
 	# visual adjustment: nudge slightly towards the wall so it looks like they are hitting it
 	var tower_pos = blocking_tower.global_position
 	var my_pos = unit.global_position
+	movement_component.velocity = Vector2.ZERO
 	#var nudge = (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.1
 	#movement_component.velocity += nudge
 	movement_component.target_position = Island.cell_to_position(Island.position_to_cell(unit.global_position)) + (tower_pos - my_pos).normalized() * Island.CELL_SIZE * 0.3

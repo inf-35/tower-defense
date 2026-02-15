@@ -1,8 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://cpbglnjon3xp6"]
+[gd_scene load_steps=14 format=3 uid="uid://cpbglnjon3xp6"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_y12hn"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_eys8t"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="2_xow1n"]
 [ext_resource type="Script" uid="uid://bigp8gkrdqok7" path="res://Content/Effects/_capacity_generator.gd" id="3_e03kd"]
+[ext_resource type="Resource" uid="uid://j0r1sgyiwb0f" path="res://Content/StatDisplays/population.tres" id="3_fb2q0"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_oknhp"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_hwhiv"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_d0144"]
@@ -22,6 +24,7 @@ metadata/_custom_type_script = "uid://bigp8gkrdqok7"
 z_index = 100
 script = ExtResource("1_y12hn")
 type = 52
+stat_displays = Array[ExtResource("2_eys8t")]([ExtResource("3_fb2q0")])
 behavior = NodePath("HamletBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

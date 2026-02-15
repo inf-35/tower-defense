@@ -13,4 +13,5 @@ description = "Very tanky"
 stat_displays = Array[ExtResource("2_r5cwj")]([ExtResource("3_xwohu"), ExtResource("4_8qnxe")])
 unit_scene = ExtResource("5_oh00t")
 flux_value = 0.6
+strength_value = 2.0
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

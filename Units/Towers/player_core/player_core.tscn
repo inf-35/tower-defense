@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_2li7g"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="2_vum4a"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_yq3fw"]
-[ext_resource type="Resource" uid="uid://bh2xrt4aqtxib" path="res://Content/StatDisplays/core_flux.tres" id="3_hh2tl"]
+[ext_resource type="Resource" uid="uid://j0r1sgyiwb0f" path="res://Content/StatDisplays/population.tres" id="3_ok6e0"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="3_yq3fw"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="4_cg3ju"]
 [ext_resource type="Script" uid="uid://qpwm2iqakx70" path="res://UnitComponents/core_hitbox.gd" id="5_cg3ju"]
@@ -20,7 +20,7 @@ z_index = 100
 script = ExtResource("1_2li7g")
 type = 1
 blocking = false
-stat_displays = Array[ExtResource("2_yq3fw")]([ExtResource("3_hh2tl")])
+stat_displays = Array[ExtResource("2_yq3fw")]([ExtResource("3_ok6e0")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
 movement_component = NodePath("MovementComponent")

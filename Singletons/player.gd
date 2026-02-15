@@ -224,11 +224,9 @@ func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
 			relevant_modifiers.append(new_modifier)
 
 	return relevant_modifiers
-	
-# MODIFIED: Tower placement request now focuses only on player-side checks.
-# it asks the Island to handle the actual placement validation and construction.
+
 func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: Tower.Facing):
-	# 1. Check player's own resources.
+	#NOTE: reduplicated logic from TerrainService (condense?)
 	if not unlocked_towers.get(tower_type, false):
 		return
 		
@@ -236,7 +234,7 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		return
 	
 	if not (tower_type == Towers.Type.GENERATOR and References.island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
-		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity:
+		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity and not is_zero_approx(Towers.get_tower_capacity(tower_type)):
 			# NOTE: You could add a UI warning here about insufficient capacity.
 			return
 
@@ -303,7 +301,8 @@ func load_save_data(save_data: Dictionary) -> void:
 	for active_relic: Dictionary in save_data.relics:
 		load_relic(active_relic)
 		
-	trader_service.load_save_data(save_data.trader)
+	if save_data.has("trader"):
+		trader_service.load_save_data(save_data.trader)
 	
 	UI.update_relics.emit()
 	UI.update_flux.emit(flux)

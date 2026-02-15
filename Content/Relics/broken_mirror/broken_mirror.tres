@@ -9,7 +9,6 @@
 script = ExtResource("1_c0otv")
 input_status = 4
 output_status = 5
-conversion_rate = 1.0
 metadata/_custom_type_script = "uid://c1ydyvx8fvx8g"
 
 [resource]
@@ -17,7 +16,7 @@ script = ExtResource("4_gq43s")
 type = 1
 global_effect = SubResource("Resource_sk8em")
 title = "Broken Mirror"
-description = "Each stack of {CURSED} also inflicts a stack of {BLEED} on enemies.
+description = "Each stack of {CURSED} also inflicts half a stack of {BLEED} on enemies.
 "
 icon = ExtResource("2_sk8em")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -52,6 +52,7 @@ window/size/viewport_width=3840
 window/size/viewport_height=2160
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/stretch/scale=1.2
 window/vsync/vsync_mode=0
 
 [editor]

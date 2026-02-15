@@ -55,8 +55,8 @@ metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="AcceleratingBehavior" type="Node" parent="."]
 script = ExtResource("2_yap6c")
-speed_increase_percent = 0.3
-interval = 0.5
+speed_increase_percent = 0.12
+interval = 0.3
 metadata/_custom_type_script = "uid://hhphtfxndfib"
 
 [node name="NavigationComponent" type="Node" parent="."]

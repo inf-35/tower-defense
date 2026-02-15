@@ -7,6 +7,9 @@ class_name CapacityGeneratorEffect
 
 class CapacityState extends RefCounted:
 	var last_capacity_generation: float = 0.0
+	
+static func _static_init() -> void:
+	ModifiersComponent.register_dynamic_attribute(&"capacity")
 
 func _init() -> void:
 	event_hooks =  [GameEvent.EventType.ADJACENCY_UPDATED, GameEvent.EventType.DIED]
@@ -17,15 +20,20 @@ func create_instance() -> EffectInstance:
 	instance.state = CapacityState.new()
 	return instance
 
+func _handle_display_attach(instance: EffectInstance):
+	instance.host.modifiers_component.register_dynamic_stat(&"capacity", base_capacity + bonus_capacity_amount)
+
 func _handle_attach(instance: EffectInstance):
 	var state := instance.state as CapacityState
 	var initial_contribution: float = _calculate_contribution(instance)
 	state.last_capacity_generation = initial_contribution
+	instance.host.modifiers_component.register_dynamic_stat(&"capacity", base_capacity + bonus_capacity_amount)
 	Player.add_to_total_capacity(initial_contribution)
 
 func _handle_detach(instance: EffectInstance):
 	var state := instance.state as CapacityState
 	Player.remove_from_total_capacity(state.last_capacity_generation)
+	instance.host.modifiers_component.register_dynamic_stat(&"capacity", 0.0)
 	state.last_capacity_generation = 0.0
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:

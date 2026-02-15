@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_xhnm1"]
 
 [node name="Trade" type="Panel" node_paths=PackedStringArray("wave_text", "exit_button", "card_list", "reroll_button")]
+self_modulate = Color(1, 1, 1, 0)
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,6 +20,14 @@ exit_button = NodePath("CenterContainer/main_container/PanelContainer/MarginCont
 card_list = NodePath("CenterContainer/main_container/card_list")
 card_scene = ExtResource("4_egd4h")
 reroll_button = NodePath("CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer/reroll")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1

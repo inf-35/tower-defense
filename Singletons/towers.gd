@@ -57,6 +57,7 @@ enum Type {
 	HAMLET,
 	FARM,
 	BRICKLAYER,
+	WATCHTOWER,
 	
 }
 
@@ -222,3 +223,7 @@ func _load_all_tower_stats() -> void:
 
 func _init():
 	_load_all_tower_stats()
+	
+func start():
+	for tower_type in tower_stats:
+		get_tower_prototype(tower_type)

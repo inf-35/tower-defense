@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://b4jjm1837mjs3"]
+[gd_scene load_steps=23 format=3 uid="uid://b4jjm1837mjs3"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_mpu13"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_b88dd"]
@@ -12,9 +12,10 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_u4q0k"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_8swcr"]
 [ext_resource type="Resource" uid="uid://c1714d1rsmu04" path="res://Units/Towers/firewall/firewall_attack.tres" id="9_vqe15"]
-[ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="10_tds48"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_a5hl3"]
+[ext_resource type="Texture2D" uid="uid://bqgp53higu00i" path="res://Assets/firewall_towers.png" id="13_6nj57"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_w76k3"]
+[ext_resource type="Texture2D" uid="uid://b14cpmvo2j37x" path="res://Assets/firewall_steps.png" id="15_mi2ft"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_i3qpa"]
 size = Vector2(10, 10)
@@ -89,7 +90,7 @@ _data = {
 }
 
 [node name="Firewall" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
-z_index = 80
+z_index = 100
 script = ExtResource("1_mpu13")
 type = 23
 stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_nim3f")])
@@ -132,7 +133,7 @@ texture = SubResource("PlaceholderTexture2D_i3qpa")
 
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("10_tds48")
+texture = ExtResource("13_6nj57")
 
 [node name="Muzzle" type="Marker2D" parent="Graphics"]
 position = Vector2(0.47718075, 1.6484104)
@@ -140,6 +141,17 @@ scale = Vector2(1.3162339, 0.769)
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics"]
 script = ExtResource("14_w76k3")
+height_multiplier = 1.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+z_index = 50
+z_as_relative = false
+texture = ExtResource("15_mi2ft")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D"]
+script = ExtResource("14_w76k3")
+height_multiplier = 0.2
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]

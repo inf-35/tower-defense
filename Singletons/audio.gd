@@ -62,8 +62,7 @@ func play_sound(sound_name: StringName, volume: float = 0.0, position: Vector2 =
 	player.play()
 	
 func get_volume_from_damage(damage: float) -> float:
-	print(damage, " -> ", (log(maxf(damage, 0.0001)) * 0.5) - 3.0)
-	return (log(maxf(damage, 0.0001)) * 0.5) - 3.0
+	return (log(maxf(damage, 0.0001)) * 0.5) - 5.0
 	
 # this function is called when a sound effect has finished playing
 func _on_sfx_player_finished(player: AudioStreamPlayer2D) -> void:

@@ -18,6 +18,7 @@ enum TargetingMode {
 	MOST_HEALTH,
 	FASTEST,
 	SCATTER,
+	STRONGEST
 }
 
 func _ready() -> void:
@@ -184,7 +185,10 @@ func get_targets(count: int) -> Array[Unit]:
 				var dist_b = (b.position - unit.position).length_squared()
 				return dist_a < dist_b
 			TargetingMode.MOST_HEALTH:
+				#TODO: create a special [STRONGEST] mode
 				return a.health_component.health > b.health_component.health
+			TargetingMode.STRONGEST:
+				return a.strength > b.strength
 			TargetingMode.FASTEST:
 				# Assuming speed exists in movement component stats
 				var speed_a = a.get_stat(Attributes.id.MAX_SPEED)

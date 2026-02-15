@@ -14,4 +14,5 @@ description = "Armoured units that shrug off light hits."
 stat_displays = Array[ExtResource("2_jmdnu")]([ExtResource("3_qqk5r"), ExtResource("5_qqk5r"), ExtResource("4_1ttpw")])
 unit_scene = ExtResource("2_upri3")
 flux_value = 0.4
+strength_value = 1.05
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

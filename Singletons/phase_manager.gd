@@ -7,7 +7,7 @@ extends Node
 # UI and other systems should listen to this.
 signal wave_cycle_started(wave_number: int) ##wave cycle started (beginning of day). towers resurrect with this signal
 signal wave_ended(wave_number: int) ##combat wave ended (end of night). towers have not yet resurrected. succeeded by wave_cycle_started.
-
+signal phase_advanced()
 signal combat_started(wave_number: int) ##combat wave started
 
 signal wave_schedule_updated() ## wave schedule updated
@@ -22,7 +22,9 @@ enum CombatVariant { NORMAL, BOSS, SURGE}
 var current_wave_number: int = 0:
 	set(ncwm):
 		current_wave_number = ncwm
-		var goal: float = 1.0 + (max(current_wave_number - 12, 0) * 0.05)
+		var base_scaling: float = 0.8 if Phases.current_game_difficulty == GameDifficulty.NORMAL else 1.0
+		var scaling: float = 0.03 if Phases.current_game_difficulty == GameDifficulty.NORMAL else 0.04
+		var goal: float = base_scaling + (max(current_wave_number - 12, 0) * scaling)
 		Phases.current_game_scaling = max(Phases.current_game_scaling - 0.1, goal)
 		
 var current_phase: GamePhase = GamePhase.IDLE
@@ -59,6 +61,7 @@ func start_game() -> void:
 	References.start()
 	ClickHandler.start()
 	Units.start()
+	Towers.start()
 	Player.start()
 	SpawnPointService.start()
 	TowerNetworkManager.start()
@@ -105,6 +108,10 @@ func start_tutorial():
 	turret.trigger_signal = UI.place_tower_requested
 	turret.desired_parameters = [Towers.Type.TURRET]
 	
+	var farm: TutorialStep = load("res://UI/tutorial/place_farm.tres")
+	farm.trigger_signal = UI.place_tower_requested
+	farm.desired_parameters = [Towers.Type.FARM]
+	
 	var gold_population: TutorialStep = load("res://UI/tutorial/gold_population_explanation.tres")
 	var hover_player_stats: TutorialStep = load("res://UI/tutorial/hover_player_stats.tres")
 	var trade: TutorialStep = load("res://UI/tutorial/trade.tres")
@@ -118,6 +125,7 @@ func start_tutorial():
 	
 	steps.append(select)
 	steps.append(turret)
+	steps.append(farm)
 	steps.append(gold_population)
 	steps.append(hover_player_stats)
 	steps.append(trade)
@@ -222,6 +230,7 @@ func _advance_phase():
 			_advance_phase() # go directly to the next cycle prep
 		GamePhase.GAME_OVER:
 			_report("Game over state.")
+	phase_advanced.emit()
 
 # --- choice Phase Logic ---
 func _start_choice_phase(type: ChoiceType) -> void:

@@ -13,4 +13,5 @@ description = "Heals nearby enemies."
 stat_displays = Array[ExtResource("2_8gry3")]([ExtResource("3_fvg2m"), ExtResource("4_76r1b")])
 unit_scene = ExtResource("2_rthdo")
 flux_value = 0.8
+strength_value = 1.6
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

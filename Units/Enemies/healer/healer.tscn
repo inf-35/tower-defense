@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bl12mn0bm7utq"]
+[gd_scene load_steps=20 format=3 uid="uid://bl12mn0bm7utq"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_y0lj0"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_l3ud4"]
@@ -11,6 +11,11 @@
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="8_ub73x"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_cg248"]
 [ext_resource type="Script" uid="uid://dwx63ohv786ew" path="res://Units/Enemies/healer/healer_behavior.gd" id="10_8vdnj"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_6okpw"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="13_cgqdq"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="14_27nxq"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="15_tqofa"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="16_vc60n"]
 
 [sub_resource type="Resource" id="Resource_86qj0"]
 script = ExtResource("4_wcil4")
@@ -22,10 +27,17 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
 size = Vector2(80.000046, 100.00003)
 
-[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component")]
+[sub_resource type="Resource" id="Resource_luiw2"]
+script = ExtResource("15_tqofa")
+range = 8.0
+damage = 2.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_y0lj0")
 hostile = true
+attack_only_when_blocked = true
 behavior = NodePath("HealerBehavior")
 graphics = NodePath("Graphics")
 hitbox = NodePath("Hitbox")
@@ -33,6 +45,8 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="NavigationComponent" type="Node" parent="."]
@@ -81,6 +95,16 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="HealerBehavior" type="Node" parent="."]
 script = ExtResource("10_8vdnj")
-heal_amount = 2.0
-heal_range = 15.0
+heal_amount = 0.8
+heal_interval = 1.5
+heal_range = 20.0
 metadata/_custom_type_script = "uid://dwx63ohv786ew"
+
+[node name="RangeComponent" type="Node" parent="."]
+script = ExtResource("12_6okpw")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("13_cgqdq")
+attack_data = SubResource("Resource_luiw2")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

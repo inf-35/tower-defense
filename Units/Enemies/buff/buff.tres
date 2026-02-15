@@ -13,4 +13,5 @@ description = "Strong yet slow."
 stat_displays = Array[ExtResource("2_00b60")]([ExtResource("3_c42nr"), ExtResource("4_u3yoc")])
 unit_scene = ExtResource("5_123hm")
 flux_value = 0.6
+strength_value = 1.2
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

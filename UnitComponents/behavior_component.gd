@@ -36,6 +36,7 @@ func initialise(host_unit: Unit): ##his function is called by the unit to give t
 		self.turret = unit.turret
 		
 	if unit.abstractive:
+		display_start()
 		return
 
 	start()
@@ -62,6 +63,9 @@ func attach(): ##function called when the unit wants to reattach this handler (i
 
 func transfer_state(new_behavior: Behavior): ##called when we want to transfer state to another behavior (i.e. upgrading)
 	new_behavior._cooldown = _cooldown
+	
+func display_start() -> void: ##for prototypes (abstractive)
+	pass
 
 func start() -> void: ##behavior start function, called at the start of behavior when the unit is created or revived
 	#by default units try to navigate to the origin

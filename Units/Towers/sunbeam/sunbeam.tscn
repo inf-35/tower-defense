@@ -35,8 +35,8 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [sub_resource type="Resource" id="Resource_16r00"]
 script = ExtResource("5_kblh8")
 range = 50.0
-cooldown = 0.25
-damage = 0.1
+cooldown = 0.2
+damage = 0.15
 status_effects = Array[ExtResource("6_2gfii")]([SubResource("Resource_x2me6")])
 vfx_on_spawn = SubResource("Resource_avtv1")
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

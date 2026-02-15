@@ -26,6 +26,8 @@ var stack_update_handler: Callable = _handle_stack_update
 @abstract func _handle_attach(instance: EffectInstance) -> void
 @abstract func _handle_detach(instance: EffectInstance) -> void
 @abstract func _handle_event(instance: EffectInstance, event: GameEvent) -> void
+func _handle_display_attach(instance: EffectInstance) -> void:
+	pass
 func _handle_stack_update(instance: EffectInstance) -> void:
 	pass
 

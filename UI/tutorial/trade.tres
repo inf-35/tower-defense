@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_tnhaf")
-instruction_text = "Open the trader menu to view and purchase upgrades and towers."
-success_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below.
+instruction_text = "Open the trade menu to view and purchase upgrades and towers."
+success_text = "Pressing T also opens and closes the menu.
 Q to continue."
 panel_anchor = 2
 trigger_action = &"0"

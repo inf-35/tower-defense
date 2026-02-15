@@ -19,7 +19,7 @@ func _ready() -> void:
 	exit_button.pressed.connect(func():
 		Player.trader_service.close_menu()
 	)
-	
+
 func _present_options(choices: Array[Reward]) -> void:
 	_clear_options()
 	
@@ -31,7 +31,7 @@ func _update_restock_cost(restock_cost: float) -> void:
 	reroll_button.text = "Restock (%.2f)" % restock_cost
 
 func _update_restock_waves(waves: int) -> void:
-	wave_text.text = "Restocks automatically in %d waves." % waves
+	wave_text.text = "Restocks automatically in %d wave(s)." % waves
 
 func _instantiate_card(data: Reward, index: int) -> void:
 	if not card_scene:

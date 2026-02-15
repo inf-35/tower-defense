@@ -73,7 +73,7 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.DAMAGE_TAKEN, 0.0, 1.25, true, Color(0.446, 0.002, 0.768, 0.5)
 	),
 	Status.BLEED: StatusEffectData.new(
-		id.FLAT_DAMAGE_TAKEN, 1.0, 0.0, true, Color(1,0,0,0.5),
+		id.FLAT_DAMAGE_TAKEN, 0.5, 0.0, true, Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.0, false, Color(1, 1, 0.5) #completely stops enemies
