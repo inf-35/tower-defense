@@ -58,7 +58,8 @@ enum Type {
 	FARM,
 	BRICKLAYER,
 	WATCHTOWER,
-	
+	RITE_HAMMER,
+	RITE_SCYTHE,
 }
 
 enum Element {

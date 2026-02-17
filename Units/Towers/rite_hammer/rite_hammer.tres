@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://3gwffrtkwdap"]
+
+[ext_resource type="Texture2D" uid="uid://dnsbvwxjb6hg" path="res://Assets/rite_hammer_full.png" id="1_1jbvf"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cw4s5"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_y5y31"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_xlpip"]
+[ext_resource type="PackedScene" uid="uid://cfnbbnsne3ulu" path="res://Units/Towers/rite_hammer/rite_hammer.tscn" id="5_v3eoh"]
+
+[resource]
+script = ExtResource("4_xlpip")
+id = 56
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Hammer Rite"
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 1.5% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has."
+icon = ExtResource("1_1jbvf")
+preview = ExtResource("1_1jbvf")
+inspector_actions = Array[ExtResource("2_cw4s5")]([ExtResource("3_y5y31")])
+tower_scene = ExtResource("5_v3eoh")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

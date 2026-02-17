@@ -410,7 +410,7 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		
 # this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Player.flux += hit_report_data.flux_value * 0.25 #reward player with flux
+	Player.flux += hit_report_data.flux_value * 0.4 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 	
 	behavior.detach() #disable behavior

@@ -121,7 +121,8 @@ func begin_new_game():
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
 	}
-	#add_rite(Towers.Type.RITE_FROST, 20)
+	add_rite(Towers.Type.RITE_HAMMER, 20)
+	add_rite(Towers.Type.RITE_SCYTHE, 20)
 	#
 	#var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RELIC
