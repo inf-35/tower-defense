@@ -17,6 +17,7 @@ script = ExtResource("2_7sn2y")
 adjacent_tower_type = 19
 modifier_prototype = SubResource("Resource_w8u05")
 schedule = 0
+icon = ExtResource("3_w8u05")
 metadata/_custom_type_script = "uid://b74ug56sj02f0"
 
 [resource]

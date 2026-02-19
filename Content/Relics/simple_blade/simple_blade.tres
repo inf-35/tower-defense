@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://fp1hhngscll3"]
+
+[ext_resource type="Script" uid="uid://bx0jig5k8v7tt" path="res://Content/Relics/simple_blade/simple_blade_effect.gd" id="1_ardha"]
+[ext_resource type="Texture2D" uid="uid://dk7tkkbc6if6w" path="res://Assets/simple_blade.png" id="2_ardha"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_yigvj"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_ifn67"]
+
+[sub_resource type="Resource" id="Resource_wm4ca"]
+script = ExtResource("1_ardha")
+bonus_per_tower = 0.01
+schedule = 0
+icon = ExtResource("2_ardha")
+metadata/_custom_type_script = "uid://bx0jig5k8v7tt"
+
+[resource]
+script = ExtResource("3_ifn67")
+type = 32
+global_effect = SubResource("Resource_wm4ca")
+title = "Simple Blade"
+description = "All towers gain +1% {UNIT_DAMAGE} for each tower on the field."
+icon = ExtResource("2_ardha")
+metadata/_custom_type_script = "uid://bdmptskvnyn3g"

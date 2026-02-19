@@ -21,6 +21,7 @@ func detach():
 		_heal_area.free()
 
 func update(_delta: float) -> void:
+	_attempt_simple_attack()
 	# update the cooldown timer
 	_cooldown += Clock.game_delta
 	

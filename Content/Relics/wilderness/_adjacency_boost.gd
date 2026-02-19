@@ -78,6 +78,7 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void:
 	# apply or update modifier
 	if adjacent_stacks > 0:
 		_apply_buff_to_tower(state, tower, adjacent_stacks)
+		UI.floating_text_manager.show_icon(icon, tower.global_position)
 	else:
 		_remove_buff_from_tower(state, tower)
 

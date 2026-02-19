@@ -33,7 +33,7 @@ func _update_health(hp: float):
 	_update_label()
 
 func _update_label():
-	var flux_text: String = "{GOLD}: %s" % str(roundi(flux * 10) * 0.1)
+	var flux_text: String = "{GOLD}: %s" % str(floori(flux * 10) * 0.1)
 	var capacity_text: String = "{POPULATION}: %s / %s" % [str(roundi(used_capacity * 10) * 0.1), str(roundi(total_capacity * 10) * 0.1)]
 	var health_text: String = "{PLAYER_HP}: %s" % [str(roundi(health))]
 	

@@ -25,6 +25,8 @@ var _monitoring_active: bool = false ##are we currently monitoring for a camera 
 
 var _anchor_node: Control
 
+var _current_tutorial_type: Player.TutorialFlag
+
 # --- Internal ---
 var _shader_mat: ShaderMaterial
 
@@ -73,12 +75,16 @@ func register_element(id: TutorialStep.Reference, node: Control) -> void:
 	_registered_ui_elements[id] = node
 
 # --- Public API: Sequences ---
-func start_sequence(steps: Array[TutorialStep]) -> void:
+func start_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFlag) -> void:
+	#reject tutorials already completed
+	if Player.completed_tutorials[tutorial_type]:
+		return
 	_active_sequence = steps
 	_current_step_index = -1
 	visible = true
 	overlay_color_rect.visible = true
 	instruction_panel.visible = true
+	_current_tutorial_type = tutorial_type
 	_advance_step()
 
 func end_tutorial() -> void:
@@ -87,6 +93,7 @@ func end_tutorial() -> void:
 	overlay_color_rect.visible = false
 	_current_step_index = -1
 	_target_node = null
+	Player.completed_tutorials[_current_tutorial_type] = true
 	# reset shader
 	_shader_mat.set_shader_parameter("is_active", false)
 

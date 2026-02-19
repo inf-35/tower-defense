@@ -91,8 +91,9 @@ func enter_state(input_state: State) -> void:
 # --- Internal Logic ---
 
 func _evaluate_save_validity():
-	if not state == State.PAUSE:
-		return
+	print("yes!")
+	#if not state == State.PAUSE:
+		#return
 		
 	if Phases.current_phase == Phases.GamePhase.BUILDING:
 		save_and_quit_button.disabled = false
@@ -127,6 +128,8 @@ func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
 		# DisplayServer.window_set_position(...)
 		
 func _on_save_and_quit():
+	if Phases.current_phase != Phases.GamePhase.BUILDING:
+		return
 	Phases.in_game = false
 	SaveLoad.save_game()
 	get_tree().change_scene_to_file("res://main_menu.tscn")

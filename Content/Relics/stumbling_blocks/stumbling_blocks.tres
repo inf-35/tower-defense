@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_iv7fa"]
 script = ExtResource("1_i1wg1")
 attribute = 3
-multiplicative = 0.5
+multiplicative = 0.25
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -24,6 +24,6 @@ script = ExtResource("2_wrs5o")
 type = 12
 global_effect = SubResource("Resource_p0ayh")
 title = "Stumbling Blocks"
-description = "Enemies travelling on destroyed towers are slowed down by 50%."
+description = "Enemies travelling on destroyed towers are slowed down by 75%."
 icon = ExtResource("3_bkglv")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

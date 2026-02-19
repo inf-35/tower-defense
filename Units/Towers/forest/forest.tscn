@@ -15,6 +15,7 @@
 z_index = 100
 script = ExtResource("1_pacpt")
 type = 10
+environmental = true
 incorporeal = true
 stat_displays = Array[ExtResource("2_t117n")]([ExtResource("3_sklve")])
 behavior = NodePath("ForestBehavior")

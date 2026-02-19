@@ -50,6 +50,17 @@ var active_relics: Array[RelicData]
 
 var _active_effects_container: Node
 
+#tutorial
+enum TutorialFlag {
+	MAIN,
+	TROLL,
+}
+
+var completed_tutorials: Dictionary[TutorialFlag, bool] = {
+	TutorialFlag.MAIN: false,
+	TutorialFlag.TROLL: false,
+}
+
 #various services (which are children of this node)
 var ruin_service: RuinService
 var global_event_service: GlobalEventService
@@ -121,12 +132,10 @@ func begin_new_game():
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
 	}
-	add_rite(Towers.Type.RITE_HAMMER, 20)
-	add_rite(Towers.Type.RITE_SCYTHE, 20)
 	#
 	#var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.WALLFLOWER
+	#reward.relic = Relics.SIMPLE_BLADE
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
@@ -289,7 +298,7 @@ func get_save_data() -> Dictionary:
 	save_data["relics"] = relics_data
 	save_data["trader"] = trader_service.get_save_data()
 	return save_data
-	
+
 func load_save_data(save_data: Dictionary) -> void:
 	flux = float(save_data.gold)
 	hp = int(save_data.hp)
@@ -332,3 +341,15 @@ func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
 
 	# announce that the global state has changed
 	relics_changed.emit()
+	
+func get_profile() -> Dictionary:
+	var profile_data: Dictionary = {
+		"completed_tutorials": completed_tutorials,
+	}
+	print(profile_data.get("completed_tutorials"))
+	return profile_data
+
+func load_profile(profile_data: Dictionary) -> void:
+	print(profile_data.get("completed_tutorials"))
+	for tutorial_key: String in profile_data.get("completed_tutorials"):
+		completed_tutorials[int(tutorial_key)] = profile_data.get("completed_tutorials")[tutorial_key]

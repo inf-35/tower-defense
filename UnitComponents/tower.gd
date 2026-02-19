@@ -6,6 +6,8 @@ signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island f
 @export var type: Towers.Type
 @export var blocking: bool = true ##does this tower block enemy units from passing through?
 
+@export var environmental: bool = false ##is this tower generated as part of the environment
+
 @export var turret: Node2D ##this is the part of the turret that turns to face and shoot
 
 enum Facing {

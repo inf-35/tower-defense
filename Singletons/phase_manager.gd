@@ -78,6 +78,7 @@ func start_game() -> void:
 		Player.begin_new_game()
 
 func begin_new_game():
+	SaveLoad.load_profile()
 	References.island.generate_new_island()
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
@@ -131,7 +132,7 @@ func start_tutorial():
 	steps.append(trade)
 	steps.append(timeline)
 	steps.append(start_wave)
-	UI.tutorial_manager.start_sequence(steps)
+	UI.tutorial_manager.start_sequence(steps, Player.TutorialFlag.MAIN)
 
 func _generate_wave_plan() -> void:
 	_report("generating wave plan.")
@@ -203,7 +204,7 @@ func _prepare_for_next_wave_cycle() -> void:
 		var type : Units.Type = enemy_stack[0]
 		if type == Units.Type.TROLL and not _troll_spawned:
 			_troll_spawned = true
-			UI.tutorial_manager.start_sequence([load("res://UI/tutorial/troll_warning.tres")])
+			UI.tutorial_manager.start_sequence([load("res://UI/tutorial/troll_warning.tres")], Player.TutorialFlag.TROLL)
 			
 	if not choice_queue.is_empty():
 		var next_choice: ChoiceType = choice_queue.pop_front()

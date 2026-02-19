@@ -42,6 +42,7 @@ func _evaluate(instance: EffectInstance) -> void:
 	
 	if not has_neighbors:
 		if not state.modifier:
+			UI.floating_text_manager.show_icon(icon, tower.global_position)
 			var mod := modifier_prototype.generate_modifier()
 			tower.modifiers_component.add_modifier(mod)
 			state.modifier = mod

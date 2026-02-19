@@ -73,7 +73,6 @@ func get_effect_instance_by_prototype(prototype: EffectPrototype) -> EffectInsta
 
 func _handle_event(_unit: Unit, game_event: GameEvent) -> void:
 	var event_type: GameEvent.EventType = game_event.event_type
-	
 	# iterate through schedules in deterministic order (Multiplicative -> Additive -> Reactive)
 	for schedule: int in EffectPrototype.Schedule.values():
 		if not _global_effects.has(schedule):

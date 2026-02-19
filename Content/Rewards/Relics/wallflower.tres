@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=4 format=3 uid="uid://dat3yiw754e3r"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_7ckf2"]
+[ext_resource type="Resource" uid="uid://c72rkivkjygay" path="res://Content/Relics/wallflower/wallflower.tres" id="3_7ckf2"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="4_ufu6r"]
+
+[resource]
+script = ExtResource("4_ufu6r")
+id_name = "wilderness"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("3_7ckf2")
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

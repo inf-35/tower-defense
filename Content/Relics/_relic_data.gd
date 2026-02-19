@@ -44,7 +44,8 @@ enum Type {
 	SIGNAL_FLAG,
 	MAGIC_BEANS,
 	STRAW_HAT,
-	WALLFLOWER
+	WALLFLOWER,
+	SIMPLE_BLADE,
 }
 
 @export var type: Type

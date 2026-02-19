@@ -17,11 +17,13 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 script = ExtResource("2_j17rg")
 modifier_prototype = SubResource("Resource_0ufni")
 schedule = 0
+icon = ExtResource("2_a3j5j")
 metadata/_custom_type_script = "uid://6jt1v42va25f"
 
 [sub_resource type="Resource" id="Resource_3dy2h"]
 script = ExtResource("1_q4fwq")
 effect_to_grant = SubResource("Resource_pctud")
+icon = ExtResource("2_a3j5j")
 metadata/_custom_type_script = "uid://chjx55eww4tnp"
 
 [resource]

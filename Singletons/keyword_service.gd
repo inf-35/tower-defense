@@ -98,7 +98,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"STUN": {
 		"title": "Stun",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Stunned units cannot move.",
+		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 10% speed.",
 		"icon": preload("res://Assets/stun_icon.png"),
 	},
 	"STATUS_EFFECT_LABEL": {

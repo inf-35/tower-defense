@@ -121,15 +121,13 @@ func _prepare_components() -> void:
 		
 	died.connect(func(hit_report_data: HitReportData):
 		hit_report_data.flux_value = flux_value #submit base flux value to be modified
-		#NOTE: the global unit_died signal must fire before execution of on_killed, since on_killed
-		#could destroy the instance, and we want the instance intact for any post-kill abilities
+		
+		on_killed(hit_report_data) #connect the died signal to the on_killed method. for units this frees the instance
+		#(which implements flux reward and ruins behaviour for units and towers respectively)
 		var evt := GameEvent.new()
 		evt.event_type = GameEvent.EventType.DIED
 		evt.data = hit_report_data
 		on_event.emit(evt) #this also fires the global died signal
-
-		on_killed(hit_report_data) #connect the died signal to the on_killed method. for units this frees the instance
-		#(which implements flux reward and ruins behaviour for units and towers respectively)
 	)
 	changed_cell.connect(func(new_cell: Vector2i, old_cell: Vector2i):
 		var changed_cell_data := ChangedCellData.new()
@@ -193,9 +191,6 @@ func _setup_event_bus() -> void:
 	)
 	
 	on_event.connect(func(event: GameEvent): #setup main event bus
-		if disabled:
-			return
-		
 		if event.data.recursion > EffectInstance.GLOBAL_RECURSION_LIMIT:
 			return #prevent recursion
 			

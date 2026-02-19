@@ -41,5 +41,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	# e.g. 50% missing * 1.0 bonus = +50% damage
 	# Multiplier = 1.0 + (0.5 * 1.0) = 1.5
 	var multiplier = 1.0 + (factor * bonus_per_percent * instance.stacks)
-	print(factor, " ", hit_data.damage, " ", hit_data.damage * multiplier)
 	hit_data.damage *= multiplier

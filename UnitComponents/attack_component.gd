@@ -13,7 +13,7 @@ func _ready():
 
 func _process(_delta: float):
 	current_cooldown -= Clock.game_delta
-
+	
 func inject_components(modifiers_component: ModifiersComponent):
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
