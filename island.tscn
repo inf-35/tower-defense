@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dj5u4rlrnurt7"]
+[gd_scene format=3 uid="uid://dj5u4rlrnurt7"]
 
 [ext_resource type="Script" uid="uid://cwba468pei6cn" path="res://Scene Elements/island.gd" id="1_0iamf"]
 [ext_resource type="Script" uid="uid://dy73bbmhagdgr" path="res://camera.gd" id="2_04hb4"]
@@ -21,36 +21,59 @@
 [ext_resource type="Texture2D" uid="uid://dykg0w6ijl6m" path="res://Assets/paper_background.png" id="19_uq18n"]
 [ext_resource type="Script" uid="uid://cnxbhp7sm72re" path="res://UI/floating_text/floating_text_manager.gd" id="20_hkouh"]
 [ext_resource type="PackedScene" uid="uid://dxij1uny2nk2o" path="res://UI/floating_text/floating_text.tscn" id="21_q2og1"]
+[ext_resource type="Shader" uid="uid://c470efx242vnm" path="res://Shaders/screen_boil.gdshader" id="22_hwxyc"]
 
-[node name="Island" type="Node2D" node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q2og1"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hwxyc"]
+shader = ExtResource("22_hwxyc")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_q2og1")
+shader_parameter/boil_speed = 3.30800015713
+shader_parameter/boil_strength = 0.0010000000475
+shader_parameter/noise_scale = 5.60000026274012
+
+[node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
 y_sort_enabled = true
 script = ExtResource("1_0iamf")
 terrain_renderer = NodePath("TerrainRenderer")
 preview_renderer = NodePath("PreviewRenderer")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1723399969]
 zoom = Vector2(12, 12)
 script = ExtResource("2_04hb4")
 
-[node name="AudioListener2D" type="AudioListener2D" parent="Camera2D"]
+[node name="AudioListener2D" type="AudioListener2D" parent="Camera2D" unique_id=107970021]
 current = true
 
-[node name="UI" parent="." instance=ExtResource("2_hdtfb")]
+[node name="UI" parent="." unique_id=1683695170 instance=ExtResource("2_hdtfb")]
 
-[node name="Tooltips" type="CanvasLayer" parent="."]
+[node name="BoilOverlay" type="CanvasLayer" parent="." unique_id=1253245311]
+process_mode = 3
+layer = 100
+
+[node name="ColorRect" type="ColorRect" parent="BoilOverlay" unique_id=1391640463]
+material = SubResource("ShaderMaterial_hwxyc")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Tooltips" type="CanvasLayer" parent="." unique_id=1716548420]
 process_mode = 3
 layer = 2
 
-[node name="Projectiles" type="Node2D" parent="."]
+[node name="Projectiles" type="Node2D" parent="." unique_id=293392939]
 z_index = 300
 script = ExtResource("3_qurb2")
 
-[node name="TowerPreview" type="Node2D" parent="."]
+[node name="TowerPreview" type="Node2D" parent="." unique_id=918587504]
 process_mode = 3
 z_index = 250
 script = ExtResource("3_fgmf3")
 
-[node name="PathRenderer" type="Node2D" parent="."]
+[node name="PathRenderer" type="Node2D" parent="." unique_id=1267335686]
 z_index = 200
 script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
@@ -59,7 +82,7 @@ stroke_spacing = 10.0
 flow_speed = 3.0
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 
-[node name="PreviewRenderer" type="Node2D" parent="."]
+[node name="PreviewRenderer" type="Node2D" parent="." unique_id=1992026522]
 z_index = 250
 script = ExtResource("7_b4opu")
 shader = ExtResource("8_c7iw8")
@@ -67,7 +90,7 @@ max_gradient_depth = 3.0
 paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
 wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
 
-[node name="TerrainRenderer" type="Node2D" parent="." node_paths=PackedStringArray("paper_rect", "color_rect")]
+[node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("paper_rect", "color_rect")]
 script = ExtResource("7_b4opu")
 is_main_terrain_renderer = true
 shader = ExtResource("9_8ervs")
@@ -80,7 +103,7 @@ brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0x
 paper_rect = NodePath("paper_rect")
 color_rect = NodePath("color_rect")
 
-[node name="paper_rect" type="TextureRect" parent="TerrainRenderer"]
+[node name="paper_rect" type="TextureRect" parent="TerrainRenderer" unique_id=9571044]
 modulate = Color(1, 1, 1, 0.078431375)
 z_as_relative = false
 anchors_preset = 15
@@ -97,7 +120,7 @@ mouse_filter = 2
 texture = ExtResource("19_uq18n")
 stretch_mode = 1
 
-[node name="color_rect" type="ColorRect" parent="TerrainRenderer"]
+[node name="color_rect" type="ColorRect" parent="TerrainRenderer" unique_id=385445106]
 z_index = -1
 z_as_relative = false
 offset_left = -2829.0
@@ -108,24 +131,24 @@ scale = Vector2(0.08, 0.08)
 mouse_filter = 2
 color = Color(0.99215686, 0.9372549, 0.84705883, 1)
 
-[node name="NavigationDebugger" type="Node2D" parent="."]
+[node name="NavigationDebugger" type="Node2D" parent="." unique_id=1062625785]
 visible = false
 z_index = 100
 script = ExtResource("15_ad6l7")
 draw_flow_arrows = true
 metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
 
-[node name="RangeIndicator" type="Node2D" parent="."]
+[node name="RangeIndicator" type="Node2D" parent="." unique_id=1018228916]
 z_index = 500
 z_as_relative = false
 script = ExtResource("18_aibdv")
 metadata/_custom_type_script = "uid://ibj2mt03m5av"
 
-[node name="InworldUI" type="Node2D" parent="."]
+[node name="InworldUI" type="Node2D" parent="." unique_id=2111889340]
 z_index = 400
 z_as_relative = false
 
-[node name="FloatingTextManager" type="Node2D" parent="."]
+[node name="FloatingTextManager" type="Node2D" parent="." unique_id=1889057357]
 z_index = 400
 z_as_relative = false
 script = ExtResource("20_hkouh")
