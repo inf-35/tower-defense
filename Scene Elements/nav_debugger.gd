@@ -88,7 +88,7 @@ func _draw_grid_state() -> void:
 		
 		# Draw Cost Text
 		if draw_costs:
-			draw_string(_font, pos + Vector2(-4, 4), str(cost), HORIZONTAL_ALIGNMENT_CENTER, -1, 10, Color.WHITE)
+			draw_string(_font, pos + Vector2(-4, 4), str(cost), HORIZONTAL_ALIGNMENT_CENTER, -1, 5, Color.WHITE)
 
 func _draw_simulation_overlay() -> void:
 	var cell_size = Island.CELL_SIZE

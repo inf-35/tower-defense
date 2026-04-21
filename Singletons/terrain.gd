@@ -27,6 +27,9 @@ func get_color(terrain_base: Base) -> Color:
 
 	return color
 
+func get_visual_strength(terrain_base: Base) -> float:
+	return terrain_database.terrain_base_types[terrain_base].visual_strength
+
 func get_icon(terrain_base: Base) -> Texture2D:
 	return terrain_database.terrain_base_types[terrain_base].texture
 

@@ -2,7 +2,7 @@ extends Node
 #terrain_service.gd (autoload singleton)
 # applies a block of new terrain data to the island
 func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]) -> void:
-	var terrain_changes: Dictionary[Vector2i, bool] = {}
+	var terrain_changes: Dictionary = {}
 	for cell: Vector2i in block:
 		var cell_data: Terrain.CellData = block[cell]
 		# apply terrain base
@@ -11,7 +11,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 		if cell_data.feature != Towers.Type.VOID:
 			island.construct_tower_at(cell, cell_data.feature, Tower.Facing.UP, cell_data.initial_state)
 		# update renderer
-		terrain_changes[cell] = true
+		terrain_changes[cell] = cell_data.terrain
 
 		# this function (in TerrainRenderer) checks Terrain.get_icon(type)
 		# and spawns a sprite if a texture exists.

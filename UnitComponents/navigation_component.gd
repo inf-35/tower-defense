@@ -76,6 +76,10 @@ func _check_for_obstructions() -> void:
 	# also check the cell we are standing on (Anti-Stuck / Built-On-Top)
 	var current_cell: Vector2i = movement_component.cell_position
 	
+	if not Navigation.grid.has(next_cell):
+		push_warning("Navigation failed to retrieve at position: ", next_cell)
+		push_warning(_path)
+		return
 	# look up the map NOTE: if the corresponding cell has a base navcost, we immmediately assume it is not a valid blocker
 	var tower_ahead = References.island.get_tower_on_tile(next_cell) if Navigation.grid[next_cell] != Navigation.BASE_COST else null
 	var tower_here = References.island.get_tower_on_tile(current_cell) if Navigation.grid[current_cell] != Navigation.BASE_COST else null

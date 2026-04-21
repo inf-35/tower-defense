@@ -377,12 +377,6 @@ func load_save_data(data: Dictionary) -> void:
 			var type = int(terrain_import[key])
 			edits[cell] = Terrain.CellData.new(type, Towers.Type.VOID)
 	TerrainService.expand_island(self, edits)
-	# update visuals for terrain (batch update)
-	var changes: Dictionary[Vector2i, bool] = {}
-	for cell in terrain_base_grid: 
-		changes[cell] = true
-	if is_instance_valid(terrain_renderer):
-		terrain_renderer.apply_terrain_changes(changes)
 		
 	var tower_list: Dictionary = data.get("towers", [])
 	var sorted_unit_ids: Array[int] = []

@@ -29,7 +29,9 @@ var _decoration_container: Node2D ## container for stamped sprites
 
 var _grid_image: Image
 var _grid_texture: ImageTexture
-var _grid_data: Dictionary = {} # stores Vector2i -> bool (is_land)
+var _terrain_color_image: Image
+var _terrain_color_texture: ImageTexture
+var _grid_data: Dictionary = {} # stores Vector2i -> Terrain.Base
 # visual state trackers
 var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} # stores Vector2i -> Sprite2D
 var _active_previews: Dictionary[Vector2i, Sprite2D] = {} # for preview sprites only
@@ -75,6 +77,9 @@ func _setup_visuals() -> void:
 	# initialize with a small empty grid
 	_grid_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_grid_texture = ImageTexture.create_from_image(_grid_image)
+	_terrain_color_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	_terrain_color_image.fill(Color.TRANSPARENT)
+	_terrain_color_texture = ImageTexture.create_from_image(_terrain_color_image)
 	_brush_viewport = SubViewport.new()
 	_brush_viewport.name = "BrushMaskViewport"
 	_brush_viewport.disable_3d = true
@@ -120,10 +125,12 @@ func _setup_visuals() -> void:
 	watercolor_tex.noise.frequency = 0.005
 	
 	mat.set_shader_parameter("grid_data_texture", _grid_texture)
+	mat.set_shader_parameter("terrain_color_texture", _terrain_color_texture)
 	mat.set_shader_parameter("distortion_texture", noise_tex)
 	mat.set_shader_parameter("noise_texture", watercolor_tex)
 	mat.set_shader_parameter("paint_color", paint_color)
 	mat.set_shader_parameter("wash_color", wash_color)
+	mat.set_shader_parameter("distance_field_step", 1.0 / maxf(max_gradient_depth, 0.001))
 	
 	# placeholder paper (replace with load("res://...") if you have one)
 	var paper_img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -148,7 +155,7 @@ func _setup_visuals() -> void:
 	_update_rect_transform()
 
 # accepts a list of tiles to add/remove to minimize resize operations
-# changes: dictionary of { Vector2i cell: bool is_land }
+# changes: dictionary of { Vector2i cell: Terrain.Base terrain }, or false to remove
 func apply_terrain_changes(changes: Dictionary) -> void:
 	if changes.is_empty():
 		return
@@ -157,10 +164,11 @@ func apply_terrain_changes(changes: Dictionary) -> void:
 	
 	# 1. update logic and calculate new bounds
 	for cell: Vector2i in changes:
-		var is_land: bool = changes[cell]
+		var change = changes[cell]
+		var is_land : bool = not (change is bool and change == false)
 		
 		if is_land:
-			_grid_data[cell] = true
+			_grid_data[cell] = _terrain_type_from_change(change)
 			# expand bounds if necessary
 			if _grid_data.size() == 1: # first tile
 				new_min = cell
@@ -193,6 +201,7 @@ func apply_terrain_changes(changes: Dictionary) -> void:
 	
 	# 2. recalculate distance field
 	_update_distance_field()
+	_update_terrain_color_map()
 	
 	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	
@@ -268,17 +277,17 @@ func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
 	_active_previews[cell] = sprite
 
 # completely clears and replaces the terrain with the new set of tiles
-func reset_grid(new_land_tiles: Array[Vector2i]) -> void:
+func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {}) -> void:
 	# 1. reset data
 	_grid_data.clear()
 	# clear image (make it all water)
 	_grid_image.fill(Color.BLACK)
-	# 2. apply new tiles
-	var active_cells: Dictionary = {}
+	_terrain_color_image.fill(Color.TRANSPARENT)
 	
 	# if input is empty, just update texture and return
 	if new_land_tiles.is_empty():
-		_grid_texture.update(_grid_image)
+		_grid_texture.set_image(_grid_image)
+		_terrain_color_texture.set_image(_terrain_color_image)
 		return
 		
 	# calculate new bounds
@@ -286,8 +295,7 @@ func reset_grid(new_land_tiles: Array[Vector2i]) -> void:
 	var max_c := new_land_tiles[0]
 	
 	for cell in new_land_tiles:
-		_grid_data[cell] = true
-		active_cells[cell] = true
+		_grid_data[cell] = terrain_by_cell.get(cell, Terrain.Base.EARTH)
 		
 		min_c.x = min(min_c.x, cell.x)
 		min_c.y = min(min_c.y, cell.y)
@@ -304,6 +312,7 @@ func reset_grid(new_land_tiles: Array[Vector2i]) -> void:
 	
 	# 4. update visual (recalculate distance field for the new set)
 	_update_distance_field()
+	_update_terrain_color_map()
 	
 # helper to modify shader parameters dynamically
 func set_color_param(param_name: String, value: Color) -> void:
@@ -352,9 +361,12 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	
 	# create new blank image
 	var new_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_L8)
+	var new_color_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
+	new_color_img.fill(Color.TRANSPARENT)
 	
 	# update state
 	_grid_image = new_img
+	_terrain_color_image = new_color_img
 	_min_coord = new_origin
 	_size_cells = new_size
 	# update visual rect
@@ -386,6 +398,7 @@ func _update_rect_transform() -> void:
 	var mat = _terrain_rect.material as ShaderMaterial
 	mat.set_shader_parameter("region_pixel_offset", _terrain_rect.position)
 	mat.set_shader_parameter("region_pixel_size", _terrain_rect.size)
+	mat.set_shader_parameter("terrain_color_texture_size", Vector2(_size_cells))
 
 func _update_distance_field() -> void:
 	# standard bfs logic, but offset by _min_coord
@@ -462,3 +475,22 @@ func _update_distance_field() -> void:
 		_grid_image.set_pixelv(local_pos, Color(norm, norm, norm))
 		
 	_grid_texture.set_image(_grid_image)
+
+func _update_terrain_color_map() -> void:
+	_terrain_color_image.fill(Color.TRANSPARENT)
+	for global_pos: Vector2i in _grid_data:
+		var local_pos: Vector2i = global_pos - _min_coord
+		if local_pos.x < 0 or local_pos.y < 0 or local_pos.x >= _size_cells.x or local_pos.y >= _size_cells.y:
+			continue
+
+		var terrain_type: Terrain.Base = _grid_data[global_pos]
+		var terrain_color := Terrain.get_color(terrain_type)
+		terrain_color.a = clamp(terrain_color.a * Terrain.get_visual_strength(terrain_type), 0.0, 1.0)
+		_terrain_color_image.set_pixelv(local_pos, terrain_color)
+
+	_terrain_color_texture.set_image(_terrain_color_image)
+
+func _terrain_type_from_change(change) -> Terrain.Base:
+	if change is int:
+		return change
+	return Terrain.Base.EARTH

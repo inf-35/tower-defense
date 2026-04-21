@@ -8,14 +8,15 @@
 
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
-color = Color(1, 1, 1, 1)
+color = Color(0.7647059, 0.84705883, 0.7137255, 1)
 navigable = true
 constructable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_u30vj"]
 script = ExtResource("2_2st4k")
-color = Color(1, 1, 1, 1)
+color = Color(0.8784314, 0.7607843, 0.5686275, 1)
+visual_strength = 0.25
 texture = ExtResource("5_4wuia")
 navigable = true
 constructable = true
@@ -30,6 +31,7 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_4wuia"]
 script = ExtResource("2_2st4k")
+color = Color(0.5686275, 0.72156864, 0.6313726, 1)
 texture = ExtResource("6_0duxl")
 navigable = true
 constructable = true
