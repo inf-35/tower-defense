@@ -13,9 +13,28 @@ var _is_overridden: bool = false
 var _active_tween: Tween
 #save camera state before override
 var camera_state_cache: Array[Vector2] #[ position, zoom ]
+var _is_drag_panning: bool = false
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_target_position = position
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _is_overridden:
+		return
+
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		if event.is_pressed() and ClickHandler.enabled and ClickHandler.current_state != ClickHandler.State.IDLE:
+			return
+
+		_is_drag_panning = event.is_pressed()
+		get_viewport().set_input_as_handled()
+		return
+
+	if _is_drag_panning and event is InputEventMouseMotion:
+		_target_position -= event.relative / zoom
+		position = _target_position
+		get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	# only allow manual camera control if no override is active

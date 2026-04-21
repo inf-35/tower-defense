@@ -31,6 +31,7 @@ static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 
 @export var range_component: RangeComponent
 @export var attack_component: AttackComponent
+@export var corpse_component: CorpseComponent
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 
@@ -112,6 +113,21 @@ func _create_components() -> void:
 		hitbox.collision_mask = 0
 		hitbox.monitoring = false
 		hitbox.monitorable = true
+
+	if corpse_component == null:
+		for child in get_children():
+			if child is CorpseComponent:
+				corpse_component = child
+				break
+
+	if corpse_component == null and _needs_corpse_component():
+		var n_corpse_component := CorpseComponent.new()
+		n_corpse_component.name = "CorpseComponent"
+		add_child(n_corpse_component)
+		corpse_component = n_corpse_component
+
+func _needs_corpse_component() -> bool:
+	return hostile and not abstractive and is_instance_valid(graphics)
 	
 func _prepare_components() -> void:
 	unit_id = References.assign_unit_id() #assign this unit a unit id
@@ -411,6 +427,9 @@ func on_killed(hit_report_data: HitReportData) -> void:
 	behavior.detach() #disable behavior
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		remove_effect(effect_prototype) #detach effects
+
+	if is_instance_valid(corpse_component):
+		corpse_component.release_corpse(hit_report_data)
 
 	queue_free()
 
