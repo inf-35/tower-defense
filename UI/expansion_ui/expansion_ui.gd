@@ -95,7 +95,7 @@ func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 		
 	# tile count
 	if show_tile_count:
-		text += " %d Tiles" % choice.block_data.size()
+		text += " %d Tiles" % _count_land_tiles(choice)
 		
 	var terrain_counts: Dictionary[String, int] = {}
 	var standard_feature_counts: Dictionary[String, int] = {}
@@ -170,6 +170,13 @@ func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
 			text += " %s" % anomaly_desc
 			
 	return text
+
+func _count_land_tiles(choice: ExpansionChoice) -> int:
+	var count := 0
+	for cell: Vector2i in choice.block_data:
+		if choice.block_data[cell].terrain != Terrain.Base.WATER:
+			count += 1
+	return count
 
 func _on_choice_pressed(choice_id: int):
 	UI.choice_focused.emit(choice_id)

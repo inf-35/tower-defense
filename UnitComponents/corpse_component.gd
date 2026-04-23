@@ -1,12 +1,12 @@
 extends UnitComponent
 class_name CorpseComponent
 
-const THROW_DURATION: float = 0.4
+const THROW_DURATION: float = 0.35
 const LINGER_DURATION: float = 0.4
 const FADE_DURATION: float = 1.5
-const THROW_DISTANCE_RANGE: Vector2 = Vector2(0.6, 0.8)
+const THROW_DISTANCE_RANGE: Vector2 = Vector2(0.3, 0.5)
 const ARC_HEIGHT_RANGE: Vector2 = Vector2(0.2, 0.3)
-const SPIN_RANGE: Vector2 = Vector2(-1.2, 1.2)
+const SPIN_RANGE: Vector2 = Vector2(0.4, 0.6)
 
 func release_corpse(hit_report_data: HitReportData) -> void:
 	if not is_instance_valid(unit) or not is_instance_valid(unit.graphics) or not is_instance_valid(unit.get_parent()):
@@ -15,7 +15,7 @@ func release_corpse(hit_report_data: HitReportData) -> void:
 	var corpse_root := Node2D.new()
 	corpse_root.name = "%s Corpse" % unit.name
 	corpse_root.z_as_relative = false
-	corpse_root.z_index = unit.z_index
+	corpse_root.z_index = Layers.NON_COLLIDABLE_OBJECTS
 	unit.get_parent().add_child(corpse_root)
 	corpse_root.global_position = unit.global_position
 

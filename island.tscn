@@ -32,11 +32,12 @@ shader_parameter/boil_speed = 3.30800015713
 shader_parameter/boil_strength = 0.0010000000475
 shader_parameter/noise_scale = 5.60000026274012
 
-[node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer")]
+[node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer", "lake_preview_renderer")]
 y_sort_enabled = true
 script = ExtResource("1_0iamf")
 terrain_renderer = NodePath("TerrainRenderer")
 preview_renderer = NodePath("PreviewRenderer")
+lake_preview_renderer = NodePath("LakePreviewRenderer")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1723399969]
 zoom = Vector2(12, 12)
@@ -87,8 +88,13 @@ z_index = 250
 script = ExtResource("7_b4opu")
 shader = ExtResource("8_c7iw8")
 max_gradient_depth = 3.0
-paint_color = Color(0.79607844, 0.8745098, 0.7490196, 1)
-wash_color = Color(0.79286, 0.87, 0.7482, 0.105882354)
+
+[node name="LakePreviewRenderer" type="Node2D" parent="." unique_id=322664427]
+z_index = 9
+script = ExtResource("7_b4opu")
+shader = ExtResource("8_c7iw8")
+max_gradient_depth = 2.5
+draw_background = false
 
 [node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("paper_rect", "color_rect")]
 script = ExtResource("7_b4opu")
@@ -97,8 +103,6 @@ shader = ExtResource("9_8ervs")
 max_gradient_depth = 1.5
 draw_background = false
 background_stain_color = Color(0, 0, 0, 0)
-paint_color = Color(0.9882353, 0.9882353, 0.9882353, 1)
-wash_color = Color(0.7647059, 0.8509804, 0.7137255, 0.25882354)
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
 paper_rect = NodePath("paper_rect")
 color_rect = NodePath("color_rect")

@@ -9,8 +9,6 @@ class_name TerrainRenderer
 @export var draw_background: bool = true
 
 @export var background_stain_color: Color
-@export var paint_color: Color
-@export var wash_color: Color
 @export var brush_textures: Array[Texture2D]
 
 @export var paper_rect: TextureRect
@@ -31,6 +29,10 @@ var _grid_image: Image
 var _grid_texture: ImageTexture
 var _terrain_color_image: Image
 var _terrain_color_texture: ImageTexture
+var _terrain_wash_image: Image
+var _terrain_wash_texture: ImageTexture
+var _terrain_control_image: Image
+var _terrain_control_texture: ImageTexture
 var _grid_data: Dictionary = {} # stores Vector2i -> Terrain.Base
 # visual state trackers
 var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} # stores Vector2i -> Sprite2D
@@ -51,9 +53,9 @@ func start() -> void:
 
 func _create_debug_view() -> void:
 	var dr = TextureRect.new()
-	dr.texture = _grid_texture
+	dr.texture = _brush_viewport.get_texture()
 	dr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	dr.scale = Vector2(8, 8)
+	dr.scale = Vector2(5, 5)
 	dr.position = Vector2(20, 20)
 	var c = CanvasLayer.new()
 	c.add_child(dr)
@@ -64,14 +66,10 @@ func _setup_configuration() -> void:
 		Phases.GameEnvironment.WINTER:
 			RenderingServer.set_default_clear_color(Color(0.867, 0.871, 0.867))
 			color_rect.color = Color(0.87, 0.87, 0.87, 1.0)
-			paint_color = Color(0.988, 0.988, 0.988)
-			wash_color = Color(0.99, 0.99, 0.99, 0.553)
 			
 		Phases.GameEnvironment.WOODS:
 			RenderingServer.set_default_clear_color(Color(0.992, 0.937, 0.847))
 			color_rect.color = Color(0.992, 0.937, 0.847)
-			paint_color = Color(0.765, 0.847, 0.714)
-			wash_color = Color(0.765, 0.851, 0.714, 0.259)
 
 func _setup_visuals() -> void:
 	# initialize with a small empty grid
@@ -80,6 +78,12 @@ func _setup_visuals() -> void:
 	_terrain_color_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
 	_terrain_color_image.fill(Color.TRANSPARENT)
 	_terrain_color_texture = ImageTexture.create_from_image(_terrain_color_image)
+	_terrain_wash_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	_terrain_wash_image.fill(Color.TRANSPARENT)
+	_terrain_wash_texture = ImageTexture.create_from_image(_terrain_wash_image)
+	_terrain_control_image = Image.create(1, 1, false, Image.FORMAT_L8)
+	_terrain_control_image.fill(Color.BLACK)
+	_terrain_control_texture = ImageTexture.create_from_image(_terrain_control_image)
 	_brush_viewport = SubViewport.new()
 	_brush_viewport.name = "BrushMaskViewport"
 	_brush_viewport.disable_3d = true
@@ -126,10 +130,10 @@ func _setup_visuals() -> void:
 	
 	mat.set_shader_parameter("grid_data_texture", _grid_texture)
 	mat.set_shader_parameter("terrain_color_texture", _terrain_color_texture)
+	mat.set_shader_parameter("terrain_wash_texture", _terrain_wash_texture)
+	mat.set_shader_parameter("terrain_control_texture", _terrain_control_texture)
 	mat.set_shader_parameter("distortion_texture", noise_tex)
 	mat.set_shader_parameter("noise_texture", watercolor_tex)
-	mat.set_shader_parameter("paint_color", paint_color)
-	mat.set_shader_parameter("wash_color", wash_color)
 	mat.set_shader_parameter("distance_field_step", 1.0 / maxf(max_gradient_depth, 0.001))
 	
 	# placeholder paper (replace with load("res://...") if you have one)
@@ -283,11 +287,15 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 	# clear image (make it all water)
 	_grid_image.fill(Color.BLACK)
 	_terrain_color_image.fill(Color.TRANSPARENT)
+	_terrain_wash_image.fill(Color.TRANSPARENT)
+	_terrain_control_image.fill(Color.BLACK)
 	
 	# if input is empty, just update texture and return
 	if new_land_tiles.is_empty():
 		_grid_texture.set_image(_grid_image)
 		_terrain_color_texture.set_image(_terrain_color_image)
+		_terrain_wash_texture.set_image(_terrain_wash_image)
+		_terrain_control_texture.set_image(_terrain_control_image)
 		return
 		
 	# calculate new bounds
@@ -362,11 +370,17 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	# create new blank image
 	var new_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_L8)
 	var new_color_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
+	var new_wash_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
+	var new_control_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_L8)
 	new_color_img.fill(Color.TRANSPARENT)
+	new_wash_img.fill(Color.TRANSPARENT)
+	new_control_img.fill(Color.BLACK)
 	
 	# update state
 	_grid_image = new_img
 	_terrain_color_image = new_color_img
+	_terrain_wash_image = new_wash_img
+	_terrain_control_image = new_control_img
 	_min_coord = new_origin
 	_size_cells = new_size
 	# update visual rect
@@ -478,6 +492,8 @@ func _update_distance_field() -> void:
 
 func _update_terrain_color_map() -> void:
 	_terrain_color_image.fill(Color.TRANSPARENT)
+	_terrain_wash_image.fill(Color.TRANSPARENT)
+	_terrain_control_image.fill(Color.BLACK)
 	for global_pos: Vector2i in _grid_data:
 		var local_pos: Vector2i = global_pos - _min_coord
 		if local_pos.x < 0 or local_pos.y < 0 or local_pos.x >= _size_cells.x or local_pos.y >= _size_cells.y:
@@ -485,10 +501,17 @@ func _update_terrain_color_map() -> void:
 
 		var terrain_type: Terrain.Base = _grid_data[global_pos]
 		var terrain_color := Terrain.get_color(terrain_type)
-		terrain_color.a = clamp(terrain_color.a * Terrain.get_visual_strength(terrain_type), 0.0, 1.0)
+		terrain_color.a = clamp(terrain_color.a, 0.0, 1.0)
 		_terrain_color_image.set_pixelv(local_pos, terrain_color)
+		var wash_color := Terrain.get_wash_color(terrain_type)
+		wash_color.a = clamp(wash_color.a, 0.0, 1.0)
+		_terrain_wash_image.set_pixelv(local_pos, wash_color)
+		var dominance := Terrain.get_dominance_strength(terrain_type) * terrain_color.a
+		_terrain_control_image.set_pixelv(local_pos, Color(dominance, dominance, dominance))
 
 	_terrain_color_texture.set_image(_terrain_color_image)
+	_terrain_wash_texture.set_image(_terrain_wash_image)
+	_terrain_control_texture.set_image(_terrain_control_image)
 
 func _terrain_type_from_change(change) -> Terrain.Base:
 	if change is int:

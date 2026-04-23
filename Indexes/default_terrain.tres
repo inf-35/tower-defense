@@ -8,15 +8,16 @@
 
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
-color = Color(0.7647059, 0.84705883, 0.7137255, 1)
+color = Color(0.81960785, 0.8666667, 0.74509805, 1)
+wash_color = Color(0.82331, 0.87, 0.7482, 0.23529412)
 navigable = true
 constructable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_u30vj"]
 script = ExtResource("2_2st4k")
-color = Color(0.8784314, 0.7607843, 0.5686275, 1)
-visual_strength = 0.25
+color = Color(0.88, 0.7754267, 0.60719997, 0.5803922)
+wash_color = Color(0.88, 0.7619333, 0.57199997, 0.14901961)
 texture = ExtResource("5_4wuia")
 navigable = true
 constructable = true
@@ -31,11 +32,19 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_4wuia"]
 script = ExtResource("2_2st4k")
-color = Color(0.5686275, 0.72156864, 0.6313726, 1)
+color = Color(0.56880003, 0.72, 0.6318, 0.49411765)
+wash_color = Color(0.654902, 0.8, 0.6862745, 0.24)
 texture = ExtResource("6_0duxl")
 navigable = true
 constructable = true
 modifiers = Array[ExtResource("3_u30vj")]([SubResource("Resource_p873x")])
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[sub_resource type="Resource" id="Resource_0duxl"]
+script = ExtResource("2_2st4k")
+color = Color(0.728, 0.8, 0.7892, 1)
+wash_color = Color(0.728, 0.8, 0.78800005, 0.101960786)
+dominance_strength = 0.75
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [resource]
@@ -43,6 +52,7 @@ script = ExtResource("1_h065e")
 terrain_base_types = Dictionary[int, ExtResource("2_2st4k")]({
 0: SubResource("Resource_2st4k"),
 1: SubResource("Resource_u30vj"),
-2: SubResource("Resource_4wuia")
+2: SubResource("Resource_4wuia"),
+3: SubResource("Resource_0duxl")
 })
 metadata/_custom_type_script = "uid://bb5bm1s2h1ack"

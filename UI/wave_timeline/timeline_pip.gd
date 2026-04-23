@@ -113,12 +113,12 @@ func _on_mouse_entered() -> void:
 
 	# instantiate tooltip
 	_active_tooltip = KeywordService.TOOLTIP_PANEL.instantiate()
-	add_child(_active_tooltip)
+	add_child.call_deferred(_active_tooltip)
 	
-	_active_tooltip.show_tooltip({
+	_active_tooltip.ready.connect(func(): _active_tooltip.show_tooltip({
 		"title": title_text,
 		"description": desc_text
-	})
+	}))
 
 func _on_mouse_exited() -> void:
 	if is_instance_valid(_active_tooltip):

@@ -8,7 +8,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 		# apply terrain base
 		island.terrain_base_grid[cell] = cell_data.terrain
 		# check if a tower needs to be constructed as part of the expansion
-		if cell_data.feature != Towers.Type.VOID:
+		if cell_data.feature != Towers.Type.VOID and Terrain.is_constructable(cell_data.terrain):
 			island.construct_tower_at(cell, cell_data.feature, Tower.Facing.UP, cell_data.initial_state)
 		# update renderer
 		terrain_changes[cell] = cell_data.terrain
@@ -19,6 +19,7 @@ func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]
 	
 	island.update_shore_boundary()
 	island.update_navigation_grid()
+	island.update_lake_preview()
 	island.terrain_changed.emit()
 	island.terrain_renderer.apply_terrain_changes(terrain_changes)
 

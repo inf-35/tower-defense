@@ -5,6 +5,8 @@ signal expansion_process_complete
 
 #configuration
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
+const GENERATION_ATTEMPTS: int = 24
+const WATER_EXTRA_RATIO: float = 1.8
 # --- procedural configuration ---
 # A helper class to define how a specific terrain type (Bonus Tile) spawns
 class TerrainGenRule extends Resource:
@@ -39,7 +41,7 @@ var _pending_choice_id: int = -1 # the choice waiting for confirmation
 
 var expansions_this_phase: int = 0
 var minimum_expansions: int = 1
-var maximum_expansions: int = 3
+var maximum_expansions: int = 50
 
 var _terrain_pity_counters: Dictionary[Terrain.Base, float] = {}
 
@@ -239,26 +241,9 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	References.terrain_generating.emit(params) 
 	var block_data: Dictionary[Vector2i, Terrain.CellData] = {}
 	
-	# 1. SHAPE GENERATION (BFS)
-	var start_pos: Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
-	var to_visit: Array[Vector2i] = [start_pos]
-	var visited: Dictionary[Vector2i, bool] = {}
-	var generated_coords: Array[Vector2i] = []
-
-	while not to_visit.is_empty() and generated_coords.size() < block_size:
-		var cell: Vector2i = to_visit.pop_front()
-		if visited.has(cell):
-			continue
-		visited[cell] = true
-		
-		# Only expand into empty space
-		if island.terrain_base_grid.get(cell) == null:
-			generated_coords.append(cell)
-
-		for dir: Vector2i in island.DIRS:
-			var neighbor: Vector2i = cell + dir 
-			if not visited.has(neighbor):
-				to_visit.append(neighbor)
+	var generated := _generate_expansion_coords(island, block_size)
+	var generated_coords: Array[Vector2i] = generated.land
+	var generated_water: Array[Vector2i] = generated.water
 	
 	if generated_coords.is_empty():
 		return {}
@@ -267,6 +252,8 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	# First, fill everything with default EARTH
 	for coord: Vector2i in generated_coords:
 		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
+	for coord: Vector2i in generated_water:
+		block_data[coord] = Terrain.CellData.new(Terrain.Base.WATER, Towers.Type.VOID)
 	
 	# Now apply procedural terrain rules (Ruins, Highlands, Gold Veins, etc.)
 	# We shuffle coords to prevent "top-left" bias
@@ -354,6 +341,59 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 			placed_features += 1
 			
 	return block_data
+
+func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary:
+	var best_land: Array[Vector2i] = []
+	var best_water: Array[Vector2i] = []
+	for _attempt in GENERATION_ATTEMPTS:
+		var start : Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
+		var result := _grow_expansion_from_start(island, start, land_target)
+		if result.land.size() >= land_target:
+			return result
+		if result.land.size() > best_land.size():
+			best_land = result.land
+			best_water = result.water
+	return {"land": best_land, "water": best_water}
+
+func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: int) -> Dictionary:
+	var water_cap := int(ceil(float(land_target) * WATER_EXTRA_RATIO))
+	var to_visit: Array[Vector2i] = [start]
+	var visited: Dictionary[Vector2i, bool] = {}
+	var land: Array[Vector2i] = []
+	var water: Array[Vector2i] = []
+
+	while not to_visit.is_empty() and land.size() < land_target:
+		var cell: Vector2i = to_visit.pop_front()
+		if visited.has(cell):
+			continue
+		visited[cell] = true
+
+		if island.terrain_base_grid.has(cell):
+			if island.terrain_base_grid[cell] != Terrain.Base.WATER:
+				_queue_neighbors(cell, to_visit, visited, island.DIRS)
+			continue
+
+		if island.is_lake_cell(cell):
+			if water.size() < water_cap:
+				water.append(cell)
+				_queue_neighbors(cell, to_visit, visited, island.DIRS, true, island)
+			continue
+
+		land.append(cell)
+		_queue_neighbors(cell, to_visit, visited, island.DIRS)
+
+	return {"land": land, "water": water}
+
+func _queue_neighbors(cell: Vector2i, queue: Array[Vector2i], visited: Dictionary[Vector2i, bool], dirs: Array[Vector2i], water_only: bool = false, island: Island = null) -> void:
+	var shuffled_dirs := dirs.duplicate()
+	shuffled_dirs.shuffle()
+	for dir: Vector2i in shuffled_dirs:
+		var neighbor := cell + dir
+		if visited.has(neighbor):
+			continue
+		if water_only and (not is_instance_valid(island) or not island.is_lake_cell(neighbor)):
+			continue
+		queue.append(neighbor)
 	
 #helper function to find valid locations based on a placement rule
 func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic: PlacementLogic) -> Array[Vector2i]:
@@ -391,6 +431,7 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 		
 		# validation check
 		if not block_data.has(current): continue
+		if block_data[current].terrain == Terrain.Base.WATER: continue
 		if check_feature_empty and block_data[current].feature != Towers.Type.VOID: continue
 		
 		result.append(current)
@@ -401,7 +442,7 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 		
 		for n: Vector2i in neighbors:
 			var next = current + n
-			if block_data.has(next) and not processed.has(next):
+			if block_data.has(next) and block_data[next].terrain != Terrain.Base.WATER and not processed.has(next):
 				processed[next] = true
 				open_list.append(next)
 				

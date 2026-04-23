@@ -5,6 +5,7 @@ enum Base { #base terrain type
 	EARTH,
 	SETTLEMENT,
 	HIGHLAND,
+	WATER,
 }
 class CellData: #used to communicate info during runtime
 	var terrain: Base
@@ -27,8 +28,11 @@ func get_color(terrain_base: Base) -> Color:
 
 	return color
 
-func get_visual_strength(terrain_base: Base) -> float:
-	return terrain_database.terrain_base_types[terrain_base].visual_strength
+func get_wash_color(terrain_base: Base) -> Color:
+	return terrain_database.terrain_base_types[terrain_base].wash_color
+
+func get_dominance_strength(terrain_base: Base) -> float:
+	return terrain_database.terrain_base_types[terrain_base].dominance_strength
 
 func get_icon(terrain_base: Base) -> Texture2D:
 	return terrain_database.terrain_base_types[terrain_base].texture

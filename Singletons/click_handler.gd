@@ -74,17 +74,7 @@ func _update_idle_tooltip() -> void:
 	
 	# Priority 3: Terrain Info
 	else:
-		if island.terrain_base_grid.has(cell):
-			var terrain = island.get_terrain_base(cell)
-			msg = Terrain.Base.keys()[terrain].capitalize()
-			
-			# Add flavor for special tiles
-			if terrain == Terrain.Base.HIGHLAND:
-				msg += "\n(Range Bonus)"
-			elif terrain == Terrain.Base.SETTLEMENT:
-				msg += "\n(Used to build villages)"
-		else:
-			msg = "Uncharted"
+		msg = _get_cell_tooltip(island, cell)
 
 	UI.cursor_info.display_message(msg, false)
 
@@ -100,27 +90,21 @@ func _update_preview_tooltip() -> void:
 			var count = Player.get_rite_count(preview_tower_prototype.type)
 			msg += "Rite Available: %d\n" % count
 			
-		if island.terrain_base_grid.has(cell):
-			var terrain = island.get_terrain_base(cell)
-			msg += Terrain.Base.keys()[terrain].capitalize()
-			
-			# Add flavor for special tiles
-			if terrain == Terrain.Base.HIGHLAND:
-				msg += "\n(Range Bonus)"
-			elif terrain == Terrain.Base.SETTLEMENT:
-				msg += "\n(Used to build villages)"
-		else:
-			msg = "Uncharted"
+		msg += _get_cell_tooltip(island, cell)
 		msg += "\nLMB to place\nRMB to deselect\nR to rotate"
 		UI.cursor_info.display_message(msg, false)
 	else:
 		# If invalid, get the specific reason
 		# Note: We used 'preview_tower_position' which was calculated in _update_preview_visuals
-		var error_msg = TerrainService.get_construction_error_message(
-			References.island, 
-			preview_tower_position, 
-			preview_tower_prototype
-		)
+		var error_msg := ""
+		if _is_uncharted_lake_cell(island, cell):
+			error_msg = _get_cell_tooltip(island, cell)
+		else:
+			error_msg = TerrainService.get_construction_error_message(
+				References.island,
+				preview_tower_position,
+				preview_tower_prototype
+			)
 		error_msg += "\nLMB to place\nRMB to deselect\nR to rotate"
 		UI.cursor_info.display_message(error_msg, true)
 
@@ -260,6 +244,26 @@ func _handle_tower_selected_input(event: InputEvent) -> void:
 			_enter_idle_state()
 
 # --- Helper Functions ---
+func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
+	if island.terrain_base_grid.has(cell):
+		var terrain: Terrain.Base = island.get_terrain_base(cell)
+		var msg: String = Terrain.Base.keys()[terrain].capitalize()
+		if terrain == Terrain.Base.HIGHLAND:
+			msg += "\n(Range Bonus)"
+		elif terrain == Terrain.Base.SETTLEMENT:
+			msg += "\n(Used to build villages)"
+		elif terrain == Terrain.Base.WATER:
+			msg += "\n(Blocks building and movement)"
+		return msg
+
+	if _is_uncharted_lake_cell(island, cell):
+		return "Uncharted Water\n(Blocks building and movement once revealed)"
+
+	return "Uncharted"
+
+func _is_uncharted_lake_cell(island: Island, cell: Vector2i) -> bool:
+	return island.is_lake_cell(cell) and not island.terrain_base_grid.has(cell)
+
 func _update_preview_visuals():
 	if not preview_tower_prototype:
 		return

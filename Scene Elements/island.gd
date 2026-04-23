@@ -11,6 +11,7 @@ signal navigation_grid_updated
 # --- attachments ---
 @export var terrain_renderer: TerrainRenderer
 @export var preview_renderer: TerrainRenderer
+@export var lake_preview_renderer: TerrainRenderer
 
 # --- services ---
 var expansion_service: ExpansionService
@@ -18,6 +19,8 @@ var expansion_service: ExpansionService
 # --- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
+var lake_seed: int = 0
+var lake_cells: Dictionary[Vector2i, bool] = {}
 
 var shore_boundary_tiles: Array[Vector2i] = []
 
@@ -32,6 +35,18 @@ const CELL_SIZE: int = 10
 const DIRS: Array[Vector2i] = [ Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1) ]
 #configuration
 const _DEBUG_SHOW_NAVCOST: bool = false
+const LAKE_FIELD_RADIUS: int = 90
+const LAKE_PREVIEW_MARGIN: int = 18
+const LAKE_SAFE_RADIUS: int = 5
+const LAKE_NOISE_FREQUENCY: float = 0.05
+const LAKE_NOISE_OCTAVES: int = 4
+const LAKE_THRESHOLD: float = 0.6
+const LAKE_WARP_FREQUENCY: float = 0.035
+const LAKE_WARP_STRENGTH: float = 11.0
+const LAKE_RING_SPACING: float = 24.0
+const LAKE_RING_BIAS: float = 0.2
+const LAKE_RING_WARP_STRENGTH: float = 4.0
+const LAKE_MIN_NEIGHBORS: int = 2
 
 func _ready():
 	Phases.in_game = true
@@ -47,7 +62,10 @@ func _ready():
 func generate_new_island() -> void:
 	terrain_renderer.start()
 	_setup_preview_renderer()
+	_setup_lake_preview_renderer()
 	_clear_island_state()
+	lake_seed = randi()
+	_generate_lake_cells()
 	# initial terrain generation
 	var starting_block: Dictionary = expansion_service.generate_initial_island_block(self, 50)
 	# delegate application of the block to the TerrainService
@@ -59,6 +77,7 @@ func generate_new_island() -> void:
 	
 	update_shore_boundary()
 	update_navigation_grid()
+	update_lake_preview()
 	queue_redraw()
 
 func _setup_preview_renderer() -> void:
@@ -89,6 +108,28 @@ func _setup_preview_renderer() -> void:
 	sketch_mat.set_shader_parameter("fill_color", Color(1, 1, 1, 0.2))
 	
 	preview_renderer._terrain_rect.material = sketch_mat
+
+func _setup_lake_preview_renderer() -> void:
+	if not is_instance_valid(lake_preview_renderer):
+		return
+	lake_preview_renderer.cell_size = CELL_SIZE
+	lake_preview_renderer.max_gradient_depth = 2.5
+	lake_preview_renderer.draw_background = false
+	lake_preview_renderer.z_index = Layers.FLOATING_UI
+	lake_preview_renderer.start()
+
+	var sketch_mat := ShaderMaterial.new()
+	sketch_mat.shader = preload("res://Shaders/sketch_terrain.gdshader")
+	var noise := FastNoiseLite.new()
+	noise.frequency = 0.025
+	var noise_tex := NoiseTexture2D.new()
+	noise_tex.noise = noise
+	noise_tex.seamless = true
+	sketch_mat.set_shader_parameter("grid_data_texture", lake_preview_renderer._grid_texture)
+	sketch_mat.set_shader_parameter("noise_texture", noise_tex)
+	sketch_mat.set_shader_parameter("outline_color", Color(0.109, 0.239, 0.31, 0.192))
+	sketch_mat.set_shader_parameter("fill_color", Color(0.252, 0.551, 0.68, 0.024))
+	lake_preview_renderer._terrain_rect.material = sketch_mat
 	
 # --- public api / request handlers ---
 # this is the main entry point for player actions like building or selling
@@ -199,10 +240,84 @@ func update_shore_boundary() -> void: #used for expansion
 	# simplified logic to find all land tiles adjacent to nothing
 	shore_boundary_tiles.clear()
 	for cell: Vector2i in terrain_base_grid:
+		if terrain_base_grid[cell] == Terrain.Base.WATER:
+			continue
 		for dir: Vector2i in DIRS:
 			if not terrain_base_grid.has(cell + dir):
 				shore_boundary_tiles.append(cell)
 				break
+
+func is_lake_cell(cell: Vector2i) -> bool:
+	return lake_cells.has(cell)
+
+func update_lake_preview() -> void:
+	if not is_instance_valid(lake_preview_renderer):
+		return
+	lake_preview_renderer.reset_grid(get_nearby_lake_cells())
+
+func get_nearby_lake_cells() -> Array[Vector2i]:
+	if terrain_base_grid.is_empty():
+		return []
+	var bounds := get_island_bounds()
+	var min_cell := position_to_cell(bounds.position) - Vector2i.ONE * LAKE_PREVIEW_MARGIN
+	var max_cell := position_to_cell(bounds.end) + Vector2i.ONE * LAKE_PREVIEW_MARGIN
+	var visible_cells: Array[Vector2i] = []
+	for cell: Vector2i in lake_cells:
+		if terrain_base_grid.has(cell):
+			continue
+		if cell.x >= min_cell.x and cell.y >= min_cell.y and cell.x <= max_cell.x and cell.y <= max_cell.y:
+			visible_cells.append(cell)
+	return visible_cells
+
+func _generate_lake_cells() -> void:
+	lake_cells.clear()
+	var lake_noise := _make_lake_noise(lake_seed, LAKE_NOISE_FREQUENCY, LAKE_NOISE_OCTAVES)
+	var warp_noise := _make_lake_noise(lake_seed + 1013, LAKE_WARP_FREQUENCY, 2)
+	for x in range(-LAKE_FIELD_RADIUS, LAKE_FIELD_RADIUS + 1):
+		for y in range(-LAKE_FIELD_RADIUS, LAKE_FIELD_RADIUS + 1):
+			var cell := Vector2i(x, y)
+			var distance := Vector2(cell).length()
+			if distance < LAKE_SAFE_RADIUS or distance > LAKE_FIELD_RADIUS:
+				continue
+			if _lake_score(cell, lake_noise, warp_noise) >= LAKE_THRESHOLD:
+				lake_cells[cell] = true
+	_prune_lake_speckles()
+
+func _make_lake_noise(seed_value: int, frequency: float, octaves: int) -> FastNoiseLite:
+	var noise := FastNoiseLite.new()
+	noise.seed = seed_value % 2147483647
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.frequency = frequency
+	noise.fractal_type = FastNoiseLite.FRACTAL_FBM
+	noise.fractal_octaves = octaves
+	return noise
+
+func _lake_score(cell: Vector2i, lake_noise: FastNoiseLite, warp_noise: FastNoiseLite) -> float:
+	var pos := Vector2(cell)
+	var direction := pos.normalized()
+	var ring_phase := pos.length() / LAKE_RING_SPACING * TAU
+	var ring_warp := direction * sin(ring_phase) * LAKE_RING_WARP_STRENGTH
+	# Domain warp keeps the radial bias broken and organic instead of drawing clean circles.
+	var domain_warp := Vector2(
+		warp_noise.get_noise_2d(pos.x, pos.y),
+		warp_noise.get_noise_2d(pos.x + 137.0, pos.y - 59.0)
+	) * LAKE_WARP_STRENGTH
+	var sample_pos := pos + ring_warp + domain_warp
+	var noise_value := (lake_noise.get_noise_2d(sample_pos.x, sample_pos.y) + 1.0) * 0.5
+	var ring_value := (sin((sample_pos.length() / LAKE_RING_SPACING) * TAU) + 1.0) * 0.5
+	return noise_value + (ring_value - 0.5) * LAKE_RING_BIAS
+
+func _prune_lake_speckles() -> void:
+	var removed: Array[Vector2i] = []
+	for cell: Vector2i in lake_cells:
+		var neighbors := 0
+		for dir: Vector2i in DIRS:
+			if lake_cells.has(cell + dir):
+				neighbors += 1
+		if neighbors < LAKE_MIN_NEIGHBORS:
+			removed.append(cell)
+	for cell: Vector2i in removed:
+		lake_cells.erase(cell)
 
 func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	_preview_choices = choices_by_id
@@ -214,9 +329,10 @@ func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	# by default, show ALL choices as a faint outline
 	var all_preview_cells: Array[Vector2i] = []
 	for choice in _preview_choices.values():
-		all_preview_cells.append_array(choice.block_data.keys())
+		all_preview_cells.append_array(_choice_land_cells(choice))
 		
 	preview_renderer.reset_grid(all_preview_cells)
+	update_lake_preview()
 	
 	# set to "passive" style
 	preview_renderer.set_color_param("outline_color", Color(0, 0, 0, 0.4)) # gray/faint
@@ -234,7 +350,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		# revert to showing all choices faintly
 		var all_cells: Array[Vector2i] = []
 		for choice in _preview_choices.values():
-			all_cells.append_array(choice.block_data.keys())
+			all_cells.append_array(_choice_land_cells(choice))
 		preview_renderer.reset_grid(all_cells)
 		preview_renderer.set_color_param("outline_color", Color(0.16, 0.16, 0.16, 0.4))
 		preview_renderer.set_color_param("fill_color", Color(1, 1, 1, 0.1))
@@ -244,6 +360,8 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 			var choice: ExpansionChoice = _preview_choices[local_choice_id]
 			for cell: Vector2i in choice.block_data:
 				var cell_data: Terrain.CellData = choice.block_data[cell]
+				if cell_data.terrain == Terrain.Base.WATER:
+					continue
 				preview_renderer.update_decoration(cell, cell_data.terrain)
 				if cell_data.feature != Towers.Type.VOID:
 					preview_renderer.set_preview_feature(cell, cell_data.feature)
@@ -251,8 +369,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 	elif _preview_choices.has(choice_id):
 		# show ONLY the highlighted choice, with strong distinct style
 		var active_choice: ExpansionChoice = _preview_choices[choice_id]
-		var cells: Array[Vector2i] = []
-		cells.append_array(active_choice.block_data.keys())
+		var cells: Array[Vector2i] = _choice_land_cells(active_choice)
 		
 		preview_renderer.reset_grid(cells)
 		preview_renderer.set_color_param("outline_color", Color(0.27, 0.27, 0.27, 0.576)) # solid black
@@ -260,9 +377,18 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 		
 		for cell: Vector2i in active_choice.block_data:
 			var cell_data: Terrain.CellData = active_choice.block_data[cell]
+			if cell_data.terrain == Terrain.Base.WATER:
+				continue
 			preview_renderer.update_decoration(cell, cell_data.terrain)
 			if cell_data.feature != Towers.Type.VOID:
 				preview_renderer.set_preview_feature(cell, cell_data.feature)
+
+func _choice_land_cells(choice: ExpansionChoice) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for cell: Vector2i in choice.block_data:
+		if choice.block_data[cell].terrain != Terrain.Base.WATER:
+			cells.append(cell)
+	return cells
 	
 #signal handlers
 func _on_tower_destroyed(tower: Tower):
@@ -340,6 +466,7 @@ func get_save_data() -> Dictionary:
 		var key = "%d,%d" % [cell.x, cell.y]
 		terrain_export[key] = terrain_base_grid[cell] # enum int
 	data["terrain"] = terrain_export
+	data["lake_seed"] = lake_seed
 		
 	data["maximum_unit_id"] = References.current_unit_id
 	data["maximum_stat_id"] = References.current_stat_id
@@ -365,8 +492,11 @@ func get_save_data() -> Dictionary:
 func load_save_data(data: Dictionary) -> void:
 	terrain_renderer.start()
 	_setup_preview_renderer()
+	_setup_lake_preview_renderer()
 	# clear existing world
 	_clear_island_state()
+	lake_seed = int(data.get("lake_seed", randi()))
+	_generate_lake_cells()
 	# restore terrain
 	var terrain_import: Dictionary = data.get("terrain", {})
 	var edits: Dictionary[Vector2i, Terrain.CellData] = {}
@@ -405,11 +535,13 @@ func load_save_data(data: Dictionary) -> void:
 	#finalize
 	update_shore_boundary()
 	update_navigation_grid()
+	update_lake_preview()
 	
 func _clear_island_state() -> void:
 	#wipe grid
 	terrain_base_grid.clear()
 	tower_grid.clear()
+	lake_cells.clear()
 	_towers_by_type.clear()
 	
 	#wipe nodes
@@ -420,6 +552,8 @@ func _clear_island_state() -> void:
 	if is_instance_valid(terrain_renderer):
 		#reset the grid data in renderer
 		terrain_renderer.reset_grid([])
+	if is_instance_valid(lake_preview_renderer):
+		lake_preview_renderer.reset_grid([])
 
 # static position helpers
 static func position_to_cell(_position: Vector2) -> Vector2i:
