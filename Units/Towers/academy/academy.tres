@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://Units/Towers/academy/academy.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://Assets/mage_provisional.png" id="3"]
+[ext_resource type="Script" path="res://Content/inspector_action_info.gd" id="4"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/default_sell.tres" id="5"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/default_upgrade.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = 59
+cost = 7.0
+required_capacity = 0.8
+element = 5
+tower_name = "Academy"
+tower_description = "Towers in a 3-tile cross attack 50% {UNIT_HITRATE|label=Faster}."
+icon = ExtResource("3")
+preview = ExtResource("3")
+inspector_actions = Array[ExtResource("4")]([ExtResource("5"), ExtResource("6")])
+tower_scene = ExtResource("2")

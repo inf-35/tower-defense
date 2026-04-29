@@ -266,8 +266,13 @@ func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid gr
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 	if behavior.has_method(&"get_adjacent_towers"):
 		return behavior.get_adjacent_towers()
+
+	if is_instance_valid(References.island) and is_instance_valid(References.island.topology_service):
+		# keys are local offsets relative to this tower's top-left cell.
+		var query := TowerTopologyService.Query.new()
+		return References.island.topology_service.query(self, query).towers_by_local_offset
 	
-	var adjacencies: Dictionary[Vector2i, Tower]
+	var adjacencies: Dictionary[Vector2i, Tower] = {}
 	for cell: Vector2i in get_adjacent_cells():
 		var tower : Tower = References.island.get_tower_on_tile(cell)
 		if tower:
@@ -275,19 +280,22 @@ func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 			
 	return adjacencies
 	
-func get_diagonal_towers() -> Dictionary[Vector2i, Tower]: #ONLY WORKS ON 1x1
-	var diagonals: Array[Vector2i] = [
-		Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)
-	]
+func get_diagonal_towers() -> Dictionary[Vector2i, Tower]:
+	if is_instance_valid(References.island) and is_instance_valid(References.island.topology_service):
+		var query := TowerTopologyService.Query.new(
+			TowerTopologyService.QueryKind.DIAGONAL_LINE,
+			1,
+			1,
+			TowerTopologyService.AXIS_UP | TowerTopologyService.AXIS_RIGHT | TowerTopologyService.AXIS_DOWN | TowerTopologyService.AXIS_LEFT
+		)
+		return References.island.topology_service.query(self, query).towers_by_local_offset
+
+	var diagonals: Array[Vector2i] = [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]
 	var results: Dictionary[Vector2i, Tower] = {}
-	var island = References.island
-	
 	for dir in diagonals:
-		var check_pos := tower_position + dir
-		var tower = island.get_tower_on_tile(check_pos)
+		var tower = References.island.get_tower_on_tile(tower_position + dir)
 		if tower:
 			results[dir] = tower
-			
 	return results
 	
 static func get_side_from_offset(tower_size: Vector2i, rel_offset: Vector2i) -> Facing:

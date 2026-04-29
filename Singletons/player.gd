@@ -131,6 +131,7 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
+		Towers.Type.ACADEMY: true,
 	}
 	#
 	#var reward := Reward.new()

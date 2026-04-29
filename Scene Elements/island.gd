@@ -15,6 +15,7 @@ signal navigation_grid_updated
 
 # --- services ---
 var expansion_service: ExpansionService
+var topology_service: TowerTopologyService
 
 # --- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
@@ -49,6 +50,7 @@ func _ready():
 	Phases.in_game = true
 	
 	expansion_service = ExpansionService.new()
+	topology_service = TowerTopologyService.new(self)
 	add_child.call_deferred(expansion_service)
 	
 	Phases.start_game()
@@ -400,15 +402,13 @@ func _on_tower_destroyed(tower: Tower):
 	tower_changed.emit(cell)
 	
 func update_adjacencies_around_tower(tower: Tower):
-	var adjacencies := tower.get_adjacent_towers()
-	for adjacent_tower: Tower in adjacencies.values():
-		adjacent_tower.adjacency_updated.emit(adjacent_tower.get_adjacent_towers())
+	if is_instance_valid(topology_service):
+		topology_service.notify_tower_changed(tower)
 
 func _update_adjacencies_around(cell: Vector2i):
 	var adjacent_towers: Dictionary[Vector2i, Tower] = get_adjacent_towers(cell)
 	for tower: Tower in adjacent_towers.values():
-		var local_adjacencies: Dictionary[Vector2i, Tower] = tower.get_adjacent_towers()
-		tower.adjacency_updated.emit(local_adjacencies)
+		update_adjacencies_around_tower(tower)
 
 #static data access functions
 func get_towers_by_type(type: Towers.Type) -> Array:
@@ -534,6 +534,8 @@ func _clear_island_state() -> void:
 	tower_grid.clear()
 	lake_cells.clear()
 	_towers_by_type.clear()
+	if is_instance_valid(topology_service):
+		topology_service.clear()
 	
 	#wipe nodes
 	for tower in get_tree().get_nodes_in_group(References.TOWER_GROUP):

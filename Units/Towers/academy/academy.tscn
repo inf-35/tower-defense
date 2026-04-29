@@ -1,0 +1,51 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://UnitComponents/tower.gd" id="1"]
+[ext_resource type="Script" path="res://Content/Behaviors/pattern_amplifier_behavior.gd" id="2"]
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="4"]
+[ext_resource type="Script" path="res://Content/modifier_data_prototype.gd" id="5"]
+[ext_resource type="Script" path="res://UnitComponents/movement_component.gd" id="6"]
+[ext_resource type="Resource" path="res://Content/Movement/immobile_mvmt.tres" id="7"]
+[ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="8"]
+[ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="9"]
+[ext_resource type="Texture2D" path="res://Assets/mage_provisional.png" id="10"]
+[ext_resource type="Script" path="res://UnitComponents/shadow_component.gd" id="11"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("5")
+attribute = 8
+multiplicative = 0.666667
+
+[node name="Academy" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1")
+type = 59
+stat_displays = Array[ExtResource("3")]([ExtResource("4")])
+behavior = NodePath("PatternAmplifierBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+
+[node name="PatternAmplifierBehavior" type="Node" parent="."]
+script = ExtResource("2")
+modifier_prototypes = Array[ExtResource("5")]([SubResource("1")])
+max_range = 3
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("6")
+movement_data = ExtResource("7")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("8")
+
+[node name="Graphics" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("11")
+
+[node name="ModifiersComponent" type="Node" parent="."]
+script = ExtResource("9")
