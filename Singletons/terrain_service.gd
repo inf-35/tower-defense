@@ -82,7 +82,6 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 			
 			if not Terrain.is_constructable(island.terrain_base_grid[cell]):
 				return false
-	print("true!")
 	return true
 
 # Returns an empty string if valid, or an error description if invalid

@@ -23,6 +23,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _is_overridden:
 		return
 
+	# Handle zoom here instead of polling Input in _process(), so scrollable UI
+	# controls can consume mouse wheel events before the camera ever sees them.
+	if event.is_action_pressed("zoom_in"):
+		zoom *= 0.9
+		get_viewport().set_input_as_handled()
+		return
+
+	if event.is_action_pressed("zoom_out"):
+		zoom /= 0.9
+		get_viewport().set_input_as_handled()
+		return
+
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.is_pressed() and ClickHandler.enabled and ClickHandler.current_state != ClickHandler.State.IDLE:
 			return
@@ -40,13 +52,6 @@ func _process(delta: float) -> void:
 	# only allow manual camera control if no override is active
 	if _is_overridden:
 		return
-
-	# check if the abstract action was just triggered this frame.
-	if Input.is_action_just_pressed("zoom_in"):
-		zoom *= 0.9
-		
-	if Input.is_action_just_pressed("zoom_out"):
-		zoom /= 0.9
 
 	_target_position += get_viewport_rect().size / zoom * Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down") * delta * 0.8
 	position = lerp(position, _target_position, 12.0 * delta)

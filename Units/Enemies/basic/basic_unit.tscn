@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cq3xh22ociyaa"]
+[gd_scene format=3 uid="uid://cq3xh22ociyaa"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_anqll"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_n3sy1"]
@@ -25,7 +25,7 @@ shader_parameter/overlay_color = Color(0, 0, 1, 0)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
 size = Vector2(70, 70.00002)
 
-[node name="BasicUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="BasicUnit" type="Node2D" unique_id=1832972274 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_anqll")
 hostile = true
@@ -41,16 +41,16 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=2050061521]
 script = ExtResource("2_n3sy1")
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=347488850]
 script = ExtResource("3_phfvd")
 face_towards_movement = false
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=2074337395]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 2.5)
@@ -59,45 +59,45 @@ script = ExtResource("6_trm8b")
 shadow_size = Vector2(45, 25)
 metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=988218666]
 material = SubResource("ShaderMaterial_j01gd")
 scale = Vector2(0.10810186, 0.10810187)
 texture = ExtResource("7_n0rgw")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1496709801]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
 script = ExtResource("7_j01gd")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=293129247]
 scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_n0rgw")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=352042108]
 script = ExtResource("8_bsfdp")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="DefaultBehavior" type="Node" parent="."]
+[node name="DefaultBehavior" type="Node" parent="." unique_id=2067920162]
 script = ExtResource("9_n3sy1")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1179248963]
 script = ExtResource("12_j01gd")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=778287836]
 script = ExtResource("10_ns662")
 attack_data = ExtResource("13_n0rgw")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=521926004]
 script = ExtResource("4_urfjf")
 health_data = ExtResource("13_j01gd")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeIndicator" type="Node2D" parent="."]
+[node name="RangeIndicator" type="Node2D" parent="." unique_id=1940767257]
 script = ExtResource("15_bqh04")
 line_width = 4.0
 metadata/_custom_type_script = "uid://ibj2mt03m5av"

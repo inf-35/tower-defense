@@ -3,10 +3,13 @@ class_name GameOverScreen
 
 @export var title_label: InteractiveRichTextLabel
 @export var wave_label: InteractiveRichTextLabel
-@export var relic_container: GridContainer
-@export var tower_container: GridContainer
+@export var relic_container: RelicDisplay
+@export var tower_container: RelicDisplay
 @export var restart_button: Button
 @export var quit_button: Button
+@export var debug_game_over_icons: bool = false
+
+var _last_hovered_control_path: String = ""
 
 const VICTORY_TITLE: String = "Victory!"
 const VICTORY_COLOR: Color = Color("68bf8c") # Greenish
@@ -24,8 +27,29 @@ func _ready() -> void:
 	# though usually we instantiate this dynamically
 	hide()
 
+func _process(_delta: float) -> void:
+	if not debug_game_over_icons or not visible:
+		return
+	var hovered: Control = get_viewport().gui_get_hovered_control()
+	var hovered_path := "<none>"
+	if is_instance_valid(hovered):
+		hovered_path = str(hovered.get_path())
+	if hovered_path != _last_hovered_control_path:
+		_last_hovered_control_path = hovered_path
+		_debug_log("viewport hovered control = %s" % hovered_path)
+
+func _gui_input(event: InputEvent) -> void:
+	if not debug_game_over_icons:
+		return
+	if event is InputEventMouseMotion:
+		_debug_log("root gui_input motion")
+	elif event is InputEventMouseButton:
+		_debug_log("root gui_input button %d pressed=%s" % [event.button_index, str(event.pressed)])
+
 func display(is_victory: bool) -> void:
 	Clock.speed_multiplier = 0.0
+	relic_container.debug_hover_icons = debug_game_over_icons
+	tower_container.debug_hover_icons = debug_game_over_icons
 
 	if is_victory:
 		title_label.text = VICTORY_TITLE
@@ -38,6 +62,7 @@ func display(is_victory: bool) -> void:
 
 	_populate_relics()
 	_populate_towers()
+	_debug_log("displayed end screen for wave %d" % Phases.current_wave_number)
 
 	show()
 	
@@ -47,24 +72,10 @@ func display(is_victory: bool) -> void:
 	tween.tween_property(self, "modulate:a", 1.0, 0.5)
 
 func _populate_relics() -> void:
-	# clear placeholders
-	for child in relic_container.get_children():
-		child.queue_free()
-		
-	# iterate player relics
-	for relic: RelicData in Player.active_relics:
-		var icon := TextureRect.new()
-		icon.texture = relic.icon
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(48, 48)
-		icon.tooltip_text = relic.title
-		relic_container.add_child(icon)
+	relic_container.show_relics(Player.active_relics)
+	_debug_log("populated %d relic icons" % Player.active_relics.size())
 
 func _populate_towers() -> void:
-	for child in tower_container.get_children():
-		child.queue_free()
-		
 	# to find "used" towers, we scan the island for unique active types
 	# TODO: implement actual book-keeping
 	var used_types: Dictionary[Towers.Type, bool] = {}
@@ -74,16 +85,13 @@ func _populate_towers() -> void:
 	for tower: Tower in all_towers:
 		if not used_types.has(tower.type):
 			used_types[tower.type] = true
-			
-	# instantiate icons
-	for type: Towers.Type in used_types:
-		var icon := TextureRect.new()
-		icon.texture = Towers.get_tower_icon(type)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(96, 96)
-		icon.tooltip_text = Towers.get_tower_name(type)
-		tower_container.add_child(icon)
+
+	var sorted_types: Array[Towers.Type] = []
+	for tower_type: Towers.Type in used_types:
+		sorted_types.append(tower_type)
+	sorted_types.sort()
+	tower_container.show_towers(sorted_types)
+	_debug_log("populated %d tower icons" % sorted_types.size())
 
 func _on_restart_pressed() -> void:
 	#delete the current save (which just died)
@@ -100,3 +108,7 @@ func _on_quit_pressed() -> void:
 	# return to main menu
 	Phases.in_game = false
 	get_tree().change_scene_to_file.call_deferred("res://main_menu.tscn")
+
+func _debug_log(message: String) -> void:
+	if debug_game_over_icons:
+		print("[GameOverScreen] %s" % message)

@@ -3,30 +3,30 @@ class_name WaveEnemies
 const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	# Example: Wave 1 is just 5 Basics (Tutorial)
 	1: [
-		[Units.Type.BASIC, 3],
+		[Units.Type.BASIC, 4],
 	],
 	2: [
-		[Units.Type.BASIC, 5],
+		[Units.Type.BASIC, 6],
 	],
 	3: [
-		[Units.Type.BASIC, 3],
+		[Units.Type.BASIC, 4],
 		[Units.Type.BUFF, 1],
 	],
 	4: [
-		[Units.Type.BASIC, 3],
+		[Units.Type.BASIC, 4],
 		[Units.Type.BUFF, 2],
 	],
 	5 : [
-		[Units.Type.BASIC, 3],
+		[Units.Type.BASIC, 4],
 		[Units.Type.DRIFTER, 6],
 	],
 	6 : [
-		[Units.Type.BASIC, 4],
+		[Units.Type.BASIC, 6],
 		[Units.Type.HEALER, 2],
-		[Units.Type.BASIC, 4],
+		[Units.Type.BASIC, 6],
 	],
 	7 : [
-		[Units.Type.BUFF, 3],
+		[Units.Type.BUFF, 4],
 		[Units.Type.HEALER, 2],
 		[Units.Type.BASIC, 6],
 	],
@@ -76,16 +76,16 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.WARRIOR, 12],
 	],
 	17 : [
-		[Units.Type.SPRINTER, 10],
+		[Units.Type.SPRINTER, 12],
 		[Units.Type.HEALER, 4],
-		[Units.Type.SPRINTER, 10],
+		[Units.Type.SPRINTER, 12],
 	],
 	18 : [
 		[Units.Type.TROLL, 5],
 		[Units.Type.SPRINTER, 8],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 8],
 		[Units.Type.HEALER, 4],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 8],
 		[Units.Type.ARCHER, 8],
 	],
 	19 : [

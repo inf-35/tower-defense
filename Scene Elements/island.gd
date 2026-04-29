@@ -38,14 +38,11 @@ const _DEBUG_SHOW_NAVCOST: bool = false
 const LAKE_FIELD_RADIUS: int = 90
 const LAKE_PREVIEW_MARGIN: int = 18
 const LAKE_SAFE_RADIUS: int = 5
-const LAKE_NOISE_FREQUENCY: float = 0.05
-const LAKE_NOISE_OCTAVES: int = 4
-const LAKE_THRESHOLD: float = 0.6
-const LAKE_WARP_FREQUENCY: float = 0.035
-const LAKE_WARP_STRENGTH: float = 11.0
-const LAKE_RING_SPACING: float = 24.0
-const LAKE_RING_BIAS: float = 0.2
-const LAKE_RING_WARP_STRENGTH: float = 4.0
+const LAKE_NOISE_FREQUENCY: float = 0.15
+const LAKE_NOISE_OCTAVES: int = 1
+const LAKE_THRESHOLD: float = 0.65
+const LAKE_WARP_FREQUENCY: float = 0.015
+const LAKE_WARP_STRENGTH: float = 0.0
 const LAKE_MIN_NEIGHBORS: int = 2
 
 func _ready():
@@ -294,18 +291,12 @@ func _make_lake_noise(seed_value: int, frequency: float, octaves: int) -> FastNo
 
 func _lake_score(cell: Vector2i, lake_noise: FastNoiseLite, warp_noise: FastNoiseLite) -> float:
 	var pos := Vector2(cell)
-	var direction := pos.normalized()
-	var ring_phase := pos.length() / LAKE_RING_SPACING * TAU
-	var ring_warp := direction * sin(ring_phase) * LAKE_RING_WARP_STRENGTH
-	# Domain warp keeps the radial bias broken and organic instead of drawing clean circles.
 	var domain_warp := Vector2(
 		warp_noise.get_noise_2d(pos.x, pos.y),
 		warp_noise.get_noise_2d(pos.x + 137.0, pos.y - 59.0)
 	) * LAKE_WARP_STRENGTH
-	var sample_pos := pos + ring_warp + domain_warp
-	var noise_value := (lake_noise.get_noise_2d(sample_pos.x, sample_pos.y) + 1.0) * 0.5
-	var ring_value := (sin((sample_pos.length() / LAKE_RING_SPACING) * TAU) + 1.0) * 0.5
-	return noise_value + (ring_value - 0.5) * LAKE_RING_BIAS
+	var sample_pos := pos + domain_warp
+	return (lake_noise.get_noise_2d(sample_pos.x, sample_pos.y) + 1.0) * 0.5
 
 func _prune_lake_speckles() -> void:
 	var removed: Array[Vector2i] = []

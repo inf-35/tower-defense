@@ -62,7 +62,11 @@ var disabled: bool:
 			
 var is_ready: bool = false
 
+const BEHAVIOR_CYCLE: int = 3
+var behavior_stagger: int = 0
+
 func _ready():
+	behavior_stagger = randi_range(0, BEHAVIOR_CYCLE)
 	name = name + " " + str(unit_id)
 	_setup_event_bus()
 	_attach_intrinsic_effects()
@@ -78,7 +82,8 @@ func _ready():
 	behavior.initialise(self)
 
 func _process(_delta: float):
-	if not disabled and is_instance_valid(behavior):
+	behavior_stagger += 1
+	if not disabled and is_instance_valid(behavior) and behavior_stagger % BEHAVIOR_CYCLE == 0:
 		behavior.update(Clock.game_delta)
 
 	if _DEBUG_DRAW:

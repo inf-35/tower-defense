@@ -16,7 +16,7 @@ enum GameSpeed {
 
 const PAUSE_SPEED: float = 0.0
 const BASE_SPEED: float = 1.0
-const FAST_FORWARD_SPEED: float = 2.0
+const FAST_FORWARD_SPEED: float = 3.0
 
 # --- public api ---
 # this is the variable the UI will control (e.g., 1.0 for normal, 2.0 for double speed)

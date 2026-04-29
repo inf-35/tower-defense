@@ -7,6 +7,7 @@ signal expansion_process_complete
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
 const GENERATION_ATTEMPTS: int = 24
 const WATER_EXTRA_RATIO: float = 1.8
+const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
 # --- procedural configuration ---
 # A helper class to define how a specific terrain type (Bonus Tile) spawns
 class TerrainGenRule extends Resource:
@@ -41,7 +42,7 @@ var _pending_choice_id: int = -1 # the choice waiting for confirmation
 
 var expansions_this_phase: int = 0
 var minimum_expansions: int = 1
-var maximum_expansions: int = 50
+var maximum_expansions: int = 1
 
 var _terrain_pity_counters: Dictionary[Terrain.Base, float] = {}
 
@@ -57,8 +58,8 @@ func _init():
 	STANDARD_EXPANSION_PARAMS = GenerationParameters.new()
 	
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.08, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.025))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.04, 1, 2))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.01))
 	
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -67,12 +68,14 @@ func _init():
 	
 	var rite_rule := PlacementRule.new()
 	rite_rule.seed_placement = PlacementLogic.ANYWHERE
+	rite_rule.min_seeds = 1
+	rite_rule.max_seeds = 1
 	
 	var forest_rule := PlacementRule.new()
 	forest_rule.tower_type = Towers.Type.FOREST
 	forest_rule.seed_placement = PlacementLogic.ANYWHERE
 	forest_rule.cluster_size_min = 1
-	forest_rule.cluster_size_max = 6
+	forest_rule.cluster_size_max = 8
 	forest_rule.min_seeds = 1
 	forest_rule.max_seeds = 1
 	
@@ -109,11 +112,10 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	return _generate_block(island, block_size, initial_params)
 
 func start_expansion_phase() -> void: #entry point called by phases
-	generate_and_present_choices(References.island, 12, 4)
+	generate_and_present_choices(References.island, 22, 4)
 	expansions_this_phase = 0
 	if expansions_this_phase < minimum_expansions:
 		UI.hide_expansion_exit.emit()
-		
 
 func generate_and_present_choices(island: Island, block_size: int, choice_count: int) -> void:
 	_choices_by_id.clear()
@@ -342,20 +344,38 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 			
 	return block_data
 
-func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary:
-	var best_land: Array[Vector2i] = []
-	var best_water: Array[Vector2i] = []
+func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary: ##wrapper for _grow_expansion_from_start, quality control (number of tiles of each type, size)
+	var best_result: Dictionary = {"land": [], "water": []}
+	var best_land_count: int = -1
 	for _attempt in GENERATION_ATTEMPTS:
-		var start : Vector2i = Vector2i.ZERO if island.shore_boundary_tiles.is_empty() else island.shore_boundary_tiles.pick_random()
+		var start := _pick_origin_biased_shore_start(island)
 		var result := _grow_expansion_from_start(island, start, land_target)
-		if result.land.size() >= land_target:
+		var land_count: int = result.land.size()
+		if land_count >= land_target:
 			return result
-		if result.land.size() > best_land.size():
-			best_land = result.land
-			best_water = result.water
-	return {"land": best_land, "water": best_water}
+		if land_count > best_land_count:
+			best_result = result
+			best_land_count = land_count
+	return best_result
 
-func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: int) -> Dictionary:
+func _pick_origin_biased_shore_start(island: Island) -> Vector2i:
+	if island.shore_boundary_tiles.is_empty():
+		return Vector2i.ZERO
+	var total_weight := 0.0
+	var weights: Array[float] = []
+	for cell: Vector2i in island.shore_boundary_tiles:
+		var radius := maxf(Vector2(cell).length(), 1.0)
+		var weight := 1.0 / pow(radius + 1.0, EXPANSION_ORIGIN_BIAS_EXPONENT)
+		weights.append(weight)
+		total_weight += weight
+	var roll := randf() * total_weight
+	for i: int in range(island.shore_boundary_tiles.size()):
+		roll -= weights[i]
+		if roll <= 0.0:
+			return island.shore_boundary_tiles[i]
+	return island.shore_boundary_tiles[island.shore_boundary_tiles.size() - 1]
+
+func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: int) -> Dictionary: ##terrain canvas generator, determines land/water, and which tiles to visit
 	var water_cap := int(ceil(float(land_target) * WATER_EXTRA_RATIO))
 	var to_visit: Array[Vector2i] = [start]
 	var visited: Dictionary[Vector2i, bool] = {}

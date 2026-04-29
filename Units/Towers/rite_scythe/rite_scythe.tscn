@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://3hds44r7wpbg"]
+[gd_scene format=3 uid="uid://3hds44r7wpbg"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_33cm1"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="4_b7cx4"]
@@ -90,7 +90,7 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Scythe Rite" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
+[node name="Scythe Rite" type="Node2D" unique_id=1754637924 node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_33cm1")
 type = 57
@@ -102,42 +102,40 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="EffectDistributorBehavior" type="Node" parent="."]
+[node name="EffectDistributorBehavior" type="Node" parent="." unique_id=465742457]
 script = ExtResource("4_b7cx4")
 buff_effect = SubResource("Resource_a7ure")
 metadata/_custom_type_script = "uid://dnjc1qtsra5h2"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1696405103]
 script = ExtResource("6_td1ja")
 movement_data = ExtResource("7_8mrvk")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=82579935]
 script = ExtResource("8_qbt5v")
 health_data = SubResource("Resource_1dhlk")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="refeerence" type="Sprite2D" parent="."]
+[node name="refeerence" type="Sprite2D" parent="." unique_id=1161533885]
 visible = false
 texture = SubResource("PlaceholderTexture2D_p6ncc")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=440257157]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_0c63h")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=273905463]
 script = ExtResource("11_j7tm3")
 height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="scythe" type="Sprite2D" parent="Graphics"]
+[node name="scythe" type="Sprite2D" parent="Graphics" unique_id=931175395]
 texture = ExtResource("12_l77yx")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1867072264]
 script = ExtResource("12_lbqiq")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_uhk0q")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1595280762]
+libraries/ = SubResource("AnimationLibrary_uhk0q")

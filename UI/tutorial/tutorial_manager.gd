@@ -124,6 +124,7 @@ func _advance_step() -> void:
 		TutorialStep.TriggerType.WAIT_FOR_SIGNAL:
 			# ... (Existing Signal Logic) ...
 			if step.trigger_signal:
+				print(step.trigger_signal)
 				step.trigger_signal.connect(_on_trigger_signal)
 				
 		TutorialStep.TriggerType.CAMERA_PAN:
@@ -208,6 +209,7 @@ func _update_spotlight_position(node: Control) -> void:
 	_shader_mat.set_shader_parameter(&"spotlight_size", uv_size)
 
 func _on_trigger_signal(...args) -> void:
+	print("signal: ", args)
 	# generic handler that accepts many arguments to be compatible with any signal signature
 	var desired_parameters: Array = _active_sequence[_current_step_index].desired_parameters
 	print(args, " / ", desired_parameters)

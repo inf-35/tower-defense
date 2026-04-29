@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://lvhut8mofy7k"]
+[gd_scene format=3 uid="uid://lvhut8mofy7k"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_1marj"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_lb2at"]
@@ -28,7 +28,7 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="Resource" id="Resource_d3klt"]
 script = ExtResource("5_lj1uh")
 max_health = 6.0
-flat_damage_taken = -0.8
+flat_damage_taken = -0.75
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
@@ -47,7 +47,7 @@ cooldown = 0.75
 damage = 4.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
-[node name="Warrior" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Warrior" type="Node2D" unique_id=677515735 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_1marj")
 hostile = true
@@ -63,56 +63,56 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=1298621205]
 script = ExtResource("2_lb2at")
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=135344701]
 script = ExtResource("3_o2o6m")
 face_towards_movement = false
 movement_data = SubResource("Resource_mb2by")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=2014458735]
 script = ExtResource("4_lcmr6")
 health_data = SubResource("Resource_d3klt")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=975241993]
 material = SubResource("ShaderMaterial_j01gd")
 scale = Vector2(0.10810186, 0.10810187)
 texture = ExtResource("7_lj1uh")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=423180848]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
 script = ExtResource("8_bi07s")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=656118575]
 position = Vector2(0, -2.4999983)
 scale = Vector2(0.9999998, 0.9999998)
 shape = SubResource("RectangleShape2D_n0rgw")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=6025733]
 script = ExtResource("9_oxxsx")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="DefaultBehavior" type="Node" parent="."]
+[node name="DefaultBehavior" type="Node" parent="." unique_id=1607341556]
 script = ExtResource("10_0d56v")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=485274658]
 script = ExtResource("11_lw2bw")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=28375671]
 script = ExtResource("12_qynf8")
 attack_data = SubResource("Resource_pineb")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=918264021]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 2.5)
