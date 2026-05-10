@@ -115,7 +115,7 @@ func _on_mouse_entered() -> void:
 	_active_tooltip = KeywordService.TOOLTIP_PANEL.instantiate()
 	add_child.call_deferred(_active_tooltip)
 	
-	_active_tooltip.ready.connect(func(): _active_tooltip.show_tooltip({
+	_active_tooltip.ready.connect(func(): _active_tooltip.show_tooltip.call_deferred({
 		"title": title_text,
 		"description": desc_text
 	}))

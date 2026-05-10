@@ -96,9 +96,10 @@ func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Arr
 		# filter by requested type
 		if (not type_filter.is_empty()) and (not type_filter.has(reward.type)):
 			continue
+		if _player_already_has_reward(reward):
+			continue
 
-		var weight: float = 100.0
-		weight = _calculate_reward_weight(reward)
+		var weight: float = _calculate_reward_weight(reward)
 
 		if weight > 0.0:
 			candidates.append(reward)
@@ -126,7 +127,12 @@ func get_reroll_cost() -> float:
 	return pow(2, rerolls_this_phase) + 2.0
 	
 func _calculate_reward_weight(reward: Reward) -> float:
+	if _player_already_has_reward(reward):
+		return 0.0
+
 	var final_weight: float = reward.base_weight
+	if reward.type == Reward.Type.UNLOCK_TOWER:
+		final_weight = maxf(final_weight, 200.0)
 	
 	for rule: RewardBiasRule in reward.bias_rules:
 		final_weight *= rule.get_multiplier()
@@ -136,6 +142,21 @@ func _calculate_reward_weight(reward: Reward) -> float:
 			return 0.0
 			
 	return final_weight
+
+func _player_already_has_reward(reward: Reward) -> bool:
+	match reward.type:
+		Reward.Type.UNLOCK_TOWER:
+			return reward.tower_type != Towers.Type.VOID and Player.is_tower_unlocked(reward.tower_type)
+		Reward.Type.ADD_RELIC:
+			return _player_has_relic_type(reward.relic.type) if is_instance_valid(reward.relic) else false
+		_:
+			return false
+
+func _player_has_relic_type(relic_type: RelicData.Type) -> bool:
+	for relic: RelicData in Player.active_relics:
+		if is_instance_valid(relic) and relic.type == relic_type:
+			return true
+	return false
 
 func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
 	var roll: float = randf_range(0.0, total_weight)
@@ -173,12 +194,12 @@ func apply_reward(reward: Reward) -> void:
 			
 		Reward.Type.UNLOCK_TOWER:
 			var tower_type: Towers.Type = reward.tower_type
-			if tower_type != Towers.Type.VOID:
+			if tower_type != Towers.Type.VOID and not Player.is_tower_unlocked(tower_type):
 				Player.unlock_tower(tower_type)
 
 		Reward.Type.ADD_RELIC:
 			var relic: RelicData = reward.relic
-			if relic:
+			if relic and not _player_has_relic_type(relic.type):
 				Player.add_relic(relic)
 		
 		Reward.Type.ADD_RITE:

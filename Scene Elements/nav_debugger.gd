@@ -30,7 +30,6 @@ var _sim_goal: Vector2i = Vector2i.ZERO
 func _ready() -> void:
 	_font = ThemeDB.get_fallback_font()
 	# Connect to real navigation updates to keep the background grid sync'd
-	Navigation.field_cleared.connect(queue_redraw)
 	if is_instance_valid(References.island):
 		References.island.navigation_grid_updated.connect(queue_redraw)
 

@@ -52,9 +52,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BUFF, 3],
 	],
 	12 : [
-		[Units.Type.WARRIOR, 10],
-		[Units.Type.HEALER, 2],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 8],
+		[Units.Type.HEALER, 1],
+		[Units.Type.WARRIOR, 8],
 		[Units.Type.HEALER, 2],
 	],
 	13 : [
@@ -65,7 +65,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.ARCHER, 5],
 	],
 	15 : [
-		[Units.Type.TROLL, 6],
+		[Units.Type.TROLL, 5],
 		[Units.Type.HEALER, 3],
 	],
 	16 : [

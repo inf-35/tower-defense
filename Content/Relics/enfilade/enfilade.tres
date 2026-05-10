@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://bb7hnjn38vhw8"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://bb7hnjn38vhw8"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_lflh5"]
 [ext_resource type="Script" uid="uid://c06ve61msauiy" path="res://Content/Relics/enfilade/enfilade.gd" id="2_ex4gp"]

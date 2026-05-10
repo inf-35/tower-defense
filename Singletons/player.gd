@@ -11,6 +11,9 @@ signal relics_changed()
 signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
 #and relevant towers 
 
+const DEBUG_CAPACITY: bool = false
+const RITE_EXCAVATION_COST: float = 3.0
+
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
 var flux: float = 200.0:
@@ -54,11 +57,13 @@ var _active_effects_container: Node
 enum TutorialFlag {
 	MAIN,
 	TROLL,
+	TOWER_DESTROYED,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
 	TutorialFlag.MAIN: false,
 	TutorialFlag.TROLL: false,
+	TutorialFlag.TOWER_DESTROYED: false,
 }
 
 #various services (which are children of this node)
@@ -73,6 +78,7 @@ func _ready():
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
+	UI.excavate_rite_requested.connect(_on_excavate_rite_requested)
 	UI.upgrade_tower_requested.connect(_on_upgrade_tower_requested)
 	UI.reward_rerolled.connect(_on_reward_reroll_requested)
 	#couple playerside logic signals with UI output signals
@@ -131,7 +137,6 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
-		Towers.Type.ACADEMY: true,
 	}
 	#
 	#var reward := Reward.new()
@@ -154,17 +159,33 @@ func begin_new_game():
 	UI.update_tower_types.emit(unlocked_towers, rite_inventory)
 	
 #capacity helper functions
-func add_to_used_capacity(amount: float):
+func _debug_capacity(channel: String, delta: float, reason: String = "") -> void:
+	if not DEBUG_CAPACITY:
+		return
+	var suffix := "" if reason.is_empty() else " | " + reason
+	print("[Capacity][%s] delta=%s | used=%s | total=%s%s" % [
+		channel,
+		str(delta),
+		str(used_capacity),
+		str(tower_capacity),
+		suffix,
+	])
+
+func add_to_used_capacity(amount: float, reason: String = ""):
 	self.used_capacity += amount
+	_debug_capacity("used", amount, reason)
 
-func remove_from_used_capacity(amount: float):
+func remove_from_used_capacity(amount: float, reason: String = ""):
 	self.used_capacity -= amount
+	_debug_capacity("used", -amount, reason)
 	
-func add_to_total_capacity(amount : float):
+func add_to_total_capacity(amount : float, reason: String = ""):
 	self.tower_capacity += amount
+	_debug_capacity("total", amount, reason)
 
-func remove_from_total_capacity(amount : float):
+func remove_from_total_capacity(amount : float, reason: String = ""):
 	self.tower_capacity -= amount
+	_debug_capacity("total", -amount, reason)
 	
 func has_capacity(tower_type : Towers.Type) -> bool:
 	return Player.used_capacity + Towers.get_tower_capacity(tower_type) - 0.01 < Player.tower_capacity
@@ -266,6 +287,19 @@ func _on_sell_tower_requested(tower):
 		return
 	if tower is Tower:
 		tower.sell()
+
+func _on_excavate_rite_requested(tower):
+	if not is_instance_valid(tower):
+		return
+	assert(tower is Tower and Towers.is_tower_rite(tower.type), "Excavation expects a rite tower.")
+	if tower.current_state != Tower.State.ACTIVE:
+		return
+	if flux < RITE_EXCAVATION_COST:
+		return
+
+	self.flux -= RITE_EXCAVATION_COST
+	add_rite(tower.type, 1)
+	tower.excavate()
 		
 func _on_upgrade_tower_requested(old_tower: Tower, upgrade_type: Towers.Type):
 	var cost: float = Towers.get_tower_upgrade_cost(old_tower.type, upgrade_type)
@@ -347,10 +381,8 @@ func get_profile() -> Dictionary:
 	var profile_data: Dictionary = {
 		"completed_tutorials": completed_tutorials,
 	}
-	print(profile_data.get("completed_tutorials"))
 	return profile_data
 
 func load_profile(profile_data: Dictionary) -> void:
-	print(profile_data.get("completed_tutorials"))
 	for tutorial_key: String in profile_data.get("completed_tutorials"):
 		completed_tutorials[int(tutorial_key)] = profile_data.get("completed_tutorials")[tutorial_key]

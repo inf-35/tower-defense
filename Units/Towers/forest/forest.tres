@@ -1,6 +1,5 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://dopp4qertjvnt"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dopp4qertjvnt"]
 
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_jdfve"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_f36vk"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_hw2ui"]
 [ext_resource type="Texture2D" uid="uid://dwha3anjlqofr" path="res://Assets/trees.png" id="2_oqohe"]
@@ -15,6 +14,7 @@ required_capacity = 0.0
 element = 3
 tower_name = "Forest"
 tower_description = "A thicket of trees."
+icon = ExtResource("2_oqohe")
 preview = ExtResource("2_oqohe")
 inspector_actions = Array[ExtResource("2_hw2ui")]([ExtResource("3_qd7sm")])
 tower_scene = ExtResource("3_enagb")

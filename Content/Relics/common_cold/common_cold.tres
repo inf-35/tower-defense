@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://cdgwf65nwokpo"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cdgwf65nwokpo"]
 
 [ext_resource type="Script" uid="uid://c1ydyvx8fvx8g" path="res://Content/Relics/common_cold/status_linkage_effect.gd" id="1_xr361"]
 [ext_resource type="Texture2D" uid="uid://bmjalswq0t1kp" path="res://Assets/common_cold.png" id="2_4q4qk"]

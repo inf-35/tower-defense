@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://dr08k7k5hnf0p"]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://dr08k7k5hnf0p"]
 
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_gfbxn"]
 [ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_5kt6n"]

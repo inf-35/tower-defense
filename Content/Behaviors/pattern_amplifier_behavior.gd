@@ -1,10 +1,12 @@
 extends AmplifierBehavior
 class_name PatternAmplifierBehavior
 
+@export var query_kind: TowerTopologyService.QueryKind = TowerTopologyService.QueryKind.AXIAL_LINE
 @export var min_range: int = 1
 @export var max_range: int = 3
 @export_flags("Up", "Right", "Down", "Left") var active_directions: int = 0b1111
-@export_enum("World", "Local Facing") var axis_space: int = TowerTopologyService.AxisSpace.WORLD
+@export var offsets: Array[Vector2i] = []
+@export_enum("World", "Local Facing") var axis_space: int = TowerTopologyService.AxisSpace.LOCAL_FACING
 
 var _subscription_id: int = -1
 var _last_report
@@ -44,12 +46,17 @@ func _unsubscribe() -> void:
 	_subscription_id = -1
 
 func _make_query():
+	var query_min := min_range
+	var query_max := max_range
+	if query_kind == TowerTopologyService.QueryKind.OFFSET_MASK:
+		query_min = 0
+		query_max = 0
 	return TowerTopologyService.Query.new(
-		TowerTopologyService.QueryKind.AXIAL_LINE,
-		min_range,
-		max_range,
+		query_kind,
+		query_min,
+		query_max,
 		active_directions,
-		[],
+		offsets,
 		axis_space
 	)
 

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://wk1embr7b0fo"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://wk1embr7b0fo"]
 
 [ext_resource type="Script" uid="uid://cnpliuoex413q" path="res://Content/Relics/signal_flag/signal_wall_effect.gd" id="1_jcq77"]
 [ext_resource type="Script" uid="uid://chjx55eww4tnp" path="res://Content/Relics/pawn_structure/global_distributor_effect.gd" id="2_bpbfs"]

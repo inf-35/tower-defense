@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://ddu0kih5o36wt"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://ddu0kih5o36wt"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_465g7"]
 [ext_resource type="Script" uid="uid://b74ug56sj02f0" path="res://Content/Relics/wilderness/_adjacency_boost.gd" id="2_7sn2y"]

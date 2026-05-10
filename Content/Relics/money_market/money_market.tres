@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://c80vp855pe6oq"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://c80vp855pe6oq"]
 
 [ext_resource type="Script" uid="uid://bx75y7j76chrr" path="res://Content/Relics/money_market/interest_relic.gd" id="1_vo0tq"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_fv8q0"]

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://1yeeeiby535x"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://1yeeeiby535x"]
 
 [ext_resource type="Texture2D" uid="uid://bb53kjmn7wv8y" path="res://Assets/fiery_spirit.png" id="1_qbejg"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_hyisy"]

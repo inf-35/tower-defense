@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://dvgtybjigrc7x"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dvgtybjigrc7x"]
 
 [ext_resource type="Script" uid="uid://bkh1iolpvnhku" path="res://Content/Relics/macuahuitl/macuahuitl_effect.gd" id="1_3apu2"]
 [ext_resource type="Texture2D" uid="uid://cee6m0y5f51gf" path="res://Assets/macuahuitl.png" id="2_3apu2"]

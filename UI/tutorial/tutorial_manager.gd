@@ -12,6 +12,10 @@ class_name TutorialManager
 @export var timeline_anchor: Control
 @export var start_wave_anchor: Control
 
+const DESTROYED_TOWER_HINT_TEXT: String = "[b]Tutorial[/b]\nDestroyed - revives next wave.\nQ to continue."
+const DESTROYED_TOWER_HINT_OFFSET: Vector2 = Vector2(56.0, -96.0)
+const DESTROYED_TOWER_HINT_LABEL_MIN_SIZE: Vector2 = Vector2(280.0, 0.0)
+
 # --- State ---
 var _registered_ui_elements: Dictionary[TutorialStep.Reference, Control] = {} # { "id": ControlNode }
 var _current_step_index: int = -1
@@ -26,6 +30,10 @@ var _monitoring_active: bool = false ##are we currently monitoring for a camera 
 var _anchor_node: Control
 
 var _current_tutorial_type: Player.TutorialFlag
+var _world_hint_open: bool = false
+var _world_hint_target: Tower
+var _world_hint_previous_speed: float = Clock.BASE_SPEED
+var _default_instruction_label_min_size: Vector2
 
 # --- Internal ---
 var _shader_mat: ShaderMaterial
@@ -45,14 +53,18 @@ func _ready() -> void:
 	# Register self to UI singleton so other scripts can find us
 	UI.tutorial_manager = self
 	register_element(TutorialStep.Reference.TUTORIAL_TEXT, instruction_panel)
+	_default_instruction_label_min_size = instruction_panel.label.custom_minimum_size
 
 func _process(_delta: float) -> void:
 	if visible and is_instance_valid(_target_node) and _highlight_target:
 		_update_spotlight_position(_target_node)
 	
 	if is_instance_valid(instruction_panel) and instruction_panel.visible:
-		instruction_panel.position = _anchor_node.position
-		instruction_panel.size = _anchor_node.size
+		if _world_hint_open:
+			_update_world_hint_panel()
+		elif is_instance_valid(_anchor_node):
+			instruction_panel.position = _anchor_node.position
+			instruction_panel.size = _anchor_node.size
 		
 	if not _monitoring_active or _current_step_index == -1:
 		return
@@ -63,10 +75,50 @@ func _input(event: InputEvent) -> void:
 	# NEW: Handle Q confirmation
 	if _waiting_for_confirmation:
 		if event.is_action_pressed("interact"): # Map 'Q' to this action
-			_advance_step()
+			if _world_hint_open and not _has_active_sequence():
+				_dismiss_world_hint()
+			else:
+				_advance_step()
 
 func _process_overlay_input(input_event: InputEvent):
 	print(input_event)
+
+func _has_active_sequence() -> bool:
+	return _current_step_index != -1
+
+func _is_world_hint_active() -> bool:
+	return _world_hint_open
+
+func _hide_world_hint() -> void:
+	if _world_hint_open:
+		Clock.speed_multiplier = _world_hint_previous_speed
+	_world_hint_open = false
+	_world_hint_target = null
+	_waiting_for_confirmation = false
+	instruction_panel.label.custom_minimum_size = _default_instruction_label_min_size
+	if not _has_active_sequence():
+		instruction_panel.visible = false
+
+func _dismiss_world_hint() -> void:
+	_hide_world_hint()
+	overlay_color_rect.visible = false
+	_shader_mat.set_shader_parameter(&"is_active", false)
+
+func _update_world_hint_panel() -> void:
+	if not is_instance_valid(_world_hint_target):
+		_hide_world_hint()
+		return
+
+	var screen_pos := _world_hint_target.get_global_transform_with_canvas().origin
+	screen_pos.x += float(_world_hint_target.size.x) * Island.CELL_SIZE * 0.35
+	screen_pos.y -= float(_world_hint_target.size.y) * Island.CELL_SIZE * 0.45
+
+	instruction_panel.reset_size()
+	var viewport_size := get_viewport().get_visible_rect().size
+	var panel_pos := screen_pos + DESTROYED_TOWER_HINT_OFFSET
+	panel_pos.x = clampf(panel_pos.x, 12.0, viewport_size.x - instruction_panel.size.x - 12.0)
+	panel_pos.y = clampf(panel_pos.y, 12.0, viewport_size.y - instruction_panel.size.y - 12.0)
+	instruction_panel.position = panel_pos
 
 # --- Public API: Registration ---
 # UI elements call this in their _ready(): 
@@ -76,6 +128,7 @@ func register_element(id: TutorialStep.Reference, node: Control) -> void:
 
 # --- Public API: Sequences ---
 func start_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFlag) -> void:
+	_hide_world_hint()
 	#reject tutorials already completed
 	if Player.completed_tutorials[tutorial_type]:
 		return
@@ -86,6 +139,33 @@ func start_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFl
 	instruction_panel.visible = true
 	_current_tutorial_type = tutorial_type
 	_advance_step()
+
+func show_destroyed_tower_hint(tower: Tower) -> void:
+	if not is_instance_valid(tower):
+		return
+	if Player.completed_tutorials[Player.TutorialFlag.TOWER_DESTROYED]:
+		return
+	if _has_active_sequence():
+		return
+
+	_target_node = null
+	_anchor_node = null
+	_waiting_for_confirmation = false
+	_monitoring_active = false
+	overlay_color_rect.visible = false
+	_shader_mat.set_shader_parameter(&"is_active", false)
+
+	_world_hint_target = tower
+	_world_hint_open = true
+	_world_hint_previous_speed = Clock.speed_multiplier
+	Clock.speed_multiplier = Clock.PAUSE_SPEED
+	_waiting_for_confirmation = true
+	instruction_panel.visible = true
+	instruction_panel.label.custom_minimum_size = DESTROYED_TOWER_HINT_LABEL_MIN_SIZE
+	instruction_panel.label.set_parsed_text(DESTROYED_TOWER_HINT_TEXT)
+	instruction_panel.reset_size()
+	Player.completed_tutorials[Player.TutorialFlag.TOWER_DESTROYED] = true
+	_update_world_hint_panel()
 
 func end_tutorial() -> void:
 	visible = false

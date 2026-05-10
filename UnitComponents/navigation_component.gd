@@ -30,7 +30,7 @@ func inject_components(movement: MovementComponent):
 
 func _ready():
 	# Listen for global path updates (e.g. maze changed)
-	Navigation.field_cleared.connect(update_path)
+	References.island.navigation_grid_updated.connect(update_path)
 	_STAGGER_CYCLE = 5
 	_stagger += randi_range(0, _STAGGER_CYCLE)
 
@@ -124,20 +124,12 @@ func update_path():
 	var path_data = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
 	_process_path_result(path_data)
 
-func receive_path_data(path_data: Navigation.PathData):
-	_process_path_result(path_data)
-
 func _process_path_result(path_data: Navigation.PathData):
 	_update_deviation()
-	if path_data.status == Navigation.PathData.Status.BUILDING_PATH:
-		# async request
-		Navigation.request_path_promise(Navigation.PathPromise.new(self, movement_component.cell_position, goal, ignore_walls))
-	else:
-		# path received
-		self._path = path_data.path
-		self._current_waypoint_index = 0 # reset progress on new path
-		# important: Check if the new path spawns us directly into a wall
-		_check_for_obstructions()
+	self._path = path_data.path
+	self._current_waypoint_index = 0 # reset progress on new path
+	# important: Check if the new path spawns us directly into a wall
+	_check_for_obstructions()
 
 func _update_deviation() -> void:
 	_deviation_timer = DEVIATION_INTERVAL + randf_range(-0.1, 0.1)

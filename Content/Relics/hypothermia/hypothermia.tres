@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://cia08bmtkwtuh"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cia08bmtkwtuh"]
 
 [ext_resource type="Script" uid="uid://ble10drla0jee" path="res://Content/Relics/hypothermia/damage_boost_status_effect.gd" id="1_htyje"]
 [ext_resource type="Texture2D" uid="uid://ccr81xl6ifkpm" path="res://Assets/hypothermia.png" id="2_j5shw"]

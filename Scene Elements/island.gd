@@ -41,7 +41,7 @@ const LAKE_PREVIEW_MARGIN: int = 18
 const LAKE_SAFE_RADIUS: int = 5
 const LAKE_NOISE_FREQUENCY: float = 0.15
 const LAKE_NOISE_OCTAVES: int = 1
-const LAKE_THRESHOLD: float = 0.65
+const LAKE_THRESHOLD: float = 0.68
 const LAKE_WARP_FREQUENCY: float = 0.015
 const LAKE_WARP_STRENGTH: float = 0.0
 const LAKE_MIN_NEIGHBORS: int = 2
@@ -148,7 +148,7 @@ func request_tower_placement(cell: Vector2i, tower_type: Towers.Type, facing: To
 
 # public APIs (used by TerrainService)
 func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: Tower.Facing = Tower.Facing.UP, initial_state: Dictionary = {}) -> Tower:
-	print("Construct tower of: ", Towers.Type.keys()[tower_type])
+	#print("Construct tower of: ", Towers.Type.keys()[tower_type])
 	var tower: Tower = Towers.create_tower(tower_type)
 	var rotated_size: Vector2i = Towers.get_tower_size(tower_type)
 	if (tower_facing as int) % 2 != 0:
@@ -167,7 +167,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	
 	add_child(tower)
 
-	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type))
+	Player.add_to_used_capacity(Towers.get_tower_capacity(tower_type), "construct %s@%s" % [tower.name, str(cell)])
 	update_adjacencies_around_tower(tower)
 	update_navigation_grid()
 			
@@ -395,7 +395,7 @@ func _on_tower_destroyed(tower: Tower):
 		tower_grid.erase(local_cell)
 	update_adjacencies_around_tower(tower)
 	#update capacity, caches, navigation
-	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type))
+	Player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type), "destroy %s@%s" % [tower.name, str(cell)])
 	update_navigation_grid()
 	if _towers_by_type.has(tower.type):
 		_towers_by_type[tower.type].erase(tower)

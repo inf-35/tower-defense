@@ -234,9 +234,15 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 				)
 				
 		InspectorAction.ActionType.SELL:
-			var sell_value: float = roundi(tower.flux_value * 10) * 0.1
-			btn.text += " (%.2f)" % sell_value
-			btn.pressed.connect(UI.sell_tower_requested.emit.bind(tower))
+			if Towers.is_tower_rite(tower.type):
+				btn.text = "Excavate (%.2f)" % Player.RITE_EXCAVATION_COST
+				if Player.flux < Player.RITE_EXCAVATION_COST or tower.current_state != Tower.State.ACTIVE:
+					is_disabled = true
+				btn.pressed.connect(UI.excavate_rite_requested.emit.bind(tower))
+			else:
+				var sell_value: float = roundi(tower.flux_value * 10) * 0.1
+				btn.text += " (%.2f)" % sell_value
+				btn.pressed.connect(UI.sell_tower_requested.emit.bind(tower))
 			
 	btn.disabled = is_disabled
 

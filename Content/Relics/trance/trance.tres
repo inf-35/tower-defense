@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://dic8sge2e6pmb"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dic8sge2e6pmb"]
 
 [ext_resource type="Script" uid="uid://bsqsmnqngcku6" path="res://Content/Relics/trance/kill_cooldown_reduction_effect.gd" id="1_sloqq"]
 [ext_resource type="Texture2D" uid="uid://cyqsdo8dsgosj" path="res://Assets/trance_icon.png" id="2_be2qu"]

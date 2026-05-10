@@ -25,6 +25,8 @@ var unit_prototypes: Dictionary[Type, Unit] = {}
 
 var _units_modified_by_difficulty: Dictionary[Type, bool] = {} #whether a unit type's stats has been modified by difficulty
 
+const VERBOSE: bool = false
+
 func start():
 	unit_stats.clear()
 	unit_prototypes.clear()
@@ -106,7 +108,7 @@ func _load_all_unit_stats():
 					if Type.has(type_name):
 						var type_enum: Type = Type[type_name]
 						unit_stats[type_enum] = data_resource
-						print("Units: Loaded " + type_name)
+						if VERBOSE: print("Units: Loaded " + type_name)
 					else:
 						push_warning("Units: Folder '" + folder_name + "' does not match any 'Units.Type' Enum.")
 				else:

@@ -7,6 +7,17 @@ class_name CapacityGeneratorEffect
 
 class CapacityState extends RefCounted:
 	var last_capacity_generation: float = 0.0
+
+func _debug_capacity(instance: EffectInstance, action: String, delta: float = 0.0) -> void:
+	if not Player.DEBUG_CAPACITY:
+		return
+	var host_name := "<no host>" if not is_instance_valid(instance.host) else "%s@%s" % [instance.host.name, str(instance.host.tower_position)]
+	print("[CapacityEffect] %s | host=%s | delta=%s | last=%s" % [
+		action,
+		host_name,
+		str(delta),
+		str((instance.state as CapacityState).last_capacity_generation),
+	])
 	
 static func _static_init() -> void:
 	ModifiersComponent.register_dynamic_attribute(&"capacity")
@@ -28,11 +39,13 @@ func _handle_attach(instance: EffectInstance):
 	var initial_contribution: float = _calculate_contribution(instance)
 	state.last_capacity_generation = initial_contribution
 	instance.host.modifiers_component.register_dynamic_stat(&"capacity", base_capacity + bonus_capacity_amount)
-	Player.add_to_total_capacity(initial_contribution)
+	Player.add_to_total_capacity(initial_contribution, "attach %s" % instance.host.name)
+	_debug_capacity(instance, "attach", initial_contribution)
 
 func _handle_detach(instance: EffectInstance):
 	var state := instance.state as CapacityState
-	Player.remove_from_total_capacity(state.last_capacity_generation)
+	Player.remove_from_total_capacity(state.last_capacity_generation, "detach %s" % instance.host.name)
+	_debug_capacity(instance, "detach", -state.last_capacity_generation)
 	instance.host.modifiers_component.register_dynamic_stat(&"capacity", 0.0)
 	state.last_capacity_generation = 0.0
 
@@ -50,11 +63,11 @@ func _handle_adjacency_updated(instance: EffectInstance):
 	if is_equal_approx(old_contribution, new_contribution):
 		return
 	# calculate, apply delta between the new and old values.
-	Player.add_to_total_capacity(new_contribution - old_contribution)
+	var delta := new_contribution - old_contribution
+	Player.add_to_total_capacity(delta, "adjacency %s" % instance.host.name)
 	# update the state to reflect the new contribution amount for future calculations.
 	state.last_capacity_generation = new_contribution
-	
-	print("Capacity contribution changed by %f" % str(new_contribution - old_contribution))
+	_debug_capacity(instance, "adjacency_updated", delta)
 	
 func _calculate_contribution(instance: EffectInstance) -> float:
 	if not is_instance_valid(instance.host):

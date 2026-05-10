@@ -106,6 +106,8 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 		return
 	
 	Player.ruin_service.register_ruin(self, reason)
+	if not environmental and not abstractive and is_instance_valid(UI.tutorial_manager):
+		UI.tutorial_manager.show_destroyed_tower_hint(self)
 	
 	var rubble := Sprite2D.new()
 	rubble.texture = preload("res://Assets/rubble_grey.png")
@@ -175,6 +177,13 @@ func sell():
 			
 		enter_ruin_state(RuinService.RuinReason.SOLD)
 		died.emit(HitReportData.blank_hit_report)
+
+func excavate() -> void:
+	if abstractive or current_state != State.ACTIVE:
+		return
+
+	enter_ruin_state(RuinService.RuinReason.SOLD)
+	died.emit(HitReportData.blank_hit_report)
 
 func _create_hitbox():
 	hitbox = Hitbox.new()

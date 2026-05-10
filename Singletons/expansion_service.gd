@@ -129,7 +129,10 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 		# generate the block data, which may now include a breach seed
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
 		var rite_rule: PlacementRule = expansion_params.placement_rules[1]
-		rite_rule.tower_type = RewardService.get_rewards(1, [Reward.Type.ADD_RITE])[0].rite_type
+		rite_rule.tower_type = _pick_random_rite_type()
+		var second_rite_rule: PlacementRule = rite_rule.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+		second_rite_rule.tower_type = _pick_random_rite_type()
+		expansion_params.placement_rules.insert(2, second_rite_rule)
 
 		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():
@@ -147,6 +150,12 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	island.update_previews(_choices_by_id)
 	UI.display_expansion_choices.emit(options) #now await choice_focused -> _on_expansion_option_clicked
 	_trigger_camera_overview(island) #initial overview of all choices
+
+func _pick_random_rite_type() -> Towers.Type:
+	var rewards := RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
+	if rewards.is_empty():
+		return Towers.Type.VOID
+	return rewards[0].rite_type
 
 # applies the chosen expansion
 func select_expansion(island: Island, choice_id: int) -> void:

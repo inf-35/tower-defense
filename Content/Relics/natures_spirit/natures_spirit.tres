@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://cc6y0hr2pgsep"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cc6y0hr2pgsep"]
 
 [ext_resource type="Texture2D" uid="uid://catq6keljj554" path="res://Assets/natures_spirit.png" id="1_1c5fl"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_1c5fl"]

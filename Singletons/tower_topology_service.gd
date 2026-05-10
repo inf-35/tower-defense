@@ -205,7 +205,7 @@ func _build_offsets(size: Vector2i, query_data: Query) -> Array[Vector2i]:
 	for distance in range(query_data.min_range, query_data.max_range + 1):
 		match query_data.kind:
 			QueryKind.CARDINAL_RING:
-				_add_axis_offsets(offsets, seen, size, distance, _LEGACY_AXIS_MASK)
+				_add_taxicab_ring_offsets(offsets, seen, size, distance, query_data.axis_mask)
 			QueryKind.AXIAL_LINE:
 				_add_axis_offsets(offsets, seen, size, distance, query_data.axis_mask)
 			QueryKind.DIAGONAL_LINE:
@@ -233,11 +233,47 @@ func _add_axis_offsets(offsets: Array[Vector2i], seen: Dictionary, size: Vector2
 		for y in range(size.y):
 			_push_offset(offsets, seen, Vector2i(-distance, y))
 
+func _add_taxicab_ring_offsets(offsets: Array[Vector2i], seen: Dictionary, size: Vector2i, distance: int, axis_mask: int) -> void:
+	for x in range(-distance, size.x + distance):
+		for y in range(-distance, size.y + distance):
+			var offset := Vector2i(x, y)
+			if _distance_to_footprint(offset, size) != distance:
+				continue
+			if not _matches_axis_mask(offset, size, axis_mask):
+				continue
+			_push_offset(offsets, seen, offset)
+
 func _push_offset(offsets: Array[Vector2i], seen: Dictionary, offset: Vector2i) -> void:
 	if seen.has(offset):
 		return
 	seen[offset] = true
 	offsets.append(offset)
+
+func _distance_to_footprint(offset: Vector2i, size: Vector2i) -> int:
+	var dx := 0
+	if offset.x < 0:
+		dx = -offset.x
+	elif offset.x >= size.x:
+		dx = offset.x - size.x + 1
+	var dy := 0
+	if offset.y < 0:
+		dy = -offset.y
+	elif offset.y >= size.y:
+		dy = offset.y - size.y + 1
+	return dx + dy
+
+func _matches_axis_mask(offset: Vector2i, size: Vector2i, axis_mask: int) -> bool:
+	if axis_mask == 0:
+		return false
+	if (axis_mask & AXIS_UP) and offset.y < 0:
+		return true
+	if (axis_mask & AXIS_RIGHT) and offset.x >= size.x:
+		return true
+	if (axis_mask & AXIS_DOWN) and offset.y >= size.y:
+		return true
+	if (axis_mask & AXIS_LEFT) and offset.x < 0:
+		return true
+	return false
 
 func _rotate_offset(offset: Vector2i, base_size: Vector2i, facing: Tower.Facing) -> Vector2i:
 	match facing:

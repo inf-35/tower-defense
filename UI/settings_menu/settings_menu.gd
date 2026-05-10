@@ -91,7 +91,6 @@ func enter_state(input_state: State) -> void:
 # --- Internal Logic ---
 
 func _evaluate_save_validity():
-	print("yes!")
 	#if not state == State.PAUSE:
 		#return
 		

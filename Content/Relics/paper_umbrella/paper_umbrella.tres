@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://c3ae7m3wmqqci"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://c3ae7m3wmqqci"]
 
 [ext_resource type="Script" uid="uid://bio1wo0lv0utn" path="res://Content/Relics/paper_umbrella/paper_umbrella_effect.gd" id="1_bknlg"]
 [ext_resource type="Texture2D" uid="uid://d3aqfapgblt67" path="res://Assets/paper_umbrella_icon.png" id="2_5tldk"]

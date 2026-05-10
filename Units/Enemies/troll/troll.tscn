@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bn2b51cmejpc5"]
+[gd_scene format=3 uid="uid://bn2b51cmejpc5"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_r3k45"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_8wtba"]
@@ -25,7 +25,7 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ej4o"]
 size = Vector2(120.00007, 122.81258)
 
-[node name="TrollUnit" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="TrollUnit" type="Node2D" unique_id=359506842 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_r3k45")
 hostile = true
@@ -41,12 +41,12 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=1882070497]
 script = ExtResource("2_8wtba")
 ignore_walls = true
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=47432647]
 script = ExtResource("3_g7w6o")
 face_towards_movement = false
 movement_data = SubResource("Resource_86qj0")
@@ -54,12 +54,12 @@ jiggle_speed = 4.0
 jiggle_angle = 6.0
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1335706750]
 script = ExtResource("5_bbnn2")
 health_data = ExtResource("6_cbyq1")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=2089178535]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 1)
@@ -68,35 +68,35 @@ shadow_size = Vector2(8, 3.5)
 color = Color(0.1764706, 0.19215687, 0.2784314, 0.34117648)
 metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1429828421]
 position = Vector2(1, -4)
 scale = Vector2(0.096, 0.096)
 texture = ExtResource("7_bvdqm")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=802899695]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("8_yo6oh")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=702247003]
 position = Vector2(10, -30)
 scale = Vector2(0.99999917, 0.99999917)
 shape = SubResource("RectangleShape2D_1ej4o")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1817181267]
 script = ExtResource("9_inom0")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="DefaultBehavior" type="Node" parent="."]
+[node name="DefaultBehavior" type="Node" parent="." unique_id=1842341524]
 script = ExtResource("10_3mlr7")
 metadata/_custom_type_script = "uid://bkf1ak1pxhk0i"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=338261754]
 script = ExtResource("11_h0p7f")
 attack_data = ExtResource("12_bvdqm")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=558765978]
 script = ExtResource("13_bvdqm")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"

@@ -61,7 +61,7 @@ enum Type {
 	RITE_HAMMER,
 	RITE_SCYTHE,
 	RITE_SNAIL,
-	ACADEMY
+	CAMPGROUNDS
 }
 
 enum Element {
@@ -76,6 +76,8 @@ enum Element {
 var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
+
+const VERBOSE: bool = false
 
 func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat based off an unmodified prototype
 	var prototype: Tower = get_tower_prototype(tower_type)
@@ -210,7 +212,7 @@ func _load_all_tower_stats() -> void:
 					var type_name: String = folder_name.to_upper()
 					# convert the string name to the actual enum value
 					if Type.has(type_name):
-						print("Assigned " + resource_path + " to " + type_name)
+						if VERBOSE: print("Assigned " + resource_path + " to " + type_name)
 						var tower_type: Type = Type[type_name]
 						tower_stats[tower_type] = stat_resource
 					else:

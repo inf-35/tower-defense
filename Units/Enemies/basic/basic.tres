@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://ki06q2nupqr4"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://ki06q2nupqr4"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_38k20"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_iugvc"]
@@ -12,5 +12,5 @@ title = "Goblin"
 description = "Weak, yet dangerous in numbers."
 stat_displays = Array[ExtResource("2_iugvc")]([ExtResource("3_5ux05"), ExtResource("4_sh6hu")])
 unit_scene = ExtResource("5_r3od5")
-flux_value = 0.7
+flux_value = 1.2
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

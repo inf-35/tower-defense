@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://14ryroruquth"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://14ryroruquth"]
 
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_50urh"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_vwkbd"]
@@ -15,7 +15,7 @@ upgrades_into = Dictionary[int, float]({
 27: 1.0
 })
 tower_name = "Plant"
-tower_description = "Wild flora repurposed into killing machine, the plant starts off weak but grows stronger (+10% initial {UNIT_DAMAGE}) each wave."
+tower_description = "Wild flora domesticated into killing machine. Gains +0.3 {UNIT_DAMAGE} per nearby {T_FOREST} within 2 cardinal tiles."
 icon = ExtResource("5_50urh")
 preview = ExtResource("5_50urh")
 tower_scene = ExtResource("3_huqpa")

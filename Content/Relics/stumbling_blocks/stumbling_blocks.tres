@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=8 format=3 uid="uid://clyv4pfesggb3"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://clyv4pfesggb3"]
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_i1wg1"]
 [ext_resource type="Script" uid="uid://c6lrutd6k1p1l" path="res://Content/Relics/stumbling_blocks/ruined_ground_relic.gd" id="2_bkglv"]

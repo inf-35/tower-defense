@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=14 format=3 uid="uid://bbovk7qh751ho"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://bbovk7qh751ho"]
 
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5tggy"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_j3b25"]

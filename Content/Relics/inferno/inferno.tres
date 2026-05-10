@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://cvsugm8vn8kjy"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cvsugm8vn8kjy"]
 
 [ext_resource type="Script" uid="uid://bl072eqclcpj1" path="res://Content/Relics/inferno/status_compound_effect.gd" id="1_hfy0w"]
 [ext_resource type="Texture2D" uid="uid://x85oty32fyk4" path="res://Assets/blackpowder.png" id="2_7jw3c"]

@@ -30,12 +30,14 @@ func _init():
 	pass
 	
 func detach() -> void:
+	enabled = false
 	if is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 	
 func attach_to(_host: Unit) -> void:
 	detach()
 	host = _host
+	enabled = true
 	
 	if is_instance_valid(host):
 		if host.abstractive:
@@ -44,9 +46,12 @@ func attach_to(_host: Unit) -> void:
 			effect_prototype.attach_handler.call(self)
 
 func attach_global() -> void: ##for attaching as a global effect
+	enabled = true
 	effect_prototype.attach_handler.call(self)
 
 func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit in setup_event_bus
+	if not enabled:
+		return
 	if not global:
 		if not is_instance_valid(host):
 			return

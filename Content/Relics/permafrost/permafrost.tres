@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://j7epcpye37my"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://j7epcpye37my"]
 
 [ext_resource type="Script" uid="uid://n4hk6ylcusd2" path="res://Content/Relics/permafrost/permafrost_effect.gd" id="1_2wcwk"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_2wcwk"]

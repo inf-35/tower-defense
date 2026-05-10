@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=5 format=3 uid="uid://wilx6e67j6un"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://wilx6e67j6un"]
 
 [ext_resource type="Texture2D" uid="uid://coyux68csxk8e" path="res://Assets/straw_hat.png" id="1_ili8f"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_fd2sd"]

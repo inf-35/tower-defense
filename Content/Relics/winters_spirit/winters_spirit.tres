@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://3gfb1ujydb5l"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://3gfb1ujydb5l"]
 
 [ext_resource type="Texture2D" uid="uid://cmlpomov80gqa" path="res://Assets/frost_spirit.png" id="1_belbj"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="2_belbj"]

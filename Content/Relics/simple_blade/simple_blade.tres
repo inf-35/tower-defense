@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=6 format=3 uid="uid://fp1hhngscll3"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://fp1hhngscll3"]
 
 [ext_resource type="Script" uid="uid://bx0jig5k8v7tt" path="res://Content/Relics/simple_blade/simple_blade_effect.gd" id="1_ardha"]
 [ext_resource type="Texture2D" uid="uid://dk7tkkbc6if6w" path="res://Assets/simple_blade.png" id="2_ardha"]

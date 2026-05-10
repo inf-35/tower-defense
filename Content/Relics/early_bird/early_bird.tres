@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=9 format=3 uid="uid://bfrry0ojjyk5f"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://bfrry0ojjyk5f"]
 
 [ext_resource type="Script" uid="uid://d4h1djnngjtxl" path="res://Content/Relics/early_bird/early_bird_effect.gd" id="2_0l13k"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_gubha"]

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=7 format=3 uid="uid://dubd7pcr7wbnk"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dubd7pcr7wbnk"]
 
 [ext_resource type="PackedScene" uid="uid://b7ikev455648n" path="res://Content/Relics/mucous_sac/poison_cloud.tscn" id="1_i5j5g"]
 [ext_resource type="Script" uid="uid://crqsbq6q4f12w" path="res://Content/Relics/mucous_sac/mucous_sac_effect.gd" id="2_xhwtb"]
