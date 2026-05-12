@@ -78,6 +78,7 @@ var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
 const VERBOSE: bool = false
+const PROTOTYPE_LOAD_CHUNK: int = 4
 
 func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat based off an unmodified prototype
 	var prototype: Tower = get_tower_prototype(tower_type)
@@ -232,3 +233,15 @@ func _init():
 func start():
 	for tower_type in tower_stats:
 		get_tower_prototype(tower_type)
+
+func start_async(progress_callback: Callable = Callable()) -> void:
+	var tower_types: Array = tower_stats.keys()
+	var total_types: int = maxi(tower_types.size(), 1)
+
+	for i: int in range(tower_types.size()):
+		get_tower_prototype(tower_types[i])
+		if (i + 1) % PROTOTYPE_LOAD_CHUNK == 0 or i == tower_types.size() - 1:
+			if progress_callback.is_valid():
+				var t := float(i + 1) / float(total_types)
+				progress_callback.call("Preparing towers...", lerpf(0.24, 0.58, t))
+			await get_tree().process_frame

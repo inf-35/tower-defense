@@ -9,6 +9,7 @@ signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
 static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
+const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -66,6 +67,7 @@ const BEHAVIOR_CYCLE: int = 3
 var behavior_stagger: int = 0
 
 func _ready():
+	add_to_group(DebugAssistant.GROUP_UNITS)
 	behavior_stagger = randi_range(0, BEHAVIOR_CYCLE)
 	name = name + " " + str(unit_id)
 	_setup_event_bus()
@@ -162,9 +164,10 @@ func _prepare_components() -> void:
 	)
 	
 	if graphics != null:
-		var unit_effects_shader_material: ShaderMaterial = ShaderMaterial.new()
-		unit_effects_shader_material.shader = preload("res://Shaders/unit_effects.gdshader")
+		var unit_effects_shader_material := ShaderMaterial.new()
+		unit_effects_shader_material.shader = UNIT_EFFECT_SHADER
 		graphics.material = unit_effects_shader_material
+		graphics.visible = not DebugAssistant.hide_unit_graphics
 
 	if navigation_component != null:
 		navigation_component.inject_components(movement_component)
@@ -230,7 +233,7 @@ func _setup_event_bus() -> void:
 	)
 
 func _attach_health_bar() -> void:
-	if abstractive or disabled:
+	if abstractive or disabled or DebugAssistant.disable_hp_bars:
 		return
 		
 	var hp_bar = HP_BAR_SCENE.instantiate()

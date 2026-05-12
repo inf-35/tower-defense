@@ -11,8 +11,10 @@ var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon]
 const VERTICAL_OFFSET: Vector2 = Vector2(0,-5)
 
 func setup(unit: Unit, health_comp: HealthComponent) -> void:
+	add_to_group(DebugAssistant.GROUP_HP_BARS)
 	_parent_unit = unit
 	_health_component = health_comp
+	_status_icons = {}
 	
 	_health_component.health_changed.connect(_on_health_changed)
 	visible = false
@@ -45,6 +47,14 @@ func _on_health_changed(new_health: float) -> void:
 	visible = is_damaged and is_alive
 	
 func _on_status_changed(status: Attributes.Status, stacks: float, duration: float):
+	if DebugAssistant.disable_status_icons:
+		if _status_icons.has(status):
+			var icon_to_remove: UnitStatusIcon = _status_icons[status]
+			_status_icons.erase(status)
+			icon_to_remove.free()
+			_reposition_icons()
+		return
+
 	if stacks <= 0.0: #removal
 		if not _status_icons.has(status):
 			return
@@ -58,12 +68,18 @@ func _on_status_changed(status: Attributes.Status, stacks: float, duration: floa
 	else: #addition/refresh
 		if not _status_icons.has(status):
 			_status_icons[status] = preload("res://UI/unit_hp_bar/status_icon.tscn").instantiate()
-			_status_icons[status].setup(status)
-			add_child(_status_icons[status])
+			add_child.call_deferred(_status_icons[status])
+			_status_icons[status].ready.connect(func():
+				_status_icons[status].setup(status)
+				_status_icons[status].update_data(stacks, duration)
+				_reposition_icons()
+				CONNECT_ONE_SHOT
+			)
+			return
 
 		_status_icons[status].update_data(stacks, duration)
-		_reposition_icons() 
-		
+		_reposition_icons()
+
 func _reposition_icons() -> void:
 	var active_icons: Array[UnitStatusIcon] = _status_icons.values()
 	var spacing: float = 2.0
@@ -80,5 +96,3 @@ func _reposition_icons() -> void:
 		icon.position = VERTICAL_OFFSET
 		icon.position.x = 0.0 - total_width * 0.5 + w * 0.5 + accumulated_width
 		accumulated_width += w
-		
-		

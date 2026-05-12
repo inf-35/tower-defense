@@ -1,11 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://m6uvw5uwem5a"]
+[gd_scene format=3 uid="uid://m6uvw5uwem5a"]
 
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_fxei5"]
 [ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="2_ml2c4"]
 [ext_resource type="Script" uid="uid://r6r6mrya0npo" path="res://UI/unit_hp_bar/unit_status_icon.gd" id="3_ml2c4"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_s8phw"]
 
-[node name="StatusIcon" type="TextureProgressBar" node_paths=PackedStringArray("stack_label")]
+[node name="StatusIcon" type="TextureProgressBar" unique_id=984098286 node_paths=PackedStringArray("stack_label")]
 offset_right = 46.0
 offset_bottom = 38.0
 scale = Vector2(0.1, 0.1)
@@ -23,7 +23,7 @@ tint_under = Color(1, 1, 1, 0.12156863)
 script = ExtResource("3_ml2c4")
 stack_label = NodePath("InteractiveRichTextLabel")
 
-[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="."]
+[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="." unique_id=1969155192]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0

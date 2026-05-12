@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://wv1a4nst6xfl"]
+
+[ext_resource type="Script" uid="uid://b5v6d6xy80icm" path="res://UI/loading_screen/loading_screen.gd" id="1_1"]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_1"]
+
+[node name="LoadingScreen" type="Control" unique_id=822467203 node_paths=PackedStringArray("status_label", "progress_bar")]
+z_index = 1000
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_1")
+script = ExtResource("1_1")
+status_label = NodePath("MarginContainer/PanelContainer/MarginContainer/VBoxContainer/Label")
+progress_bar = NodePath("MarginContainer/PanelContainer/MarginContainer/VBoxContainer/ProgressBar")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=536501946]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9490196, 0.90588236, 0.8352941, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1766990745]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1942359971]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer" unique_id=1201417773]
+layout_mode = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer" unique_id=1423835265]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=616312373]
+layout_mode = 2
+text = "Preparing island..."
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=147642060]
+custom_minimum_size = Vector2(360, 24)
+layout_mode = 2
+show_percentage = false

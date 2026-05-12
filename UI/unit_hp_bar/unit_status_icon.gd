@@ -8,6 +8,7 @@ var _current_duration: float = 0.0
 var _max_seen_duration: float = 0.1 # Prevent div by zero
 
 func setup(status: Attributes.Status) -> void:
+	add_to_group(DebugAssistant.GROUP_STATUS_ICONS)
 	var icon_texture: Texture2D = Attributes.get_icon(status)
 	texture_under = icon_texture
 	texture_progress = icon_texture

@@ -63,3 +63,4 @@ signal update_inspector_bar(tower: Tower)
 static var tutorial_manager: TutorialManager
 static var cursor_info: CursorInfo
 static var floating_text_manager: FloatingTextManager
+static var loading_screen: LoadingScreen

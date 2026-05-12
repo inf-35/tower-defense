@@ -1,6 +1,8 @@
 extends Node2D
 class_name ShadowComponent
 
+const SILHOUETTE_SHADER := preload("res://Shaders/silhouette.gdshader")
+
 # Defines "Height": Multiplies the global offset.
 # 1.0 = Standard, 0.5 = Short box, 3.0 = Tall Tower
 @export var height_multiplier: float = 1.0 
@@ -29,6 +31,11 @@ func _ready():
 		push_warning("ShadowCaster: No parent Sprite2D found!")
 		return
 
+	if DebugAssistant.disable_shadows:
+		return
+
+	add_to_group(DebugAssistant.GROUP_SHADOW_COMPONENTS)
+
 	# 2. Create the Shadow Sprite
 	shadow_sprite = Sprite2D.new()
 	# Draw behind the parent
@@ -43,12 +50,11 @@ func _ready():
 
 	# 3. Apply the Silhouette Shader
 	shadow_material = ShaderMaterial.new()
-	shadow_material.shader = load("res://Shaders/silhouette.gdshader") # UPDATE THIS PATH
+	shadow_material.shader = SILHOUETTE_SHADER
 	shadow_sprite.material = shadow_material
 	
 	height_material = ShaderMaterial.new()
-	height_material.shader = load("res://Shaders/silhouette.gdshader") # UPDATE THIS PATH
-	
+	height_material.shader = SILHOUETTE_SHADER
 	height_sprite.material = height_material
 	
 	# 4. Connect to Sun changes

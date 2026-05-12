@@ -26,6 +26,8 @@ func _ready() -> void:
 # --- Public API ---
 
 func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, scale_mod: float = 1.0) -> void:
+	if DebugAssistant.disable_floating_text:
+		return
 	var str_val = str(snappedf(value, 0.1))
 	var final_color = color
 	var scale_mult = scale_mod
@@ -33,9 +35,13 @@ func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, sc
 	_spawn_text(str_val, world_pos, final_color, scale_mult)
 
 func show_text(text: String, world_pos: Vector2, color: Color) -> void:
+	if DebugAssistant.disable_floating_text:
+		return
 	_spawn_text(text, world_pos, color, 1.0)
 
 func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0) -> void:
+	if DebugAssistant.disable_floating_text:
+		return
 	if not icon: return
 
 	var instance: FloatingText

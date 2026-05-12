@@ -56,12 +56,22 @@ func _ready() -> void:
 	wave_ended.connect(UI.end_wave.emit)
 	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
 	
-func start_game() -> void:
+func start_game(progress_callback: Callable = Callable()) -> void:
+	_report_loading(progress_callback, "Preparing references...", 0.08)
+	await get_tree().process_frame
 	Clock.start()
 	References.start()
 	ClickHandler.start()
+
+	_report_loading(progress_callback, "Loading enemy data...", 0.16)
+	await get_tree().process_frame
 	Units.start()
-	Towers.start()
+
+	_report_loading(progress_callback, "Preparing towers...", 0.24)
+	await Towers.start_async(progress_callback)
+
+	_report_loading(progress_callback, "Starting services...", 0.6)
+	await get_tree().process_frame
 	Player.start()
 	SpawnPointService.start()
 	TowerNetworkManager.start()
@@ -70,16 +80,20 @@ func start_game() -> void:
 	current_game_environment = GameEnvironment.WOODS
 	
 	if SaveLoad.has_save_file():
+		_report_loading(progress_callback, "Loading save...", 0.7)
+		await get_tree().process_frame
 		_report("Starting from save file.")
 		SaveLoad.load_game()
 	else:
 		await References.references_ready
-		begin_new_game()
+		await begin_new_game(progress_callback)
 		Player.begin_new_game()
 
-func begin_new_game():
+func begin_new_game(progress_callback: Callable = Callable()) -> void:
+	_report_loading(progress_callback, "Loading profile...", 0.62)
+	await get_tree().process_frame
 	SaveLoad.load_profile()
-	References.island.generate_new_island()
+	await References.island.generate_new_island()
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
 	
@@ -94,6 +108,10 @@ func begin_new_game():
 	start_tutorial()
 	
 	_prepare_for_next_wave_cycle()
+
+func _report_loading(progress_callback: Callable, message: String, progress: float) -> void:
+	if progress_callback.is_valid():
+		progress_callback.call(message, progress)
 	
 func start_tutorial():
 	var steps: Array[TutorialStep] = [

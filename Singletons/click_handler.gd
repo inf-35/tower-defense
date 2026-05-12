@@ -42,6 +42,8 @@ func _process(_delta: float) -> void:
 		return
 	if not enabled or not is_instance_valid(UI.cursor_info):
 		return
+	if not is_instance_valid(References.camera):
+		return
 		
 	match current_state:
 		State.IDLE:

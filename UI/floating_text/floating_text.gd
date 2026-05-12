@@ -10,6 +10,9 @@ var _lifetime: float
 var _age: float
 var _manager_ref: FloatingTextManager
 
+func _ready() -> void:
+	add_to_group(DebugAssistant.GROUP_FLOATING_TEXTS)
+
 func setup(text_val: String, pos: Vector2, color: Color, velocity: Vector2, gravity: float, lifetime: float, manager) -> void:
 	icon_rect.visible = false
 	text = text_val

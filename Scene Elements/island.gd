@@ -48,28 +48,45 @@ const LAKE_MIN_NEIGHBORS: int = 2
 
 func _ready():
 	Phases.in_game = true
-	
+
 	expansion_service = ExpansionService.new()
 	topology_service = TowerTopologyService.new(self)
 	add_child.call_deferred(expansion_service)
-	
-	Phases.start_game()
-	#register self with services that need references
 	PowerService.register_island(self)
+	_show_loading("Preparing island...", 0.0)
+
+	_boot_game.call_deferred()
 	#generate_new_island called by Phases
 
+func _boot_game() -> void:
+	await get_tree().process_frame
+	await Phases.start_game(_set_loading_status)
+	_hide_loading()
+
 func generate_new_island() -> void:
+	_set_loading_status("Preparing terrain...", 0.66)
 	terrain_renderer.start()
 	_setup_preview_renderer()
 	_setup_lake_preview_renderer()
 	_clear_island_state()
+	await get_tree().process_frame
+
+	_set_loading_status("Sketching lakes...", 0.74)
 	lake_seed = randi()
 	_generate_lake_cells()
+	await get_tree().process_frame
+
+	_set_loading_status("Growing island...", 0.84)
 	# initial terrain generation
 	var starting_block: Dictionary = expansion_service.generate_initial_island_block(self, 50)
+	await get_tree().process_frame
+
+	_set_loading_status("Painting terrain...", 0.9)
 	# delegate application of the block to the TerrainService
 	TerrainService.expand_island(self, starting_block)
-	
+	await get_tree().process_frame
+
+	_set_loading_status("Placing core...", 0.96)
 	# place the player's core tower
 	var keep: Tower = construct_tower_at(Vector2i.ZERO, Towers.Type.PLAYER_CORE) #NOTE: this must come first (id = 0)
 	References.keep = keep
@@ -78,6 +95,16 @@ func generate_new_island() -> void:
 	update_navigation_grid()
 	update_lake_preview()
 	queue_redraw()
+	await get_tree().process_frame
+
+func _show_loading(message: String, progress: float = -1.0) -> void:
+	UI.loading_screen.show_loading(message, progress)
+
+func _hide_loading() -> void:
+	UI.loading_screen.hide_loading()
+
+func _set_loading_status(message: String, progress: float = -1.0) -> void:
+	UI.loading_screen.show_loading(message, progress)
 
 func _setup_preview_renderer() -> void:
 	preview_renderer.cell_size = CELL_SIZE
