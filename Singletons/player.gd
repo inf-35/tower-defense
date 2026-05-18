@@ -137,11 +137,13 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
+
 	}
 	#
 	#var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.SIMPLE_BLADE
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_DRUMS
+	#RewardService.apply_reward(reward)
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)

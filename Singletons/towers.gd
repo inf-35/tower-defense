@@ -170,6 +170,7 @@ func create_tower(tower_type: Type) -> Tower:
 	var tower: Tower = get_tower_scene(tower_type).instantiate()
 	tower.type = tower_type
 	tower.flux_value = get_tower_cost(tower_type)
+	tower.set_meta(ID.UnitMeta.IS_IMPORTANT, true) #towers are always important
 	return tower
 
 func _load_all_tower_stats() -> void:

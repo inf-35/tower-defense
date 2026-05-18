@@ -1,6 +1,7 @@
 extends Behavior
 class_name DrumRiteBehavior
 
+@export var icon: Texture2D
 @export var trigger_chance: float = 0.20
 
 #tracks currently connected towers to avoid double connections
@@ -72,6 +73,7 @@ func _trigger_all_except(exception: Tower) -> void:
 		if t == exception: continue
 		if is_instance_valid(t) and is_instance_valid(t.attack_component):
 			t.attack_component.current_cooldown = 0.0
+			UI.floating_text_manager.show_icon(icon, t.global_position)
 			
 func draw_visuals(canvas: RangeIndicator) -> void:
 	draw_visuals_adjacent_tiles(canvas)

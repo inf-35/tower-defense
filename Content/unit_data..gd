@@ -2,8 +2,10 @@ extends Resource
 class_name UnitData
 
 @export var title: String
+@export var icon: Texture2D
 @export_multiline var description: String
 @export var stat_displays: Array[StatDisplayInfo] = []
+@export var important: bool = false ## used for hp bar determination
 
 @export var unit_scene: PackedScene
 

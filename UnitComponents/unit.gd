@@ -8,7 +8,7 @@ signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto 
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
-static var HP_BAR_SCENE = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
+const HP_BAR_SCENE := preload("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
@@ -47,6 +47,7 @@ var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x
 } 
 #unit state
 var unit_id: int = References.assign_unit_id()
+var enemy_type: Units.Type ##assigned by Units.create_unit
 var blocked: bool #whether this unit is currently blocked by a tower
 
 var abstractive: bool: #fathis unit is not an actual unit (see prototypes, Towers)
@@ -236,9 +237,23 @@ func _attach_health_bar() -> void:
 	if abstractive or disabled or DebugAssistant.disable_hp_bars:
 		return
 		
-	var hp_bar = HP_BAR_SCENE.instantiate()
-	add_child(hp_bar)
-	hp_bar.setup(self, health_component)
+	var hp_bar : UnitHPBar = HP_BAR_SCENE.instantiate()
+	add_child.call_deferred(hp_bar)
+	hp_bar.ready.connect(func():
+		hp_bar.setup(self, health_component)
+		# connect hitbox mouse events to the hp bar
+		var hitbox_node := hitbox
+		hitbox_node.visible = true #doesnt actl affect graphics, just makes it hoverable
+		hitbox_node.process_mode = Node.PROCESS_MODE_ALWAYS #allows hovering to work even when paused
+		if is_instance_valid(hitbox_node):
+			# ensure hitbox is pickable
+			hitbox_node.input_pickable = true
+			
+			hitbox_node.mouse_entered.connect(hp_bar.on_mouse_entered)
+			hitbox_node.mouse_exited.connect(hp_bar.on_mouse_exited),
+			
+		CONNECT_ONE_SHOT
+	)
 
 func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:

@@ -49,6 +49,7 @@ var _path_cache_dirty: bool = true
 var _preview_dirty: bool = false
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	scale = Vector2.ONE
 
 	var island: Island = get_parent() as Island

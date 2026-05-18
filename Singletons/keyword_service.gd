@@ -110,7 +110,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"RITE_LABEL": {
 		"title": "Rite",
 		"display": "[Rite]",
-		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field. Cannot be moved once placed.",
+		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field.",
 		"icon": null,
 	},
 	"KEYWORD_TUTORIAL": {
@@ -288,7 +288,7 @@ func _resolve_unit_data(unit_id_str: String) -> Dictionary:
 		"title": Units.get_unit_name(type),
 		"labels": "[Unit]",
 		"description": desc,
-		"icon": null,
+		"icon": Units.get_unit_icon(type),
 	}
 	
 func resolve_unit_description_from_type(type: Units.Type) -> String:

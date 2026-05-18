@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://c0v2rl1btmv55"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://c0v2rl1btmv55"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_h5q3w"]
 [ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="1_qp5fc"]
@@ -21,7 +21,7 @@ upgrades_into = Dictionary[int, float]({
 26: 4.0
 })
 tower_name = "Wall"
-tower_description = "A simple wall."
+tower_description = "A simple wall. Has double the {UNIT_HP|label=Health} of most structures."
 preview = ExtResource("4_mo865")
 inspector_actions = Array[ExtResource("2_mo865")]([SubResource("Resource_74q3n"), ExtResource("3_mo865")])
 tower_scene = ExtResource("2_8e64g")

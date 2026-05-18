@@ -71,21 +71,20 @@ func start_game(progress_callback: Callable = Callable()) -> void:
 	await Towers.start_async(progress_callback)
 
 	_report_loading(progress_callback, "Starting services...", 0.6)
-	await get_tree().process_frame
 	Player.start()
 	SpawnPointService.start()
 	TowerNetworkManager.start()
+	References.start()
 	
 	current_game_scaling = 1.0
 	current_game_environment = GameEnvironment.WOODS
-	
+	await References.references_ready
 	if SaveLoad.has_save_file():
 		_report_loading(progress_callback, "Loading save...", 0.7)
-		await get_tree().process_frame
 		_report("Starting from save file.")
 		SaveLoad.load_game()
 	else:
-		await References.references_ready
+		
 		await begin_new_game(progress_callback)
 		Player.begin_new_game()
 
@@ -313,7 +312,9 @@ func _start_building_phase() -> void:
 	UI.start_phase.emit(current_wave_number, false, DayEvent.NONE)
 	_report("starting building phase for wave " + str(current_wave_number))
 	UI.show_building_ui.emit()
-	UI.building_phase_ended.connect(_on_player_ended_building_phase, CONNECT_ONE_SHOT)
+	if not UI.building_phase_ended.is_connected(_on_player_ended_building_phase): #current workaroudn
+		#as singletons persist across games, TODO: reimplement singletons as objects tied to a game
+		UI.building_phase_ended.connect(_on_player_ended_building_phase, CONNECT_ONE_SHOT)
 
 func _on_player_ended_building_phase() -> void:
 	if current_phase != GamePhase.BUILDING:

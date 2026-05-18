@@ -65,7 +65,6 @@ scale = Vector2(0.10810186, 0.10810187)
 texture = ExtResource("7_n0rgw")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1496709801]
-visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false

@@ -9,6 +9,9 @@ class UnitState: ##for ui/attribute resolution
 	
 	const CAPACITY_GENERATED: StringName = &"capacity_generated"
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"
+
+class UnitMeta: ##for meta attribute
+	const IS_IMPORTANT: StringName = &"is_important" ##is a unit "important"? see unitdata
 	
 class TerrainGen:
 	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves" #used for pregen feature initial state definition

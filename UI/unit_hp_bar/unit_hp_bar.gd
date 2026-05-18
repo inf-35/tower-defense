@@ -8,6 +8,10 @@ var _parent_unit: Node2D
 
 var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon]
 
+var _is_hovered: bool = false
+var _is_selected: bool = false
+var _is_important: bool = false
+
 const VERTICAL_OFFSET: Vector2 = Vector2(0,-5)
 
 func setup(unit: Unit, health_comp: HealthComponent) -> void:
@@ -15,8 +19,9 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	_parent_unit = unit
 	_health_component = health_comp
 	_status_icons = {}
-	
+
 	_health_component.health_changed.connect(_on_health_changed)
+	_on_health_changed(_health_component.health)
 	visible = false
 	
 	var max_hp: float = unit.get_stat(Attributes.id.MAX_HEALTH)
@@ -30,21 +35,34 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	
 	if unit.modifiers_component:
 		unit.modifiers_component.status_changed.connect(_on_status_changed)
+		
+	if unit.has_meta(ID.UnitMeta.IS_IMPORTANT) and unit.get_meta(ID.UnitMeta.IS_IMPORTANT):
+		_is_important = true
+	UI.update_inspector_bar.connect(_on_global_selection_changed)
+	_evaluate_visibility()
+	
+func _evaluate_visibility() -> void: ## visibility state machine
+	var is_alive = value > 0
+	var is_damaged = value < max_value
+	var has_intent = _is_hovered or _is_selected or (_is_important and is_damaged)
+	
+	# bar (and all child status icons) are only visible if intended and alive
+	visible = has_intent
 
 func _process(_delta):
-	if is_instance_valid(_parent_unit):
+	if is_instance_valid(_parent_unit) and visible:
 		rotation = -_parent_unit.rotation #counter rotate
 		
 func _on_health_changed(new_health: float) -> void:
 	value = new_health
 	max_value = _health_component.max_health # Update max in case of buffs
-	
-	# Visibility Logic:
-	# Show if damaged (health < max) AND alive (health > 0)
-	var is_damaged = new_health < max_value
-	var is_alive = new_health > 0
-	
-	visible = is_damaged and is_alive
+	_evaluate_visibility()
+	## Visibility Logic:
+	## Show if damaged (health < max) AND alive (health > 0)
+	#var is_damaged = new_health < max_value
+	#var is_alive = new_health > 0
+	#
+	#visible = is_damaged and is_alive
 	
 func _on_status_changed(status: Attributes.Status, stacks: float, duration: float):
 	if DebugAssistant.disable_status_icons:
@@ -79,7 +97,21 @@ func _on_status_changed(status: Attributes.Status, stacks: float, duration: floa
 
 		_status_icons[status].update_data(stacks, duration)
 		_reposition_icons()
+		
+# hitbox interaction handlers (see unit._attach_health_bar)
+func on_mouse_entered() -> void:
+	_is_hovered = true
+	_evaluate_visibility()
 
+func on_mouse_exited() -> void:
+	_is_hovered = false
+	_evaluate_visibility()
+
+func _on_global_selection_changed(selected_unit: Unit) -> void:
+	# Toggle selection state based on if we are the chosen one
+	_is_selected = (selected_unit == _parent_unit)
+	_evaluate_visibility()
+	
 func _reposition_icons() -> void:
 	var active_icons: Array[UnitStatusIcon] = _status_icons.values()
 	var spacing: float = 2.0

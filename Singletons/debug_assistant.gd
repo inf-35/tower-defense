@@ -7,10 +7,10 @@ const GROUP_STATUS_ICONS: StringName = &"debug_status_icons"
 const GROUP_FLOATING_TEXTS: StringName = &"debug_floating_texts"
 
 var hide_unit_graphics: bool = false
-var disable_shadows: bool = true
-var disable_hp_bars: bool = true
-var disable_status_icons: bool = true
-var disable_floating_text: bool = true
+var disable_shadows: bool = false
+var disable_hp_bars: bool = false
+var disable_status_icons: bool = false
+var disable_floating_text: bool = false
 func reset_visual_debug_flags() -> void:
 	hide_unit_graphics = false
 	disable_shadows = false

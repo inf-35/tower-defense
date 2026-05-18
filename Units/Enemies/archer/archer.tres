@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=9 format=3 uid="uid://8vgkem8mwbdq"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://8vgkem8mwbdq"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_i5oot"]
+[ext_resource type="Texture2D" uid="uid://cnrv2tyylnxyv" path="res://Assets/archer.png" id="1_pqcdf"]
 [ext_resource type="PackedScene" uid="uid://dfaw7qc5m52dy" path="res://Units/Enemies/archer/archer.tscn" id="2_bv1r0"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_pi0cq"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_odjfi"]
@@ -12,6 +13,7 @@
 [resource]
 script = ExtResource("1_i5oot")
 title = "Archer"
+icon = ExtResource("1_pqcdf")
 description = "Shoots arrows from afar at the closest tower."
 stat_displays = Array[ExtResource("2_pi0cq")]([ExtResource("3_odjfi"), ExtResource("4_180bx"), ExtResource("5_7s8kf"), ExtResource("6_pqcdf"), ExtResource("7_uk7lt")])
 unit_scene = ExtResource("2_bv1r0")

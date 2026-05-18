@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bw043041548tj"]
 
+[ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="1_00b60"]
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_2qfkt"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_00b60"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_c42nr"]
@@ -9,6 +10,7 @@
 [resource]
 script = ExtResource("1_2qfkt")
 title = "Orc"
+icon = ExtResource("1_00b60")
 description = "Strong yet slow."
 stat_displays = Array[ExtResource("2_00b60")]([ExtResource("3_c42nr"), ExtResource("4_u3yoc")])
 unit_scene = ExtResource("5_123hm")

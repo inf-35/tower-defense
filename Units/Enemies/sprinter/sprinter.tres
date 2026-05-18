@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://drhwn8nkwoiep"]
 
+[ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="1_8kjmg"]
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_mf7or"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3ypsr"]
 [ext_resource type="PackedScene" uid="uid://kdo8nuuiowl5" path="res://Units/Enemies/sprinter/sprinter.tscn" id="2_ceu77"]
@@ -9,6 +10,7 @@
 [resource]
 script = ExtResource("1_mf7or")
 title = "Sprinter"
+icon = ExtResource("1_8kjmg")
 description = "Footsoldier that gets faster and faster as time passes."
 stat_displays = Array[ExtResource("2_3ypsr")]([ExtResource("3_3ypsr"), ExtResource("4_8kjmg")])
 unit_scene = ExtResource("2_ceu77")

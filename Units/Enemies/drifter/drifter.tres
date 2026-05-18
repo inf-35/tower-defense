@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3 uid="uid://do3ib4ydhioaa"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://do3ib4ydhioaa"]
 
+[ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="1_bsfb6"]
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_cn370"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_cs1ho"]
 [ext_resource type="PackedScene" uid="uid://bhpgyu3tdyuh6" path="res://Units/Enemies/drifter/drifter.tscn" id="2_mvn4i"]
@@ -9,6 +10,7 @@
 [resource]
 script = ExtResource("1_cn370")
 title = "Assassin"
+icon = ExtResource("1_bsfb6")
 description = "Very fast"
 stat_displays = Array[ExtResource("2_cs1ho")]([ExtResource("3_bsfb6"), ExtResource("4_pafox")])
 unit_scene = ExtResource("2_mvn4i")

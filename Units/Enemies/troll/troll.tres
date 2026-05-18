@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=9 format=3 uid="uid://dtuoi4uublbd4"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dtuoi4uublbd4"]
 
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="1_ie7yu"]
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_t4jdu"]
 [ext_resource type="PackedScene" uid="uid://bn2b51cmejpc5" path="res://Units/Enemies/troll/troll.tscn" id="2_7o2a8"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_34ncb"]
@@ -12,8 +13,10 @@
 [resource]
 script = ExtResource("1_t4jdu")
 title = "Troll"
+icon = ExtResource("1_ie7yu")
 description = "Massive unit that pathfinds directly to your keep, smashing towers in its path."
 stat_displays = Array[ExtResource("2_34ncb")]([ExtResource("3_ie7yu"), ExtResource("4_ewk0k"), ExtResource("5_3ghmx"), ExtResource("6_etyv3"), ExtResource("7_ei6jt")])
+important = true
 unit_scene = ExtResource("2_7o2a8")
 flux_value = 1.0
 strength_value = 3.0

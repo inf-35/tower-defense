@@ -9,5 +9,4 @@ id_name = "blood_rite"
 description = "this is a relic reward description"
 type = 3
 rite_type = 50
-base_weight = 0.0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

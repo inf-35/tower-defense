@@ -18,7 +18,7 @@ class_name Inspector
 @export var stats_per_line: int = 3
 
 var inspector_mode: InspectorMode
-var current_tower: Tower
+var current_unit: Unit
 var _preview_upgrade_type: Towers.Type = Towers.Type.VOID ## void means no preview (normal mode)
 
 enum InspectorMode {
@@ -31,60 +31,71 @@ func _ready():
 
 	UI.update_inspector_bar.connect(_on_inspector_contents_tower_update)
 	UI.update_unit_state.connect(func(unit : Unit):
-		if unit == current_tower: 
-			_on_inspector_contents_tower_update(current_tower)
+		if unit == current_unit: 
+			_on_inspector_contents_tower_update(current_unit)
 	)
 	UI.update_unit_health.connect(func(unit : Unit, max_hp : float, hp : float):
-		if unit == current_tower:
-			_on_inspected_tower_health_update(current_tower, max_hp, hp)
+		if unit == current_unit:
+			_on_inspected_tower_health_update(current_unit, max_hp, hp)
 	)
 
 
-func _on_inspector_contents_tower_update(tower : Tower):
-	if not tower.is_ready:
-		await tower.components_ready
+func _on_inspector_contents_tower_update(unit : Unit):
+	if not unit.is_ready:
+		await unit.components_ready
 	
 	stats.columns = stats_per_line
 	
-	if tower != current_tower: #this is a new tower being switched to
-		tower.on_event.connect(func(event: GameEvent):
+	if unit != current_unit: #this is a new unit being switched to
+		unit.on_event.connect(func(event: GameEvent):
 			if event.event_type != GameEvent.EventType.REPLACED:
 				return
 				
 			var data := event.data as UnitReplacedData
-			if data.old_unit == current_tower:
-				_on_inspected_tower_replaced(current_tower, data.new_unit as Tower)
+			if data.old_unit == current_unit:
+				_on_inspected_tower_replaced(current_unit, data.new_unit as Tower)
 		)
 	
-	current_tower = tower
-	# update header/desc normally
-	_update_header_visuals(tower.type)
+	current_unit = unit
 	# reset preview state when switching towers
 	_preview_upgrade_type = Towers.Type.VOID
 
-	
+	# update header/desc normally
+	_update_header_visuals(unit)
 	_refresh_stats() # update stats
 	
-	tower.get_unit_state() #this prompts the tower to send us its health too
+	unit.get_unit_state() #this prompts the unit to send us its health too
 	
-	_refresh_actions(tower) # update actions
-	_update_status_display(tower)
+	_refresh_actions(unit) # update actions
+	_update_status_display(unit)
 	
-func _update_header_visuals(tower_type: Towers.Type) -> void:
-	inspector_icon.texture = Towers.get_tower_icon(tower_type)
-	inspector_title.text = Towers.get_tower_name(tower_type)
-	if _preview_upgrade_type == Towers.Type.VOID:
-		subtitle.text = ""
-	else:
-		subtitle.text = " ->%s" % Towers.get_tower_name(_preview_upgrade_type)
+func _update_header_visuals(unit: Unit) -> void:
+	if unit is Tower:
+		var tower_type: Towers.Type = unit.type
+		inspector_icon.texture = Towers.get_tower_icon(tower_type)
+		inspector_title.text = Towers.get_tower_name(tower_type)
+		if _preview_upgrade_type == Towers.Type.VOID:
+			subtitle.text = ""
+		else:
+			subtitle.text = " ->%s" % Towers.get_tower_name(_preview_upgrade_type)
+			
+		description.set_parsed_text(Towers.get_tower_description(tower_type))
+	else: #is enemy
+		var type_key = ""
+		type_key = Units.Type.keys()[unit.enemy_type]
+		#unit keywords start with the U_ prefix
+		var data = KeywordService.get_keyword_data("U_"+type_key)
 		
-	description.set_parsed_text(Towers.get_tower_description(tower_type))
-	
+		inspector_icon.texture = data.get("icon", null)
+		inspector_title.text = data.get("title", "Unknown Entity")
+		subtitle.text = ""
+		description.set_parsed_text(data.get("description", ""))
+
 func _refresh_stats() -> void:
 	for child : Control in stats.get_children():
 		child.free() #queue_free will cause bugs with get_child_count()
 		
-	if not is_instance_valid(current_tower):
+	if not is_instance_valid(current_unit):
 		return
 	# determine mode
 	if _preview_upgrade_type != Towers.Type.VOID:
@@ -93,23 +104,25 @@ func _refresh_stats() -> void:
 		_render_live_stats()
 		
 func _render_live_stats() -> void: # for standard stat displays
-	# use current tower instance's stat displays
-	for display_info: StatDisplayInfo in current_tower.stat_displays:
-		var value: Variant = get_stat_value_from_instance(current_tower, display_info)
-		if value == null: continue
-		
-		value = apply_display_modifiers(value, display_info) #format
-		var text: String = display_info.label + " " + str(value) + display_info.suffix
-		
-		var label := InteractiveRichTextLabel.new()
-		label.bbcode_enabled = true
-		label.fit_content = true
-		label.set_parsed_text(text)
-		label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		stats.add_child(label)
+	if current_unit is Tower:
+		# use current tower instance's stat displays
+		for display_info: StatDisplayInfo in current_unit.stat_displays:
+			var value: Variant = get_stat_value_from_instance(current_unit, display_info)
+			if value == null: continue
+			
+			value = apply_display_modifiers(value, display_info) #format
+			var text: String = display_info.label + " " + str(value) + display_info.suffix
+			
+			var label := InteractiveRichTextLabel.new()
+			label.bbcode_enabled = true
+			label.fit_content = true
+			label.set_parsed_text(text)
+			label.autowrap_mode = TextServer.AUTOWRAP_OFF
+			stats.add_child(label)
 
 func _render_preview_stats() -> void:
-	var current_type: Towers.Type = current_tower.type
+	assert(current_unit is Tower)
+	var current_type: Towers.Type = current_unit.type
 	var next_type: Towers.Type = _preview_upgrade_type
 	
 	var current_proto: Tower = Towers.get_tower_prototype(current_type)
@@ -117,8 +130,8 @@ func _render_preview_stats() -> void:
 	if (not next_proto) or (not current_proto):
 		return
 	
-	current_proto.tower_position = current_tower.tower_position
-	next_proto.tower_position = current_tower.tower_position 
+	current_proto.tower_position = current_unit.tower_position
+	next_proto.tower_position = current_unit.tower_position 
 	
 	for display_info in next_proto.stat_displays:
 		# compare BASE stats (prototype vs prototype)
@@ -173,12 +186,14 @@ func _render_preview_stats() -> void:
 		
 	Towers.reset_tower_prototype(next_proto.type)
 
-func _refresh_actions(tower: Tower) -> void:
+func _refresh_actions(unit: Unit) -> void:
 	# clear existing buttons
 	for child: Node in button_container.get_children():
 		child.queue_free()
 	#print("Clear!")
-	
+	if not unit is Tower:
+		return
+	var tower := unit as Tower
 	#get actions from data
 	var actions: Array[InspectorAction] = Towers.get_tower_actions(tower.type)
 	#print("Inspector: length of actions: ", len(actions), " caused by ", Towers.Type.keys()[tower.type])
@@ -221,7 +236,7 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 						return
 						
 					_preview_upgrade_type = next_type
-					_update_header_visuals(tower.type)
+					_update_header_visuals(tower)
 					_refresh_stats()
 				)
 				btn.mouse_exited.connect(func():
@@ -229,13 +244,13 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 						return
 
 					_preview_upgrade_type = Towers.Type.VOID
-					_update_header_visuals(tower.type)
+					_update_header_visuals(tower)
 					_refresh_stats()
 				)
 				
 		InspectorAction.ActionType.SELL:
 			if Towers.is_tower_rite(tower.type):
-				btn.text = "Excavate (%.2f)" % Player.RITE_EXCAVATION_COST
+				btn.text = "Reposition (%.2f)" % Player.RITE_EXCAVATION_COST
 				if Player.flux < Player.RITE_EXCAVATION_COST or tower.current_state != Tower.State.ACTIVE:
 					is_disabled = true
 				btn.pressed.connect(UI.excavate_rite_requested.emit.bind(tower))
@@ -246,14 +261,14 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 			
 	btn.disabled = is_disabled
 
-func _on_inspected_tower_health_update(tower : Tower, max_hp : float, hp : float):
+func _on_inspected_tower_health_update(unit: Unit, max_hp : float, hp : float):
 	healthbar.max_value = max_hp
 	healthbar.value = hp
 	
-	_update_status_display(tower)
+	_update_status_display(unit)
 
 func _on_inspected_tower_replaced(_old_tower: Tower, new_tower: Tower):
-	print("replaced!")
+	print("Inspector: replaced!")
 	_on_inspector_contents_tower_update(new_tower)
 	
 enum DisplayStatModifier {
@@ -270,7 +285,7 @@ enum DisplayStatModifier {
 	DISPLAY_ATTACK_STATUSES
 }
 
-func _update_status_display(tower: Tower) -> void:
+func _update_status_display(unit: Unit) -> void:
 	if not is_instance_valid(status_container):
 		return
 
@@ -278,22 +293,22 @@ func _update_status_display(tower: Tower) -> void:
 	for child in status_container.get_children():
 		child.queue_free()
 	
-	if not is_instance_valid(tower):
+	if not is_instance_valid(unit):
 		return
 
 	# 2. Check "Dead" Status
 	# We prioritize this as the first icon if valid
-	if is_instance_valid(tower.health_component):
-		if tower.health_component.health <= 0:
+	if is_instance_valid(unit.health_component):
+		if unit.health_component.health <= 0:
 			# You can add a "DEAD" entry to KeywordService or hardcode it here
 			var dead_icon := preload("res://Assets/wall.png") # Replace with your asset
-			_create_status_widget(dead_icon, "Destroyed", "This tower is destroyed and thus disabled. Will revive next wave if not sold.", 0, true)
+			_create_status_widget(dead_icon, "Destroyed", "This unit is destroyed and thus disabled. Will revive next wave if not sold.", 0, true)
 	
 	# 3. Check Modifiers/Status Effects
-	if is_instance_valid(tower.modifiers_component):
+	if is_instance_valid(unit.modifiers_component):
 		# We access the internal dictionary. 
 		# Ideally ModifiersComponent would expose: func get_active_statuses() -> Dictionary
-		var effects: Dictionary = tower.modifiers_component._status_effects
+		var effects: Dictionary = unit.modifiers_component._status_effects
 		
 		for status_enum in effects:
 			var instance = effects[status_enum]

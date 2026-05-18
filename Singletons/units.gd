@@ -23,8 +23,6 @@ enum Type {
 var unit_stats: Dictionary[Type, UnitData] = {}
 var unit_prototypes: Dictionary[Type, Unit] = {}
 
-var _units_modified_by_difficulty: Dictionary[Type, bool] = {} #whether a unit type's stats has been modified by difficulty
-
 const VERBOSE: bool = false
 
 func start():
@@ -47,6 +45,9 @@ func get_unit_prototype(unit_type: Type) -> Unit:
 	
 func get_unit_name(unit: Type) -> String:
 	return unit_stats[unit].title
+
+func get_unit_icon(unit: Type) -> Texture2D:
+	return unit_stats[unit].icon
 	
 func get_unit_description(unit: Type) -> String:
 	return unit_stats[unit].description
@@ -67,12 +68,29 @@ func create_unit(unit_type: Type) -> Unit:
 	var _unit: Unit = get_unit_scene(unit_type).instantiate()
 	_unit.flux_value = get_unit_flux(unit_type)
 	_unit.strength = get_unit_strength(unit_type)
+	_unit.enemy_type = unit_type
+	if unit_stats[unit_type].important:
+		_unit.set_meta(ID.UnitMeta.IS_IMPORTANT, true)
 	
-	if Phases.current_game_difficulty == Phases.GameDifficulty.NORMAL and not _units_modified_by_difficulty.has(unit_type):
-		if _unit.health_component: _unit.health_component.health_data.max_health = snappedf(_unit.health_component.health_data.max_health * 0.85, 0.1)
-		if _unit.movement_component: _unit.movement_component.movement_data.max_speed *= 0.7
-		if _unit.attack_component: _unit.attack_component.attack_data.cooldown *= 1.25
-		_units_modified_by_difficulty[unit_type] = true
+	if Phases.current_game_difficulty == Phases.GameDifficulty.NORMAL:
+		# wait for the unit to enter the tree and call _ready()
+		_unit.ready.connect(func():
+			if not is_instance_valid(_unit.modifiers_component):
+				return
+			if _unit.health_component:
+				var mod_hp = Modifier.new(Attributes.id.MAX_HEALTH, 0.85, 0.0, -1.0)
+				_unit.modifiers_component.add_permanent_modifier(mod_hp)
+				# force health to update to the new, lowered maximum
+				_unit.health_component.health = _unit.health_component.health 
+			if _unit.movement_component:
+				var mod_spd = Modifier.new(Attributes.id.MAX_SPEED, 0.70, 0.0, -1.0)
+				_unit.modifiers_component.add_permanent_modifier(mod_spd)
+			if _unit.attack_component:
+				var mod_cd = Modifier.new(Attributes.id.COOLDOWN, 1.25, 0.0, -1.0)
+				_unit.modifiers_component.add_permanent_modifier(mod_cd),
+				
+			CONNECT_ONE_SHOT
+		)
 	return _unit
 	
 func _load_all_unit_stats():

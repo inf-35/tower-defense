@@ -41,6 +41,5 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		return
 
 	var total_multiplier: float = 1.0 + (total_potential_stacks * damage_bonus_per_status_stack)
-	print(total_potential_stacks, " ", total_multiplier," ", instance.stacks)
 	hit_data.damage *= total_multiplier #apply damage bonus
 	hit_data.status_effects.clear() #remove all status effects

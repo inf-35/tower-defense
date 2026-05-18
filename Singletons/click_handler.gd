@@ -1,12 +1,12 @@
 extends Node
 
 # --- State Management ---
-enum State { IDLE, PREVIEWING, TOWER_SELECTED }
+enum State { IDLE, PREVIEWING, ENTITY_SELECTED }
 var current_state: State = State.IDLE
 
 # --- Properties ---
 var enabled: bool = false
-var selected_tower: Tower       # the tower instance currently selected on the map
+var selected_entity: Unit ##the unit instance currently selected on the map
 var preview_tower_prototype: Tower   # the tower type being previewed for building
 var preview_tower_position: Vector2i
 var preview_tower_facing: Tower.Facing
@@ -31,7 +31,7 @@ func start():
 	
 	current_state = State.IDLE
 	preview_tower_prototype = null
-	selected_tower = null
+	selected_entity = null
 	_ghost_unit_for_inspection = null
 	
 	current_preview = References.tower_preview
@@ -50,8 +50,8 @@ func _process(_delta: float) -> void:
 			_update_idle_tooltip()
 		State.PREVIEWING:
 			_update_preview_tooltip()
-		State.TOWER_SELECTED:
-			# Hide tooltip if a tower is selected (cleaner UI)
+		State.ENTITY_SELECTED:
+			# hide tooltip if a tower is selected (cleaner UI)
 			UI.cursor_info.display_message("")
 
 func _update_idle_tooltip() -> void:
@@ -109,6 +109,22 @@ func _update_preview_tooltip() -> void:
 			)
 		error_msg += "\nLMB to place\nRMB to deselect\nR to rotate"
 		UI.cursor_info.display_message(error_msg, true)
+		
+func _get_clicked_enemy(mouse_pos: Vector2) -> Unit: ##helper to find enemy under mouse
+	if not is_instance_valid(References.island): return null
+	var space_state = References.island.get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = mouse_pos
+	# target ememy layer
+	query.collision_mask = Hitbox.get_mask(true)
+	query.collide_with_areas = true
+	
+	var results = space_state.intersect_point(query)
+	if not results.is_empty():
+		var hitbox = results[0].collider as Hitbox
+		if is_instance_valid(hitbox) and is_instance_valid(hitbox.unit):
+			return hitbox.unit
+	return null
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not enabled:
@@ -118,7 +134,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_handle_idle_input(event)
 		State.PREVIEWING:
 			_handle_preview_input(event)
-		State.TOWER_SELECTED:
+		State.ENTITY_SELECTED:
 			_handle_tower_selected_input(event)
 
 	# rotation can be handled universally if a preview is active
@@ -130,9 +146,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_update_preview_visuals()
 
 func _enter_idle_state():
-	# Deselect any tower and hide any preview.
-	if is_instance_valid(selected_tower):
-		selected_tower = null
+	# deselect any tower and hide any preview.
+	if is_instance_valid(selected_entity):
+		selected_entity = null
 		tower_was_deselected.emit()
 	
 	# CRITICAL: ensure the ghost unit is destroyed when leaving a selection state
@@ -152,7 +168,7 @@ func _enter_idle_state():
 	current_state = State.IDLE
 
 func _enter_preview_state(tower: Tower):
-	if current_state == State.TOWER_SELECTED or current_state == State.PREVIEWING:
+	if current_state == State.ENTITY_SELECTED or current_state == State.PREVIEWING:
 		_enter_idle_state() # reset to a clean state first
 
 	current_state = State.PREVIEWING
@@ -167,21 +183,38 @@ func _enter_preview_state(tower: Tower):
 	References.range_indicator.select(preview_tower_prototype)
 	
 func _enter_tower_selected_state(tower: Tower):
-	if current_state == State.PREVIEWING or current_state == State.TOWER_SELECTED:
+	if current_state == State.PREVIEWING or current_state == State.ENTITY_SELECTED:
 		_enter_idle_state() # reset to a clean state first
 
-	current_state = State.TOWER_SELECTED
-	selected_tower = tower
-	tower_was_selected.emit(selected_tower)
-	UI.update_inspector_bar.emit(selected_tower)
+	current_state = State.ENTITY_SELECTED
+	selected_entity = tower
+	tower_was_selected.emit(selected_entity)
+	UI.update_inspector_bar.emit(selected_entity)
 	
 	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -5.0)
 	References.range_indicator.select(tower)
+
+func _enter_entity_selected_state(entity: Unit):
+	if current_state == State.PREVIEWING or current_state == State.ENTITY_SELECTED:
+		_enter_idle_state() 
+
+	current_state = State.ENTITY_SELECTED
+	selected_entity = entity
 	
+	if entity is Tower:
+		tower_was_selected.emit(entity)
+		References.range_indicator.select(entity)
+	else:
+		pass
+		#References.range_indicator.deselect() # Or implement an enemy range indicator
+		
+	UI.update_inspector_bar.emit(selected_entity)
+	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -5.0)
+
 # input handlers
 func _handle_idle_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
-		# The only thing we can do in the IDLE state is select a tower.
+		# only thing we can do in the IDLE state is select a tower
 		var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
 		var cell_pos : Vector2i = Island.position_to_cell(mouse_pos)
 		
@@ -191,10 +224,16 @@ func _handle_idle_input(event: InputEvent) -> void:
 			# preview found! create a temporary "ghost" unit for inspection.
 			_create_and_inspect_ghost_unit(preview_data, cell_pos)
 			return # stop further processing
-		
+		#check for towers
 		if References.island.tower_grid.has(cell_pos):
 			var clicked_tower: Tower = References.island.tower_grid[cell_pos]
 			_enter_tower_selected_state(clicked_tower)
+			return
+		#check for enemies last
+		var clicked_enemy = _get_clicked_enemy(mouse_pos)
+		if clicked_enemy:
+			_enter_entity_selected_state(clicked_enemy)
+			return
 		#else do nothing
 
 func _handle_preview_input(event: InputEvent) -> void:
@@ -220,18 +259,12 @@ func _handle_preview_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			# Right-click cancels the preview.
 			_enter_idle_state()
-
-func _recalculate_preview_position() -> Vector2i:
-	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
-	var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
-	var effective_size: Vector2i = Tower.get_rotated_size(base_size, preview_tower_facing)
-	var center_offset: Vector2i = effective_size * 0.5
-	return Island.position_to_cell(mouse_pos) - center_offset
 	
 func _handle_tower_selected_input(event: InputEvent) -> void:
 	# Any click while a tower is selected will deselect it.
 	if References.camera and event is InputEventMouseButton and event.is_pressed():
-		var cell_pos : Vector2i = Island.position_to_cell(References.camera.get_global_mouse_position())
+		var mouse_pos: Vector2 = References.camera.get_global_mouse_position()
+		var cell_pos : Vector2i = Island.position_to_cell(mouse_pos)
 		
 		# check for previews first
 		var preview_data: Terrain.CellData = References.island.expansion_service.get_preview_data_at_cell(cell_pos)
@@ -244,8 +277,22 @@ func _handle_tower_selected_input(event: InputEvent) -> void:
 			_enter_tower_selected_state(clicked_tower)
 		else: #otherwise transition to idle
 			_enter_idle_state()
+		#check for enemies last
+		var clicked_enemy = _get_clicked_enemy(mouse_pos)
+		if clicked_enemy:
+			_enter_entity_selected_state(clicked_enemy)
+			return
+		#else do nothing
+		
 
 # --- Helper Functions ---
+func _recalculate_preview_position() -> Vector2i:
+	var mouse_pos : Vector2 = References.camera.get_global_mouse_position()
+	var base_size: Vector2i = Towers.get_tower_size(preview_tower_prototype.type)
+	var effective_size: Vector2i = Tower.get_rotated_size(base_size, preview_tower_facing)
+	var center_offset: Vector2i = effective_size * 0.5
+	return Island.position_to_cell(mouse_pos) - center_offset
+
 func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
 	if island.terrain_base_grid.has(cell):
 		var terrain: Terrain.Base = island.get_terrain_base(cell)
@@ -320,10 +367,10 @@ func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vecto
 	# transition to the TOWER_SELECTED state using the ghost unit
 	# we don't call the full _enter_tower_selected_state because we don't want to
 	# clear the ghost; we just set the state and tell the inspector to update.
-	current_state = State.TOWER_SELECTED
-	selected_tower = _ghost_unit_for_inspection
-	tower_was_selected.emit(selected_tower)
-	UI.update_inspector_bar.emit(selected_tower)
+	current_state = State.ENTITY_SELECTED
+	selected_entity = _ghost_unit_for_inspection
+	tower_was_selected.emit(selected_entity)
+	UI.update_inspector_bar.emit(selected_entity)
 
 # --- Signal Connections ---
 func _on_build_tower_selected(tower: Tower):

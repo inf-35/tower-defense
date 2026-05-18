@@ -34,9 +34,12 @@ func initialise() -> void:
 	# listen for wave progression
 	if not Phases.wave_ended.is_connected(_on_wave_ended):
 		Phases.wave_ended.connect(_on_wave_ended)
-		
-	UI.trader_choice_selected.connect(purchase_item)
-	UI.trader_force_restock_requested.connect(force_restock)
+	
+	if not UI.trader_choice_selected.is_connected(purchase_item):
+		UI.trader_choice_selected.connect(purchase_item)
+			
+	if not UI.trader_force_restock_requested.is_connected(force_restock):
+		UI.trader_force_restock_requested.connect(force_restock)
 
 	if _current_stock.is_empty():
 		_generate_stock()
@@ -65,16 +68,16 @@ func get_restock_cost() -> float:
 	return snappedf(pow(_manual_restocks, 1.5) * 1.8 + 2.0, 0.1)
 
 func purchase_item(slot_index: int) -> bool:
-	print(_current_stock, slot_index)
+	#push_warning(_current_stock, slot_index)
 	if slot_index < 0 or slot_index >= _current_stock.size():
 		return false
 
 	var item = _current_stock[slot_index]
-	if Player.flux < item.price:
-		return false
-		
 	if item == null:
 		return false #already exhausted
+		
+	if Player.flux < item.price:
+		return false
 		
 	Player.flux -= item.price
 	RewardService.apply_reward(item)
