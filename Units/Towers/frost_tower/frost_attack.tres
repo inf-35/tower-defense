@@ -3,11 +3,21 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_ly7l5"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_7up7a"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_7up7a"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_h67ia"]
 
 [sub_resource type="Resource" id="Resource_h67ia"]
 script = ExtResource("3_7up7a")
 cooldown = 4.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Gradient" id="Gradient_okclc"]
+colors = PackedColorArray(0.6, 0.8066667, 1, 0.42352942, 0.6, 0.8066667, 1, 0)
+
+[sub_resource type="Resource" id="Resource_ir1ub"]
+script = ExtResource("4_h67ia")
+vfx_type = 1
+color_over_lifetime = SubResource("Gradient_okclc")
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
 script = ExtResource("2_7up7a")
@@ -16,5 +26,6 @@ range = 18.0
 cooldown = 0.8
 damage = 0.2
 status_effects = Array[ExtResource("3_7up7a")]([SubResource("Resource_h67ia")])
+vfx_on_spawn = SubResource("Resource_ir1ub")
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -20,6 +20,10 @@ config/features=PackedStringArray("4.6", "Mobile")
 run/max_fps=200
 config/icon="res://Assets/icon.svg"
 
+[audio]
+
+buses/default_bus_layout="uid://drarvyi0l5wlj"
+
 [autoload]
 
 Navigation="*res://Singletons/navigation.gd"

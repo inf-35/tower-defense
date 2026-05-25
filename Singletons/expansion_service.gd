@@ -130,9 +130,9 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
 		var rite_rule: PlacementRule = expansion_params.placement_rules[1]
 		rite_rule.tower_type = _pick_random_rite_type()
-		var second_rite_rule: PlacementRule = rite_rule.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
-		second_rite_rule.tower_type = _pick_random_rite_type()
-		expansion_params.placement_rules.insert(2, second_rite_rule)
+		#var second_rite_rule: PlacementRule = rite_rule.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+		#second_rite_rule.tower_type = _pick_random_rite_type()
+		#expansion_params.placement_rules.insert(1, second_rite_rule)
 
 		var block_data: Dictionary = _generate_block(island, block_size, expansion_params)
 		if block_data.is_empty():

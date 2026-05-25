@@ -65,7 +65,7 @@ func get_stock() -> Array[Reward]:
 	return _current_stock
 
 func get_restock_cost() -> float:
-	return snappedf(pow(_manual_restocks, 1.5) * 1.8 + 2.0, 0.1)
+	return snappedf(pow(_manual_restocks, 2.0) * 2.0 + 2.0, 0.1)
 
 func purchase_item(slot_index: int) -> bool:
 	#push_warning(_current_stock, slot_index)

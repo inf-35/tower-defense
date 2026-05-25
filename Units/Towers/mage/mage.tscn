@@ -1,28 +1,22 @@
-[gd_scene load_steps=24 format=3 uid="uid://uyeylgrvtiyj"]
+[gd_scene format=3 uid="uid://uyeylgrvtiyj"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ngn05"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_4ads2"]
 [ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_1xmkd"]
-[ext_resource type="Script" uid="uid://g5t7r5umsmw2" path="res://Content/Behaviors/mage_tower_behavior.gd" id="3_4yu0f"]
 [ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="3_nf0er"]
 [ext_resource type="Resource" uid="uid://cybuicau0bb6i" path="res://Content/StatDisplays/radius.tres" id="4_37eu3"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_if2uy"]
-[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_vwio8"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_7cmip"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="5_b5w7g"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_bny6i"]
 [ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="6_cg873"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_ckp3o"]
+[ext_resource type="Script" uid="uid://brm20jombnrfb" path="res://Units/Towers/mage/mage_behavior.gd" id="8_1xmkd"]
 [ext_resource type="Resource" uid="uid://ndg855khj2v6" path="res://Units/Towers/mage/mage_attack.tres" id="8_lxl5g"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_0imk1"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_vwio8"]
 [ext_resource type="Texture2D" uid="uid://ceb7ksik3lia2" path="res://Assets/mage_provisional.png" id="15_1xmkd"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_37eu3"]
-
-[sub_resource type="Resource" id="Resource_nf0er"]
-script = ExtResource("4_vwio8")
-attribute = 8
-metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Animation" id="Animation_uhk0q"]
 length = 0.001
@@ -86,7 +80,7 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Mage" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Mage" type="Node2D" unique_id=2086473696 node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_ngn05")
 type = 18
@@ -101,42 +95,39 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="MageBehavior" type="Node" parent="."]
-script = ExtResource("3_4yu0f")
-modifier_prototype = SubResource("Resource_nf0er")
-metadata/_custom_type_script = "uid://g5t7r5umsmw2"
+[node name="MageBehavior" type="Node" parent="." unique_id=304497029]
+script = ExtResource("8_1xmkd")
+metadata/_custom_type_script = "uid://brm20jombnrfb"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=197303440]
 script = ExtResource("4_if2uy")
 movement_data = ExtResource("5_7cmip")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=273239734]
 script = ExtResource("6_bny6i")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=816228346]
 script = ExtResource("7_ckp3o")
 attack_data = ExtResource("8_lxl5g")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1900364865]
 scale = Vector2(0.065, 0.065)
 texture = ExtResource("15_1xmkd")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1661911847]
 script = ExtResource("16_37eu3")
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=782126817]
 script = ExtResource("10_0imk1")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1941244212]
 script = ExtResource("12_vwio8")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_uhk0q")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=860000600]
+libraries/ = SubResource("AnimationLibrary_uhk0q")

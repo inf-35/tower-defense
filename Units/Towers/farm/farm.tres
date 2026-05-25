@@ -11,6 +11,7 @@
 script = ExtResource("5_mtsrh")
 id = 53
 cost = 5.0
+cost_scaling_override = 1.02
 required_capacity = 0.5
 element = 5
 tower_name = "Farm"

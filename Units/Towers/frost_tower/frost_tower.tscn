@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b5w56jjx8pany"]
+[gd_scene format=3 uid="uid://b5w56jjx8pany"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_8tw53"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_5w00j"]
@@ -20,7 +20,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_lmklq"]
 radius = 600.0
 
-[node name="FrostTower" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="FrostTower" type="Node2D" unique_id=145651031 node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_8tw53")
 type = 3
@@ -33,43 +33,43 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=317883570]
 script = ExtResource("3_6aoul")
 movement_data = ExtResource("4_ywqh1")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=420691843]
 script = ExtResource("5_r2l7t")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1878917332]
 script = ExtResource("6_4vlia")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=403589591]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("6_vnb4f")
 
-[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=1417743333]
 texture = ExtResource("7_u0bn4")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1015777286]
 script = ExtResource("13_cycj3")
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="Range" type="Area2D" parent="."]
+[node name="Range" type="Area2D" parent="." unique_id=655642214]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_layer = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Range"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Range" unique_id=1530902463]
 shape = SubResource("CircleShape2D_lmklq")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1158697049]
 script = ExtResource("9_j0i6s")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=433063316]
 script = ExtResource("7_5npwk")
 attack_data = ExtResource("10_wqvsu")
 metadata/_custom_type_script = "uid://detgar3t50qgi"

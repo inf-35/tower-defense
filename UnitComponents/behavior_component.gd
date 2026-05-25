@@ -115,7 +115,7 @@ func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 		animation_player.play(anim_name, -1, custom_speed * Clock.speed_multiplier, custom_speed < 0.0)
 
 #helper functions for child classes to use
-func _is_attack_possible() -> bool:
+func _is_attack_possible(target_needed: bool = true) -> bool:
 	if attack_component == null or range_component == null:
 		return false
 	
@@ -127,6 +127,9 @@ func _is_attack_possible() -> bool:
 	
 	#print(attack_component, " ", attack_component.attack_data)
 	if attack_component.current_cooldown <= 0.0:
+		if not target_needed:
+			return true
+
 		var target = range_component.get_target() as Unit
 		if target:
 			return true

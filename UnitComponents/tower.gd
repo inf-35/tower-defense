@@ -9,6 +9,8 @@ signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island f
 @export var environmental: bool = false ##is this tower generated as part of the environment
 
 @export var turret: Node2D ##this is the part of the turret that turns to face and shoot
+#global configuration
+const REFUND_PROPORTION: float = 1.0 ##proportion of tower value refunded upon sale
 
 enum Facing {
 	UP,
@@ -18,6 +20,7 @@ enum Facing {
 }
 
 enum State { ACTIVE, RUINED } ##overarching state machine of the tower
+
 var current_state: State = State.ACTIVE #NOTE: should not be directly modified
 var level: int = 0: #upgrade level of tower
 	set(new_level):
@@ -170,7 +173,8 @@ func on_killed(_hit_report_data: HitReportData) -> void:
 
 func sell():
 	if not abstractive and current_state == State.ACTIVE:
-		Player.flux += flux_value #full refund!
+		var refund: float = Towers.get_tower_refund_value(type) * REFUND_PROPORTION
+		Player.flux += refund
 		
 		#if Towers.is_tower_rite(type):
 			#Player.add_rite(type, 1)

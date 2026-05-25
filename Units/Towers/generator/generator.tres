@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://kiqqpyvi5e1s"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://kiqqpyvi5e1s"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_2oild"]
 [ext_resource type="Texture2D" uid="uid://b4ymi0q7wgfg" path="res://Assets/town.png" id="1_7j6cm"]
@@ -11,6 +11,7 @@
 script = ExtResource("1_2oild")
 id = 5
 cost = 8.0
+cost_scaling_override = 1.2
 required_capacity = 0.0
 element = 5
 allowed_terrain = Array[int]([1])

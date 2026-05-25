@@ -5,6 +5,17 @@ class_name AttackComponent
 @export var muzzle: Marker2D ##where the bullets are coming from
 var _modifiers_component: ModifiersComponent
 
+#proxy variables
+var damage: float:
+	get():
+		return get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
+var radius: float:
+	get():
+		return get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
+var cooldown: float:
+	get():
+		return get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
+
 var current_cooldown: float = 0.0 ##centralised value for cooldown to next attack, starts at cooldown and ticks towards zero
 
 func _ready():
@@ -19,11 +30,14 @@ func inject_components(modifiers_component: ModifiersComponent):
 	_modifiers_component.register_data(attack_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])
 
+func refresh_cooldown(): ##resets cooldown, used for external components which might want to manually attack
+	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
+	
 func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 	if attack_data == null:
 		return
 		
-	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN) #reset cooldown
+	refresh_cooldown()
 	#NOTE: this must be before the actual attack execution
 	var delivery_data: DeliveryData = generate_delivery_data()
 	if intercept_override != Vector2.ZERO:

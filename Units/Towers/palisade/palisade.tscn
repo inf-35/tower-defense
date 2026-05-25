@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://uyqncqkt255h"]
+[gd_scene format=3 uid="uid://uyqncqkt255h"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_o21m0"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_p6aan"]
@@ -64,7 +64,7 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Palisade" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
+[node name="Palisade" type="Node2D" unique_id=1232505619 node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_o21m0")
 type = 6
@@ -77,39 +77,37 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="DefaultTowerBehavior" type="Node" parent="."]
+[node name="DefaultTowerBehavior" type="Node" parent="." unique_id=321522937]
 script = ExtResource("3_6c6fy")
 metadata/_custom_type_script = "uid://cs61b35p7jme8"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=548234451]
 script = ExtResource("4_kd25e")
 movement_data = ExtResource("5_1h7xk")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1314725459]
 script = ExtResource("6_7y8qa")
 health_data = SubResource("Resource_1dhlk")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="refeerence" type="Sprite2D" parent="."]
+[node name="refeerence" type="Sprite2D" parent="." unique_id=1203772154]
 visible = false
 texture = SubResource("PlaceholderTexture2D_p6ncc")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1250912087]
 position = Vector2(0, 0.5)
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("7_ylobt")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1687196647]
 script = ExtResource("10_qv47i")
-height_multiplier = 0.45
+height_multiplier = 0.6
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1174513941]
 script = ExtResource("12_w22p4")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_uhk0q")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1728862064]
+libraries/ = SubResource("AnimationLibrary_uhk0q")

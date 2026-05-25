@@ -17,7 +17,7 @@ func _handle_detach(_i): pass
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT: return
-	
+	print("aea")
 	var hit_data = event.data as HitData
 	if not hit_data: return
 	

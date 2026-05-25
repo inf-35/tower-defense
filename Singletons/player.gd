@@ -137,13 +137,16 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
-
+		Towers.Type.MAGE: true,
+		Towers.Type.FROST_TOWER: true,
+		Towers.Type.WATCHTOWER: true,
+		Towers.Type.CAMPGROUNDS: true,
 	}
 	#
-	#var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_DRUMS
-	#RewardService.apply_reward(reward)
+	var reward := Reward.new()
+	reward.type = Reward.Type.ADD_RITE
+	reward.rite_type = Towers.Type.RITE_BLOOD
+	RewardService.apply_reward(reward)
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
@@ -271,18 +274,17 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity and not is_zero_approx(Towers.get_tower_capacity(tower_type)):
 			# NOTE: You could add a UI warning here about insufficient capacity.
 			return
-
-	# 2. Ask the Island to perform the placement. The Island is responsible for world checks.
+	self.flux -= Towers.get_tower_cost(tower_type)
 	var success = References.island.request_tower_placement(cell, tower_type, facing)
 	
 	# 3. If the Island confirms placement, deduct resources.
 	if success:
 		Audio.play_sound(ID.Sounds.TOWER_PLACED_SOUND, 0.0, Island.cell_to_position(cell))
-		self.flux -= Towers.get_tower_cost(tower_type)
 		
 		if Towers.is_tower_rite(tower_type):
 			self.add_rite(tower_type, -1)
-		#TODO: Towers.update_tower_cost(tower_type, 1)
+	else:
+		self.flux += Towers.get_tower_refund_value(tower_type)
 
 func _on_sell_tower_requested(tower):
 	if not is_instance_valid(tower):

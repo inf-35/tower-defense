@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=9 format=3 uid="uid://ctna0n2u30j3g"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://ctna0n2u30j3g"]
 
 [ext_resource type="Texture2D" uid="uid://b5lrvn5go6w2v" path="res://Assets/poison_turret.png" id="1_bbdyr"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_bbdyr"]

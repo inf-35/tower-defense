@@ -12,6 +12,9 @@ func _ready() -> void:
 	# Player.towerss setter will emit the initial list.
 	
 	UI.update_tower_types.connect(_on_player_tower_types_update)
+	UI.update_tower_counts.connect(func():
+		_on_player_tower_types_update(Player.unlocked_towers, Player.rite_inventory)
+	)
 	
 	UI.show_building_ui.connect(func():
 		start_wave_button.text = "Start Wave" # More descriptive

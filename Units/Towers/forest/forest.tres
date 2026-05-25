@@ -12,6 +12,7 @@ id = 19
 cost = -5.0
 required_capacity = 0.0
 element = 3
+is_environmental = true
 tower_name = "Forest"
 tower_description = "A thicket of trees."
 icon = ExtResource("2_oqohe")

@@ -5,6 +5,7 @@ class_name Island
 signal terrain_changed
 signal tower_created(tower: Tower) ##this signal fires when a tower is created.
 signal tower_changed(tower_position: Vector2i) ##fires when a tower is created, destroyed or moved. fires after tower_created
+signal island_changed ##fires when anything changes
 signal expansion_applied
 signal navigation_grid_updated
 
@@ -48,6 +49,9 @@ const LAKE_MIN_NEIGHBORS: int = 2
 
 func _ready():
 	Phases.in_game = true
+	
+	terrain_changed.connect(func(): island_changed.emit())
+	tower_changed.connect(func(tower_change): island_changed.emit())
 
 	expansion_service = ExpansionService.new()
 	topology_service = TowerTopologyService.new(self)
@@ -202,6 +206,7 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	if not _towers_by_type.has(tower.type):
 		_towers_by_type[tower.type] = []
 	_towers_by_type[tower.type].append(tower)
+	UI.update_tower_counts.emit()
 
 	tower_created.emit(tower)
 	tower_changed.emit(cell)
@@ -427,6 +432,7 @@ func _on_tower_destroyed(tower: Tower):
 	if _towers_by_type.has(tower.type):
 		_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
+	UI.update_tower_counts.emit()
 	
 func update_adjacencies_around_tower(tower: Tower):
 	if is_instance_valid(topology_service):

@@ -8,6 +8,7 @@ var canvas_item: RID  # The RID of the visual on the RenderingServer.
 var position: Vector2
 var velocity: Vector2
 var rotation: float = 0.0 # In radians
+var scale: Vector2 = Vector2.ONE #overall scale
 
 var age: float = 0.0      # Current time since creation.
 var lifetime: float = 0.00

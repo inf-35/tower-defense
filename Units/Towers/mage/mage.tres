@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cxthio1f4tbuf"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cxthio1f4tbuf"]
 
 [ext_resource type="Texture2D" uid="uid://ceb7ksik3lia2" path="res://Assets/mage_provisional.png" id="1_4g74q"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_cqlpt"]
@@ -12,6 +12,7 @@ script = ExtResource("2_cqlpt")
 id = 18
 cost = 12.0
 element = 5
+allowed_terrain = Array[int]([2])
 tower_name = "Mage"
 tower_description = "Firing arcane bolts, mages penetrate shields and inflict enemies with {CURSED}."
 icon = ExtResource("1_4g74q")

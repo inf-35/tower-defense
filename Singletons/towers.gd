@@ -77,6 +77,9 @@ var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
+const TOWER_COST_SCALING: float = 1.05 ##how much price scales per existing tower. i.e. 1.5 = +50% cost per tower
+const TOWER_COST_INCREMENT: float = 0.05  ##smallest increment to which tower price values will snap to
+
 const VERBOSE: bool = false
 const PROTOTYPE_LOAD_CHUNK: int = 4
 
@@ -103,7 +106,7 @@ func get_tower_prototype(tower_type: Type) -> Tower:
 
 func reset_tower_prototype(tower_type: Type) -> void: ##resets a tower prototype (by type). use after manipulation of prototype
 	var prototype := tower_prototypes[tower_type] as Tower
-	if prototype:
+	if prototype: #1915 and 5823 are arbitrary, large, noncongruent values
 		prototype.tower_position = Vector2i(1915 * tower_type * prototype.unit_id, 5823 * tower_type * prototype.unit_id)
 		prototype.facing = Tower.Facing.UP
 	
@@ -122,8 +125,46 @@ func get_tower_actions(tower_type: Type) -> Array[InspectorAction]:
 func get_tower_element(tower_type: Type) -> Towers.Element:
 	return tower_stats[tower_type].element
 
-func get_tower_cost(tower_type: Type) -> float:
-	return tower_stats[tower_type].cost
+func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT tower to be built
+	if not tower_stats.has(tower_type):
+		push_warning("Towers: tried to get tower cost of non-existing tower-type")
+		return 0.0
+		
+	var base_cost = tower_stats[tower_type].cost
+	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
+		return base_cost
+		
+	var current_count: int = 0
+	if is_instance_valid(References.island):
+		current_count = References.island.get_towers_by_type(tower_type).size()
+		
+	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
+						else tower_stats[tower_type].cost_scaling_override
+	var final_cost: float = base_cost * pow(scaling, current_count)
+	
+	return snappedf(final_cost, TOWER_COST_INCREMENT)
+	
+func get_tower_refund_value(tower_type: Type): ##returns the refund value for selling ONE tower of this type right now (cost of last tower built)
+	if not tower_stats.has(tower_type):
+		push_warning("Towers: tried to get refund value of non-existing tower-type@")
+		return 0.0
+		
+	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
+		return tower_stats[tower_type].cost
+
+	var current_count: int = 0
+	if is_instance_valid(References.island):
+		current_count = References.island.get_towers_by_type(tower_type).size()
+		
+	if current_count == 0:
+		return tower_stats[tower_type].cost ##nothing to sell; fallback to base cost
+		
+	var base_cost = tower_stats[tower_type].cost
+	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
+						else tower_stats[tower_type].cost_scaling_override
+	var refund_value: float = base_cost * pow(scaling, current_count - 1)
+	
+	return snappedf(refund_value, TOWER_COST_INCREMENT)
 
 func get_max_level(tower_type : Type) -> int:
 	return tower_stats[tower_type].max_level #TODO: actually implement this
@@ -155,6 +196,11 @@ func is_tower_upgrade(tower_type: Type) -> bool:
 	if not tower_stats.has(tower_type):
 		return false
 	return tower_stats[tower_type].is_upgrade
+	
+func is_tower_environmental(tower_type: Type) -> bool:
+	if not tower_stats.has(tower_type):
+		return false
+	return tower_stats[tower_type].is_environmental
 	
 func get_tower_upgrades(tower_type: Type) -> Array[Towers.Type]:
 	if not tower_stats.has(tower_type):

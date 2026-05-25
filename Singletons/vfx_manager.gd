@@ -62,7 +62,7 @@ func _draw_vfx():
 			VFXInfo.VFXType.TEXTURE:
 				if not is_instance_valid(info.texture):
 					return #abort
-				transform = transform.scaled(Vector2.ONE * current_scale_val)
+				transform = transform.scaled(vfx.scale * current_scale_val)
 				
 				var frame := int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
 				var fx : int = frame % info.h_frames
@@ -75,12 +75,12 @@ func _draw_vfx():
 				RenderingServer.canvas_item_add_texture_rect_region(canvas_item_rid, draw_rect, info.texture.get_rid(), region)
 
 			VFXInfo.VFXType.CIRCLE:
-				var radius : float = info.radius * current_scale_val
+				var radius : float = vfx.scale.x * info.radius * current_scale_val
 				# For primitives, position is handled by the transform, not the primitive's offset.)
 				RenderingServer.canvas_item_add_circle(canvas_item_rid, Vector2.ZERO, radius, current_color)
 
 			VFXInfo.VFXType.RECTANGLE:
-				var size : Vector2 = info.size * current_scale_val
+				var size : Vector2 = vfx.scale * info.size * current_scale_val
 				var rect := Rect2(-size / 2.0, size)
 				RenderingServer.canvas_item_set_transform(canvas_item_rid, transform)
 				if info.filled:
@@ -100,13 +100,14 @@ func _cleanup_vfx(vfx : VFXInstance):
 	_active_vfx.erase(vfx)
 
 #public api
-func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF) -> VFXInstance:
+func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF, scale = Vector2.ONE) -> VFXInstance:
 	if not info: return
 
 	var vfx := VFXInstance.new()
 	vfx.vfx_info = info
 	vfx.position = position
 	vfx.velocity = velocity
+	vfx.scale = scale * 0.06
 	
 	if lifetime == INF: #NOTE: INF means to use info.lifetime
 		vfx.lifetime = info.lifetime

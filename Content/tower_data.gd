@@ -6,12 +6,14 @@ class_name TowerData
 #meta-properties
 @export var size: Vector2i = Vector2i.ONE
 @export var cost: float = 10.0
+@export var cost_scaling_override: float = 0.0
 @export var required_capacity: float = 1.0
 @export var max_level: int = 5
 @export var element: Towers.Element
 
 @export var is_upgrade: bool = false ##is this tower type itself an upgrade
 @export var is_rite: bool = false ##is this tower type a rite?
+@export var is_environmental: bool = false ##is this tower type environmental? i.e. a forest
 @export var upgrades_into: Dictionary[Towers.Type, float] = {} ##list of possible upgrades, where key is Type and value is cost (in gold)
 
 @export var allowed_terrain: Array[Terrain.Base] = [] #if empty, allows all constructable terrains

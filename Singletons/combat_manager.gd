@@ -319,6 +319,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			Targeting.add_damage(target, -hit_data.expected_damage)
 
 		DeliveryData.DeliveryMethod.CONE_AOE:
+			VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius)
 			var potential_targets : Array[Unit] = get_units_in_radius(hit_data.radius, source_position, hit_data.target_affiliation)
 			if potential_targets.is_empty():
 				return #no potential targets
@@ -418,6 +419,9 @@ static func get_units_in_radius(radius: float, origin: Vector2, affiliation: boo
 		if exclude_units.has(hitbox.unit):
 			continue
 			
+		if hitbox.unit.abstractive:
+			continue
+			
 		output_array.append(hitbox.unit)
 	return output_array
 
@@ -442,6 +446,9 @@ static func get_unit_along_ray(from: Vector2, to: Vector2, affiliation: bool, ex
 		return null
 		
 	if exclude_units.has(hitbox.unit):
+		return null
+		
+	if hitbox.unit.abstractive:
 		return null
 		
 	return hitbox.unit

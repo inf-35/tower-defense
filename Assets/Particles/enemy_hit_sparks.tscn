@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bpkv0kdoa1v2w"]
+[gd_scene format=3 uid="uid://bpkv0kdoa1v2w"]
 
 [ext_resource type="Texture2D" uid="uid://bcrmt4oeeptht" path="res://Assets/blood_particle.png" id="1_fj4ii"]
 
@@ -22,7 +22,7 @@ gravity = Vector3(0, 20, 0)
 scale_max = 4.0
 scale_curve = SubResource("CurveTexture_85dsb")
 
-[node name="EnemyHitSparks" type="GPUParticles2D"]
+[node name="EnemyHitSparks" type="GPUParticles2D" unique_id=1169314906]
 z_index = 3
 z_as_relative = false
 emitting = false

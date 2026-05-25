@@ -30,3 +30,10 @@ func _draw() -> void:
 		
 	if _current_tower.behavior:
 		_current_tower.behavior.draw_visuals(self)
+		
+func draw_cell(cell: Vector2i, color: Color):
+	var _margin: int = 2
+	var cell_size := Island.CELL_SIZE - _margin
+	var half_size := Vector2(cell_size, cell_size) * 0.5
+	var rect := Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
+	draw_rect(rect, color, false, 1.0)

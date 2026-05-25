@@ -1,6 +1,7 @@
 // combined_unit_effects.gdshader
 shader_type canvas_item;
 
+uniform vec4 base_tint: source_color = vec4(1.0, 1.0, 1.0, 1.0);
 // 1. Hit Flash (Managed by Unit.gd/take_hit)
 uniform float flash_intensity : hint_range(0.0, 1.0) = 0.0; // 1.0 = fully white
 uniform float transparency : hint_range(0.0, 1.0) = 1.0;
@@ -9,7 +10,8 @@ uniform float transparency : hint_range(0.0, 1.0) = 1.0;
 uniform vec4 overlay_color : source_color = vec4(0.0, 0.0, 1.0, 0.0); // R, G, B, Alpha of the overlay
 
 void fragment() {
-	vec4 original_color = texture(TEXTURE, UV);
+	vec4 original_color = texture(TEXTURE, UV); //COLOR is built-in modlate
+	original_color = COLOR;
 
 	// --- Step 1: Apply Hit Flash (Instantaneous) ---
 	// Mix original color with white based on intensity.

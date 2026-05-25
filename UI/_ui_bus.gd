@@ -53,6 +53,7 @@ signal get_unit_state(unit: Unit)
 #Player -> UI
 #signal update_blueprints(blueprints: Array[Blueprint]) #WARNING: DEPRECATED
 signal update_tower_types(unlocked_tower_types : Dictionary[Towers.Type, bool], flux_inventory: Dictionary[Towers.Type, int])
+signal update_tower_counts()
 signal update_flux(flux: float)
 signal update_capacity(used: float, total: float)
 signal update_health(health: float)
