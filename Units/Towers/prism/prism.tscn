@@ -1,18 +1,20 @@
-[gd_scene load_steps=18 format=3 uid="uid://ksfx36h6at77"]
+[gd_scene format=3 uid="uid://ksfx36h6at77"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_w167e"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3cbd0"]
 [ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_hutkb"]
-[ext_resource type="Script" uid="uid://ckhifst5yepxi" path="res://Content/Behaviors/prism_tower_behavior.gd" id="3_re6h0"]
+[ext_resource type="Script" uid="uid://ckhifst5yepxi" path="res://Units/Towers/prism/prism_tower_behavior.gd" id="3_re6h0"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_3odyx"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_bkv5h"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_k3v0q"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="5_x46gt"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_mkedu"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_cc5vy"]
 [ext_resource type="Resource" uid="uid://mm6jmnmsl4sn" path="res://Units/Towers/prism/prism_attack.tres" id="8_1h0fc"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_bjnya"]
 [ext_resource type="Texture2D" uid="uid://dcfduo7hvvlqh" path="res://Assets/prism_base.png" id="9_1h0fc"]
 [ext_resource type="Texture2D" uid="uid://gw4gpd6mhy2t" path="res://Assets/prism_crystal.png" id="10_n478g"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="13_bkv5h"]
 
 [sub_resource type="Animation" id="Animation_uhk0q"]
 length = 0.001
@@ -76,11 +78,11 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Prism" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "attack_component")]
+[node name="Prism" type="Node2D" unique_id=799524698 node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_w167e")
 type = 17
-stat_displays = Array[ExtResource("2_3cbd0")]([ExtResource("3_hutkb"), ExtResource("4_bkv5h")])
+stat_displays = Array[ExtResource("2_3cbd0")]([ExtResource("3_hutkb"), ExtResource("4_bkv5h"), ExtResource("5_x46gt")])
 behavior = NodePath("PrismBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -90,37 +92,39 @@ movement_component = NodePath("MovementComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="PrismBehavior" type="Node" parent="."]
+[node name="PrismBehavior" type="Node" parent="." unique_id=1209571841]
 script = ExtResource("3_re6h0")
 metadata/_custom_type_script = "uid://ckhifst5yepxi"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1371919990]
 script = ExtResource("4_3odyx")
 movement_data = ExtResource("5_k3v0q")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1211282462]
 script = ExtResource("6_mkedu")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=1079220689]
 script = ExtResource("7_cc5vy")
 attack_data = ExtResource("8_1h0fc")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1286350146]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("9_1h0fc")
 
-[node name="Crystal" type="Sprite2D" parent="Graphics"]
+[node name="Crystal" type="Sprite2D" parent="Graphics" unique_id=1089155666]
 position = Vector2(0, -16.666666)
 texture = ExtResource("10_n478g")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=514134315]
+script = ExtResource("13_bkv5h")
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=364270912]
 script = ExtResource("8_bjnya")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_uhk0q")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=136393125]
+libraries/ = SubResource("AnimationLibrary_uhk0q")

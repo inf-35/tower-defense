@@ -8,6 +8,7 @@
 
 [resource]
 script = ExtResource("2_f36vk")
+target_type_name = "FOREST"
 id = 19
 cost = -5.0
 required_capacity = 0.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dsllflmiiv5tx"]
+
+[ext_resource type="Texture2D" uid="uid://d13kdblr7tiub" path="res://Assets/watchtower.png" id="1_4do30"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_mpah2"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_6h044"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_6sck2"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="5_o6e7m"]
+[ext_resource type="PackedScene" uid="uid://clynx07x8os3p" path="res://Units/Towers/outpost/outpost.tscn" id="6_mt0mj"]
+
+[resource]
+script = ExtResource("5_o6e7m")
+target_type_name = "OUTPOST"
+id = 60
+cost = 4.5
+required_capacity = 0.8
+element = 5
+tower_name = "Outpost"
+tower_description = "Aims forward at one target tower, which no longer attacks by itself. Whenever any other adjacent tower fires, the target tower immediately fires as well."
+icon = ExtResource("1_4do30")
+preview = ExtResource("1_4do30")
+tower_scene = ExtResource("6_mt0mj")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

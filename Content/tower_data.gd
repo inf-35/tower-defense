@@ -1,6 +1,23 @@
+@tool
 extends Resource
 class_name TowerData
 
+
+@export var target_type_name: String = "VOID"
+@export_tool_button("submit tower type") var submit = submit_tower_type
+func submit_tower_type():
+	var clean_val = target_type_name.strip_edges().to_upper()
+	
+	# Look up the Enum dictionary
+	if Towers.Type.has(clean_val):
+		# Valid! Save the integer and the formatted string
+		id = Towers.Type[clean_val]
+		target_type_name = clean_val
+	else:
+		# Invalid! Reject the change or revert to VOID
+		push_warning("Inspector: '" + target_type_name + "' is not a valid Towers.Type.")
+		id = Towers.Type.VOID
+		target_type_name = "VOID"
 @export var id: Towers.Type
 
 #meta-properties

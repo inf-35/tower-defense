@@ -17,7 +17,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="tower_defense"
 run/main_scene="uid://mhb8xv30283p"
 config/features=PackedStringArray("4.6", "Mobile")
-run/max_fps=200
+run/max_fps=1000
 config/icon="res://Assets/icon.svg"
 
 [audio]

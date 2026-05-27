@@ -116,7 +116,7 @@ func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 
 #helper functions for child classes to use
 func _is_attack_possible(target_needed: bool = true) -> bool:
-	if attack_component == null or range_component == null:
+	if attack_component == null or (target_needed and range_component == null):
 		return false
 	
 	if unit.disabled:

@@ -141,13 +141,15 @@ func begin_new_game():
 		Towers.Type.FROST_TOWER: true,
 		Towers.Type.WATCHTOWER: true,
 		Towers.Type.CAMPGROUNDS: true,
+		Towers.Type.PRISM: true,
+		Towers.Type.OUTPOST: true,
 	}
 	#
 	var reward := Reward.new()
 	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_BLOOD
+	reward.rite_type = Towers.Type.RITE_WHEEL
 	RewardService.apply_reward(reward)
-	#RewardService.apply_reward(reward)
+	RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EARLY_BIRD

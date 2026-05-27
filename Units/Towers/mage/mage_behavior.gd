@@ -2,6 +2,7 @@ extends Behavior
 class_name MageBehavior
 
 @export var network_tint: Color = Color(0.9, 0.7, 1.0, 1.0) # Purple
+@export var pulse_vfx_scene: PackedScene = preload("res://Units/Towers/mage/mage_pulse.tscn")##we keep a single instance to prevent object churn
 
 var _connected_palisades: Array[Tower] = [] ##the list of palisades this specific Mage is currently powering
 
@@ -49,6 +50,14 @@ func _pulse_network() -> void:
 		
 		unit.deal_hit(hit_data, delivery)
 		
+		# trigger the retained vfx
+		if palisade.has_meta("mage_pulse_vfx"):
+			var pulse = palisade.get_meta("mage_pulse_vfx") as RadialPulseVFX
+			if is_instance_valid(pulse):
+				pulse.start_radius = radius * 0.75
+				pulse.max_radius = radius # update dynamically in case relics buffed range
+				pulse.reset()
+				pulse.start()
 		#play the VFX defined in the Mage's attack data on the palisade
 		if hit_data.vfx_on_spawn:
 			VFXManager.play_vfx(hit_data.vfx_on_spawn, palisade.global_position, Vector2.UP)
@@ -131,6 +140,13 @@ func _set_palisade_tint(palisade: Tower, is_connected: bool) -> void:
 	# Only change color if the threshold crosses 0
 	if is_connected and mage_count == 1:
 		get_tree().create_tween().tween_property(palisade.graphics, "self_modulate", network_tint, 0.3)
+		if pulse_vfx_scene:
+			var pulse := pulse_vfx_scene.instantiate() as RadialPulseVFX
+			pulse.autostart = false
+			pulse.destroy_on_finish = false
+			# add to palisade so it moves with it and stays clean
+			palisade.add_child(pulse) 
+			palisade.set_meta("mage_pulse_vfx", pulse)
 	elif mage_count <= 0:
 		get_tree().create_tween().tween_property(palisade.graphics, "self_modulate", Color.WHITE, 0.3)
 		

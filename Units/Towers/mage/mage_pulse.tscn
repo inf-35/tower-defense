@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://5rdkq31bu35f"]
+
+[ext_resource type="Script" uid="uid://cs6gla52lh7q4" path="res://Content/CommonVisuals/radial_pulse.gd" id="1_ukqms"]
+
+[sub_resource type="Gradient" id="Gradient_mrw8l"]
+colors = PackedColorArray(0.89088005, 0.61439997, 0.96, 0.3137255, 1, 1, 1, 0)
+
+[node name="MagePulse" type="Node2D" unique_id=128882441]
+script = ExtResource("1_ukqms")
+filled = true
+color_gradient = SubResource("Gradient_mrw8l")
+autostart = false
+max_radius = 0.0
+metadata/_custom_type_script = "uid://cs6gla52lh7q4"

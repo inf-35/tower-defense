@@ -61,7 +61,8 @@ enum Type {
 	RITE_HAMMER,
 	RITE_SCYTHE,
 	RITE_SNAIL,
-	CAMPGROUNDS
+	CAMPGROUNDS,
+	OUTPOST
 }
 
 enum Element {

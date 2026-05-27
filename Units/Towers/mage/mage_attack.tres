@@ -3,23 +3,12 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_dk6pn"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_3gio5"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_dxh48"]
-[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_dk6pn"]
 
 [sub_resource type="Resource" id="Resource_dk6pn"]
 script = ExtResource("3_dxh48")
 type = 4
 cooldown = 3.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
-
-[sub_resource type="Gradient" id="Gradient_3gio5"]
-colors = PackedColorArray(0.89088005, 0.61439997, 0.96, 0.28235295, 1, 1, 1, 0)
-
-[sub_resource type="Resource" id="Resource_dxh48"]
-script = ExtResource("4_dk6pn")
-vfx_type = 1
-size = Vector2(1, 1)
-color_over_lifetime = SubResource("Gradient_3gio5")
-metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
 script = ExtResource("2_3gio5")
@@ -29,6 +18,5 @@ radius = 10.0
 damage = 0.8
 breaking = true
 status_effects = Array[ExtResource("3_dxh48")]([SubResource("Resource_dk6pn")])
-vfx_on_spawn = SubResource("Resource_dxh48")
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
