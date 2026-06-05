@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://n6s0t78bin6x"]
+
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="1_tdfsb"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_v3njl"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="3_2vjas"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="4_3ixyl"]
+[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="5_qam4f"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="6_muh02"]
+[ext_resource type="PackedScene" uid="uid://df7ncwp7mxqyv" path="res://Units/Towers/resonator/resonator.tscn" id="7_cttj0"]
+
+[sub_resource type="Resource" id="Resource_1xnkv"]
+script = ExtResource("2_v3njl")
+upgrade_index = 1
+metadata/_custom_type_script = "uid://do6qrosup8u56"
+
+[resource]
+script = ExtResource("6_muh02")
+target_type_name = "RESONATOR"
+id = 64
+cost = 7.0
+upgrades_into = Dictionary[int, float]({
+34: 10.0,
+35: 10.0
+})
+tower_name = "Resonator"
+tower_description = "A crude yet effective all-rounder that fires bolts towards enemies."
+icon = ExtResource("1_tdfsb")
+preview = ExtResource("5_qam4f")
+inspector_actions = Array[ExtResource("2_v3njl")]([ExtResource("3_2vjas"), SubResource("Resource_1xnkv"), ExtResource("4_3ixyl")])
+tower_scene = ExtResource("7_cttj0")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

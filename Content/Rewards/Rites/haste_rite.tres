@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://uml7x3xjhff8"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_xvpw2"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_chpw6"]
+
+[resource]
+script = ExtResource("2_chpw6")
+id_name = "blood_rite"
+description = "this is a relic reward description"
+type = 3
+rite_type = 61
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

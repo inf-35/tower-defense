@@ -61,11 +61,11 @@ func _scan_direction(dir: Vector2i) -> Tower:
 	
 	# Scan until edge of map or hit a tower
 	while island.terrain_base_grid.has(current_cell):
-		var check_tower = island.get_tower_on_tile(current_cell)
+		var check_tower := island.get_tower_on_tile(current_cell) as Tower
 		
 		if is_instance_valid(check_tower):
 			# If it's a prism, return it. If it's anything else (wall), block line of sight.
-			if check_tower.type == (unit as Tower).type:
+			if check_tower.type == (unit as Tower).type and (not check_tower.disabled):
 				return check_tower
 			else:
 				return null

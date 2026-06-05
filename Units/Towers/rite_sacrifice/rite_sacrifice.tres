@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://ca71hchx63cv6"]
+
+[ext_resource type="Texture2D" uid="uid://5jvbyn2rc8yf" path="res://Assets/liberty_rite.png" id="1_vkwkj"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_xnq48"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_3mxq6"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_3gwwu"]
+[ext_resource type="PackedScene" uid="uid://cb01alkeyg6y3" path="res://Units/Towers/rite_sacrifice/rite_sacrifice.tscn" id="5_50pjc"]
+
+[resource]
+script = ExtResource("4_3gwwu")
+id = 62
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Rite of Sacrifice"
+tower_description = "{RITE_LABEL}. All adjacent towers gain 50% {UNIT_HITRATE} per empty adjacent tile."
+icon = ExtResource("1_vkwkj")
+preview = ExtResource("1_vkwkj")
+inspector_actions = Array[ExtResource("2_xnq48")]([ExtResource("3_3mxq6")])
+tower_scene = ExtResource("5_50pjc")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

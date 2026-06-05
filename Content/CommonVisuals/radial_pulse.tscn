@@ -1,3 +1,9 @@
 [gd_scene format=3 uid="uid://ojlmrgya1m80"]
 
-[node name="RadialPulse" type="Node2D" unique_id=1961935131]
+[ext_resource type="Script" uid="uid://cs6gla52lh7q4" path="res://Content/CommonVisuals/radial_pulse.gd" id="1_4x5gw"]
+
+[node name="RadialPulse" type="Node2D" unique_id=452343057]
+scale = Vector2(0.06, 0.06)
+script = ExtResource("1_4x5gw")
+filled = true
+metadata/_custom_type_script = "uid://cs6gla52lh7q4"

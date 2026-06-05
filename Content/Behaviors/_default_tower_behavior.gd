@@ -9,7 +9,7 @@ var _locked_target: Unit = null
 var _in_anticipation: bool = false ##whether the unit is in an anticipation state
 
 var _stagger: int = 0
-var _STAGGER_CYCLE: int = 5
+var _STAGGER_CYCLE: int = 2
 
 var predicted_target_pos: Vector2 
 var prediction_valid: bool = false

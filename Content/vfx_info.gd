@@ -6,8 +6,17 @@ const INFINITE_LIFETIME: float = -1.0 ##use for vfx which have unbounded lifetim
 enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var vfx_type: VFXType = VFXType.TEXTURE
 
+@export_group("Scene")
+@export var is_scene: bool = false ##if true, ignores procedural vfx and instantiates scene below
+@export var scene: PackedScene ##vfx scene to instantiate
+@export var is_persistent: bool = false ##if true, attaches to host unit and reuses the same instance
+@export_subgroup("RadialPulse")
+@export var color_gradient: Gradient
+@export var is_full_circle: bool = true
+@export var start_angle_deg: float = -45.0 
+@export var end_angle_deg: float = 45.0   
 # --- Properties for TEXTURE type ---
-@export_category("Texture")
+@export_group("Texture")
 @export var texture: Texture2D
 @export var is_spritesheet: bool = false
 @export var h_frames: int = 1
@@ -15,13 +24,13 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var fps: float = 12.0
 
 # --- Properties for GEOMETRY types ---
-@export_category("Geometry")
+@export_group("Geometry")
 @export var radius: float = 10.0 # For CIRCLE
 @export var size: Vector2 = Vector2(20, 20) # For RECTANGLE
 @export var filled: bool = true # For RECTANGLE, false creates an outline.
 @export var primitive_width: float = 2.0 # For outline width.
 
-@export_category("Line")
+@export_group("Line")
 @export var line_width: float = 3.0
 @export var line_length: float = 20.0
 
@@ -36,6 +45,8 @@ enum RotationMode { STATIC, FACE_VELOCITY, SPIN }
 
 @export var scale_over_lifetime: Curve
 @export var color_over_lifetime: Gradient
+
+
 
 
 ## This function dynamically changes what's visible in the Inspector.

@@ -100,9 +100,11 @@ func _cleanup_vfx(vfx : VFXInstance):
 	_active_vfx.erase(vfx)
 
 #public api
-func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF, scale = Vector2.ONE) -> VFXInstance:
+func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF, scale = Vector2.ONE, host: Node2D = null) -> Variant: ##returns either vfxinstance or instantiated node, dependent on whether vfx was a scene
 	if not info: return
-
+	
+	if info.is_scene:
+		return _play_vfx_scene(info, position, velocity, scale, host)
 	var vfx := VFXInstance.new()
 	vfx.vfx_info = info
 	vfx.position = position
@@ -121,3 +123,59 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	#attach our orphan canvas item to the world canvas
 	_active_vfx.append(vfx)
 	return vfx
+
+func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vector2, host: Node2D) -> Node2D:
+	if not info.scene:
+		push_warning("VFX: ", host, " tried to create vfx without valid scene")
+	
+	var instance: Node2D
+	var is_new: bool = false
+	
+	if info.is_persistent and is_instance_valid(host):
+		#use a unique meta key based on the VFXInfo resource ID to track the instance
+		var meta_key: String = "vfx_persist_" + str(abs(info.get_instance_id()))
+		#NOTE: abs is to filter out hyphens, which form invalid keys
+		print(meta_key)
+		if host.has_meta(meta_key):
+			instance = host.get_meta(meta_key)
+			if not is_instance_valid(instance):
+				instance = null #instance freed somehow?
+			else:
+				print("retrieved ", instance)
+		if not instance:
+			instance = info.scene.instantiate() as Node2D
+			host.add_child(instance)
+			host.set_meta(meta_key, instance)
+			is_new = true
+			print("instantiated ", instance)
+	else:
+		instance = info.scene.instantiate() as Node2D
+		if is_instance_valid(References.island):
+			References.island.add_child(instance)
+	
+	#contract
+	instance.z_index = Layers.ALLIED_PROJECTILES
+	instance.global_position = pos
+	instance.scale = scale * 0.06
+	#setup
+	print("host is ", host, " ", host is Unit, " ", host.attack_component, " ", instance is RadialPulseVFX)
+	var host_unit := host as Unit 
+	if is_instance_valid(host_unit) and is_instance_valid(host.attack_component):
+		if instance is RadialPulseVFX:
+			print("setup...")
+			host_unit.attack_component.setup_radial_pulse(instance as RadialPulseVFX, info)
+		
+	if "velocity" in instance:
+		instance.velocity = velocity
+
+	if instance.has_method("reset"):
+		instance.reset()
+	else:
+		push_warning("VFX: ", instance, " lacks reset!")
+	if instance.has_method("start"):
+		instance.start()
+	else:
+		push_warning("VFX: ", instance, " lacks start!")
+
+	return instance
+		

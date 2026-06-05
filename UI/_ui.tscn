@@ -26,7 +26,7 @@
 [ext_resource type="Script" uid="uid://ddlb750e0o03a" path="res://UI/tutorial/tutorial_manager.gd" id="21_7qncy"]
 [ext_resource type="Shader" uid="uid://filx1mvi3oje" path="res://Shaders/tutorial_spotlight.gdshader" id="22_b47fn"]
 [ext_resource type="PackedScene" uid="uid://cbdyajq0i6jec" path="res://UI/cursor_info/cursor_info.tscn" id="23_vlen6"]
-[ext_resource type="PackedScene" path="res://UI/loading_screen/loading_screen.tscn" id="24_1"]
+[ext_resource type="PackedScene" uid="uid://wv1a4nst6xfl" path="res://UI/loading_screen/loading_screen.tscn" id="24_1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
 shader = ExtResource("22_b47fn")
@@ -66,7 +66,7 @@ visible = false
 offset_right = 74.0
 offset_bottom = 34.0
 
-[node name="LoadingScreen" parent="." instance=ExtResource("24_1")]
+[node name="LoadingScreen" parent="." unique_id=1318486233 instance=ExtResource("24_1")]
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=878017124]
 anchors_preset = 15

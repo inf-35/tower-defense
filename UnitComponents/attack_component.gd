@@ -11,10 +11,15 @@ var damage: float:
 		return get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 var radius: float:
 	get():
+		if attack_data.delivery_method == DeliveryData.DeliveryMethod.CONE_AOE:
+			return get_stat(_modifiers_component, attack_data, Attributes.id.RANGE)
 		return get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
 var cooldown: float:
 	get():
 		return get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
+var range: float:
+	get():
+		return get_stat(_modifiers_component, attack_data, Attributes.id.RANGE)
 
 var current_cooldown: float = 0.0 ##centralised value for cooldown to next attack, starts at cooldown and ticks towards zero
 
@@ -124,4 +129,11 @@ static func predict_intercept_position(source_unit: Unit, target_unit: Unit, pro
 
 func get_save_data() -> Dictionary:
 	return {} #everything here thats persistent is typically run by modifiers component
-	
+#NOTE: currently radius is calibrated(?) incorrectly
+func setup_radial_pulse(radial_pulse: RadialPulseVFX, vfx_info: VFXInfo):
+	radial_pulse.start_radius = radius * 0.75 * 0.5
+	radial_pulse.max_radius = radius * 0.5
+	radial_pulse.color_gradient = vfx_info.color_gradient
+	radial_pulse.is_full_circle = vfx_info.is_full_circle
+	radial_pulse.start_angle_deg = vfx_info.start_angle_deg
+	radial_pulse.end_angle_deg = vfx_info.end_angle_deg

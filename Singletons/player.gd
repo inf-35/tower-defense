@@ -73,7 +73,7 @@ var trader_service: TraderService
 
 func _ready():
 	if not OS.has_feature("web"): # web builds are automatically resized
-		get_window().size = DisplayServer.screen_get_size() * 0.8
+		get_window().size = DisplayServer.screen_get_size() * 0.6
 		get_window().move_to_center()
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
@@ -137,18 +137,17 @@ func begin_new_game():
 		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
 		Towers.Type.FARM: true,
-		Towers.Type.MAGE: true,
-		Towers.Type.FROST_TOWER: true,
-		Towers.Type.WATCHTOWER: true,
-		Towers.Type.CAMPGROUNDS: true,
-		Towers.Type.PRISM: true,
-		Towers.Type.OUTPOST: true,
+		Towers.Type.CANNON: true,
+		Towers.Type.POISON: true,
+		Towers.Type.SIPHON: true,
+		Towers.Type.RESONATOR: true,
 	}
 	#
 	var reward := Reward.new()
 	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_WHEEL
+	reward.rite_type = Towers.Type.RITE_HASTE
 	RewardService.apply_reward(reward)
+	reward.rite_type = Towers.Type.RITE_SACRIFICE
 	RewardService.apply_reward(reward)
 	#reward.relic = Relics.MACUAHUITL
 	#RewardService.apply_reward(reward)

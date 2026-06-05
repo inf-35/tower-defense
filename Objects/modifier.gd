@@ -19,6 +19,14 @@ func _init(_attribute: Attributes.id, _multiplicative: float = 1.0, _additive: f
 	override = _override
 	source_id = _source_id
 	
+func stack(stack: int = 1): ##mutates this modifier instance
+	if stack < 1:
+		return
+	for i in stack-1:
+		additive *= 2.0
+		multiplicative = multiplicative ** 2.0
+	#cooldown and override unaffected
+	
 func duplicate() -> Modifier:
 	var modifier := Modifier.new(
 		attribute,

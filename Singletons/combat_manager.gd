@@ -83,7 +83,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 	var _current_pierces_left: int = 0
 	var _exclude_colliders: Array[RID] = [] #tracks what we've already hit to prevent double collision
 	
-	var vfx_instance: VFXInstance
+	var vfx_instance: Variant
 	#cached objects
 	var _raycast_query: PhysicsRayQueryParameters2D
 	
@@ -139,7 +139,10 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			var move_vec := projectile_velocity * remaining_delta
 			var end_pos := start_pos + move_vec
 			
-			vfx_instance.position = projectile_position #vfx update
+			if vfx_instance is VFXInstance:
+				vfx_instance.position = projectile_position #vfx update
+			else:
+				vfx_instance.global_position = projectile_position
 			
 			# perform custom raycast
 			var result = _perform_raycast(start_pos, end_pos)
@@ -252,7 +255,13 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		CombatManager.simulated_projectiles.erase(self)
 		
 		if is_instance_valid(vfx_instance):
-			vfx_instance.delete = true
+			if vfx_instance is VFXInstance:
+				vfx_instance.delete = true
+			elif vfx_instance is Node2D:
+				if vfx_instance.has_method("stop"):
+					vfx_instance.stop()
+				else:
+					vfx_instance.queue_free()
 			
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
 			
@@ -319,7 +328,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			Targeting.add_damage(target, -hit_data.expected_damage)
 
 		DeliveryData.DeliveryMethod.CONE_AOE:
-			VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius)
+			VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
 			var potential_targets : Array[Unit] = get_units_in_radius(hit_data.radius, source_position, hit_data.target_affiliation)
 			if potential_targets.is_empty():
 				return #no potential targets

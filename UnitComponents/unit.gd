@@ -367,7 +367,7 @@ func take_hit(hit: HitData):
 	
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
-		
+	print(self, " aig")
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
 	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
 	
@@ -394,6 +394,7 @@ func take_hit(hit: HitData):
 	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
+	hit_report.statuses_applied = hit.status_effects.duplicate(true)
 	
 	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
