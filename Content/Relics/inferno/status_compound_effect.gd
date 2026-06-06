@@ -23,11 +23,11 @@ func _handle_detach(_instance: EffectInstance) -> void:
 func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
-	
-	var hit_data := event.data as HitData
+
+	var hit_data: HitData = event.data as HitData
 	if not hit_data:
 		return
-		
+
 	var victim: Unit = event.unit
 	if not is_instance_valid(victim) or not is_instance_valid(victim.modifiers_component):
 		return
@@ -38,11 +38,11 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if not hit_data.status_effects.has(status_type): #hit must also apply burn
 		return
 
-	if randf() > trigger_chance: # rng check
+	if randf() > trigger_chance: #rng check
 		return
-	
+
 	var stacks: float = victim.modifiers_component.get_status_count(status_type) + bonus_stacks
-	# take the duration from the incoming hit to keep it consistent with the attack
+	#take the duration from the incoming hit to keep it consistent with the attack
 	var incoming_duration: float = hit_data.status_effects[status_type].y
 	victim.modifiers_component.add_status(status_type, stacks, incoming_duration)
 	UI.floating_text_manager.show_icon(icon, victim.global_position)

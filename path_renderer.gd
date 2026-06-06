@@ -1,20 +1,20 @@
 extends Node2D
 class_name PathRenderer
 
-@export var stroke_texture: Texture2D ## The main brush stroke (straight lines)
-@export var corner_texture: Texture2D ## The stamp for 90 degree turns
+@export var stroke_texture: Texture2D ##the main brush stroke (straight lines)
+@export var corner_texture: Texture2D ##the stamp for 90 degree turns
 
 @export var tint_color: Color = Color(1,1,1,0.6)
-@export var stroke_spacing: float = 5.0 ## Distance between stamps on straight lines
+@export var stroke_spacing: float = 5.0 ##distance between stamps on straight lines
 @export var stroke_scale: Vector2 = Vector2(0.1, 0.1)
 
-@export var line_color: Color = Color(0.2, 0.15, 0.1, 0.8) # Standard Path
-@export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) # Wall-ignoring Path
-@export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) # Invalid Path
+@export var line_color: Color = Color(0.2, 0.15, 0.1, 0.8) #standard path
+@export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) #wall-ignoring path
+@export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) #invalid path
 
-@export var pos_jitter: float = 0.5 ## Random offset in pixels
-@export var rot_jitter: float = 5.0 ## Random rotation in degrees
-@export var scale_jitter: float = 0.0 ## Random scale variation (e.g. 0.1 = +/- 10%)
+@export var pos_jitter: float = 0.5 ##random offset in pixels
+@export var rot_jitter: float = 5.0 ##random rotation in degrees
+@export var scale_jitter: float = 0.0 ##random scale variation (e.g. 0.1 = +/- 10%)
 
 @export var wave_frequency: float = 0.8
 @export var wave_min_alpha: float = 0.4
@@ -32,7 +32,7 @@ class PathRender:
 	var is_phasing: bool
 	var is_valid: bool
 
-	func _init():
+	func _init() -> void:
 		path_cells = []
 		path_cell_set = {}
 		points = PackedVector2Array()
@@ -47,18 +47,26 @@ var _preview_blocker_hash: int = 0
 var _is_previewing: bool = false
 var _path_cache_dirty: bool = true
 var _preview_dirty: bool = false
+var _is_initialised: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	scale = Vector2.ONE
+	if not Run.is_run_ready():
+		await Run.references_ready
 
 	var island: Island = get_parent() as Island
 	assert(island != null, "PathRenderer must be parented under an Island.")
 	island.navigation_grid_updated.connect(_mark_paths_dirty)
-	Phases.wave_cycle_started.connect(_mark_paths_dirty)
+	Run.phases.wave_cycle_started.connect(_mark_paths_dirty)
 	SpawnPointService.spawn_points_changed.connect(_mark_paths_dirty)
+	_is_initialised = true
+	_mark_paths_dirty()
 
 func _process(_d: float) -> void:
+	if not _is_initialised:
+		return
+
 	_time_from_last_step += Clock.game_delta
 	_time_accumulator += Clock.game_delta
 
@@ -137,22 +145,22 @@ func _rebuild_preview_paths() -> void:
 
 func _build_preview_path_render(start_cell: Vector2i, ignore_walls: bool) -> PathRender:
 	var key: int = _make_path_key(start_cell, ignore_walls)
-	assert(_path_cache_by_key.has(key), "Committed path cache missing preview source.")
-	var committed_path: PathRender = _path_cache_by_key[key]
+	#assert(_path_cache_by_key.has(key), "Committed path cache missing preview source.")
+	var committed_path: PathRender = _path_cache_by_key.get(key)
 
-	if committed_path.is_phasing or not _intersects_blockers(committed_path):
+	if committed_path and (committed_path.is_phasing or not _intersects_blockers(committed_path)):
 		return committed_path
 
 	return _build_path_render(start_cell, false, _preview_blockers)
 
 func _get_current_wave_modes() -> Dictionary:
-	var modes = {"normal": false, "phasing": false}
+	var modes: Dictionary[String, bool] = {"normal": false, "phasing": false}
 
-	if Phases.current_wave_number <= 0:
+	if Run.phases.current_wave_number <= 0:
 		modes.normal = true
 		return modes
 
-	var enemies = WaveEnemies.get_enemies_for_wave(Phases.current_wave_number)
+	var enemies = WaveEnemies.get_enemies_for_wave(Run.phases.current_wave_number)
 	if enemies.is_empty():
 		modes.normal = true
 		return modes
@@ -193,7 +201,7 @@ func _intersects_blockers(path_render: PathRender) -> bool:
 	return false
 
 func _convert_path_to_world(start: Vector2i, path_cells: Array[Vector2i]) -> PackedVector2Array:
-	var world_points := PackedVector2Array([Island.cell_to_position(start)])
+	var world_points: PackedVector2Array = PackedVector2Array([Island.cell_to_position(start)])
 	for cell: Vector2i in path_cells:
 		world_points.append(Island.cell_to_position(cell))
 	return world_points
@@ -232,12 +240,12 @@ func _draw() -> void:
 			draw_color.a *= 3.0
 		_draw_stamped_path(data.points, draw_color)
 
-# --- Stamping Logic ---
+#--- stamping logic ---
 
 func _draw_stamped_path(points: PackedVector2Array, color: Color) -> void:
 	if not stroke_texture: return
 
-	# Seed based on start position so the "hand drawn" look doesn't jitter every frame
+	#seed based on start position so the "hand drawn" look doesn't jitter every frame
 	var rng = RandomNumberGenerator.new()
 	rng.seed = hash(points[0])
 
@@ -246,7 +254,7 @@ func _draw_stamped_path(points: PackedVector2Array, color: Color) -> void:
 	for i in points.size():
 		var current_pos = points[i]
 
-		# 1. Determine Directions
+		#1. determine directions
 		var dir_prev = Vector2.ZERO
 		var dir_next = Vector2.ZERO
 
@@ -255,40 +263,40 @@ func _draw_stamped_path(points: PackedVector2Array, color: Color) -> void:
 		if i < points.size() - 1:
 			dir_next = (points[i+1] - current_pos).normalized()
 
-		# 2. Check for Corner
-		# If the direction in is different from direction out, we are at a bend.
-		# We use a dot product check (if dot < 0.9, they aren't parallel)
+		#2. check for corner
+		#if the direction in is different from direction out, we are at a bend.
+		#we use a dot product check (if dot < 0.9, they aren't parallel)
 		var is_corner: bool = false
 		var flip_corner: bool = true
 		if i > 0 and i < points.size() - 1:
 			if dir_prev.dot(dir_next) < 0.9:
 				is_corner = true
-				# NEW: Determine Turn Direction via Cross Product
-				# In Godot (Y-Down), cross product (x1*y2 - x2*y1) gives:
-				# > 0: Right Turn (Clockwise)
-				# < 0: Left Turn (Counter-Clockwise)
+				#new: determine turn direction via cross product
+				#in godot (y-down), cross product (x1*y2 - x2*y1) gives:
+				#> 0: right turn (clockwise)
+				#< 0: left turn (counter-clockwise)
 				var cross = dir_prev.cross(dir_next)
 				if cross < 0:
 					flip_corner = false
 
 		var stroke_color := color
 		stroke_color.a *= _calculate_path_alpha(path_dist_traveled)
-		# 3. Draw Node Stamp (Corner)
+		#3. draw node stamp (corner)
 		if is_corner and corner_texture:
-			# Calculate angle: Bisect the angle for the corner stamp?
-			# Or just align to the incoming direction?
-			# Simple approach: Align to incoming, let texture handle the look.
+			#calculate angle: bisect the angle for the corner stamp?
+			#or just align to the incoming direction?
+			#simple approach: align to incoming, let texture handle the look.
 			_draw_single_stamp(current_pos, dir_prev.angle(), corner_texture, stroke_color, rng, flip_corner)
 
-		# 4. Draw Segment Strokes (Connecting to next point)
+		#4. draw segment strokes (connecting to next point)
 		elif i < points.size() - 1:
 			_draw_single_stamp(current_pos, dir_next.angle(), stroke_texture, stroke_color, rng, false)
 
 		path_dist_traveled += 1.0
 
 func _draw_single_stamp(pos: Vector2, angle: float, tex: Texture2D, color: Color, rng: RandomNumberGenerator, flip_y: bool) -> void:
-	# Jitter calculations
-	var pos_offset = Vector2(rng.randf_range(-pos_jitter, pos_jitter), rng.randf_range(-pos_jitter, pos_jitter))
+	#jitter calculations
+	var pos_offset: Vector2 = Vector2(rng.randf_range(-pos_jitter, pos_jitter), rng.randf_range(-pos_jitter, pos_jitter))
 	var rot_offset = deg_to_rad(rng.randf_range(-rot_jitter, rot_jitter))
 	var s_jitter = rng.randf_range(-scale_jitter, scale_jitter)
 
@@ -299,19 +307,19 @@ func _draw_single_stamp(pos: Vector2, angle: float, tex: Texture2D, color: Color
 	if flip_y:
 		final_scale.y *= -1.0
 
-	# Drawing with Transform
-	# We construct a transform to handle the rotation and positioning
-	var xform = Transform2D(final_rot, Vector2.ZERO)
+	#drawing with transform
+	#we construct a transform to handle the rotation and positioning
+	var xform: Transform2D = Transform2D(final_rot, Vector2.ZERO)
 	xform = xform.translated(final_pos)
 
 	var tex_size = tex.get_size() * final_scale
-	var rect := Rect2(-tex_size * 0.5, tex_size)
+	var rect: Rect2 = Rect2(-tex_size * 0.5, tex_size)
 
 	draw_set_transform_matrix(xform)
 	draw_texture_rect(tex, rect, false, color)
 
-	#
-	## Reset transform for next operations (though we reset it every loop iteration anyway)
+
+	##reset transform for next operations (though we reset it every loop iteration anyway)
 	#draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func _calculate_path_alpha(distance: float) -> float:

@@ -3,7 +3,7 @@ extends Node
 class_name UnitComponent
 #abstract class for all unit components
 
-@onready var unit : Unit = get_parent()
+@onready var unit: Unit = get_parent()
 #stagger system --- for components that dont need to run every frame
 var _stagger: int = 0
 var _STAGGER_CYCLE: int = 3
@@ -11,10 +11,10 @@ var _accumulated_delta: float = 0.0
 #stat cache system
 var stat_cache: Dictionary[Attributes.id, Variant] = {} #keys are Attributes.id
 
-func initiate():
+func initiate() -> void:
 	pass
 
-func _ready():
+func _ready() -> void:
 	_stagger = randi_range(0, _STAGGER_CYCLE)
 
 func create_stat_cache(modifiers_component: ModifiersComponent, needed_stats: Array[Attributes.id] = []) -> void:
@@ -26,17 +26,17 @@ func create_stat_cache(modifiers_component: ModifiersComponent, needed_stats: Ar
 		if needed_stats.has(attr): #we already know we have the prereqs
 			stat_cache[attr] = modifiers_component.pull_stat(attr)
 	)
-	
+
 func get_stat(modifiers_component: ModifiersComponent, data: Data, attribute: Attributes.id) -> Variant:
 	if stat_cache.has(attribute):
 		return stat_cache[attribute]
 	else:
 		return get_stat_raw(modifiers_component, data, attribute)
-		
+
 func get_stat_raw(modifiers_component: ModifiersComponent, data: Data, attribute: Attributes.id) -> Variant:
 	if not data:
 		push_warning("no data found in ", self, ", unit: ", unit)
 		return 0.0
-	return data.get(Data.get_stringname(attribute)) if (modifiers_component == null or modifiers_component.pull_stat(attribute) == null) else modifiers_component.pull_stat(attribute) 
+	return data.get(Data.get_stringname(attribute)) if (modifiers_component == null or modifiers_component.pull_stat(attribute) == null) else modifiers_component.pull_stat(attribute)
 
 @abstract func get_save_data()

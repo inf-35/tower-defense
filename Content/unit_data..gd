@@ -5,9 +5,9 @@ class_name UnitData
 @export var icon: Texture2D
 @export_multiline var description: String
 @export var stat_displays: Array[StatDisplayInfo] = []
-@export var important: bool = false ## used for hp bar determination
+@export var important: bool = false ##used for hp bar determination
 
 @export var unit_scene: PackedScene
 
-@export var flux_value: float = 0.5 ## base flux dropped on death
-@export var strength_value: float = 1.0 ## used for director/difficulty calculation
+@export var flux_value: float = 0.5 ##base flux dropped on death
+@export var strength_value: float = 1.0 ##used for director/difficulty calculation

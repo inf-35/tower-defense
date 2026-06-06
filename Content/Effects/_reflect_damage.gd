@@ -3,9 +3,9 @@ class_name ReflectDamageEffect
 
 @export var reflection: float = 0.01 ##proportion of damage reflected
 
-func _init():
+func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
-	
+
 func create_instance() -> EffectInstance: #must be implemented in subclasses
 	var instance := EffectInstance.new()
 	apply_generics(instance)
@@ -17,7 +17,7 @@ func _handle_attach(instance: EffectInstance) -> void: #one-time effect upon att
 func _handle_detach(instance: EffectInstance) -> void: #undo _attach
 	pass
 
-func _handle_event(instance: EffectInstance, event : GameEvent):
+func _handle_event(instance: EffectInstance, event : GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
 
@@ -28,5 +28,5 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	reflect_hit.source = instance.host
 	reflect_hit.target = hit_data.source
 	reflect_hit.recursion = hit_data.recursion + 1
-	
+
 	reflect_hit.target.deal_hit(reflect_hit)

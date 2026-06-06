@@ -1,11 +1,11 @@
 extends EffectPrototype
 class_name DamageBoostOnStatusEffect
 
-@export var required_status: Attributes.Status = Attributes.Status.FROST ## seeking status for the unit being damaged
-@export var damage_bonus_per_stack: float = 0.20 ## increased damage per stack
+@export var required_status: Attributes.Status = Attributes.Status.FROST ##seeking status for the unit being damaged
+@export var damage_bonus_per_stack: float = 0.20 ##increased damage per stack
 
 func _init() -> void:
-	# HIT_RECEIVED allows us to modify incoming damage based on the unit's state
+	#hit_received allows us to modify incoming damage based on the unit's state
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
 	global = true
 
@@ -23,8 +23,8 @@ func _handle_detach(_instance: EffectInstance) -> void:
 func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
-	
-	var hit_data := event.data as HitData
+
+	var hit_data: HitData = event.data as HitData
 	if not hit_data:
 		return
 
@@ -38,7 +38,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	var stacks: float = 0.0
 	if victim.modifiers_component._status_effects.has(required_status):
 		stacks = victim.modifiers_component._status_effects[required_status].stack
-	
+
 	if stacks <= 0.0:
 		return
 

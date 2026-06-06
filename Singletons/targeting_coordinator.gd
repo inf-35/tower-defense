@@ -2,7 +2,7 @@ extends Node #TargetingCoordinator
 
 var damage_reservations: Dictionary[Unit, float] = {}
 #records expected damage dealt to enemy, prevents two towers "overkilling" a unit.
-func add_damage(unit: Variant, damage: float): ##its ok to pass a null target into this function
+func add_damage(unit: Variant, damage: float) -> void: ##its ok to pass a null target into this function
 	if not is_instance_valid(unit):
 		return
 
@@ -11,23 +11,23 @@ func add_damage(unit: Variant, damage: float): ##its ok to pass a null target in
 	else:
 		damage_reservations[unit] += damage
 
-func clear_damage(unit):
+func clear_damage(unit) -> void:
 	if not is_instance_valid(unit):
 		return
-		
+
 	damage_reservations.erase(unit)
-	
+
 func is_unit_overkilled(unit: Unit) -> bool: #prevents overkill on units
 	if not damage_reservations.has(unit):
 		return false
-		
+
 	if not is_instance_valid(unit.health_component): #units without health component (bc they dont take damage) should always be ignored
 		return true
-		
+
 	if damage_reservations[unit] >= unit.health_component.health:
 		return true
 	else:
 		return false
 
-func _ready():
+func _ready() -> void:
 	set_process(false)

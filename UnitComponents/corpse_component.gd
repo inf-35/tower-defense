@@ -63,7 +63,7 @@ func _animate_corpse(corpse_root: Node2D, corpse_graphics: Sprite2D, hit_report_
 	corpse_tween.tween_callback(Callable(corpse_root, "queue_free"))
 
 func _prepare_corpse_material(corpse_graphics: Sprite2D) -> ShaderMaterial:
-	var corpse_material := corpse_graphics.material as ShaderMaterial
+	var corpse_material: ShaderMaterial = corpse_graphics.material as ShaderMaterial
 	if not is_instance_valid(corpse_material):
 		return null
 

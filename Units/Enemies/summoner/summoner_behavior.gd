@@ -2,9 +2,9 @@ extends Behavior
 class_name SummonerBehavior
 
 @export var spawn_unit_type: Units.Type = Units.Type.BASIC
-@export var damage_per_unit_cost: float = 1.0 ## e.g., 50 Damage / 10 = 5 Units spawned
-@export var spawn_radius: float = 15.0 ## how far from the host they appear
-@export var max_spawn_count: int = 10 ## safety cap to prevent lag spikes
+@export var damage_per_unit_cost: float = 1.0 ##e.g., 50 damage / 10 = 5 units spawned
+@export var spawn_radius: float = 15.0 ##how far from the host they appear
+@export var max_spawn_count: int = 10 ##safety cap to prevent lag spikes
 
 func start() -> void:
 	super.start()
@@ -21,19 +21,19 @@ func _perform_summoning() -> void:
 		return
 
 	var current_damage: float = unit.get_stat(Attributes.id.DAMAGE)
-	# avoid division by zero or negative logic
+	#avoid division by zero or negative logic
 	if current_damage <= 0 or damage_per_unit_cost <= 0:
 		return
 	var raw_count: int = floori(current_damage / damage_per_unit_cost)
 	var final_count: int = clampi(raw_count, 1, max_spawn_count)
 
-	_play_animation(&"cast") # requires 'cast' animation in the player
+	_play_animation(&"cast") #requires 'cast' animation in the player
 	ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, unit.global_position)
 
-	var island = References.island
+	var island = Run.references.island
 	if not is_instance_valid(island):
 		return
-		
+
 	for i in final_count:
 		var safety: int = 0
 		var spawn_position: Vector2
@@ -46,16 +46,16 @@ func _perform_summoning() -> void:
 				safety += 1
 				continue
 
-			if References.island.tower_grid.has(spawn_cell):
-				var tower: Tower = References.island.tower_grid[spawn_cell]
+			if Run.references.island.tower_grid.has(spawn_cell):
+				var tower: Tower = Run.references.island.tower_grid[spawn_cell]
 				if tower.blocking:
 					safety += 1
 					continue
-			
-			Waves.spawn_enemy(spawn_unit_type, spawn_position)
+
+			Run.waves.spawn_enemy(spawn_unit_type, spawn_position)
 			break
 
-# override display data so we can see the current spawn rate in the debug inspector
+#override display data so we can see the current spawn rate in the debug inspector
 func get_display_data() -> Dictionary:
 	var current_dmg = unit.get_stat(Attributes.id.DAMAGE) if is_instance_valid(unit) else 0.0
 	var count = floori(current_dmg / damage_per_unit_cost)

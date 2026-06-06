@@ -24,7 +24,7 @@ class PathData:
 		NO_PATH,
 	}
 
-	func _init(_path: Array[Vector2i] = [], _status: PathData.Status = PathData.Status.FOUND_PATH):
+	func _init(_path: Array[Vector2i] = [], _status: PathData.Status = PathData.Status.FOUND_PATH) -> void:
 		path = _path
 		status = _status
 

@@ -26,19 +26,19 @@ var host: Unit ##to which unit does this effect apply onto
 var source: Unit ##to which unit does this effect come from (may be null)
 var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect
 
-func _init():
+func _init() -> void:
 	pass
-	
+
 func detach() -> void:
 	enabled = false
 	if is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
-	
+
 func attach_to(_host: Unit) -> void:
 	detach()
 	host = _host
 	enabled = true
-	
+
 	if is_instance_valid(host):
 		if host.abstractive:
 			effect_prototype._handle_display_attach(self)
@@ -55,5 +55,5 @@ func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit i
 	if not global:
 		if not is_instance_valid(host):
 			return
-	
+
 	effect_prototype.event_handler.call(self, event)

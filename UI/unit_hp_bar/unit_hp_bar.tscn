@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://d3v0hdv25fw2n"]
+[gd_scene format=3 uid="uid://d3v0hdv25fw2n"]
 
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_34ent"]
 [ext_resource type="Script" uid="uid://ujr43k3ftswk" path="res://UI/unit_hp_bar/unit_hp_bar.gd" id="2_as0g5"]
 
-[node name="UnitHpBar" type="ProgressBar"]
+[node name="UnitHpBar" type="ProgressBar" unique_id=1030602814]
 z_index = 500
 z_as_relative = false
 offset_right = 10.0

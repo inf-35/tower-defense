@@ -25,14 +25,14 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	if event.unit != instance.host:
 		return
-		
+
 	_spawn_children(instance.host.global_position)
 
 func _spawn_children(origin_pos: Vector2) -> void:
-	var island = References.island
+	var island = Run.references.island
 	if not is_instance_valid(island):
 		return
-		
+
 	for i in spawn_count:
 		var offset := Vector2.from_angle(randf() * TAU) * randf_range(0, spread_radius) #small random enemy
-		Waves.spawn_enemy(spawn_unit_type, origin_pos + offset)
+		Run.waves.spawn_enemy(spawn_unit_type, origin_pos + offset)

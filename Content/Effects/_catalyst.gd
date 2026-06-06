@@ -10,10 +10,10 @@ var state: Dictionary = {
 	"current_recipe": null, #current recipe the catalyst is upholding
 }
 
-func _handle_detach(instance: EffectInstance):
+func _handle_detach(instance: EffectInstance) -> void:
 	clear_effects(instance)
 
-func _handle_event(instance: EffectInstance, event : GameEvent):
+func _handle_event(instance: EffectInstance, event : GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.ADJACENCY_UPDATED:
 		return
 
@@ -23,7 +23,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	assert(instance.host is Tower) #catalyst must be a tower
 
 	var adjacency_data: AdjacencyReportData = event.data as AdjacencyReportData
-	
+
 	if adjacency_data.pivot != instance.host: #we seem to have received the wrong report
 		push_error("received wrong adjacency report. pivot:  ", adjacency_data.pivot, " received by: ", instance.host)
 		return
@@ -44,12 +44,12 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	for adjacency: Vector2i in adjacencies:
 		if not translated_hooks.has(adjacency): #filter out adjacencies that are not hooks
 			continue
-		
+
 		var tower: Tower = adjacencies[adjacency]
 		hooked_towers.append(tower) #add tower to the list of towers concerned (see line 63)
-		
+
 		var element: Towers.Element = Towers.get_tower_element(tower.type)
-		
+
 		if not element_list.has(element): #create element list, see catalyst_recipes
 			element_list[element] = 1
 		else:
@@ -60,7 +60,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	if not result: #we didnt get any valid recipe
 		instance.state.current_recipe = null
 		return
-	
+
 	var recipe: CatalystRecipes.CatalystRecipe = result as CatalystRecipes.CatalystRecipe
 
 	if instance.state.current_recipe == recipe:
@@ -68,24 +68,24 @@ func _handle_event(instance: EffectInstance, event : GameEvent):
 	else:
 		instance.state.current_recipe = recipe
 	#clear existing effects
-	clear_effects(instance) 
+	clear_effects(instance)
 	#add new effects
 	for adjacent_tower: Tower in hooked_towers:
 		var adjacent_tower_element: Towers.Element = Towers.get_tower_element(adjacent_tower.type)
 		if not recipe.effects.has(adjacent_tower_element): #adjacent tower's element does not fall under any effect
 			continue
-		
+
 		var effect_to_apply: EffectPrototype = recipe.effects[adjacent_tower_element]
 		adjacent_tower.apply_effect(effect_to_apply)
-		
+
 		if not catalyst_effects.has(adjacent_tower): #record this new effect down under the affected tower
 			catalyst_effects[adjacent_tower] = [effect_to_apply]
 		else:
 			catalyst_effects[adjacent_tower].append(effect_to_apply)
 
-func clear_effects(instance: EffectInstance):
+func clear_effects(instance: EffectInstance) -> void:
 	assert(instance.state.has("catalyst_effects")) #check for parameter prerequisites
-	
+
 	var catalyst_effects: Dictionary = instance.state.catalyst_effects
 	for affected_tower: Tower in catalyst_effects:
 		for effect_prototype: EffectPrototype in catalyst_effects[affected_tower]:

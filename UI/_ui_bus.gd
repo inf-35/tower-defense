@@ -33,7 +33,7 @@ signal end_wave(wave: int)
 signal start_phase(wave: int, combat: bool, subtype: int)
 signal day_event_ended() ##when any day event, including NONE, ends.
 signal start_combat(wave: int)
-signal display_expansion_choices(choices: Array[ExpansionChoice]) # To UI
+signal display_expansion_choices(choices: Array[ExpansionChoice]) #to ui
 signal hide_expansion_choices()
 signal display_expansion_confirmation(pending_choice_id: int)
 signal hide_expansion_confirmation()

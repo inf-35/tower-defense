@@ -5,13 +5,13 @@ signal selected()
 signal hovered()
 signal unhovered()
 
-# --- References to Animatable Wrappers ---
-# These are the nodes with the 'AnimatableUI.gd' script attached
+#--- references to animatable wrappers ---
+#these are the nodes with the 'animatableui.gd' script attached
 @export var _icon_target: Control
 @export var _panel_target: Control
 
-# --- References to Content ---
-# These are the actual visual containers (children of the wrappers)
+#--- references to content ---
+#these are the actual visual containers (children of the wrappers)
 @export var _real_icon_panel: Control
 @export var _real_description_panel: Control
 
@@ -22,31 +22,31 @@ signal unhovered()
 var _reward_data: Reward
 
 func _ready() -> void:
-	# ensure the container itself can catch mouse events
+	#ensure the container itself can catch mouse events
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	
+
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_on_gui_input)
 
-# Public Setup Function
+#public setup function
 func setup(reward: Reward, index: int) -> void:
 	_reward_data = reward
-	
-	# apply Data
+
+	#apply data
 	_apply_visuals(reward)
-	
-	# configure animation stagger
-	# access the AnimatableUI script properties on the targets
+
+	#configure animation stagger
+	#access the animatableui script properties on the targets
 	var delay_base = index * 0.1
-	
+
 	if is_instance_valid(_icon_target) and "entrance_delay" in _icon_target:
 		_icon_target.entrance_delay = delay_base
 		_icon_target.auto_play_entrance = true
 		_icon_target.animate_entrance()
-		
+
 	if is_instance_valid(_panel_target) and "entrance_delay" in _panel_target:
-		_panel_target.entrance_delay = delay_base + 0.05 # slight offset for fluid feel
+		_panel_target.entrance_delay = delay_base + 0.05 #slight offset for fluid feel
 		_panel_target.auto_play_entrance = true
 		_panel_target.animate_entrance()
 
@@ -54,28 +54,28 @@ func _apply_visuals(reward: Reward) -> void:
 	var title_text: String = "Unknown Reward"
 	var desc_text: String = reward.description
 	var icon_tex: Texture2D = null
-	
+
 	match reward.type:
 		Reward.Type.UNLOCK_TOWER:
 			var type: Towers.Type = reward.tower_type
-			# fetch tower preview/icon
+			#fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
 			desc_text = KeywordService.resolve_tower_description_from_type(type)
-			
+
 		Reward.Type.ADD_RELIC:
 			var relic: RelicData = reward.relic
 			icon_tex = relic.icon
 			title_text = "New Relic: [color=#66ccff]%s[/color]" % relic.title
 			desc_text = relic.description
-			
+
 		Reward.Type.ADD_RITE:
 			var type: Towers.Type = reward.rite_type
-			# fetch tower preview/icon
+			#fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
 			desc_text = KeywordService.resolve_tower_description_from_type(type)
-				
+
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount
 			title_text = "Resource Cache"
@@ -83,14 +83,14 @@ func _apply_visuals(reward: Reward) -> void:
 
 	if icon:
 		icon.texture = icon_tex
-	
+
 	if title:
 		title.set_parsed_text(title_text)
-		
+
 	if description:
 		description.set_parsed_text(desc_text)
 
-# --- input handling ---
+#--- input handling ---
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -98,7 +98,7 @@ func _on_gui_input(event: InputEvent) -> void:
 			Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -1.0)
 			selected.emit()
 
-# manually trigger the hover animations on the children wrappers
+#manually trigger the hover animations on the children wrappers
 func _on_mouse_entered() -> void:
 	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -5.0)
 	hovered.emit()

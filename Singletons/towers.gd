@@ -88,7 +88,7 @@ const TOWER_COST_INCREMENT: float = 0.05  ##smallest increment to which tower pr
 const VERBOSE: bool = false
 const PROTOTYPE_LOAD_CHUNK: int = 4
 
-func get_tower_stat(tower_type: Type, attr: Attributes.id): #gets a tower's stat based off an unmodified prototype
+func get_tower_stat(tower_type: Type, attr: Attributes.id) -> Variant: #gets a tower's stat based off an unmodified prototype
 	var prototype: Tower = get_tower_prototype(tower_type)
 
 	var value = prototype.get_stat(attr)
@@ -110,20 +110,20 @@ func get_tower_prototype(tower_type: Type) -> Tower:
 	return tower_prototypes[tower_type]
 
 func reset_tower_prototype(tower_type: Type) -> void: ##resets a tower prototype (by type). use after manipulation of prototype
-	var prototype := tower_prototypes[tower_type] as Tower
+	var prototype: Tower = tower_prototypes[tower_type] as Tower
 	if prototype: #1915 and 5823 are arbitrary, large, noncongruent values
 		prototype.tower_position = Vector2i(1915 * tower_type * prototype.unit_id, 5823 * tower_type * prototype.unit_id)
 		prototype.facing = Tower.Facing.UP
-	
+
 func get_tower_size(tower_type: Type) -> Vector2i:
 	return tower_stats[tower_type].size
-	
+
 func get_tower_navcost(tower_type: Type) -> int:
 	return tower_stats[tower_type].navcost
 
 func get_tower_icon(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].icon
-	
+
 func get_tower_actions(tower_type: Type) -> Array[InspectorAction]:
 	return tower_stats[tower_type].inspector_actions
 
@@ -134,58 +134,58 @@ func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT t
 	if not tower_stats.has(tower_type):
 		push_warning("Towers: tried to get tower cost of non-existing tower-type")
 		return 0.0
-		
+
 	var base_cost = tower_stats[tower_type].cost
 	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
 		return base_cost
-		
+
 	var current_count: int = 0
-	if is_instance_valid(References.island):
-		current_count = References.island.get_towers_by_type(tower_type).size()
-		
+	if is_instance_valid(Run.references.island):
+		current_count = Run.references.island.get_towers_by_type(tower_type).size()
+
 	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
 						else tower_stats[tower_type].cost_scaling_override
 	var final_cost: float = base_cost * pow(scaling, current_count)
-	
+
 	return snappedf(final_cost, TOWER_COST_INCREMENT)
-	
-func get_tower_refund_value(tower_type: Type): ##returns the refund value for selling ONE tower of this type right now (cost of last tower built)
+
+func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund value for selling one tower of this type right now (cost of last tower built)
 	if not tower_stats.has(tower_type):
 		push_warning("Towers: tried to get refund value of non-existing tower-type@")
 		return 0.0
-		
+
 	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
 		return tower_stats[tower_type].cost
 
 	var current_count: int = 0
-	if is_instance_valid(References.island):
-		current_count = References.island.get_towers_by_type(tower_type).size()
-		
+	if is_instance_valid(Run.references.island):
+		current_count = Run.references.island.get_towers_by_type(tower_type).size()
+
 	if current_count == 0:
 		return tower_stats[tower_type].cost ##nothing to sell; fallback to base cost
-		
+
 	var base_cost = tower_stats[tower_type].cost
 	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
 						else tower_stats[tower_type].cost_scaling_override
 	var refund_value: float = base_cost * pow(scaling, current_count - 1)
-	
+
 	return snappedf(refund_value, TOWER_COST_INCREMENT)
 
 func get_max_level(tower_type : Type) -> int:
 	return tower_stats[tower_type].max_level #TODO: actually implement this
-	
+
 func get_tower_capacity(tower_type : Type) -> float:
 	return tower_stats[tower_type].required_capacity
 
 func get_tower_scene(tower_type: Type) -> PackedScene:
 	return tower_stats[tower_type].tower_scene
-	
+
 func get_tower_allowed_terrains(tower_type: Type) -> Array[Terrain.Base]:
 	return tower_stats[tower_type].allowed_terrain
 
 func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name
-	
+
 func get_tower_preview(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].preview
 
@@ -201,12 +201,12 @@ func is_tower_upgrade(tower_type: Type) -> bool:
 	if not tower_stats.has(tower_type):
 		return false
 	return tower_stats[tower_type].is_upgrade
-	
+
 func is_tower_environmental(tower_type: Type) -> bool:
 	if not tower_stats.has(tower_type):
 		return false
 	return tower_stats[tower_type].is_environmental
-	
+
 func get_tower_upgrades(tower_type: Type) -> Array[Towers.Type]:
 	if not tower_stats.has(tower_type):
 		return []
@@ -226,7 +226,7 @@ func create_tower(tower_type: Type) -> Tower:
 
 func _load_all_tower_stats() -> void:
 	var base_directory: String = "res://Units/Towers/"
-	
+
 	var dir: DirAccess = DirAccess.open(base_directory)
 	if not dir:
 		push_error("Failed to open base tower directory: " + base_directory)
@@ -234,14 +234,14 @@ func _load_all_tower_stats() -> void:
 
 	dir.list_dir_begin()
 	var folder_name: String = dir.get_next()
-	# iterate through all folders in base_directory
+	#iterate through all folders in base_directory
 	while folder_name != "":
-		# check if the current item is a directory and not "." or ".."
+		#check if the current item is a directory and not "." or ".."
 		if dir.current_is_dir() and not folder_name.begins_with("."):
-			# DEBUG: list contents of this specific folder
+			#debug: list contents of this specific folder
 			#var sub_dir_path: String = base_directory + folder_name + "/"
 			#var sub_dir: DirAccess = DirAccess.open(sub_dir_path)
-			#
+
 			#if sub_dir:
 				#push_warning("Scanning Folder: " + folder_name)
 				#sub_dir.list_dir_begin()
@@ -252,18 +252,18 @@ func _load_all_tower_stats() -> void:
 				#sub_dir.list_dir_end()
 			#else:
 				#push_error("Could not access sub-directory: " + sub_dir_path)
-				
-			# construct the expected path to the .tres file based on the new structure
+
+			#construct the expected path to the .tres file based on the new structure
 			var resource_path: String = base_directory + folder_name + "/" + folder_name + ".tres"
-			# format:  res://Units/Towers/[tower type]/[tower type].tres
-			# before trying to load, check if the file actually exists.
+			#format:  res://units/towers/[tower type]/[tower type].tres
+			#before trying to load, check if the file actually exists.
 			if FileAccess.file_exists(resource_path) or FileAccess.file_exists(resource_path + ".remap"): #remap is for web builds
 				var stat_resource: TowerData = load(resource_path)
-				
+
 				if stat_resource:
-					# the enum key is derived from the folder name, e.g., "frost_tower" -> "FROST_TOWER"
+					#the enum key is derived from the folder name, e.g., "frost_tower" -> "frost_tower"
 					var type_name: String = folder_name.to_upper()
-					# convert the string name to the actual enum value
+					#convert the string name to the actual enum value
 					if Type.has(type_name):
 						if VERBOSE: print("Assigned " + resource_path + " to " + type_name)
 						var tower_type: Type = Type[type_name]
@@ -276,13 +276,13 @@ func _load_all_tower_stats() -> void:
 				push_error("Resource did not exist at: " + resource_path)
 
 		folder_name = dir.get_next()
-		
+
 	dir.list_dir_end()
 
-func _init():
+func _init() -> void:
 	_load_all_tower_stats()
-	
-func start():
+
+func start() -> void:
 	for tower_type in tower_stats:
 		get_tower_prototype(tower_type)
 

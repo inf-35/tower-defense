@@ -14,7 +14,7 @@ class_name MovementData
 		value_changed.emit(Attributes.id.ACCELERATION)
 
 @export_category("Turning")
-@export var turn_speed: float = 360.0: # degrees per second
+@export var turn_speed: float = 360.0: #degrees per second
 	set(new_value):
 		turn_speed = new_value
-		value_changed.emit(Attributes.id.TURN_SPEED)  
+		value_changed.emit(Attributes.id.TURN_SPEED)

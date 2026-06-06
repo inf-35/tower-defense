@@ -8,7 +8,7 @@ signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto 
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
-const HP_BAR_SCENE := preload("res://UI/unit_hp_bar/unit_hp_bar.tscn")
+var HP_BAR_SCENE: PackedScene = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
@@ -18,7 +18,7 @@ const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 @export var _DEBUG_DRAW: bool = false
 
 @export_category("Presentation")
-@export var stat_displays : Array[StatDisplayInfo] = []
+@export var stat_displays: Array[StatDisplayInfo] = []
 
 @export_category("Components")
 @export var behavior: Behavior
@@ -37,16 +37,16 @@ const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 
 var flux_value: float #how much flux this unit drops when killed / sold
-var strength: float ## how "strong" this unit is, used for targeting
+var strength: float ##how "strong" this unit is, used for targeting
 #effect-related state
 var effect_prototypes: Array[EffectPrototype] #for prototypes created during runtime
 var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x][y] -> Array[EffectInstance] where x is schedule and y is event hook.
 	EffectPrototype.Schedule.MULTIPLICATIVE: {},
 	EffectPrototype.Schedule.ADDITIVE: {},
 	EffectPrototype.Schedule.REACTIVE: {},
-} 
+}
 #unit state
-var unit_id: int = References.assign_unit_id()
+var unit_id: int = Run.references.assign_unit_id()
 var enemy_type: Units.Type ##assigned by Units.create_unit
 var blocked: bool #whether this unit is currently blocked by a tower
 
@@ -61,13 +61,13 @@ var disabled: bool:
 		if graphics and graphics.material != null:
 			graphics.material.set_shader_parameter(&"overlay_color", Color(0.0, 0.0, 0.0, 1.0) if disabled else Color(0,0,0,0))
 			graphics.material.set_shader_parameter(&"transparency", 0.3 if disabled else 1.0)
-			
+
 var is_ready: bool = false
 
 const BEHAVIOR_CYCLE: int = 3
 var behavior_stagger: int = 0
 
-func _ready():
+func _ready() -> void:
 	add_to_group(DebugAssistant.GROUP_UNITS)
 	behavior_stagger = randi_range(0, BEHAVIOR_CYCLE)
 	name = name + " " + str(unit_id)
@@ -75,16 +75,16 @@ func _ready():
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
-	
+
 	if not is_instance_valid(behavior):
 		behavior = DefaultBehavior.new()
 		add_child(behavior)
-	
+
 	is_ready = true
 	components_ready.emit()
 	behavior.initialise(self)
 
-func _process(_delta: float):
+func _process(_delta: float) -> void:
 	behavior_stagger += 1
 	if not disabled and is_instance_valid(behavior) and behavior_stagger % BEHAVIOR_CYCLE == 0:
 		behavior.update(Clock.game_delta)
@@ -97,22 +97,22 @@ func _create_components() -> void:
 		var n_modifiers_component: = ModifiersComponent.new()
 		add_child(n_modifiers_component)
 		modifiers_component = n_modifiers_component
-		
+
 	if movement_component == null: #by default, add an immobile movement component
 		var n_movement_component: = MovementComponent.new()
 		n_movement_component.movement_data = load("res://Content/Movement/immobile_mvmt.tres")
 		add_child(n_movement_component)
 		movement_component = n_movement_component
-		
+
 	if not is_instance_valid(hitbox):
 		hitbox = Hitbox.new() #generate range area
 		hitbox.name = "Hitbox"
 		hitbox.unit = self
 		add_child.call_deferred(hitbox)
-		
+
 		var shape := RectangleShape2D.new()
 		shape.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
-		
+
 		var collision := CollisionShape2D.new()
 		collision.shape = shape
 		hitbox.add_child.call_deferred(collision)
@@ -136,16 +136,16 @@ func _create_components() -> void:
 
 func _needs_corpse_component() -> bool:
 	return hostile and not abstractive and is_instance_valid(graphics)
-	
+
 func _prepare_components() -> void:
-	unit_id = References.assign_unit_id() #assign this unit a unit id
-	
+	unit_id = Run.references.assign_unit_id() #assign this unit a unit id
+
 	if is_instance_valid(hitbox) and abstractive:
-		hitbox.monitorable = false # disables the hitbox (if abstractive)
-		
+		hitbox.monitorable = false #disables the hitbox (if abstractive)
+
 	died.connect(func(hit_report_data: HitReportData):
 		hit_report_data.flux_value = flux_value #submit base flux value to be modified
-		
+
 		on_killed(hit_report_data) #connect the died signal to the on_killed method. for units this frees the instance
 		#(which implements flux reward and ruins behaviour for units and towers respectively)
 		var evt := GameEvent.new()
@@ -157,13 +157,13 @@ func _prepare_components() -> void:
 		var changed_cell_data := ChangedCellData.new()
 		changed_cell_data.new_cell = new_cell
 		changed_cell_data.original_cell = old_cell
-		
+
 		var evt := GameEvent.new()
 		evt.event_type = GameEvent.EventType.CHANGED_CELL
 		evt.data = changed_cell_data
 		on_event.emit(evt)
 	)
-	
+
 	if graphics != null:
 		var unit_effects_shader_material := ShaderMaterial.new()
 		unit_effects_shader_material.shader = UNIT_EFFECT_SHADER
@@ -177,7 +177,7 @@ func _prepare_components() -> void:
 				#command range component to prioritise the tower
 				if is_instance_valid(range_component):
 					range_component.priority_target_override = tower
-				# command the movement component to stop moving
+				#command the movement component to stop moving
 				if is_instance_valid(movement_component):
 					movement_component.target_direction = Vector2.ZERO
 				blocked = true
@@ -186,39 +186,39 @@ func _prepare_components() -> void:
 					range_component.priority_target_override = null
 				blocked = false
 		)
-	
+
 	if movement_component != null:
 		movement_component.inject_components(graphics, modifiers_component)
 		position = movement_component.position
-		
+
 		movement_component.movement_to_cell.connect(changed_cell.emit)
-	
+
 	if health_component != null:
 		health_component.inject_components(modifiers_component)
 		_attach_health_bar()
-	
+
 	if attack_component != null:
 		attack_component.inject_components(modifiers_component)
-	
+
 	if range_component != null and attack_component.attack_data:
 		range_component.inject_components(attack_component, modifiers_component)
-	
+
 	for child in get_children(true):
 		if "unit" in child:
 			child.unit = self
 
 func _setup_event_bus() -> void:
-	Player.on_event.connect(func(_unit: Unit, event: GameEvent): #propagate wave events from global to local scope
+	Run.player.on_event.connect(func(_unit: Unit, event: GameEvent): #propagate wave events from global to local scope
 		if not (event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED):
 			return
-		
+
 		on_event.emit(event)
 	)
-	
+
 	on_event.connect(func(event: GameEvent): #setup main event bus
 		if event.data.recursion > EffectInstance.GLOBAL_RECURSION_LIMIT:
 			return #prevent recursion
-			
+
 		event.unit = self
 		#execute local effects
 		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
@@ -230,28 +230,39 @@ func _setup_event_bus() -> void:
 		#exectue global effects
 		if event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
 			return
-		Player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
+		Run.player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
 	)
 
 func _attach_health_bar() -> void:
 	if abstractive or disabled or DebugAssistant.disable_hp_bars:
 		return
-		
-	var hp_bar : UnitHPBar = HP_BAR_SCENE.instantiate()
+
+	if not HP_BAR_SCENE.can_instantiate():
+		push_error("Unit: hp bar scene could not be instantiated.")
+		return
+
+	var hp_bar: UnitHPBar = HP_BAR_SCENE.instantiate()
+	if not is_instance_valid(hp_bar):
+		push_error("Unit: hp bar scene instantiated to an invalid control.")
+		return
+
 	add_child.call_deferred(hp_bar)
 	hp_bar.ready.connect(func():
-		hp_bar.setup(self, health_component)
-		# connect hitbox mouse events to the hp bar
+		if not hp_bar.has_method(&"setup"):
+			push_error("Unit: hp bar scene is missing setup().")
+			return
+		hp_bar.call(&"setup", self, health_component)
+		#connect hitbox mouse events to the hp bar
 		var hitbox_node := hitbox
 		hitbox_node.visible = true #doesnt actl affect graphics, just makes it hoverable
 		hitbox_node.process_mode = Node.PROCESS_MODE_ALWAYS #allows hovering to work even when paused
 		if is_instance_valid(hitbox_node):
-			# ensure hitbox is pickable
+			#ensure hitbox is pickable
 			hitbox_node.input_pickable = true
-			
-			hitbox_node.mouse_entered.connect(hp_bar.on_mouse_entered)
-			hitbox_node.mouse_exited.connect(hp_bar.on_mouse_exited),
-			
+
+			hitbox_node.mouse_entered.connect(Callable(hp_bar, &"on_mouse_entered"))
+			hitbox_node.mouse_exited.connect(Callable(hp_bar, &"on_mouse_exited")),
+
 		CONNECT_ONE_SHOT
 	)
 
@@ -274,7 +285,7 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 	if get_effect_instance_by_prototype(effect_prototype):
 		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
 		return get_effect_instance_by_prototype(effect_prototype)
-	
+
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	var schedule := effect_instance.schedule
 	for event_hook: GameEvent.EventType in effect_instance.event_hooks:
@@ -288,72 +299,56 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 
 func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effects, regardless of number
 	var effects_to_remove: Array[EffectInstance] = get_effect_instances_by_prototype(effect_prototype)
-			
+
 	for effect in effects_to_remove:
 		effect.detach() #trigger effect's detach handler
 		for event_hook in effect.event_hooks:
 			effects[effect.schedule][event_hook].erase(effect)
-		
+
 		effect.free()
-#
+
 	effect_prototypes.erase(effect_prototype)
 
-# helper to find a specific running instance of a prototype on this unit
+#helper to find a specific running instance of a prototype on this unit
 func get_effect_instance_by_prototype(proto: EffectPrototype) -> EffectInstance:
-	# iterate through all schedules to find the instance
+	#iterate through all schedules to find the instance
 	for instance_array: Array in effects[proto.schedule].values():
 		for instance: EffectInstance in instance_array:
 			if instance.effect_prototype == proto:
 					return instance
 	return null
-	
+
 func get_effect_instances_by_prototype(proto: EffectPrototype) -> Array[EffectInstance]:
 	var output: Array[EffectInstance] = []
-	# iterate through all schedules to find the instance
+	#iterate through all schedules to find the instance
 	for schedule_dictionary: Dictionary in effects.values():
 		for instance_array: Array in schedule_dictionary.values():
 			for instance: EffectInstance in instance_array:
 				if instance.effect_prototype == proto and not output.has(instance):
 					output.append(instance)
 	return output
-#
-#func get_intrinsic_effect_attribute(effect_type: Effects.Type, attribute_name: StringName) -> Variant: ##access properties of intrinsic effects, mainly for UI
-	#if not effects_by_type.has(effect_type):
-		#return null
-		#
-	#var instances = effects_by_type[effect_type]
-	#if instances.is_empty():
-		#return null
-		#
-	## for intrinsic effects, we usually only care about the first one.
-	#var first_instance: EffectInstance = instances[0]
-	## using .get() is safer than `[]` as it returns null instead of crashing if the key doesn't exist.
-	#if first_instance.effect_prototype.get(attribute_name): #first check effect prototype parameters
-		#return first_instance.effect_prototype.get(attribute_name)
-	#else: #fallback to checking effect instance state
-		#return first_instance.state.get(attribute_name)
 
 func get_behavior_attribute(attribute_name: StringName) -> Variant: ##accesses properties for units, mainly for UI
 	if not is_instance_valid(behavior):
 		return null
-	
-	# check that the behavior actually implements the function before calling it.
+
+	#check that the behavior actually implements the function before calling it.
 	if behavior.has_method(&"get_display_data"):
 		var data: Dictionary = behavior.get_display_data()
-		# use .get() for a safe lookup that returns null if the key doesn't exist.
+		#use .get() for a safe lookup that returns null if the key doesn't exist.
 		return data.get(attribute_name, null)
-		
+
 	return null
-	
+
 func get_unit_state() -> void: ##used to refresh data about units, mainly for UI
 	if is_instance_valid(health_component):
 		UI.update_unit_health.emit(self, health_component.max_health, health_component.health)
 
-func set_initial_behaviour_state(behavior_packet: Dictionary): ##preconfigure units before instantiation, used for environmental features with custom states (see terrain_expansion.gd)
+func set_initial_behaviour_state(behavior_packet: Dictionary) -> void: ##preconfigure units before instantiation, used for environmental features with custom states (see terrain_expansion.gd)
 	if not is_instance_valid(behavior):
 		components_ready.connect(set_initial_behaviour_state.bind(behavior_packet), CONNECT_ONE_SHOT)
 		return #wait until everything's ready
-	
+
 	for attribute: StringName in behavior_packet:
 		if attribute in behavior:
 			behavior[attribute] = behavior_packet[attribute]
@@ -361,26 +356,26 @@ func set_initial_behaviour_state(behavior_packet: Dictionary): ##preconfigure un
 			push_error(self, ": tried to apply behaviour modification of key: ", attribute, " but could not find matching behaviour attribute.")
 	UI.update_unit_state.emit(self)
 
-func take_hit(hit: HitData):
+func take_hit(hit: HitData) -> void:
 	if not is_instance_valid(self):
 		return
-	
+
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
 	print(self, " aig")
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
 	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
-	
+
 	hit.damage = maxf(hit.damage, 0.0)
-	
+
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
 	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
-	
+
 	if hit.negate: #ignore negated hits
 		return
-	
+
 	var damage: float = evt.data.damage
 	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
 	health_component.take_damage(damage, evt.data.breaking)
@@ -395,23 +390,23 @@ func take_hit(hit: HitData):
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
 	hit_report.statuses_applied = hit.status_effects.duplicate(true)
-	
+
 	if unit_dead: #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
 
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
-		
+
 		died.emit(hit_report) #NOTE: this is when the unit dies
 	else:
 		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
-		
+
 		var shader_material: ShaderMaterial = graphics.material as ShaderMaterial
 		shader_material.set_shader_parameter(&"flash_intensity", 1.0)
-		
+
 		var flash_tween := create_tween()
 		flash_tween.tween_property(shader_material, "shader_parameter/flash_intensity", 0.0, 0.25)
 		flash_tween.play()
-		
+
 	for modifier: Modifier in hit.modifiers:
 		modifiers_component.add_modifier(modifier)
 
@@ -421,20 +416,20 @@ func take_hit(hit: HitData):
 		if stack <= 0.0: #refuse to process insignificant status effects (will crash if not done otherwise)
 			continue
 		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id if is_instance_valid(hit.source) else 0)
-	
+
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT
 	hit_report_evt.data = hit_report
-	
+
 	if not is_instance_valid(hit.source):
 		return
 	hit.source.on_event.emit(hit_report_evt) #cause source of hit to emit report
 
-func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
+func deal_hit(hit: HitData, delivery_data : DeliveryData = null) -> void:
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.PRE_HIT_DEALT
 	evt.data = hit
-	
+
 	on_event.emit(evt) #trigger any pre-hit-received effects, such as damage buffs
 	#------ HANDOVER --------
 	if delivery_data == null: #fallback on guaranteed instant hit
@@ -442,12 +437,12 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null):
 		hit.target.take_hit(hit) #cause target to take hit
 	else:
 		CombatManager.resolve_hit(hit, delivery_data)
-		
-# this is a new virtual function that deals with actual death (connects to the died signal)
+
+#this is a new virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Player.flux += hit_report_data.flux_value * 0.4 #reward player with flux
+	Run.player.flux += hit_report_data.flux_value * 0.4 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
-	
+
 	behavior.detach() #disable behavior
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		remove_effect(effect_prototype) #detach effects
@@ -458,9 +453,9 @@ func on_killed(hit_report_data: HitReportData) -> void:
 	queue_free()
 
 func get_terrain_base() -> Terrain.Base: #retrieves terrain base at current position
-	return References.island.get_terrain_base(movement_component.cell_position)
-	
-func get_stat(attr: Attributes.id): #GENERIC get stat function
+	return Run.references.island.get_terrain_base(movement_component.cell_position)
+
+func get_stat(attr: Attributes.id) -> Variant: #generic get stat function
 	if health_component != null:
 		if attr == Attributes.id.MAX_HEALTH or attr == Attributes.id.REGENERATION or attr == Attributes.id.REGEN_PERCENT or attr == Attributes.id.DAMAGE_TAKEN or attr == Attributes.id.FLAT_DAMAGE_TAKEN:
 			return health_component.get_stat(modifiers_component, health_component.health_data, attr)
@@ -468,10 +463,12 @@ func get_stat(attr: Attributes.id): #GENERIC get stat function
 	if movement_component != null:
 		if attr == Attributes.id.MAX_SPEED or attr == Attributes.id.ACCELERATION:
 			return movement_component.get_stat(modifiers_component, movement_component.movement_data, attr)
-	
+
 	if attack_component != null:
 		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
+
+	return null
 
 func _draw() -> void:
 	if not _DEBUG_DRAW:
@@ -483,15 +480,15 @@ func _draw() -> void:
 			var next_pos = Island.cell_to_position(next_tile)
 			draw_line(Vector2.ZERO, to_local(next_pos), Color(0, 0, 1, 0.5), 2.0)
 
-	# 2. VISUALIZE TARGET (Red/Yellow Line)
+	#2. visualize target (red/yellow line)
 	if is_instance_valid(range_component):
 		var target = range_component.get_target()
 		if is_instance_valid(target):
 			var local_target = to_local(target.global_position)
 
-			# YELLOW = Priority Override (Blocking Tower)
-			# RED = Normal Target (Closest/Health/etc)
-			var color = Color(1,0,0,0.5)
+			#yellow = priority override (blocking tower)
+			#red = normal target (closest/health/etc)
+			var color: Color = Color(1,0,0,0.5)
 			if range_component.priority_target_override == target:
 				color = Color(1,1,0,0.5)
 

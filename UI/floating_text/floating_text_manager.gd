@@ -1,7 +1,7 @@
 extends Node2D
 class_name FloatingTextManager
 
-# --- Configuration ---
+#--- configuration ---
 @export var text_scene: PackedScene
 @export var initial_pool_size: int = 20
 
@@ -11,19 +11,19 @@ class_name FloatingTextManager
 @export var default_gravity: float = 10.0
 @export var default_lifetime: float = 0.5
 
-# --- State ---
+#--- state ---
 var _pool: Array[FloatingText] = []
 var _active_count: int = 0
 
 func _ready() -> void:
 	UI.floating_text_manager = self
-	
-	# Pre-populate
+
+	#pre-populate
 	if text_scene:
 		for i in range(initial_pool_size):
 			_create_new_text()
 
-# --- Public API ---
+#--- public api ---
 
 func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, scale_mod: float = 1.0) -> void:
 	if DebugAssistant.disable_floating_text:
@@ -31,7 +31,7 @@ func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, sc
 	var str_val = str(snappedf(value, 0.1))
 	var final_color = color
 	var scale_mult = scale_mod
-	
+
 	_spawn_text(str_val, world_pos, final_color, scale_mult)
 
 func show_text(text: String, world_pos: Vector2, color: Color) -> void:
@@ -49,34 +49,34 @@ func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0) -> v
 		instance = _create_new_text()
 	else:
 		instance = _pool.pop_back()
-	
+
 	_active_count += 1
-	
-	# float up
-	var vel = Vector2(0, -7.0) 
+
+	#float up
+	var vel: Vector2 = Vector2(0, -7.0)
 	instance.scale = Vector2(0.06, 0.06) * scale_mod
-	
-	var lifetime = 0.5 if Phases.current_phase == Phases.GamePhase.COMBAT_WAVE else 1.2
-	var color = Color(1,1,1,0.5) if Phases.current_phase == Phases.GamePhase.COMBAT_WAVE else Color.WHITE
-	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self) # 0 gravity
+
+	var lifetime = 0.5 if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else 1.2
+	var color: Color = Color(1,1,1,0.5) if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else Color.WHITE
+	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self) #0 gravity
 
 func _spawn_text(txt: String, pos: Vector2, col: Color, scale_mod: float) -> void:
 	var instance: FloatingText
-	
+
 	if _pool.is_empty():
 		instance = _create_new_text()
 	else:
 		instance = _pool.pop_back()
-		
+
 	_active_count += 1
 
-	var vel = Vector2(
+	var vel: Vector2 = Vector2(
 		randf_range(default_velocity_min.x, default_velocity_max.x),
 		randf_range(default_velocity_min.y, default_velocity_max.y)
 	) * scale_mod
 
 	instance.scale = Vector2(0.06, 0.06) * scale_mod
-	
+
 	instance.setup(txt, pos, col, vel, default_gravity, default_lifetime, self)
 
 func _create_new_text() -> FloatingText:

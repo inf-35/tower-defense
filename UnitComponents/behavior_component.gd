@@ -1,10 +1,10 @@
 extends Node
 class_name Behavior
 
-# this will be the unit "chassis" that owns this behavior
+#this will be the unit "chassis" that owns this behavior
 var unit: Unit
 
-# references to the unit's other components, injected by the unit itself
+#references to the unit's other components, injected by the unit itself
 var modifiers_component: ModifiersComponent
 var health_component: HealthComponent
 var movement_component: MovementComponent
@@ -18,11 +18,11 @@ var turret: Node2D
 #generic "timer" variable
 var _cooldown: float = 0.0 ##NOTE: this is not the attack cooldown, which can be found in AttackComponent
 
-func initialise(host_unit: Unit): ##his function is called by the unit to give the behavior all the tools it needs
+func initialise(host_unit: Unit) -> void: ##his function is called by the unit to give the behavior all the tools it needs
 	set_process(false)
-	
+
 	self.unit = host_unit
-	# safely get references
+	#safely get references
 	self.modifiers_component = unit.modifiers_component
 	self.health_component = unit.health_component
 	self.movement_component = unit.movement_component
@@ -30,40 +30,40 @@ func initialise(host_unit: Unit): ##his function is called by the unit to give t
 	self.range_component = unit.range_component
 	self.attack_component = unit.attack_component
 	self.animation_player = unit.animation_player
-	
+
 	self.graphics = unit.graphics
 	if &"turret" in unit:
 		self.turret = unit.turret
-		
+
 	if unit.abstractive:
 		display_start()
 		return
 
 	start()
-	
+
 	unit.on_event.connect(func(event: GameEvent):
 		if event.event_type == GameEvent.EventType.WAVE_STARTED:
 			_cooldown = 0.0 #reset timer upon wave starting
-		
+
 		if event.event_type == GameEvent.EventType.HIT_RECEIVED:
 			_play_animation(&"hit")
-			
+
 		if event.event_type == GameEvent.EventType.REPLACED: #handle transfer to new unit behavior
-			var data := event.data as UnitReplacedData
+			var data: UnitReplacedData = event.data as UnitReplacedData
 			if data.old_unit == unit:
 				if is_instance_valid(data.new_unit.behavior):
 					transfer_state(data.new_unit.behavior)
 	)
 
-func detach(): ##function called when the unit wants to detach this behavior (i.e. upon death)
-	pass
-	
-func attach(): ##function called when the unit wants to reattach this handler (i.e. tower resurrection)
+func detach() -> void: ##function called when the unit wants to detach this behavior (i.e. upon death)
 	pass
 
-func transfer_state(new_behavior: Behavior): ##called when we want to transfer state to another behavior (i.e. upgrading)
+func attach() -> void: ##function called when the unit wants to reattach this handler (i.e. tower resurrection)
+	pass
+
+func transfer_state(new_behavior: Behavior) -> void: ##called when we want to transfer state to another behavior (i.e. upgrading)
 	new_behavior._cooldown = _cooldown
-	
+
 func display_start() -> void: ##for prototypes (abstractive)
 	pass
 
@@ -72,43 +72,43 @@ func start() -> void: ##behavior start function, called at the start of behavior
 	_attempt_navigate_to_origin()
 
 func update(delta: float) -> void: ##main update loop; delta is already game delta
-	# this virtual function will be overridden by concrete behaviors
+	#this virtual function will be overridden by concrete behaviors
 	_cooldown += delta
 	_attempt_simple_attack()
 
-# this virtual function is the new, generic entrypoint for the UI to query
-# custom data from a behavior. concrete behaviors should override this.
+#this virtual function is the new, generic entrypoint for the ui to query
+#custom data from a behavior. concrete behaviors should override this.
 func get_display_data() -> Dictionary:
-	return {} # return an empty dictionary by default
+	return {} #return an empty dictionary by default
 
 func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
-	var tower := unit as Tower
+	var tower: Tower = unit as Tower
 	if not tower.get_stat(Attributes.id.RANGE):
 		return
 	canvas.draw_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
-	
+
 func draw_visuals_adjacent_tiles(canvas: RangeIndicator) -> void:
-	var tower := unit as Tower
+	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower): return
-	
+
 	var margin: int = 2
 	var cell_size := Island.CELL_SIZE - margin
-	var half_size := Vector2(cell_size, cell_size) * 0.5
+	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
 
 	var adj_cells: Array[Vector2i] = tower.get_adjacent_cells()
-	
+
 	for cell: Vector2i in adj_cells:
 		var dir_vec: Vector2i = cell - tower.tower_position
-		
+
 		if self.has_method(&"_is_local_direction_allowed"): #for EffectDistributorBehavior
 			if not self.call(&"_is_local_direction_allowed", tower.facing, dir_vec):
 				continue
 
 		var pos = Island.cell_to_position(cell)
-		var rect = Rect2(pos - half_size, Vector2(cell_size, cell_size))
+		var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
 
 		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
-	
+
 #a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 	if is_instance_valid(animation_player) and animation_player.has_animation(anim_name):
@@ -118,13 +118,13 @@ func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:
 func _is_attack_possible(target_needed: bool = true) -> bool:
 	if attack_component == null or (target_needed and range_component == null):
 		return false
-	
+
 	if unit.disabled:
 		return false
-		
+
 	if unit.attack_only_when_blocked and not unit.blocked:
 		return false
-	
+
 	#print(attack_component, " ", attack_component.attack_data)
 	if attack_component.current_cooldown <= 0.0:
 		if not target_needed:
@@ -139,23 +139,23 @@ func _is_attack_possible(target_needed: bool = true) -> bool:
 func _attempt_simple_attack() -> bool:
 	if not _is_attack_possible():
 		return false
-		
+
 	var target = range_component.get_target() as Unit
 	if target:
 		#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
 		attack_component.attack(target)
 		unit.queue_redraw()
 		return true
-		
+
 	return false
 
 func _attempt_navigate_to_origin() -> bool:
 	if not is_instance_valid(navigation_component):
 		return false
-	
+
 	navigation_component.goal = Vector2i.ZERO
 	return true
-	
+
 func get_save_data() -> Dictionary:
 	return {}
 

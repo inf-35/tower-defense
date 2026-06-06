@@ -1,15 +1,15 @@
 extends EffectPrototype
 class_name WallflowerEffect
 
-# --- Configuration ---
+#--- configuration ---
 @export var modifier_prototype: ModifierDataPrototype
 
-# --- State ---
+#--- state ---
 class WallflowerState extends RefCounted:
 	var modifier: Modifier
 
 func _init() -> void:
-	# Recalculate on grid changes
+	#recalculate on grid changes
 	event_hooks = [GameEvent.EventType.ADJACENCY_UPDATED]
 
 func create_instance() -> EffectInstance:
@@ -37,9 +37,9 @@ func _evaluate(instance: EffectInstance) -> void:
 
 	var neighbors = tower.get_adjacent_towers()
 	var has_neighbors = not neighbors.is_empty()
-	
+
 	var state = instance.state as WallflowerState
-	
+
 	if not has_neighbors:
 		if not state.modifier:
 			UI.floating_text_manager.show_icon(icon, tower.global_position)
@@ -47,7 +47,7 @@ func _evaluate(instance: EffectInstance) -> void:
 			tower.modifiers_component.add_modifier(mod)
 			state.modifier = mod
 	else:
-		# remove buff (condition failed)
+		#remove buff (condition failed)
 		if state.modifier:
 			tower.modifiers_component.remove_modifier(state.modifier)
 			state.modifier = null

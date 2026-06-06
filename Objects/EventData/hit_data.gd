@@ -21,8 +21,8 @@ var status_effects: Dictionary[Attributes.Status, Vector2] = {} ##Attributes.Sta
 var expected_damage: float = 0.0 ##see TargetingCoordinator, projected amount of damage caused
 
 
-var velocity: Vector2 ## instantaneous velocity of the projectile, set by CombatManager
+var velocity: Vector2 ##instantaneous velocity of the projectile, set by combatmanager
 
-var vfx_on_spawn : VFXInfo #see VFXManager and VFXInstance
-var vfx_on_impact : VFXInfo
+var vfx_on_spawn: VFXInfo #see VFXManager and VFXInstance
+var vfx_on_impact: VFXInfo
 #see unit.gd, deal_hit and take_hit and AttackData

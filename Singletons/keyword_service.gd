@@ -3,7 +3,7 @@ extends Node
 var ICON_SIZE: int = 40
 #NOTE:
 #parameters: icon_size, color, label
-# master dictionary for static keywords
+#master dictionary for static keywords
 const KEYWORDS: Dictionary[String, Dictionary] = {
 	"GOLD": {
 		"title": "Gold",
@@ -142,99 +142,99 @@ var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")
 
 var _regex: RegEx
 
-func _ready():
+func _ready() -> void:
 	_verify_keywords()
-	
-	# initialize regex for parsing {KEYWORD} patterns
-	_regex = RegEx.new()
-	_regex.compile("\\{([^}]+)\\}") 
 
-# the main public API for other scripts to query
-# now supports dynamic lookup for T_ (tower) and R_ (relic) prefixes
+	#initialize regex for parsing {keyword} patterns
+	_regex = RegEx.new()
+	_regex.compile("\\{([^}]+)\\}")
+
+#the main public api for other scripts to query
+#now supports dynamic lookup for t_ (tower) and r_ (relic) prefixes
 func get_keyword_data(keyword: String) -> Dictionary:
 	var upper_key: String = keyword.to_upper()
-	
-	# 1. check static keywords first
+
+	#1. check static keywords first
 	if KEYWORDS.has(upper_key):
 		return KEYWORDS[upper_key]
-		
-	# 2. check for tower prefix
+
+	#2. check for tower prefix
 	if upper_key.begins_with("T_"):
 		return _resolve_tower_data(upper_key.trim_prefix("T_"))
-		
+
 	if upper_key.begins_with("U_"):
 		return _resolve_unit_data(upper_key.trim_prefix("U_"))
-		
-	# 3. check for relic prefix
+
+	#3. check for relic prefix
 	if upper_key.begins_with("R_"):
 		return _resolve_relic_data(upper_key.trim_prefix("R_"))
-		
+
 	return {}
 
-# converts text with {MARKERS} into rich bbcode
+#converts text with {markers} into rich bbcode
 func parse_text_for_bbcode(text: String) -> String:
 	if text.is_empty():
 		return ""
-		
+
 	var parsed_text: String = text
 	var matches: Array[RegExMatch] = _regex.search_all(text)
 
-	# we use a dictionary to avoid processing the same keyword twice in one string.
+	#we use a dictionary to avoid processing the same keyword twice in one string.
 	var processed_keys: Dictionary = {}
-	
+
 	for match_result in matches:
-		var full_placeholder: String = match_result.get_string(0) # e.g. {GOLD}
-		var content: String = match_result.get_string(1) # e.g. FLUX
-		
+		var full_placeholder: String = match_result.get_string(0) #e.g. {gold}
+		var content: String = match_result.get_string(1) #e.g. flux
+
 		if processed_keys.has(full_placeholder):
 			continue
 		processed_keys[full_placeholder] = true
-		
+
 		#parse parameters
 		var parts: PackedStringArray = content.split("|")
-		var keyword: String = parts[0] # the first part, which should be the keyword (ie UNIT_HP)
+		var keyword: String = parts[0] #the first part, which should be the keyword (ie unit_hp)
 		var params: Dictionary = {}
 		for i: int in range(1, parts.size()): #omit the keyword
 			var param_str: String = parts[i]
 			var parameter_split = param_str.split("=")
 			if parameter_split.size() == 2:
 				params[parameter_split[0]] = parameter_split[1]
-				# eg "size=32" -> ("size", "32") -> {size: 32}
+				#eg "size=32" -> ("size", "32") -> {size: 32}
 			else:
 				pass
-		
-		# verify data exists before linking
+
+		#verify data exists before linking
 		var data: Dictionary = get_keyword_data(keyword)
 		if not data.is_empty():
-			# build the inner content (image + title)
+			#build the inner content (image + title)
 			var inner_content: String = ""
-			
+
 			if data.has("icon") and data.icon != null:
 				var tex: Texture2D = data.icon
 				var target_icon_size: int = ICON_SIZE
 				if params.has("icon_size"):
 					target_icon_size = int(params.icon_size)
-				
+
 				var icon_size_x: float = tex.get_width()
 				var icon_size_y: float = tex.get_height()
 				var scale: float = ((target_icon_size / icon_size_y) + (target_icon_size / icon_size_x)) * 0.5
-				# ensure resource exists and has a path for BBCode to find it
+				#ensure resource exists and has a path for bbcode to find it
 				if tex.resource_path != "":
-					# add image tag followed by a space
+					#add image tag followed by a space
 					inner_content += "[img=%sx%s]%s[/img]" % [icon_size_x * scale, icon_size_y * scale, tex.resource_path]
-			
-			# add the text title
+
+			#add the text title
 			if params.has("label"):
-				inner_content += params.label # manual input fields supersede
+				inner_content += params.label #manual input fields supersede
 			elif data.has("display"):
 				inner_content += data.display
 			else:
 				inner_content += data.title
-				
+
 			var color_code = "blue" #default
 			if params.has("color"):
 				color_code = params.color
-			
+
 			#wrap the combined content in the URL and Color tags
 			var bbcode_link: String = "[color=%s][url=%s]%s[/url][/color]" % [color_code, keyword, inner_content]
 			#replaced text with parsed text
@@ -242,55 +242,55 @@ func parse_text_for_bbcode(text: String) -> String:
 		else:
 			#cleanup broken tags
 			parsed_text = parsed_text.replace(full_placeholder, keyword)
-			
+
 	return parsed_text
 
-# helper to fetch tower info from the Towers autoload
+#helper to fetch tower info from the towers autoload
 func _resolve_tower_data(tower_id_str: String) -> Dictionary:
-	# convert string ID (e.g. "CANNON") to enum value
+	#convert string id (e.g. "cannon") to enum value
 	if not Towers.Type.has(tower_id_str):
 		return {}
-		
+
 	var type: Towers.Type = Towers.Type.get(tower_id_str)
 	var desc: String = resolve_tower_description_from_type(type)
-	# build dictionary to match standard keyword format
+	#build dictionary to match standard keyword format
 	return {
 		"title": Towers.get_tower_name(type),
 		"labels": "[Tower]",
 		"description": desc,
 		"icon": Towers.get_tower_icon(type)
 	}
-	
+
 func resolve_tower_description_from_type(type: Towers.Type) -> String:
 	var prototype: Tower = Towers.get_tower_prototype(type)
-	var desc: String = "" 
+	var desc: String = ""
 	if prototype and not prototype.stat_displays.is_empty():
 		for stat_display: StatDisplayInfo in prototype.stat_displays:
 			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_instance(prototype, stat_display), stat_display)
 			desc += stat_display.label + " " + str(value) + stat_display.suffix
 			desc += " "
-			
+
 	desc += "\n"
 	desc += Towers.get_tower_description(type)
 	return desc
-	
+
 func _resolve_unit_data(unit_id_str: String) -> Dictionary:
-	# convert string ID (e.g. "CANNON") to enum value
+	#convert string id (e.g. "cannon") to enum value
 	if not Units.Type.has(unit_id_str):
 		return {}
-		
+
 	var type: Units.Type = Units.Type.get(unit_id_str)
 	var prototype: Unit = Units.get_unit_prototype(type)
 	var desc: String = resolve_unit_description_from_type(type)
-	
-	# build dictionary to match standard keyword format
+
+	#build dictionary to match standard keyword format
 	return {
 		"title": Units.get_unit_name(type),
 		"labels": "[Unit]",
 		"description": desc,
 		"icon": Units.get_unit_icon(type),
 	}
-	
+
 func resolve_unit_description_from_type(type: Units.Type) -> String:
 	var prototype: Unit = Units.get_unit_prototype(type)
 	var desc: String = ""
@@ -299,18 +299,18 @@ func resolve_unit_description_from_type(type: Units.Type) -> String:
 			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_unit(prototype, stat_display), stat_display)
 			desc += stat_display.label + " " + str(value) + stat_display.suffix
 			desc += "\n"
-	
+
 	desc += Units.get_unit_description(type)
 	return desc
 
-# helper to fetch relic info
+#helper to fetch relic info
 func _resolve_relic_data(relic_id_str: String) -> Dictionary:
 	var type: RelicData.Type = int(relic_id_str)
 	var relic: RelicData = Relics.relics[type]
-	
+
 	if not relic:
 		return {}
-	
+
 	return {
 		"title": relic.title,
 		"labels": "[Relic]",
@@ -318,7 +318,7 @@ func _resolve_relic_data(relic_id_str: String) -> Dictionary:
 		"icon": relic.icon,
 	}
 
-func _verify_keywords():
+func _verify_keywords() -> void:
 	for keyword: String in KEYWORDS:
 		var keyword_data: Dictionary = KEYWORDS[keyword]
 		assert(keyword_data.has(&"title"))

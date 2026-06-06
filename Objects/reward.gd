@@ -7,7 +7,7 @@ enum Type {
 	UNLOCK_TOWER,
 	ADD_RELIC,
 	ADD_RITE,
-	
+
 	EXPORT #workaround, this tells the initialiser that the reward is defined in inspector
 }
 
@@ -17,10 +17,10 @@ enum Type {
 @export var rite_type: Towers.Type
 @export var flux_amount: float
 
-@export var base_weight: float = 100.0 ## higher = more common, 0 = disabled.
+@export var base_weight: float = 100.0 ##higher = more common, 0 = disabled.
 @export var bias_rules: Array[RewardBiasRule] = []
 
-@export var price: float = 0.0 ## in gold!
+@export var price: float = 0.0 ##in gold!
 
 @export var title: String = "dappled things" #used for terrain expansion previews and such
 @export_multiline var description: String = "Reward description"

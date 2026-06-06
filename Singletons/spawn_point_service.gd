@@ -1,4 +1,4 @@
-# spawn_point_service.gd (Autoload Singleton)
+#spawn_point_service.gd (autoload singleton)
 extends Node
 
 signal spawn_points_changed()
@@ -7,7 +7,7 @@ var _breach_seeds: Array[Tower] = []
 var _active_breaches: Array[Tower] = []
 var _tracked_breaches: Dictionary = {}
 
-func start():
+func start() -> void:
 	_breach_seeds.clear()
 	_active_breaches.clear()
 	_tracked_breaches.clear()
@@ -63,5 +63,5 @@ func _get_active_signature() -> int:
 		hash_xor ^= breach_hash
 	return hash([_active_breaches.size(), hash_sum, hash_xor])
 
-func _ready():
+func _ready() -> void:
 	set_process(false)

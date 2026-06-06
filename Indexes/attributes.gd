@@ -14,7 +14,7 @@ enum id { #trackable value
 	RANGE,
 	COOLDOWN,
 	RADIUS,
-	
+
 	NULL,
 	#NOTE: new effects are appended ad hoc to prevent disordering of exports
 	DAMAGE_TAKEN, ##damage_taken (as a proportion from 0.0 to 1.0) (health component)
@@ -38,8 +38,8 @@ class StatusEffectData:
 	var multiplicative_per_stack: float = 0.0
 	var can_stack: bool = true
 	var overlay_color: Color = Color.TRANSPARENT
-	
-	func _init(_attribute: id, _aps: float, _mps: float, _cs: bool = true, _oc: Color = Color.TRANSPARENT):
+
+	func _init(_attribute: id, _aps: float, _mps: float, _cs: bool = true, _oc: Color = Color.TRANSPARENT) -> void:
 		attribute = _attribute
 		additive_per_stack = _aps
 		multiplicative_per_stack = _mps
@@ -49,14 +49,14 @@ class StatusEffectData:
 class ReactionData:
 	var requisites: Dictionary[Status, float] #what statuses in what amount does this reaction need
 	var effect: Callable #should have one argument (host unit)
-		 
-	func _init(_requisites: Dictionary[Status, float], _effect: Callable):
+
+	func _init(_requisites: Dictionary[Status, float], _effect: Callable) -> void:
 		requisites = _requisites
 		effect = _effect
 
 #NOTE to designers, these status effects should be normalised i.e. one stack
 #of FROST should be equivalent to one stack of POISON in importance/severity
-var status_effects : Dictionary[Status, StatusEffectData] = {
+var status_effects: Dictionary[Status, StatusEffectData] = {
 	Status.FROST: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
@@ -64,10 +64,10 @@ var status_effects : Dictionary[Status, StatusEffectData] = {
 		id.REGENERATION, -0.5, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.5 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_REMAINDER_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5) # -10% remaining hp per second
+		id.REGEN_REMAINDER_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5) #-10% remaining hp per second
 	),
 	Status.HEAT: StatusEffectData.new(
-		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST 
+		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST
 	),
 	Status.CURSED: StatusEffectData.new(
 		id.DAMAGE_TAKEN, 0.0, 1.25, true, Color(0.446, 0.002, 0.768, 0.5)
@@ -104,8 +104,8 @@ static func generate_damage_callable(dmg: float) -> Callable:
 		hit_data.expected_damage = dmg
 		hit_data.source = unit #source is self (by convention)
 		hit_data.target = unit
-		
+
 		unit.take_hit(hit_data)
-		
+
 static func get_icon(status: Attributes.Status) -> Texture2D:
 	return status_effect_icons[status]

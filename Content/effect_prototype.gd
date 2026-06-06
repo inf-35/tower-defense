@@ -1,5 +1,5 @@
 @abstract extends Resource
-class_name EffectPrototype #used for cause-and-effect structures -> this is the mere effectprototype, to see runtime behaviour 
+class_name EffectPrototype #used for cause-and-effect structures -> this is the mere effectprototype, to see runtime behaviour
 #consult EffectInstance; for actual behaviour see sub-classes
 #i.e. things like thorns
 
@@ -39,7 +39,7 @@ func on_tick(instance: EffectInstance, delta: float) -> void:
 func return_generic_instance() -> EffectInstance: ##helper for child classes (returns most generic instance)
 	var instance := EffectInstance.new()
 	apply_generics(instance)
-	# no persistent state needed
+	#no persistent state needed
 	return instance
 
 func apply_generics(effect_instance: EffectInstance) -> void: ##helper for create_instance (applies generic values)
@@ -49,7 +49,7 @@ func apply_generics(effect_instance: EffectInstance) -> void: ##helper for creat
 	effect_instance.schedule = schedule
 	#effect_instance.duration = duration
 	effect_instance.effect_prototype = self as EffectPrototype
-	
+
 func get_save_data(effect_instance: EffectInstance) -> Dictionary:
 	return {}
 

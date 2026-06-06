@@ -1,7 +1,7 @@
 extends CanvasLayer
 class_name SettingsMenu
 
-# --- UI References ---
+#--- ui references ---
 @export var master_slider: HSlider
 @export var sfx_slider: HSlider
 @export var music_slider: HSlider
@@ -12,52 +12,52 @@ class_name SettingsMenu
 @export var settings_button: Button
 @export var save_and_quit_button: Button
 
-@export var settings_root: Control # The container to hide/show
+@export var settings_root: Control #the container to hide/show
 @export var pause_root: Control
 
-# state
+#state
 enum State {
 	PAUSE, #the pause menu that shows up ingame
 	SETTINGS, #the settings menu
 }
 var state: State
 
-# --- Audio Bus Indices ---
+#--- audio bus indices ---
 var _bus_master: int
 var _bus_sfx: int
 var _bus_music: int
 
-# extra-environmental state
+#extra-environmental state
 var _saved_gamespeed: float
 
 const AUDIO_POWER: float = 2.0 ##root of power curve of the audio
- 
+
 signal closed()
 
 func _ready() -> void:
-	# 1. Cache Audio Bus Indices (Safety check if names change)
+	#1. cache audio bus indices (safety check if names change)
 	_bus_master = AudioServer.get_bus_index("Master")
 	_bus_sfx = AudioServer.get_bus_index("SFX")
 	_bus_music = AudioServer.get_bus_index("Music")
-	
-	# 2. Initialize UI State from Current Settings
+
+	#2. initialize ui state from current settings
 	_load_current_settings()
-	
-	# 3. Connect Signals
+
+	#3. connect signals
 	master_slider.value_changed.connect(_on_volume_changed.bind(_bus_master))
 	sfx_slider.value_changed.connect(_on_volume_changed.bind(_bus_sfx))
 	music_slider.value_changed.connect(_on_volume_changed.bind(_bus_music))
-	
+
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
 	back_button.pressed.connect(back)
 	resume_button.pressed.connect(func(): close_menu())
 	settings_button.pressed.connect(func(): enter_state(State.SETTINGS))
 	save_and_quit_button.pressed.connect(func(): _on_save_and_quit())
-	
-	Phases.phase_advanced.connect(_evaluate_save_validity)
-	
+
+	Run.phases.phase_advanced.connect(_evaluate_save_validity)
+
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	# Start hidden
+	#start hidden
 	visible = false
 
 func open_menu() -> void:
@@ -71,13 +71,13 @@ func close_menu() -> void:
 	closed.emit()
 
 func back() -> void:
-	if state == State.SETTINGS and Phases.in_game:
+	if state == State.SETTINGS and Run.phases.in_game:
 		enter_state(State.PAUSE)
 		return
-		
+
 	close_menu()
-	
-	
+
+
 func enter_state(input_state: State) -> void:
 	match input_state:
 		State.SETTINGS:
@@ -86,36 +86,36 @@ func enter_state(input_state: State) -> void:
 		State.PAUSE:
 			settings_root.visible = false
 			pause_root.visible = true
-	
-	state = input_state
-# --- Internal Logic ---
 
-func _evaluate_save_validity():
+	state = input_state
+#--- internal logic ---
+
+func _evaluate_save_validity() -> void:
 	#if not state == State.PAUSE:
 		#return
-		
-	if Phases.current_phase == Phases.GamePhase.BUILDING:
+
+	if Run.phases.current_phase == Run.phases.GamePhase.BUILDING:
 		save_and_quit_button.disabled = false
 	else:
 		save_and_quit_button.disabled = true
 
 func _load_current_settings() -> void:
-	# Volume (Convert DB to 0-1 linear if your sliders are 0-1, or 0-100)
-	# Assuming Sliders are 0.0 to 1.0
+	#volume (convert db to 0-1 linear if your sliders are 0-1, or 0-100)
+	#assuming sliders are 0.0 to 1.0
 	master_slider.value = pow(db_to_linear(AudioServer.get_bus_volume_db(_bus_master)), -AUDIO_POWER)
 	sfx_slider.value = pow(db_to_linear(AudioServer.get_bus_volume_db(_bus_sfx)), -AUDIO_POWER)
 	music_slider.value = pow(db_to_linear(AudioServer.get_bus_volume_db(_bus_music)), -AUDIO_POWER)
-	
-	# Fullscreen
+
+	#fullscreen
 	var mode = DisplayServer.window_get_mode()
 	fullscreen_toggle.button_pressed = (mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
 
 func _on_volume_changed(value: float, bus_index: int) -> void:
-	# Convert linear slider (0-1) to Decibels
-	# Use linear_to_db which maps 0 to -INF (Silence)
+	#convert linear slider (0-1) to decibels
+	#use linear_to_db which maps 0 to -inf (silence)
 	AudioServer.set_bus_volume_db(bus_index, linear_to_db(pow(value, AUDIO_POWER)))
-	
-	# Mute if 0 to prevent faint audio issues
+
+	#mute if 0 to prevent faint audio issues
 	AudioServer.set_bus_mute(bus_index, value < 0.01)
 
 func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
@@ -123,13 +123,13 @@ func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		# Optional: Center window
-		# DisplayServer.window_set_position(...)
-		
-func _on_save_and_quit():
-	if Phases.current_phase != Phases.GamePhase.BUILDING:
+		#optional: center window
+		#displayserver.window_set_position(...)
+
+func _on_save_and_quit() -> void:
+	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
 		return
-	Phases.in_game = false
+	Run.phases.in_game = false
 	SaveLoad.save_game()
 	get_tree().change_scene_to_file("res://main_menu.tscn")
 	close_menu()

@@ -11,12 +11,12 @@ class CellData: #used to communicate info during runtime
 	var terrain: Base
 	var feature: Towers.Type
 	var initial_state: Dictionary
-	
-	func _init(_terrain: Base, _feature: Towers.Type, _initial_state: Dictionary = {}):
+
+	func _init(_terrain: Base, _feature: Towers.Type, _initial_state: Dictionary = {}) -> void:
 		terrain = _terrain
 		feature = _feature
 		initial_state = _initial_state
-		
+
 #terrain database, as a global class, is in a nother script (Objects/Indexes/terrain_database.gd)
 
 var terrain_database: TerrainDatabase = preload("res://Indexes/default_terrain.tres")
@@ -42,6 +42,6 @@ func is_navigable(terrain_base: Base) -> bool: #can this terrain be navigated up
 
 func is_constructable(terrain_base: Base) -> bool: #can this terrain be constructed upon?
 	return terrain_database.terrain_base_types[terrain_base].constructable
-	
+
 func get_modifiers_for_base(terrain_base: Base) -> Array[ModifierDataPrototype]:
 	return terrain_database.terrain_base_types[terrain_base].modifiers

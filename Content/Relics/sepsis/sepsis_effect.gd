@@ -3,7 +3,7 @@ class_name SepsisEffect
 
 @export var qualifying_status: Attributes.Status = Attributes.Status.BLEED
 @export var target_status: Attributes.Status = Attributes.Status.POISON
-@export var duration_multiplier: float = 1.5 ## 1.5 = +50% Duration
+@export var duration_multiplier: float = 1.5 ##1.5 = +50% duration
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
@@ -23,8 +23,8 @@ func _handle_detach(_instance: EffectInstance) -> void:
 func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
-	
-	var hit_data := event.data as HitData
+
+	var hit_data: HitData = event.data as HitData
 	if not hit_data:
 		return
 
@@ -38,7 +38,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if not hit_data.status_effects.has(target_status):
 		return
 
-	# status effects are stored as Vector2(stacks, duration)
+	#status effects are stored as vector2(stacks, duration)
 	var current_payload: Vector2 = hit_data.status_effects[target_status]
 	current_payload.y *= duration_multiplier
 	hit_data.status_effects[target_status] = current_payload

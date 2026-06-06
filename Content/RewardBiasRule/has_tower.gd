@@ -5,11 +5,11 @@ class_name RuleHasTower
 
 func _check_condition() -> bool:
 	for tower_type: Towers.Type in tower_types:
-		# check if the player has unlocked this tower
-		if Player.is_tower_unlocked(tower_type):
+		#check if the player has unlocked this tower
+		if Run.player.is_tower_unlocked(tower_type):
 			return true
-		# check if the player has placed a satisfying tower
-		elif References.island.get_towers_by_type(tower_type).size() > 0:
+		#check if the player has placed a satisfying tower
+		elif Run.references.island.get_towers_by_type(tower_type).size() > 0:
 			return true
-	
+
 	return false

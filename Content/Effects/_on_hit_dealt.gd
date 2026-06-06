@@ -5,15 +5,15 @@ class_name HitDealtDebugEffect
 
 class HitDebugState extends RefCounted:
 	var counter: int = 0
-	
-func _init():
+
+func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_DEALT]
 
 func create_instance() -> EffectInstance:
 	var instance := EffectInstance.new()
 	apply_generics(instance)
 	instance.state = HitDebugState.new()
-	
+
 	return instance
 
 func _handle_attach(_instance: EffectInstance) -> void:
@@ -24,9 +24,9 @@ func _handle_detach(_instance: EffectInstance) -> void:
 	#undo _attach
 	pass
 
-func _handle_event(instance: EffectInstance, event : GameEvent):
+func _handle_event(instance: EffectInstance, event : GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_DEALT:
 		return
-	
+
 	instance.state.counter += 1
-	
+

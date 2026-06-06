@@ -26,4 +26,4 @@ static var STRAW_HAT: RelicData = load("res://Content/Relics/straw_hat/straw_hat
 static var WALLFLOWER: RelicData = load("res://Content/Relics/wallflower/wallflower.tres")
 static var SIMPLE_BLADE: RelicData = load("res://Content/Relics/simple_blade/simple_blade.tres")
 
-static var relics: Dictionary[RelicData.Type, RelicData] = {} ## relics indexed by type, loaded by reward_service
+static var relics: Dictionary[RelicData.Type, RelicData] = {} ##relics indexed by type, loaded by reward_service

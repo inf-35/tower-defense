@@ -39,39 +39,39 @@ var tower_position: Vector2i = Vector2i.ZERO:
 		tower_position = new_pos
 		movement_component.unit = self #evil circular dependency resolution
 		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
-		
+
 		if tower_position == old_pos:
 			return
-		# --- apply terrain modifiers ---
-		# after the tower is created and has its components, check the terrain it's on
-		# clear pre-existing terrain modifiers
+		#--- apply terrain modifiers ---
+		#after the tower is created and has its components, check the terrain it's on
+		#clear pre-existing terrain modifiers
 		for terrain_modifier: Modifier in _terrain_modifiers:
 			modifiers_component.remove_modifier(terrain_modifier)
 		_terrain_modifiers.clear()
-		
+
 		var total_area: float = float(size.x * size.y)
 		var modifier_counts: Dictionary[ModifierDataPrototype, int] = {}
 		for x: int in size.x:
 			for y: int in size.y:
 				var check_cell: Vector2i = tower_position + Vector2i(x, y)
-				
-				# Get terrain at this specific tile
-				var terrain_base: Terrain.Base = References.island.get_terrain_base(check_cell)
+
+				#get terrain at this specific tile
+				var terrain_base: Terrain.Base = Run.references.island.get_terrain_base(check_cell)
 				var modifier_prototypes: Array[ModifierDataPrototype] = Terrain.get_modifiers_for_base(terrain_base)
-				
+
 				for proto: ModifierDataPrototype in modifier_prototypes:
 					if not modifier_counts.has(proto):
 						modifier_counts[proto] = 0
 					modifier_counts[proto] += 1
 
-		# generate and scale the final modifiers
+		#generate and scale the final modifiers
 		for proto: ModifierDataPrototype in modifier_counts:
 			var tile_count: int = modifier_counts[proto]
 			var proportion: float = float(tile_count) / total_area
-			
-			# If the tower is fully on this terrain (proportion == 1.0), it gets full effect.
-			# If it's half on (0.5), it gets half effect.
-			
+
+			#if the tower is fully on this terrain (proportion == 1.0), it gets full effect.
+			#if it's half on (0.5), it gets half effect.
+
 			var new_modifier: Modifier = proto.generate_modifier()
 
 			if new_modifier.additive != 0.0:
@@ -80,20 +80,20 @@ var tower_position: Vector2i = Vector2i.ZERO:
 			if new_modifier.multiplicative != 1.0:
 				var deviation: float = new_modifier.multiplicative - 1.0
 				new_modifier.multiplicative = 1.0 + (deviation * proportion)
-			
+
 			_terrain_modifiers.append(new_modifier)
 			modifiers_component.add_modifier(new_modifier)
 
-var _terrain_modifiers: Array[Modifier] = [] ## modifiers for terrain effects (i.e. high ground)
-var size: Vector2i = Vector2i.ONE ## this is inclusive of facing
+var _terrain_modifiers: Array[Modifier] = [] ##modifiers for terrain effects (i.e. high ground)
+var size: Vector2i = Vector2i.ONE ##this is inclusive of facing
 
-# this function is called by 'sell()' or 'on_killed()'
+#this function is called by 'sell()' or 'on_killed()'
 func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
 		return
-		
+
 	current_state = State.RUINED
-		
+
 	disabled = true
 	graphics.visible = false
 
@@ -102,23 +102,23 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
 		effect_instance.detach()
 
-	References.island.update_adjacencies_around_tower(self)
-	
-	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
+	Run.references.island.update_adjacencies_around_tower(self)
+
+	if Run.phases.current_phase != Run.phases.GamePhase.COMBAT_WAVE:
 		queue_free()
 		return
-	
-	Player.ruin_service.register_ruin(self, reason)
+
+	Run.player.ruin_service.register_ruin(self, reason)
 	if not environmental and not abstractive and is_instance_valid(UI.tutorial_manager):
 		UI.tutorial_manager.show_destroyed_tower_hint(self)
-	
+
 	var rubble := Sprite2D.new()
 	rubble.texture = preload("res://Assets/rubble_grey.png")
 	rubble.scale = Vector2(0.06, 0.06) * Vector2(size)
 	rubble.z_as_relative = false
 	rubble.z_index = Layers.TERRAIN_EFFECTS
 	add_child.call_deferred(rubble)
-	
+
 	var outline := Sprite2D.new()
 	outline.texture = Towers.get_tower_preview(type)
 	outline.scale = Vector2(0.06, 0.06)
@@ -127,13 +127,13 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	outline.z_as_relative = false
 	outline.z_index = Layers.FLOATING_UI
 	add_child.call_deferred(outline)
-	
+
 	set_meta(&"rubble_sprite", rubble)
 	set_meta(&"rubble_outline", outline)
 
-	# 3. become non-blocking for pathfinding
+	#3. become non-blocking for pathfinding
 	self.blocking = false
-	References.island.update_navigation_grid()
+	Run.references.island.update_navigation_grid()
 
 func enter_active_state() -> void:
 	if current_state == State.ACTIVE:
@@ -147,38 +147,38 @@ func enter_active_state() -> void:
 		get_meta(&"rubble_outline").queue_free()
 	#become blocking again
 	self.blocking = true
-	References.island.update_navigation_grid()
+	Run.references.island.update_navigation_grid()
 	#reenable components
 	if is_instance_valid(attack_component): attack_component.set_process(true)
 	if is_instance_valid(range_component): range_component.set_process(true)
 
-# this function is called by the RuinService at the end of a wave
+#this function is called by the ruinservice at the end of a wave
 func resurrect() -> void:
-	# 1. restore state
+	#1. restore state
 	enter_active_state()
-	# 2. restore health
+	#2. restore health
 	if is_instance_valid(health_component):
 		health_component.health = health_component.get_stat(modifiers_component, health_component.health_data, Attributes.id.MAX_HEALTH)
-	# 3. restart behaviours
+	#3. restart behaviours
 	behavior.attach()
-	# 4. reattach all effects
+	#4. reattach all effects
 	for effect_prototype: EffectPrototype in effect_prototypes:
 		var effect_instance := get_effect_instance_by_prototype(effect_prototype)
 		effect_instance.attach_to(self)
-		
-	References.island.update_adjacencies_around_tower(self)
+
+	Run.references.island.update_adjacencies_around_tower(self)
 
 func on_killed(_hit_report_data: HitReportData) -> void:
 	enter_ruin_state(RuinService.RuinReason.KILLED)
 
-func sell():
+func sell() -> void:
 	if not abstractive and current_state == State.ACTIVE:
 		var refund: float = Towers.get_tower_refund_value(type) * REFUND_PROPORTION
-		Player.flux += refund
-		
+		Run.player.flux += refund
+
 		#if Towers.is_tower_rite(type):
-			#Player.add_rite(type, 1)
-			
+			#Run.player.add_rite(type, 1)
+
 		enter_ruin_state(RuinService.RuinReason.SOLD)
 		died.emit(HitReportData.blank_hit_report)
 
@@ -189,34 +189,34 @@ func excavate() -> void:
 	enter_ruin_state(RuinService.RuinReason.SOLD)
 	died.emit(HitReportData.blank_hit_report)
 
-func _create_hitbox():
+func _create_hitbox() -> void:
 	hitbox = Hitbox.new()
 	var collision_shape := CollisionShape2D.new()
 	var shape_bound := RectangleShape2D.new()
 	shape_bound.size = size * Island.CELL_SIZE
-	
+
 	collision_shape.shape = shape_bound
 	hitbox.collision_mask = 0
 	hitbox.collision_layer = Hitbox.get_mask(hostile)
 	hitbox.unit = self
-	
+
 	hitbox.add_child(collision_shape)
 	add_child.call_deferred(hitbox)
-		
-func _ready():
+
+func _ready() -> void:
 	name = name + " " + str(unit_id)
 	level = 1
-	
+
 	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
 	_prepare_components()
 	_create_hitbox()
-	
+
 	if not is_instance_valid(behavior):
 		behavior = DefaultBehavior.new()
 		add_child(behavior)
-	
+
 	is_ready = true
 	components_ready.emit()
 	behavior.initialise(self)
@@ -225,35 +225,35 @@ func _ready():
 		var adjacency_data := AdjacencyReportData.new() #broadcast into effects system
 		adjacency_data.adjacent_towers = new_adjacencies
 		adjacency_data.pivot = self
-		
+
 		var event := GameEvent.new()
 		event.event_type = GameEvent.EventType.ADJACENCY_UPDATED
 		event.data = adjacency_data
-		
+
 		on_event.emit(event)
 	)
-	
-	Phases.wave_ended.connect(func(_wave_number: int): #heal up at the end of every wave
+
+	Run.phases.wave_ended.connect(func(_wave_number: int): #heal up at the end of every wave
 		if is_instance_valid(health_component):
 			health_component.health = health_component.max_health
 	)
-	
+
 	var build_data := BuildTowerData.new()
 	build_data.tower = self
 	var evt := GameEvent.new()
 	evt.event_type = GameEvent.EventType.TOWER_BUILT
 	evt.data = build_data
 	evt.unit = self
-	
+
 	if not abstractive:
-		Player.on_event.emit(null, evt) #fire global event (that we just got built)
-	
+		Run.player.on_event.emit(null, evt) #fire global event (that we just got built)
+
 func get_occupied_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for x: int in size.x:
 		for y: int in size.y:
 			cells.append(tower_position + Vector2i(x,y))
-			
+
 	return cells
 
 func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid grid coordinates immediately adjacent to this tower
@@ -263,9 +263,9 @@ func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid gr
 	var height: int = size.y
 
 	for x: int in width: #top and bottom edges
-		# cell immediately above
+		#cell immediately above
 		neighbors.append(Vector2i(start.x + x, start.y - 1))
-		# cell immediately below
+		#cell immediately below
 		neighbors.append(Vector2i(start.x + x, start.y + height))
 
 	for y: int in height: #left and right edges
@@ -275,62 +275,62 @@ func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid gr
 		neighbors.append(Vector2i(start.x + width, start.y + y))
 
 	return neighbors
-	
+
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 	if behavior.has_method(&"get_adjacent_towers"):
 		return behavior.get_adjacent_towers()
 
-	if is_instance_valid(References.island) and is_instance_valid(References.island.topology_service):
-		# keys are local offsets relative to this tower's top-left cell.
+	if is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		#keys are local offsets relative to this tower's top-left cell.
 		var query := TowerTopologyService.Query.new()
-		return References.island.topology_service.query(self, query).towers_by_local_offset
-	
+		return Run.references.island.topology_service.query(self, query).towers_by_local_offset
+
 	var adjacencies: Dictionary[Vector2i, Tower] = {}
 	for cell: Vector2i in get_adjacent_cells():
-		var tower : Tower = References.island.get_tower_on_tile(cell)
+		var tower: Tower = Run.references.island.get_tower_on_tile(cell)
 		if tower:
 			adjacencies[cell] = tower
-			
+
 	return adjacencies
-	
+
 func get_diagonal_towers() -> Dictionary[Vector2i, Tower]:
-	if is_instance_valid(References.island) and is_instance_valid(References.island.topology_service):
+	if is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
 		var query := TowerTopologyService.Query.new(
 			TowerTopologyService.QueryKind.DIAGONAL_LINE,
 			1,
 			1,
 			TowerTopologyService.AXIS_UP | TowerTopologyService.AXIS_RIGHT | TowerTopologyService.AXIS_DOWN | TowerTopologyService.AXIS_LEFT
 		)
-		return References.island.topology_service.query(self, query).towers_by_local_offset
+		return Run.references.island.topology_service.query(self, query).towers_by_local_offset
 
 	var diagonals: Array[Vector2i] = [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]
 	var results: Dictionary[Vector2i, Tower] = {}
 	for dir in diagonals:
-		var tower = References.island.get_tower_on_tile(tower_position + dir)
+		var tower = Run.references.island.get_tower_on_tile(tower_position + dir)
 		if tower:
 			results[dir] = tower
 	return results
-	
+
 static func get_side_from_offset(tower_size: Vector2i, rel_offset: Vector2i) -> Facing:
-	# 1. Check Vertical Sides (Top/Bottom)
-	# The offset must be within the tower's horizontal bounds (x: 0 to width-1)
+	#1. check vertical sides (top/bottom)
+	#the offset must be within the tower's horizontal bounds (x: 0 to width-1)
 	if rel_offset.x >= 0 and rel_offset.x < tower_size.x:
-		if rel_offset.y < 0: 
+		if rel_offset.y < 0:
 			return Facing.UP
-		if rel_offset.y >= tower_size.y: 
+		if rel_offset.y >= tower_size.y:
 			return Facing.DOWN
 
-	# 2. Check Horizontal Sides (Left/Right)
-	# The offset must be within the tower's vertical bounds (y: 0 to height-1)
+	#2. check horizontal sides (left/right)
+	#the offset must be within the tower's vertical bounds (y: 0 to height-1)
 	if rel_offset.y >= 0 and rel_offset.y < tower_size.y:
-		if rel_offset.x < 0: 
+		if rel_offset.x < 0:
 			return Facing.LEFT
-		if rel_offset.x >= tower_size.x: 
+		if rel_offset.x >= tower_size.x:
 			return Facing.RIGHT
 
-	# 3. Fallback (Diagonal corner or Inside tower)
+	#3. fallback (diagonal corner or inside tower)
 	return 10
-	
+
 static func get_rotated_size(input_size: Vector2i, input_facing: Facing) -> Vector2i:
 	if (input_facing as int) % 2 != 0:
 		return Vector2i(input_size.y, input_size.x)
@@ -341,12 +341,12 @@ func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for
 	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour
 		return behavior.get_navcost_for_cell(_cell)
 	return Towers.get_tower_navcost(self.type)
-	
+
 func check_placement_validity(island: Island, cell: Vector2i, input_facing: Facing) -> Dictionary:
 	if behavior.has_method(&"check_placement_validity"):
 		return behavior.check_placement_validity(island, cell, input_facing)
 	return { "valid": true, "error": "" }
-	
+
 func get_save_data() -> Dictionary:
 	var unit_save_data: Dictionary = {
 		"unit_id": unit_id,
@@ -359,7 +359,7 @@ func get_save_data() -> Dictionary:
 		"hostile": hostile,
 		"abstractive": abstractive
 	}
-	
+
 	var component_names: Array[String] = [
 		"movement_component",
 		"navigation_component",
@@ -369,13 +369,13 @@ func get_save_data() -> Dictionary:
 		"range_component",
 		"behavior"
 	]
-	
+
 	for component_name in component_names:
 		if self.get(component_name) and is_instance_valid(self[component_name]):
 			unit_save_data[component_name] = self[component_name].get_save_data()
-	
+
 	return unit_save_data
-	
+
 func load_save_data(save_data: Dictionary) -> void:
 	unit_id = save_data.unit_id
 	#type, position, facing already recreated in construction
@@ -384,4 +384,3 @@ func load_save_data(save_data: Dictionary) -> void:
 	hostile = save_data.hostile
 	abstractive = save_data.abstractive
 	behavior.load_save_data(save_data.behavior)
-	

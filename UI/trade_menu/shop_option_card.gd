@@ -5,7 +5,7 @@ class_name ShopOptionCard
 
 func setup(reward: Reward, index: int) -> void:
 	_reward_data = reward
-	# apply Data
+	#apply data
 	_apply_visuals(reward)
-	
+
 	price_text.set_parsed_text("%.2f {GOLD}" % reward.price)

@@ -7,7 +7,7 @@ class_name PawnStructureLocalEffect ##local effect
 class PawnState extends RefCounted:
 	var modifier: Modifier
 	var old_stacks: int #for recordkeeping
-	
+
 #implementation NOTE: TOWER_BUILT signals by default do not (and shldnt) propagate
 #to the local layer, so we directly proc our relevant neighbours
 
@@ -46,15 +46,15 @@ func _handle_event(instance: EffectInstance, event: GameEvent = null) -> void:
 func _evaluate(instance: EffectInstance, is_being_built: bool = false) -> void:
 	var tower = instance.host as Tower
 	if not is_instance_valid(tower): return
-	
+
 	var neighbors = tower.get_diagonal_towers()
-	var stacks = 0
+	var stacks: int = 0
 	print(tower, " updating...")
 	for n: Tower in neighbors.values():
 		if is_instance_valid(n) and n.type == target_type and (not n.disabled) and (not n.is_queued_for_deletion()):
 			print(tower, " counting ", n)
 			stacks += 1
-			
+
 	if is_being_built: #proc relevant towers to also update
 		for n: Tower in neighbors.values():
 			if is_instance_valid(n) and n.type == target_type:
@@ -64,11 +64,11 @@ func _evaluate(instance: EffectInstance, is_being_built: bool = false) -> void:
 
 	var state = instance.state as PawnState
 	var desired_mult = 1.0 + (stacks * damage_bonus)
-	
+
 	if stacks > state.old_stacks:
 		UI.floating_text_manager.show_icon(icon, tower.position)
 	state.old_stacks = stacks
-	
+
 	if stacks > 0:
 		if state.modifier:
 			state.modifier.multiplicative = desired_mult

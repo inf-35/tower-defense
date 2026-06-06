@@ -40,14 +40,14 @@ class Query extends RefCounted: ##request object
 class Report extends RefCounted: ##answer object
 	var pivot: Tower
 	var query: Query
-	var cells: Dictionary = {} ## Dictionary[Vector2i, Vector2i], local offset -> absolute cell
-	var towers_by_local_offset: Dictionary[Vector2i, Tower] = {} ## Dictionary[Vector2i, Tower]
+	var cells: Dictionary = {} ##dictionary[vector2i, vector2i], local offset -> absolute cell
+	var towers_by_local_offset: Dictionary[Vector2i, Tower] = {} ##dictionary[vector2i, tower]
 	var unique_towers: Array[Tower] = [] ##deduped towers,for multitile towers
 
 var island: Island
 
-var _subscriptions: Dictionary = {} ## id -> record
-var _subscriptions_by_pivot: Dictionary = {} ## pivot_id -> Array[int]
+var _subscriptions: Dictionary = {} ##id -> record
+var _subscriptions_by_pivot: Dictionary = {} ##pivot_id -> array[int]
 var _next_subscription_id: int = 1
 var _max_query_radius: int = 1
 var _max_tower_span: int = 1
@@ -74,7 +74,7 @@ func query(pivot: Tower, query_data: Query) -> Report: ##core function
 	for offset: Vector2i in _resolve_offsets(pivot, query_data):
 		var absolute_cell := pivot.tower_position + offset
 		report.cells[offset] = absolute_cell
-		var tower := island.get_tower_on_tile(absolute_cell) as Tower
+		var tower: Tower = island.get_tower_on_tile(absolute_cell) as Tower
 		if not is_instance_valid(tower):
 			continue
 		report.towers_by_local_offset[offset] = tower
@@ -143,9 +143,9 @@ func _emit_subscription(id: int, force: bool = false) -> void:
 	var record: Dictionary = _subscriptions.get(id, {})
 	if record.is_empty():
 		return
-	var owner := record["owner"] as Object
-	var pivot := record["pivot"] as Tower
-	var callback := record["callback"] as Callable
+	var owner: Object = record["owner"] as Object
+	var pivot: Tower = record["pivot"] as Tower
+	var callback: Callable = record["callback"] as Callable
 	if not is_instance_valid(owner) or not is_instance_valid(pivot) or not callback.is_valid():
 		_remove_subscription(id)
 		return
@@ -160,7 +160,7 @@ func _remove_subscription(id: int) -> void:
 	var record: Dictionary = _subscriptions.get(id, {})
 	if record.is_empty():
 		return
-	var pivot := record["pivot"] as Tower
+	var pivot: Tower = record["pivot"] as Tower
 	if is_instance_valid(pivot):
 		var pivot_id := pivot.unit_id
 		if _subscriptions_by_pivot.has(pivot_id):
@@ -175,7 +175,7 @@ func _get_candidate_pivots(changed_cell: Vector2i) -> Array[Tower]: ##for a chan
 	var radius := _max_query_radius + _max_tower_span
 	for x in range(changed_cell.x - radius, changed_cell.x + radius + 1):
 		for y in range(changed_cell.y - radius, changed_cell.y + radius + 1):
-			var tower := island.get_tower_on_tile(Vector2i(x, y)) as Tower
+			var tower: Tower = island.get_tower_on_tile(Vector2i(x, y)) as Tower
 			if is_instance_valid(tower):
 				pivots[tower] = true
 	var output: Array[Tower] = []
@@ -236,7 +236,7 @@ func _add_axis_offsets(offsets: Array[Vector2i], seen: Dictionary, size: Vector2
 func _add_taxicab_ring_offsets(offsets: Array[Vector2i], seen: Dictionary, size: Vector2i, distance: int, axis_mask: int) -> void:
 	for x in range(-distance, size.x + distance):
 		for y in range(-distance, size.y + distance):
-			var offset := Vector2i(x, y)
+			var offset: Vector2i = Vector2i(x, y)
 			if _distance_to_footprint(offset, size) != distance:
 				continue
 			if not _matches_axis_mask(offset, size, axis_mask):
@@ -250,12 +250,12 @@ func _push_offset(offsets: Array[Vector2i], seen: Dictionary, offset: Vector2i) 
 	offsets.append(offset)
 
 func _distance_to_footprint(offset: Vector2i, size: Vector2i) -> int:
-	var dx := 0
+	var dx: int = 0
 	if offset.x < 0:
 		dx = -offset.x
 	elif offset.x >= size.x:
 		dx = offset.x - size.x + 1
-	var dy := 0
+	var dy: int = 0
 	if offset.y < 0:
 		dy = -offset.y
 	elif offset.y >= size.y:
@@ -290,11 +290,11 @@ func _build_signature(report: Report) -> String:
 	var offsets: Array[Vector2i] = []
 	offsets.assign(report.cells.keys())
 	offsets.sort_custom(_sort_offsets)
-	var parts := PackedStringArray()
+	var parts: PackedStringArray = PackedStringArray()
 	parts.append(str(report.pivot.tower_position))
 	parts.append(str(report.pivot.facing))
 	for offset: Vector2i in offsets:
-		var tower := report.towers_by_local_offset.get(offset) as Tower
+		var tower: Tower = report.towers_by_local_offset.get(offset) as Tower
 		parts.append("%d,%d=%d" % [offset.x, offset.y, tower.get_instance_id() if is_instance_valid(tower) else 0])
 	return "|".join(parts)
 
@@ -304,7 +304,7 @@ func _sort_offsets(a: Vector2i, b: Vector2i) -> bool:
 	return a.x < b.x
 
 func _compute_max_tower_span() -> int:
-	var max_span := 1
+	var max_span: int = 1
 	for tower_data in Towers.tower_stats.values():
 		max_span = maxi(max_span, maxi(tower_data.size.x, tower_data.size.y))
 	return max_span

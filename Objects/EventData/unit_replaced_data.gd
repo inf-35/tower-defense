@@ -3,6 +3,6 @@ class_name UnitReplacedData extends EventData
 var old_unit: Unit
 var new_unit: Unit
 
-func _init(old: Unit, new: Unit):
+func _init(old: Unit, new: Unit) -> void:
 	old_unit = old
 	new_unit = new

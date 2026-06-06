@@ -9,7 +9,7 @@ class_name PatternAmplifierBehavior
 @export_enum("World", "Local Facing") var axis_space: int = TowerTopologyService.AxisSpace.LOCAL_FACING
 
 var _subscription_id: int = -1
-var _last_report
+var _last_report: TowerTopologyService.Report
 
 func start() -> void:
 	if not unit is Tower:
@@ -18,12 +18,12 @@ func start() -> void:
 		return
 	attach()
 
-func attach():
+func attach() -> void:
 	attached = true
 	_subscribe()
 	_refresh_report()
 
-func detach():
+func detach() -> void:
 	attached = false
 	_unsubscribe()
 	_clear_all_modifiers()
@@ -34,18 +34,18 @@ func _exit_tree() -> void:
 	_clear_all_modifiers()
 
 func _subscribe() -> void:
-	if _subscription_id != -1 or not is_instance_valid(References.island) or not is_instance_valid(References.island.topology_service):
+	if _subscription_id != -1 or not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
 		return
-	_subscription_id = References.island.topology_service.subscribe(self, unit as Tower, _make_query(), _on_topology_updated, false)
+	_subscription_id = Run.references.island.topology_service.subscribe(self, unit as Tower, _make_query(), _on_topology_updated, false)
 
 func _unsubscribe() -> void:
-	if _subscription_id == -1 or not is_instance_valid(References.island) or not is_instance_valid(References.island.topology_service):
+	if _subscription_id == -1 or not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
 		_subscription_id = -1
 		return
-	References.island.topology_service.unsubscribe(self, _subscription_id)
+	Run.references.island.topology_service.unsubscribe(self, _subscription_id)
 	_subscription_id = -1
 
-func _make_query():
+func _make_query() -> TowerTopologyService.Query:
 	var query_min := min_range
 	var query_max := max_range
 	if query_kind == TowerTopologyService.QueryKind.OFFSET_MASK:
@@ -61,9 +61,9 @@ func _make_query():
 	)
 
 func _refresh_report() -> void:
-	if not is_instance_valid(References.island) or not is_instance_valid(References.island.topology_service):
+	if not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
 		return
-	_on_topology_updated(References.island.topology_service.query(unit as Tower, _make_query()))
+	_on_topology_updated(Run.references.island.topology_service.query(unit as Tower, _make_query()))
 
 func _on_topology_updated(report) -> void:
 	_last_report = report
@@ -86,14 +86,14 @@ func _on_topology_updated(report) -> void:
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var report = _last_report
-	if report == null and is_instance_valid(unit) and is_instance_valid(References.island) and is_instance_valid(References.island.topology_service):
-		report = References.island.topology_service.query(unit as Tower, _make_query())
+	if report == null and is_instance_valid(unit) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		report = Run.references.island.topology_service.query(unit as Tower, _make_query())
 	if report == null:
 		return
 
 	var margin: int = 2
 	var cell_size := Island.CELL_SIZE - margin
-	var half_size := Vector2(cell_size, cell_size) * 0.5
+	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
 	for cell: Vector2i in report.cells.values():
-		var rect := Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
+		var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
 		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)

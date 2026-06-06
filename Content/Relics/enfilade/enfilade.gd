@@ -22,13 +22,13 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.TOWER_BUILT:
 		return
 	#check if mid-battle
-	if Phases.current_phase != Phases.GamePhase.COMBAT_WAVE:
+	if Run.phases.current_phase != Run.phases.GamePhase.COMBAT_WAVE:
 		return
 	#get data
-	var data := event.data as BuildTowerData
+	var data: BuildTowerData = event.data as BuildTowerData
 	if not data or not is_instance_valid(data.tower):
 		return
-		
+
 	var new_tower: Tower = data.tower
 	if not is_instance_valid(new_tower.modifiers_component):
 		return

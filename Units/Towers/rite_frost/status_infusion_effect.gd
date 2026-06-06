@@ -6,7 +6,7 @@ class_name StatusInfusionEffect
 @export var bonus_time: float = 0.8
 
 func _init() -> void:
-	# intercept hits before they leave the tower
+	#intercept hits before they leave the tower
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]
 
 func create_instance() -> EffectInstance:
@@ -23,13 +23,13 @@ func _handle_detach(_instance: EffectInstance) -> void:
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
 		return
-		
-	var hit_data := event.data as HitData
+
+	var hit_data: HitData = event.data as HitData
 	if not hit_data:
 		return
 
 	var status_vector: Vector2 = hit_data.status_effects.get(status, Vector2.ZERO)
-	
+
 	status_vector.x += bonus_stacks * instance.stacks
 	status_vector.y = maxf(status_vector.y, bonus_time)
 

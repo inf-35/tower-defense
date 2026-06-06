@@ -11,7 +11,7 @@ enum DeliveryMethod {
 }
 
 var target: Unit ##reference to the actual target of this projectile
-var excluded_units: Array[Unit] ## units that are excluded (mainly from non-targeted projectiles)
+var excluded_units: Array[Unit] ##units that are excluded (mainly from non-targeted projectiles)
 var use_source_position_override: bool = false ##if true, enables source_position override
 var source_position: Vector2 ##custom source position. if use_source_position_override is true, oversrides source (from HitData)'s position
 var use_initial_velocity_override: bool = false ##if true, uses initial_velocity
@@ -31,4 +31,4 @@ var pierce: int = 0 ##how many enemies can this projectile pass through? (-1 = i
 var stop_on_walls: bool = false ##does the projectile stop at walls?
 
 #for coneAOE
-var cone_angle : float ##angle of the fire cone in degrees
+var cone_angle: float ##angle of the fire cone in degrees

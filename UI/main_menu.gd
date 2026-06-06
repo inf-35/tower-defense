@@ -11,11 +11,11 @@ func _ready() -> void:
 	difficulty_panel.visible = false
 	if SaveLoad.has_save_file():
 		continue_button.visible = true
-		
+
 	settings_button.pressed.connect(func():
 		Pause.open_menu()
 	)
-		
+
 	continue_button.pressed.connect(func():
 		get_tree().change_scene_to_file("res://island.tscn")
 	)
@@ -23,15 +23,15 @@ func _ready() -> void:
 	play_button.pressed.connect(func():
 		difficulty_panel.visible = true
 	)
-	
+
 	normal_difficulty.pressed.connect(func():
 		SaveLoad.delete_save()
-		Phases.current_game_difficulty = Phases.GameDifficulty.NORMAL
+		Run.set_pending_game_difficulty(Run.GameDifficulty.NORMAL)
 		get_tree().change_scene_to_file("res://island.tscn")
 	)
-	
+
 	hard_difficulty.pressed.connect(func():
 		SaveLoad.delete_save()
-		Phases.current_game_difficulty = Phases.GameDifficulty.HARD
+		Run.set_pending_game_difficulty(Run.GameDifficulty.HARD)
 		get_tree().change_scene_to_file("res://island.tscn")
 	)

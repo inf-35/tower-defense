@@ -1,13 +1,13 @@
 extends Control
 class_name AnimatableUI
 
-# --- Configuration ---
+#--- configuration ---
 @export_group("References")
-@export var content: Control ## actual visual element to animate (must be a child of this node)
+@export var content: Control ##actual visual element to animate (must be a child of this node)
 
 @export_group("Entrance Animation")
 @export var auto_play_entrance: bool = false
-@export var slide_offset: Vector2 = Vector2(0, 50) ## start position offset (relative to 0,0)
+@export var slide_offset: Vector2 = Vector2(0, 50) ##start position offset (relative to 0,0)
 @export var entrance_duration: float = 0.4
 @export var entrance_delay: float = 0.0
 
@@ -18,20 +18,20 @@ class_name AnimatableUI
 
 @export_group("Idle Animation")
 @export var idle_sway_enabled: bool = false
-@export var idle_sway_angle: float = 2.0 ## max rotation degrees (sways between -angle and +angle)
-@export var idle_sway_duration: float = 4.0 ## time for a full cycle (left -> right -> left)
-@export var idle_random_phase: bool = true ## randomizes start time slightly to desync multiple items
+@export var idle_sway_angle: float = 2.0 ##max rotation degrees (sways between -angle and +angle)
+@export var idle_sway_duration: float = 4.0 ##time for a full cycle (left -> right -> left)
+@export var idle_random_phase: bool = true ##randomizes start time slightly to desync multiple items
 
 @export_group("Tween Settings")
 @export var transition_type: Tween.TransitionType = Tween.TRANS_CUBIC
 @export var ease_type: Tween.EaseType = Tween.EASE_OUT
 
-# --- State ---
+#--- state ---
 var _current_tween: Tween
-var _idle_tween: Tween # track idle separately so entrance/hover don't kill it
+var _idle_tween: Tween #track idle separately so entrance/hover don't kill it
 
 func _ready() -> void:
-	# validation and setup
+	#validation and setup
 	if not content:
 		if get_child_count() > 0 and get_child(0) is Control:
 			content = get_child(0)
@@ -39,17 +39,17 @@ func _ready() -> void:
 			push_warning("AnimatableUI: No content node assigned or found.")
 			return
 
-	# setup pivot for correct scaling/rotation
+	#setup pivot for correct scaling/rotation
 	call_deferred("_update_content_pivot")
-	
-	# connect signals
+
+	#connect signals
 	content.mouse_entered.connect(_on_mouse_entered)
 	content.mouse_exited.connect(_on_mouse_exited)
 	resized.connect(_on_resized)
 
-	# animations
+	#animations
 	if auto_play_entrance:
-		# start invisible and offset
+		#start invisible and offset
 		content.modulate.a = 0.0
 		content.position = slide_offset
 		animate_entrance()
@@ -60,28 +60,28 @@ func _ready() -> void:
 func _update_content_pivot() -> void:
 	if not content: return
 	content.set_deferred(&"size", size)
-	# Center pivot is crucial for both Scaling (Hover) and Rotation (Idle)
+	#center pivot is crucial for both scaling (hover) and rotation (idle)
 	content.pivot_offset = size / 2.0
 
 func _on_resized() -> void:
 	_update_content_pivot()
 
-# --- Animation API ---
+#--- animation api ---
 
 func animate_entrance(custom_delay: float = -1.0) -> void:
 	if not content: return
-	
+
 	var d = entrance_delay if custom_delay < 0 else custom_delay
-	
-	# Only kill the movement/fade tween, leave idle tween alone
+
+	#only kill the movement/fade tween, leave idle tween alone
 	if _current_tween: _current_tween.kill()
 	_current_tween = create_tween().set_parallel(true)
-	
-	# 1. Slide to (0,0)
+
+	#1. slide to (0,0)
 	_current_tween.tween_property(content, "position", Vector2.ZERO, entrance_duration)\
 		.set_trans(transition_type).set_ease(ease_type).set_delay(d)
-		
-	# 2. Fade In
+
+	#2. fade in
 	_current_tween.tween_property(content, "modulate:a", 1.0, entrance_duration)\
 		.set_trans(Tween.TRANS_LINEAR).set_delay(d)
 
@@ -92,19 +92,19 @@ func snap_to_default() -> void:
 	content.rotation = 0.0
 	content.modulate.a = 1.0
 
-# --- Idle Logic ---
+#--- idle logic ---
 
 func _start_idle_animation() -> void:
 	if not content: return
 	if _idle_tween: _idle_tween.kill()
-	
-	# Calculate a random duration offset to prevent robotic synchronization
+
+	#calculate a random duration offset to prevent robotic synchronization
 	var duration = idle_sway_duration
 	if idle_random_phase:
 		duration += randf_range(-0.5, 0.5)
-	
-	# To make the loop seamless, we first tween from 0 to the start angle (Right),
-	# then we start the infinite loop (Right -> Left -> Right).
+
+	#to make the loop seamless, we first tween from 0 to the start angle (right),
+	#then we start the infinite loop (right -> left -> right).
 
 
 	_idle_tween = create_tween()
@@ -115,24 +115,24 @@ func _start_idle_animation() -> void:
 	_idle_tween.tween_property(content, "rotation", deg_to_rad(-idle_sway_angle), duration * 0.5).set_ease(Tween.EASE_IN_OUT)
 	_idle_tween.play()
 
-# --- Hover Logic ---
+#--- hover logic ---
 
 func _on_mouse_entered() -> void:
 	if not hover_enabled or not content: return
-	
-	# We use a separate tween for scale so it doesn't conflict with position/rotation
+
+	#we use a separate tween for scale so it doesn't conflict with position/rotation
 	var hover_tween = create_tween()
 	hover_tween.tween_property(content, "scale", hover_scale, hover_duration)\
 		.set_trans(transition_type).set_ease(ease_type)
 
 func _on_mouse_exited() -> void:
 	if not hover_enabled or not content: return
-	
+
 	var hover_tween = create_tween()
 	hover_tween.tween_property(content, "scale", Vector2.ONE, hover_duration)\
 		.set_trans(transition_type).set_ease(ease_type)
 
-# --- Manual Control ---
+#--- manual control ---
 
 func look_at_mouse(strength: float = 10.0) -> void:
 	if not content: return

@@ -1,54 +1,54 @@
 extends Node
 class_name RuinService
 
-# defines why a tower was ruined, which dictates its fate
+#defines why a tower was ruined, which dictates its fate
 enum RuinReason { KILLED, SOLD, DESTROYED }
 
-# we track the tower node itself and the reason it was ruined
+#we track the tower node itself and the reason it was ruined
 var _ruined_towers: Dictionary[Tower, RuinReason] = {}
-# this dictionary acts as a fast lookup set for checking if a cell is ruined.
+#this dictionary acts as a fast lookup set for checking if a cell is ruined.
 var _ruined_cells: Dictionary[Vector2i, bool] = {}
 
 #initialise is the _ready substitute
 func initialise() -> void:
-	# this service is the only thing that needs to listen for the end of a wave
-	Phases.wave_cycle_started.connect(_on_wave_ended)
+	#this service is the only thing that needs to listen for the end of a wave
+	Run.phases.wave_cycle_started.connect(_on_wave_ended)
 
-# the main public API for towers to register themselves as ruined
+#the main public api for towers to register themselves as ruined
 func register_ruin(tower: Tower, reason: RuinReason) -> void:
 	print("Registered ruin")
 	if not is_instance_valid(tower) or _ruined_towers.has(tower):
 		return
-	
+
 	_ruined_towers[tower] = reason
-	# when a tower is ruined, mark all of its occupied cells in the lookup table
+	#when a tower is ruined, mark all of its occupied cells in the lookup table
 	for cell: Vector2i in tower.get_occupied_cells():
 		_ruined_cells[cell] = true
 
-# this function is the core of the system's logic
+#this function is the core of the system's logic
 func _on_wave_ended(_wave_number: int) -> void:
 	if _ruined_towers.is_empty():
 		return
-		
-	# create a copy of the keys to iterate over, as the dictionary will be modified
+
+	#create a copy of the keys to iterate over, as the dictionary will be modified
 	var towers_to_process: Array[Tower] = _ruined_towers.keys()
-	
+
 	for tower: Tower in towers_to_process:
 		if not is_instance_valid(tower):
-			# if the tower was somehow destroyed by another means, pass
+			#if the tower was somehow destroyed by another means, pass
 			continue
 
 		var reason: RuinReason = _ruined_towers[tower]
-		
+
 		match reason:
 			RuinReason.KILLED:
-				# towers that were killed are resurrected
+				#towers that were killed are resurrected
 				tower.resurrect()
 			RuinReason.SOLD:
-				# towers that were sold are permanently removed
+				#towers that were sold are permanently removed
 				tower.queue_free()
-	
-	# clear the dictionary for the next wave
+
+	#clear the dictionary for the next wave
 	_ruined_towers.clear()
 	_ruined_cells.clear()
 

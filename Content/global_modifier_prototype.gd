@@ -14,7 +14,7 @@ enum TargetFilter {
 @export var required_type: Towers.Type = Towers.Type.VOID
 
 func matches_unit(unit: Unit) -> bool:
-	# 1. Filter by Type
+	#1. filter by type
 	match target_filter:
 		TargetFilter.ALL:
 			return true
@@ -32,5 +32,5 @@ func matches_unit(unit: Unit) -> bool:
 				return false
 		TargetFilter.ENEMIES_ONLY:
 			if unit.hostile: return true
-			
+
 	return true

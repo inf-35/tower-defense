@@ -23,25 +23,25 @@ var range: float:
 
 var current_cooldown: float = 0.0 ##centralised value for cooldown to next attack, starts at cooldown and ticks towards zero
 
-func _ready():
+func _ready() -> void:
 	set_process(true)
 	current_cooldown += randf_range(0.0, 1.0)
 
-func _process(_delta: float):
+func _process(_delta: float) -> void:
 	current_cooldown -= Clock.game_delta
-	
-func inject_components(modifiers_component: ModifiersComponent):
+
+func inject_components(modifiers_component: ModifiersComponent) -> void:
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])
 
-func refresh_cooldown(): ##resets cooldown, used for external components which might want to manually attack
+func refresh_cooldown() -> void: ##resets cooldown, used for external components which might want to manually attack
 	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
-	
-func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
+
+func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO) -> void:
 	if attack_data == null:
 		return
-		
+
 	refresh_cooldown()
 	#NOTE: this must be before the actual attack execution
 	var delivery_data: DeliveryData = generate_delivery_data()
@@ -53,13 +53,13 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO):
 			delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
 		else:
 			delivery_data.intercept_position = target.global_position
-	
+
 	delivery_data.target = target
-	
+
 	var hit_data: HitData = generate_hit_data(delivery_data)
 	hit_data.target = target
 	hit_data.target_affiliation = target.hostile
-	
+
 	unit.deal_hit(hit_data, delivery_data)
 
 func generate_delivery_data() -> DeliveryData: ##generates a unit-specific targetless, overrideless deliverydata
@@ -67,7 +67,7 @@ func generate_delivery_data() -> DeliveryData: ##generates a unit-specific targe
 	delivery_data.delivery_method = attack_data.delivery_method
 	delivery_data.cone_angle = attack_data.cone_angle
 	delivery_data.projectile_speed = attack_data.projectile_speed
-	
+
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
 		delivery_data.projectile_lifetime = attack_data.projectile_lifetime
@@ -75,7 +75,7 @@ func generate_delivery_data() -> DeliveryData: ##generates a unit-specific targe
 		delivery_data.stop_on_walls = attack_data.stop_on_walls
 
 	return delivery_data
-	
+
 func generate_hit_data(delivery_data: DeliveryData = null) -> HitData: ##generates a unit-specific targetless, overrideless hitdata
 	var hit_data := HitData.new()
 	hit_data.damage = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
@@ -89,12 +89,12 @@ func generate_hit_data(delivery_data: DeliveryData = null) -> HitData: ##generat
 	for modifier: Modifier in hit_data.modifiers:
 		modifier.source_id = unit.unit_id
 	hit_data.status_effects = attack_data.format_status_effects()
-	
+
 	hit_data.vfx_on_impact = attack_data.vfx_on_impact
 	hit_data.vfx_on_spawn = attack_data.vfx_on_spawn
-	
+
 	hit_data.source = unit
-	
+
 	return hit_data
 
 #used for projectile-based attacks with non-zero traverse times
@@ -102,15 +102,15 @@ const MAXIMUM_ACCEPTABLE_INACCURACY: float = 1.0
 const MAXIMUM_ITERATIONS: int = 10
 static func predict_intercept_position(source_unit: Unit, target_unit: Unit, projectile_speed: float, fast: bool = true, time_offset: float = 0.0) -> Vector2:
 	#print("START ESTIMATE ---------------------------------------------------")
-	# Get the enemy's future position prediction function from its navigation component.
+	#get the enemy's future position prediction function from its navigation component.
 	var enemy_nav_comp = target_unit.navigation_component
 	if enemy_nav_comp == null:
-		return target_unit.global_position # Can't predict, just aim at current position.
+		return target_unit.global_position #can't predict, just aim at current position.
 
 	var my_pos = source_unit.global_position if not is_instance_valid(source_unit.attack_component.muzzle) \
 		else source_unit.attack_component.muzzle.global_position
 	var enemy_pos = target_unit.global_position
-	# Start with a first guess: how long would it take to hit the enemy's current position?
+	#start with a first guess: how long would it take to hit the enemy's current position?
 	var previous_estimate: Vector2 #previous estimate for enemy's position @ intercept
 	var estimated_travel_time: float = my_pos.distance_to(enemy_pos) / projectile_speed + time_offset
 	var inaccuracy: float = INF #estimated inaccuracy (difference between each iteration)
@@ -130,7 +130,7 @@ static func predict_intercept_position(source_unit: Unit, target_unit: Unit, pro
 func get_save_data() -> Dictionary:
 	return {} #everything here thats persistent is typically run by modifiers component
 #NOTE: currently radius is calibrated(?) incorrectly
-func setup_radial_pulse(radial_pulse: RadialPulseVFX, vfx_info: VFXInfo):
+func setup_radial_pulse(radial_pulse: RadialPulseVFX, vfx_info: VFXInfo) -> void:
 	radial_pulse.start_radius = radius * 0.75 * 0.5
 	radial_pulse.max_radius = radius * 0.5
 	radial_pulse.color_gradient = vfx_info.color_gradient

@@ -5,7 +5,7 @@ class_name InterestEffect
 @export var interest_floor: float = 0.0 ##minimum interest
 @export var interest_cap: float = 0.0 ##maximum interest
 
-func _init():
+func _init() -> void:
 	event_hooks = [GameEvent.EventType.WAVE_ENDED]
 	global = true
 
@@ -21,5 +21,5 @@ func _handle_detach(_instance: EffectInstance) -> void:
 func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.WAVE_ENDED:
 		return
-		
-	Player.flux += clampf(Player.flux * interest, interest_floor, interest_cap)
+
+	Run.player.flux += clampf(Run.player.flux * interest, interest_floor, interest_cap)

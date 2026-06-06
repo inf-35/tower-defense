@@ -1,7 +1,7 @@
 extends Behavior
 class_name SunbeamBehavior
 
-@export var max_targets: int = 3 ## Number of simultaneous lasers
+@export var max_targets: int = 3 ##number of simultaneous lasers
 @export var laser_width: float = 2.0
 @export var laser_color: Color = Color.RED
 
@@ -14,7 +14,7 @@ func start() -> void:
 
 func update(delta: float) -> void:
 	_cooldown += delta
-	
+
 	#acquire targets
 	if is_instance_valid(range_component):
 		_current_targets = range_component.get_targets(max_targets)
@@ -28,27 +28,27 @@ func _initialize_laser_pool() -> void:
 		line.width = laser_width
 		line.default_color = laser_color
 		line.visible = false
-		# Improve visuals
+		#improve visuals
 		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		line.end_cap_mode = Line2D.LINE_CAP_ROUND
 
-		if is_instance_valid(References.projectiles):
-			References.projectiles.add_child(line)
-			## move_to_back() ensures lasers appear under the tower sprite
-			#graphics.move_child(line, 0) 
+		if is_instance_valid(Run.references.projectiles):
+			Run.references.projectiles.add_child(line)
+			##move_to_back() ensures lasers appear under the tower sprite
+			#graphics.move_child(line, 0)
 		else:
 			unit.add_child(line)
-			
+
 		_active_lasers.append(line)
 
 func _update_laser_visuals() -> void:
 	var muzzle_pos := unit.global_position
 	if is_instance_valid(attack_component) and is_instance_valid(attack_component.muzzle):
 		muzzle_pos = attack_component.muzzle.position
-	
+
 	for i in range(max_targets):
 		var line = _active_lasers[i]
-		
+
 		if i < _current_targets.size():
 			var target = _current_targets[i]
 			if is_instance_valid(target):
@@ -64,15 +64,15 @@ func _update_laser_visuals() -> void:
 func _attempt_multi_attack() -> void:
 	if not _is_attack_possible_generic():
 		return
-		
-	# attack all current targets
+
+	#attack all current targets
 	for target in _current_targets:
 		if is_instance_valid(target):
 			attack_component.attack(target)
-	
+
 	_cooldown = 0.0
 
-# Helper duplicating _is_attack_possible but checking list size instead of single target
+#helper duplicating _is_attack_possible but checking list size instead of single target
 func _is_attack_possible_generic() -> bool:
 	if attack_component == null or range_component == null:
 		return false
@@ -80,7 +80,7 @@ func _is_attack_possible_generic() -> bool:
 		return false
 	if _current_targets.is_empty():
 		return false
-		
+
 	if attack_component.current_cooldown <= 0.0:
 		return true
 

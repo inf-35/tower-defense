@@ -1,9 +1,9 @@
 extends EffectPrototype
 class_name SimpleBladeEffect
 
-@export var bonus_per_tower: float = 0.03 ## +3% per tower
+@export var bonus_per_tower: float = 0.03 ##+3% per tower
 
-# State: Maps each tower to the specific modifier instance we gave it
+#state: maps each tower to the specific modifier instance we gave it
 class BladeState extends RefCounted:
 	var tower_modifiers: Dictionary[Tower, Modifier] = {}
 
@@ -38,31 +38,31 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 func _recalculate_all(instance: EffectInstance) -> void:
 	var state = instance.state as BladeState
-	var all_towers = References.island.get_tree().get_nodes_in_group(References.TOWER_GROUP)
-	var tower_count = 0
+	var all_towers = Run.references.island.get_tree().get_nodes_in_group(Run.references.TOWER_GROUP)
+	var tower_count: int = 0
 	for tower: Tower in all_towers:
 		if tower.hostile:
 			continue
-		
+
 		if tower.environmental:
 			continue
-		
+
 		if tower.is_queued_for_deletion():
 			continue
-			
+
 		tower_count += 1
-	
+
 	var multiplier = 1.0 + (tower_count * bonus_per_tower)
 	for t: Tower in all_towers:
 		if not is_instance_valid(t.modifiers_component): continue
-		
+
 		if state.tower_modifiers.has(t):
 			var mod = state.tower_modifiers[t]
 			if not is_equal_approx(mod.multiplicative, multiplier):
 				mod.multiplicative = multiplier
 				t.modifiers_component.change_modifier(mod)
 		else:
-			# Add new
+			#add new
 			var mod = Modifier.new(Attributes.id.DAMAGE, multiplier, 0.0, -1.0)
 			t.modifiers_component.add_modifier(mod)
 			state.tower_modifiers[t] = mod
