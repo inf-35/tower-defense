@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://blfksojqo6ygb"]
+
+[ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="1_vy2ek"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_5c401"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_dcebq"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_6b1bd"]
+[ext_resource type="PackedScene" uid="uid://crcnwxldbt1gh" path="res://Units/Towers/rite_glass/rite_glass.tscn" id="4_6pj86"]
+
+[resource]
+script = ExtResource("2_5c401")
+target_type_name = "RITE_GLASS"
+id = 69
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Glass"
+tower_description = "{RITE_LABEL}. Towers within 2 tiles gain 25% {UNIT_HITRATE}, but lose 66% {UNIT_HP}."
+icon = ExtResource("1_vy2ek")
+preview = ExtResource("1_vy2ek")
+inspector_actions = Array[ExtResource("2_dcebq")]([ExtResource("3_6b1bd")])
+tower_scene = ExtResource("4_6pj86")

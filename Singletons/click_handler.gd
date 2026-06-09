@@ -126,13 +126,18 @@ func _get_clicked_enemy(mouse_pos: Vector2) -> Unit: ##helper to find enemy unde
 	var results = space_state.intersect_point(query)
 	if not results.is_empty():
 		var hitbox = results[0].collider as Hitbox
-		if is_instance_valid(hitbox) and is_instance_valid(hitbox.unit):
+		if is_instance_valid(hitbox) and is_instance_valid(hitbox.unit) and (not hitbox.unit.abstractive):
 			return hitbox.unit
 	return null
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not enabled:
+	if (not Run.is_run_ready()) or not enabled:
 		return
+
+	if event.is_action_pressed("prioritize_target"):
+		_prioritize_selected_enemy()
+		return
+
 	match current_state:
 		State.IDLE:
 			_handle_idle_input(event)
@@ -382,3 +387,15 @@ func _on_build_tower_selected(tower: Tower) -> void:
 		await tower.components_ready
 	#the ui is requesting to start building a tower.
 	_enter_preview_state(tower)
+
+func _prioritize_selected_enemy() -> void:
+	if not is_instance_valid(selected_entity):
+		return
+
+	if selected_entity is Tower:
+		return
+
+	if not selected_entity.hostile:
+		return
+
+	Targeting.set_priority_target(selected_entity)

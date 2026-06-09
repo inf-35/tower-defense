@@ -80,7 +80,6 @@ func remove_modifier(mod: Modifier) -> void:
 	_modifiers.erase(mod)
 	_effective_cache.erase(mod.attribute)
 	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
-	print(self, " removed!")
 
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
 	_modifiers.erase(mod)

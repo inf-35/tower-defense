@@ -6,6 +6,7 @@ class_name HasteRiteEffect
 
 class HasteState extends RefCounted:
 	var modifier: Modifier
+	var seen_attack_ids: Dictionary[int, bool] = {}
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]
@@ -39,9 +40,9 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
 		return
 
-	var report = event.data as HitReportData
-	#prevent infinite recursion if the self-damage somehow triggers another attack
-	if report and report.recursion > 0:
+	var hit_data: HitData = event.data as HitData
+	var state: HasteState = instance.state as HasteState
+	if not HitData.consume_attack_id(hit_data, state.seen_attack_ids):
 		return
 
 	var tower: Tower = instance.host as Tower
@@ -55,7 +56,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		hit.source = tower
 		hit.target = tower
 		hit.target_affiliation = tower.hostile #matches self affiliation
+		if not hit.derive_lineage_from(hit_data, instance):
+			continue
 
 		#apply directly so it mitigates through standard defensive layers
 		tower.take_hit(hit)
-	print("....!")

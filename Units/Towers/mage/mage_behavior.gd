@@ -1,46 +1,54 @@
 extends Behavior
 class_name MageBehavior
 
-@export var network_tint: Color = Color(0.9, 0.7, 1.0, 1.0) #purple
-@export var pulse_vfx_scene: PackedScene = preload("res://Units/Towers/mage/mage_pulse.tscn")##we keep a single instance to prevent object churn
+@export var network_tint: Color = Color(0.9, 0.7, 1.0, 1.0) ##tint applied to palisades currently linked into the mage network
+@export var pulse_vfx_scene: PackedScene = preload("res://Units/Towers/mage/mage_pulse.tscn") ##optional retained pulse scene for linked palisades
 
 var _connected_palisades: Array[Tower] = [] ##the list of palisades this specific Mage is currently powering
 
-func start() -> void:
+func start() -> void: ##subscribes to build and death updates so the contiguous palisade network stays current
 	Run.player.on_event.connect(_on_global_event) ##listen globally for any tower changes to recalculate the contiguous network
 	_recalculate_network()
 
-func detach() -> void:
+func detach() -> void: ##clears the cached network and removes the visual tint when the mage leaves play
 	#cleanup: if the mage is destroyed/sold, untint everything
 	for p in _connected_palisades:
 		_set_palisade_tint(p, false)
 	_connected_palisades.clear()
 
-func update(_delta: float) -> void:
+func update(_delta: float) -> void: ##pulses every connected palisade as one logical attack whenever the mage can fire
 	if _is_attack_possible(false):
 		_pulse_network()
 
-func _pulse_network() -> void:
+func _pulse_network() -> void: ##reuses one attack context across every emitted palisade pulse in this cast
 	attack_component.refresh_cooldown()
 	#pre-calculate the mage's stats (damage, range, statuses)
 	#relics applied to the mage will buff these values here!
-	var dmg = attack_component.damage
-	var radius = attack_component.radius
+	var dmg: float = attack_component.damage
+	var radius: float = attack_component.radius
 
 	#todo: visual feedback on the mage itself
 	if is_instance_valid(animation_player):
 		_play_animation(&"cast")
 
+	var attack_id: int = AttackComponent.get_next_attack_id()
+	var attack_context: AttackComponent.AttackLineageContext = attack_component.pull_attack_context()
+	if not is_instance_valid(attack_context):
+		return
+
 	#command connected palisades to attack
 	for palisade: Tower in _connected_palisades:
 		if not is_instance_valid(palisade): continue
 
-		var hit_data = attack_component.attack_data.generate_generic_hit_data()
+		var hit_data: HitData = attack_component.attack_data.generate_generic_hit_data()
 		hit_data.source = unit #mage gets credit
 		hit_data.target = null #untargeted aoe
 		hit_data.target_affiliation = true
 		hit_data.damage = dmg
 		hit_data.radius = radius
+		hit_data.attack_id = attack_id
+		if not attack_component.apply_attack_context(hit_data, attack_context):
+			continue
 
 		var delivery := DeliveryData.new()
 		delivery.delivery_method = DeliveryData.DeliveryMethod.CONE_AOE
@@ -63,7 +71,7 @@ func _pulse_network() -> void:
 			VFXManager.play_vfx(hit_data.vfx_on_spawn, palisade.global_position, Vector2.UP)
 
 #network management
-func _on_global_event(_unit: Unit, event: GameEvent) -> void:
+func _on_global_event(_unit: Unit, event: GameEvent) -> void: ##rebuilds the network when palisade topology changes
 	if event.event_type == GameEvent.EventType.TOWER_BUILT or event.event_type == GameEvent.EventType.DIED or event.event_type == GameEvent.EventType.REPLACED:
 		if event.event_type == GameEvent.EventType.TOWER_BUILT and (event.data as BuildTowerData).tower.type != Towers.Type.PALISADE:
 			return
@@ -71,7 +79,7 @@ func _on_global_event(_unit: Unit, event: GameEvent) -> void:
 			return
 		_recalculate_network.call_deferred()
 
-func _recalculate_network() -> void:
+func _recalculate_network() -> void: ##diffs the new contiguous palisade set against the cached one and updates the tint state
 	if  unit.abstractive: return
 	var new_network: Array[Tower] = _calculate_contiguous_palisades((unit as Tower).tower_position)
 	#--- apply diff for tinting ---
@@ -88,7 +96,7 @@ func _recalculate_network() -> void:
 
 	_connected_palisades = new_network
 
-func _calculate_contiguous_palisades(start_cell: Vector2i) -> Array[Tower]:
+func _calculate_contiguous_palisades(start_cell: Vector2i) -> Array[Tower]: ##flood-fills outward through linked palisades so the mage can pulse the full contiguous network
 	var island = Run.references.island
 	if not is_instance_valid(island): return []
 	if not is_instance_valid(unit): return []

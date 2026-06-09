@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+
+[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="1_8wu75"]
+
+[resource]
+script = ExtResource("1_8wu75")
+id_name = "soul_link"
+description = "relic tower unlock"
+tower_type = 66
+base_weight = 200.0

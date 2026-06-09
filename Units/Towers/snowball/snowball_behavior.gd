@@ -5,12 +5,12 @@ const CARDINAL_DIRS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, V
 #cached objects
 var _query: PhysicsShapeQueryParameters2D
 
-func _init() -> void:
+func _init() -> void: ##prepares a reusable broad-phase query object for the four lane scans
 	_query = PhysicsShapeQueryParameters2D.new()
 	_query.collide_with_areas = true
 	_query.collide_with_bodies = false
 
-func update(delta: float) -> void:
+func update(delta: float) -> void: ##scores the four lanes and launches a projectile down the strongest one
 	_cooldown += delta
 
 	if not _is_attack_possible():
@@ -32,11 +32,11 @@ func update(delta: float) -> void:
 	if best_dir != Vector2.ZERO:
 		_fire_snowball(best_dir, range_val)
 
-func _scan_lane(dir: Vector2, max_dist: float) -> float:
-	var my_pos := unit.global_position
+func _scan_lane(dir: Vector2, max_dist: float) -> float: ##estimates lane value by counting hittable enemies inside a narrow rectangular sweep
+	var my_pos: Vector2 = unit.global_position
 
-	var space_state = unit.get_world_2d().direct_space_state
-	var shape = RectangleShape2D.new()
+	var space_state: PhysicsDirectSpaceState2D = unit.get_world_2d().direct_space_state
+	var shape := RectangleShape2D.new()
 	shape.size = Vector2(max_dist, Island.CELL_SIZE * 0.8) #slightly smaller to be purely inclusive
 
 	_query.shape = shape
@@ -47,12 +47,12 @@ func _scan_lane(dir: Vector2, max_dist: float) -> float:
 	var angle: float = dir.angle()
 	_query.transform = Transform2D(angle, center_point)
 
-	var results = space_state.intersect_shape(_query)
+	var results: Array[Dictionary] = space_state.intersect_shape(_query)
 
 	#basic scoring: 1 point per enemy
 	return float(results.size())
 
-func _fire_snowball(dir: Vector2, range_val: float) -> void:
+func _fire_snowball(dir: Vector2, range_val: float) -> void: ##builds one untargeted projectile attack and spends any queued attack lineage override
 	#we need custom logic, so we cant use attack_component.attack
 	#prepare Delivery Data
 	var delivery_data := attack_component.generate_delivery_data()
@@ -64,6 +64,13 @@ func _fire_snowball(dir: Vector2, range_val: float) -> void:
 	var hit_data := attack_component.generate_hit_data(delivery_data)
 	hit_data.target_affiliation = not unit.hostile
 	hit_data.target = null #untargeted
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	var attack_context: AttackComponent.AttackLineageContext = attack_component.pull_attack_context()
+	if not is_instance_valid(attack_context):
+		return
+
+	if not attack_component.apply_attack_context(hit_data, attack_context):
+		return
 
 	#we have no predestined intercept nor target
 	unit.deal_hit(hit_data, delivery_data)
@@ -73,9 +80,9 @@ func _fire_snowball(dir: Vector2, range_val: float) -> void:
 	if is_instance_valid(animation_player):
 		animation_player.play("attack")
 
-func draw_visuals(canvas: RangeIndicator) -> void:
+func draw_visuals(canvas: RangeIndicator) -> void: ##draws the four lane previews and marks blocking impact tiles
 	super.draw_visuals(canvas)
-	var tower = unit as Tower
+	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower): return
 
 	var start_cell: Vector2i = tower.tower_position
@@ -85,9 +92,9 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 
 	var cell_size := Island.CELL_SIZE - canvas.margin
 	var half_size: Vector2 = Vector2(cell_size, cell_size) / 2.0
-	var island := Run.references.island
+	var island: Island = Run.references.island
 
-	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var dirs: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
 
 	for d: Vector2i in dirs:
 		for i: int in range(1, range_tiles + 1):

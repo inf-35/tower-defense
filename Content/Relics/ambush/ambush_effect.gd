@@ -30,15 +30,17 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 		return
 
 	var new_tower: Tower = data.tower
-	_trigger_ambush_explosion(new_tower)
+	_trigger_ambush_explosion(_instance, data, new_tower)
 
-func _trigger_ambush_explosion(source_tower: Tower) -> void:
+func _trigger_ambush_explosion(instance: EffectInstance, parent_data: BuildTowerData, source_tower: Tower) -> void:
 	if attack_data == null:
 		push_warning("AmbushEffect: Triggered but no AttackData assigned.")
 		return
 
 	#generate the hit payload from the designer-configured resource
 	var hit_data: HitData = attack_data.generate_generic_hit_data()
+	if not hit_data.derive_lineage_from(parent_data, instance):
+		return
 	hit_data.source = source_tower
 	hit_data.target_affiliation = not source_tower.hostile
 

@@ -48,9 +48,20 @@ const DEBUG_PRINT_REPORTS: bool = true
 
 func _ready() -> void:
 	wave_cycle_started.connect(UI.start_wave.emit)
+	wave_cycle_started.connect(_emit_wave_prep_event)
 	combat_started.connect(UI.start_combat.emit)
 	wave_ended.connect(UI.end_wave.emit)
 	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
+
+func _emit_wave_prep_event(wave: int) -> void:
+	var wave_data := WaveData.new()
+	wave_data.wave = wave
+
+	var event := GameEvent.new()
+	event.event_type = GameEvent.EventType.WAVE_PREP_STARTED
+	event.data = wave_data
+
+	Run.player.on_event.emit(null, event)
 
 func start_game(progress_callback: Callable = Callable()) -> void:
 	_report_loading(progress_callback, "Preparing references...", 0.08)

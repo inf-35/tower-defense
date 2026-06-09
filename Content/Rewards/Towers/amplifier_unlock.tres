@@ -7,4 +7,5 @@ script = ExtResource("1_a45yv")
 id_name = "amplifier"
 description = "relic tower unlock"
 tower_type = 8
+base_weight = 200.0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

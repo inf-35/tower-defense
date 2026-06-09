@@ -209,7 +209,7 @@ func _prepare_components() -> void:
 
 func _setup_event_bus() -> void:
 	Run.player.on_event.connect(func(_unit: Unit, event: GameEvent): #propagate wave events from global to local scope
-		if not (event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED):
+		if not (event.event_type == GameEvent.EventType.WAVE_PREP_STARTED or event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED):
 			return
 
 		on_event.emit(event)
@@ -228,7 +228,7 @@ func _setup_event_bus() -> void:
 			for effect_instance: EffectInstance in scheduled_effects[event.event_type]:
 				effect_instance.handle_event_unfiltered(event)
 		#exectue global effects
-		if event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
+		if event.event_type == GameEvent.EventType.WAVE_PREP_STARTED or event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
 			return
 		Run.player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
 	)
@@ -362,7 +362,10 @@ func take_hit(hit: HitData) -> void:
 
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
-	print(self, " aig")
+
+	if is_zero_approx(health_component.health): #we're dead
+		return
+
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
 	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
 
@@ -384,20 +387,23 @@ func take_hit(hit: HitData) -> void:
 	var unit_dead: bool = is_zero_approx(health_component.health) #are we dead?
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
+	hit_report.copy_lineage_from(hit)
 	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
 	hit_report.target = self
+	hit_report.attack_id = hit.attack_id
 	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
+	hit_report.overkill = maxf(damage - benchmark, 0.0) if unit_dead else 0.0
 	hit_report.statuses_applied = hit.status_effects.duplicate(true)
 
-	if unit_dead: #TODO: separation of logic (decouple shader)
+	if unit_dead and not is_zero_approx(delta_health): #TODO: separation of logic (decouple shader)
 		hit_report.death_caused = true
 
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
 
 		died.emit(hit_report) #NOTE: this is when the unit dies
-	else:
+	elif graphics:
 		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
 
 		var shader_material: ShaderMaterial = graphics.material as ShaderMaterial

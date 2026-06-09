@@ -21,6 +21,12 @@ enum Facing {
 
 enum State { ACTIVE, RUINED } ##overarching state machine of the tower
 
+class ForwardScanResult extends RefCounted:
+	var hit_tower: Tower
+	var impact_cell: Vector2i = Vector2i.ZERO
+	var last_valid_cell: Vector2i = Vector2i.ZERO
+	var distance_tiles: int = 0
+
 var current_state: State = State.ACTIVE #NOTE: should not be directly modified
 var level: int = 0: #upgrade level of tower
 	set(new_level):
@@ -255,6 +261,59 @@ func get_occupied_cells() -> Array[Vector2i]:
 			cells.append(tower_position + Vector2i(x,y))
 
 	return cells
+
+func get_forward_direction() -> Vector2i:
+	match facing:
+		Facing.UP:
+			return Vector2i.UP
+		Facing.RIGHT:
+			return Vector2i.RIGHT
+		Facing.DOWN:
+			return Vector2i.DOWN
+		Facing.LEFT:
+			return Vector2i.LEFT
+
+	return Vector2i.ZERO
+
+func scan_forward(max_distance: int = 50) -> ForwardScanResult:
+	return scan_direction(get_forward_direction(), max_distance)
+
+func scan_direction(direction: Vector2i, max_distance: int = 50) -> ForwardScanResult:
+	var result: ForwardScanResult = ForwardScanResult.new()
+	result.impact_cell = tower_position
+	result.last_valid_cell = tower_position
+
+	if max_distance <= 0:
+		return result
+
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return result
+
+	if direction == Vector2i.ZERO:
+		return result
+
+	var current_cell: Vector2i = tower_position + direction
+	var distance_tiles: int = 1
+
+	while distance_tiles <= max_distance:
+		if not island.terrain_base_grid.has(current_cell):
+			break
+
+		result.last_valid_cell = current_cell
+		var check_tower: Tower = island.get_tower_on_tile(current_cell)
+		if is_instance_valid(check_tower) and check_tower != self:
+			result.hit_tower = check_tower
+			result.impact_cell = current_cell
+			result.distance_tiles = distance_tiles
+			return result
+
+		current_cell += direction
+		distance_tiles += 1
+
+	result.impact_cell = result.last_valid_cell
+	result.distance_tiles = max(distance_tiles - 1, 0)
+	return result
 
 func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid grid coordinates immediately adjacent to this tower
 	var neighbors: Array[Vector2i] = []

@@ -34,6 +34,20 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var line_width: float = 3.0
 @export var line_length: float = 20.0
 
+@export_group("Aoe Particles")
+@export var aoe_particles_enabled: bool = false ##when true, aoe-capable attacks can stamp a dense particle field across their affected shape
+@export var aoe_particle_texture: Texture2D = preload("res://Assets/particle_whirl.png") ##base sprite used for each particle in the aoe field
+@export var aoe_particle_color: Color = Color(1.0, 1.0, 1.0, 0.35) ##tint applied to every spawned particle before lifetime fading
+@export var aoe_particles_per_cell: float = 4.0 ##rough density budget measured in particles per covered island cell
+@export var aoe_particle_lifetime: float = 0.35 ##how long the field marker persists before fading out completely
+@export var aoe_particle_scale_min: float = 0.45 ##minimum per-particle sprite scale, in the same world-space convention as other vfx
+@export var aoe_particle_scale_max: float = 0.9 ##maximum per-particle sprite scale, allowing one resource to feel either misty or chunky
+@export var aoe_particle_spin_speed_min: float = -45.0 ##minimum per-particle spin rate in degrees per second
+@export var aoe_particle_spin_speed_max: float = 45.0 ##maximum per-particle spin rate in degrees per second
+@export var aoe_particle_drift_speed_min: float = 6.0 ##minimum outward drift speed in world units per second
+@export var aoe_particle_drift_speed_max: float = 18.0 ##maximum outward drift speed in world units per second
+@export var aoe_particle_drift_angle_noise_deg: float = 20.0 ##random angular wobble added around the outward direction so fields do not expand as a perfect starburst
+
 #--- universal behavior properties ---
 @export_category("Universal")
 @export var scale: float = 1.0

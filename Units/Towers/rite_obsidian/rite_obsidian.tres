@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/rite_blood.png" id="1_qkpkg"]
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_et2vc"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/destroy.tres" id="3_3pwn1"]
+[ext_resource type="PackedScene" path="res://Units/Towers/rite_obsidian/rite_obsidian.tscn" id="4_d8qo1"]
+
+[resource]
+script = ExtResource("2_et2vc")
+target_type_name = "RITE_OBSIDIAN"
+id = 68
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Obsidian"
+tower_description = "{RITE_LABEL}. Adjacent towers convert enemies' {BURN} into equal {FROST}, {BLEED}, and {CURSED} stacks on hit."
+icon = ExtResource("1_qkpkg")
+preview = ExtResource("1_qkpkg")
+inspector_actions = Array[InspectorAction]([ExtResource("3_3pwn1")])
+tower_scene = ExtResource("4_d8qo1")

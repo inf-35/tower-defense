@@ -9,7 +9,6 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_7cmip"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="5_b5w7g"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_bny6i"]
-[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="6_cg873"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_ckp3o"]
 [ext_resource type="Script" uid="uid://brm20jombnrfb" path="res://Units/Towers/mage/mage_behavior.gd" id="8_1xmkd"]
 [ext_resource type="Resource" uid="uid://ndg855khj2v6" path="res://Units/Towers/mage/mage_attack.tres" id="8_lxl5g"]
@@ -84,7 +83,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_ngn05")
 type = 18
-stat_displays = Array[ExtResource("2_4ads2")]([ExtResource("3_1xmkd"), ExtResource("4_37eu3"), ExtResource("5_b5w7g"), ExtResource("6_cg873"), ExtResource("3_nf0er")])
+stat_displays = Array[ExtResource("2_4ads2")]([ExtResource("3_1xmkd"), ExtResource("4_37eu3"), ExtResource("5_b5w7g"), ExtResource("3_nf0er")])
 behavior = NodePath("MageBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

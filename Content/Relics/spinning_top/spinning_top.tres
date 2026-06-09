@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RelicData" format=3]
+
+[ext_resource type="Script" path="res://Content/Relics/spinning_top/spinning_top_effect.gd" id="1_tgxg4"]
+[ext_resource type="Script" path="res://Content/Relics/_relic_data.gd" id="2_j64i1"]
+[ext_resource type="Texture2D" path="res://Assets/rite_wheel.png" id="3_x6e6j"]
+
+[sub_resource type="Resource" id="Resource_5v2kd"]
+script = ExtResource("1_tgxg4")
+schedule = 1
+
+[resource]
+script = ExtResource("2_j64i1")
+type = 33
+global_effect = SubResource("Resource_5v2kd")
+title = "Spinning Top"
+description = "Whenever a tower attacks, it gains +8% {UNIT_DAMAGE} until the end of the wave."
+icon = ExtResource("3_x6e6j")

@@ -3,6 +3,8 @@ class_name RangeIndicator
 
 #--- configuration ---
 @export var highlight_color: Color = Color(1.0, 0.987, 0.61, 0.412)
+@export var positive_highlight_color: Color = Color(0.35, 1.0, 0.45, 0.48)
+@export var negative_highlight_color: Color = Color(1.0, 0.2, 0.2, 0.48)
 @export var range_color: Color = Color(1.0, 1.0, 1.0, 0.4)
 @export var attack_area_color: Color = Color(1.0, 0.57, 0.57, 0.412)
 @export var margin: int = 2

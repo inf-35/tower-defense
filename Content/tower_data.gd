@@ -23,7 +23,7 @@ func submit_tower_type() -> void:
 #meta-properties
 @export var size: Vector2i = Vector2i.ONE
 @export var cost: float = 10.0
-@export var cost_scaling_override: float = 0.0
+@export var cost_scaling_override: float = 0.0 ##default = 1.05
 @export var required_capacity: float = 1.0
 @export var max_level: int = 5
 @export var element: Towers.Element

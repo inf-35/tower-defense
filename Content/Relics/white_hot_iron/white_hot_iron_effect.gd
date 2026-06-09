@@ -62,7 +62,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	if stacks_to_apply < 0.4:
 		return #dont bother applying if stacks < 0.4.
-	_spawn_sparks(stacks_to_apply, current_duration, hit_data)
+	_spawn_sparks(instance, stacks_to_apply, current_duration, hit_data)
 
 	#apply cooldown (bar this unit from retriggering the effect temporarily)
 	var state: WhiteHotIronState = instance.state as WhiteHotIronState
@@ -72,7 +72,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		CONNECT_ONE_SHOT
 	)
 
-func _spawn_sparks(stacks: int, duration: float, original_hit_data: HitData) -> void:
+func _spawn_sparks(instance: EffectInstance, stacks: int, duration: float, original_hit_data: HitData) -> void:
 	if spark_attack_data == null: return
 
 	var victim: Unit = original_hit_data.target
@@ -94,7 +94,8 @@ func _spawn_sparks(stacks: int, duration: float, original_hit_data: HitData) -> 
 		var target_unit: Unit = potential_targets[i]
 
 		var hit_data := spark_attack_data.generate_generic_hit_data()
-		hit_data.recursion = original_hit_data.recursion + 1
+		if not hit_data.derive_lineage_from(original_hit_data, instance):
+			continue
 		hit_data.source = source
 		hit_data.target = target_unit
 		hit_data.target_affiliation = victim.hostile

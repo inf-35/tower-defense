@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://3gwffrtkwdap"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://3gwffrtkwdap"]
 
 [ext_resource type="Texture2D" uid="uid://dnsbvwxjb6hg" path="res://Assets/rite_hammer_full.png" id="1_1jbvf"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cw4s5"]
@@ -17,7 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Hammer Rite"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 1.5% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has."
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 0.6% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has, up to 60%"
 icon = ExtResource("1_1jbvf")
 preview = ExtResource("1_1jbvf")
 inspector_actions = Array[ExtResource("2_cw4s5")]([ExtResource("3_y5y31")])

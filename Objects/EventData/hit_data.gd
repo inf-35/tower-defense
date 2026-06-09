@@ -2,6 +2,7 @@ extends EventData
 class_name HitData #stores information about a hit (runtime)
 
 var negate: bool = false ##if set true, this hit is not processed
+var attack_id: int = 0 ##positive when this hit belongs to a tower attack payload
 
 var source: Unit ##dealer of hit
 var target: Unit ##receiver of hit
@@ -26,3 +27,13 @@ var velocity: Vector2 ##instantaneous velocity of the projectile, set by combatm
 var vfx_on_spawn: VFXInfo #see VFXManager and VFXInstance
 var vfx_on_impact: VFXInfo
 #see unit.gd, deal_hit and take_hit and AttackData
+
+static func consume_attack_id(hit_data: HitData, seen_attack_ids: Dictionary[int, bool]) -> bool:
+	if not hit_data or hit_data.attack_id <= 0:
+		return false
+
+	if seen_attack_ids.has(hit_data.attack_id):
+		return false
+
+	seen_attack_ids[hit_data.attack_id] = true
+	return true

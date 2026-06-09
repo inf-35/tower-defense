@@ -9,13 +9,15 @@ static func _static_init() -> void:
 	ModifiersComponent.register_dynamic_attribute(&"farm_adjacent_bonus")
 
 func display_start() -> void:
-	unit.modifiers_component.register_dynamic_stat(&"farm_income_per_wave", income_per_wave)
-	unit.modifiers_component.register_dynamic_stat(&"farm_adjacent_bonus", adjacent_bonus)
+	_register_income_stats()
 
 func start() -> void:
+	_register_income_stats()
+	Run.phases.wave_ended.connect(_on_wave_ended)
+
+func _register_income_stats() -> void:
 	unit.modifiers_component.register_dynamic_stat(&"farm_income_per_wave", income_per_wave)
 	unit.modifiers_component.register_dynamic_stat(&"farm_adjacent_bonus", adjacent_bonus)
-	Run.phases.wave_ended.connect(_on_wave_ended)
 
 func check_placement_validity(island: Island, cell: Vector2i, facing: int) -> Dictionary:
 	var neighbors := (unit as Tower).get_adjacent_cells()

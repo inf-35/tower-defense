@@ -4,6 +4,7 @@ class_name HitReportData #stores information about a hit's effect; is generated 
 #hit information/effects
 var source: Unit ##source of the hit's damage
 var target: Unit ##eventual target of the hit
+var attack_id: int = 0 ##positive when this report belongs to a root tower attack payload
 var damage_caused: float = 0.0 ##how much damage did the target receive
 var overkill: float = 0.0 ##how much more damage did the target receive than was necessary
 var death_caused: bool = false ##did the target die?

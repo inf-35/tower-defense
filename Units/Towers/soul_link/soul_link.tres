@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TowerData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/mage_provisional.png" id="1_7bchs"]
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_84niy"]
+[ext_resource type="PackedScene" path="res://Units/Towers/soul_link/soul_link.tscn" id="3_ocoj4"]
+
+[resource]
+script = ExtResource("2_84niy")
+target_type_name = "SOUL_LINK"
+id = 66
+cost = 6.0
+required_capacity = 0.8
+element = 5
+tower_name = "Soul Link"
+tower_description = "Faces a protected tower. Hits on that forward tower are negated and transferred to the tower behind Soul Link while the link is active."
+icon = ExtResource("1_7bchs")
+preview = ExtResource("1_7bchs")
+tower_scene = ExtResource("3_ocoj4")

@@ -92,7 +92,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"POISON": {
 		"title": "Poison",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 10% remaining HP as damage per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 8% remaining HP as damage per second per stack",
 		"icon": preload("res://Assets/poison_icon.png"),
 	},
 	"STUN": {
@@ -100,6 +100,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"display": "",
 		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 10% speed.",
 		"icon": preload("res://Assets/stun_icon.png"),
+	},
+	"STATUS": {
+		"title": "Status",
+		"display": "Status",
+		"description": "A temporary modifier that affects a unit or tower's stats. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
+		"icon": null,
 	},
 	"STATUS_EFFECT_LABEL": {
 		"title": "Status",

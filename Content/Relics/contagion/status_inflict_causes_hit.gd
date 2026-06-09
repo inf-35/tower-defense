@@ -31,7 +31,7 @@ func _handle_attach(_instance: EffectInstance) -> void:
 func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
-func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
 
@@ -55,18 +55,17 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	var input_status_stacks: float = trigger_hit_data.status_effects[trigger_status].x
 
 	if input_status_stacks >= trigger_threshold:
-		_execute_reaction(trigger_hit_data, target_unit)
+		_execute_reaction(instance, trigger_hit_data, target_unit)
 
-func _execute_reaction(trigger_hit: HitData, center_unit: Unit) -> void:
+func _execute_reaction(instance: EffectInstance, trigger_hit: HitData, center_unit: Unit) -> void:
 	if attack_data == null:
 		push_warning("StatusReactionEffect: Triggered but no AttackData assigned.")
 		return
 
 	#create the reaction hit
 	var secondary_hit: HitData = attack_data.generate_generic_hit_data()
-
-	#inherit recursion depth to prevent infinite loops
-	secondary_hit.recursion = trigger_hit.recursion + 1
+	if not secondary_hit.derive_lineage_from(trigger_hit, instance):
+		return
 
 	#attribute the damage to the original attacker
 	secondary_hit.source = trigger_hit.source

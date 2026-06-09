@@ -10,7 +10,13 @@ class UmbrellaState extends RefCounted:
 func _init() -> void:
 	#pre_hit_received: to block damage
 	#tower_built: to register new towers
-	event_hooks = [GameEvent.EventType.HIT_RECEIVED, GameEvent.EventType.TOWER_BUILT, GameEvent.EventType.WAVE_STARTED]
+	event_hooks = [
+		GameEvent.EventType.HIT_RECEIVED,
+		GameEvent.EventType.TOWER_BUILT,
+		GameEvent.EventType.WAVE_PREP_STARTED,
+		GameEvent.EventType.WAVE_STARTED,
+		GameEvent.EventType.WAVE_ENDED,
+	]
 	global = true
 
 func create_instance() -> EffectInstance:
@@ -59,10 +65,10 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 				)
 		return
 
-	#reset cooldowns at the start of each wave
-	if event.event_type == GameEvent.EventType.WAVE_STARTED:
+	if event.event_type == GameEvent.EventType.WAVE_PREP_STARTED or event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED:
 		for tower: Tower in state.tower_cooldowns:
-			state.tower_cooldowns[tower] = 0.0 #reset cooldown
+			state.tower_cooldowns[tower] = 0.0
+			_apply_shield_visual(tower, true)
 
 	#block damage
 	elif event.event_type == GameEvent.EventType.HIT_RECEIVED:

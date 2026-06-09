@@ -27,6 +27,7 @@ func _handle_event(instance: EffectInstance, event : GameEvent) -> void:
 	reflect_hit.damage = hit_data.damage * reflection
 	reflect_hit.source = instance.host
 	reflect_hit.target = hit_data.source
-	reflect_hit.recursion = hit_data.recursion + 1
+	if not reflect_hit.derive_lineage_from(hit_data, instance):
+		return
 
 	reflect_hit.target.deal_hit(reflect_hit)

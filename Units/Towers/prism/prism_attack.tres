@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_27ydr"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_l1orb"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_27ydr"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_l1orb"]
 
 [sub_resource type="Resource" id="Resource_27ydr"]
 script = ExtResource("3_l1orb")
@@ -21,8 +22,8 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_27ydr")
 delivery_method = 1
-cooldown = 0.2
-damage = 0.3
+cooldown = 0.333
+damage = 0.25
 status_effects = Array[ExtResource("3_l1orb")]([SubResource("Resource_27ydr")])
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0

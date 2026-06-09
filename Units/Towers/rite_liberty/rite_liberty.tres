@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://dxcwdjh4dma3e"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dxcwdjh4dma3e"]
 
 [ext_resource type="Texture2D" uid="uid://5jvbyn2rc8yf" path="res://Assets/liberty_rite.png" id="1_ob68q"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_qlphn"]
@@ -17,7 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Liberty Rite"
-tower_description = "{RITE_LABEL}. All adjacent towers gain 50% {UNIT_HITRATE} per empty adjacent tile."
+tower_description = "{RITE_LABEL}. All adjacent towers gain 33% {UNIT_HITRATE} per empty adjacent tile."
 icon = ExtResource("1_ob68q")
 preview = ExtResource("1_ob68q")
 inspector_actions = Array[ExtResource("2_qlphn")]([ExtResource("3_3pncg")])

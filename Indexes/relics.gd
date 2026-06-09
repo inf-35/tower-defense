@@ -25,5 +25,10 @@ static var MAGIC_BEANS: RelicData = load("res://Content/Relics/magic_beans/magic
 static var STRAW_HAT: RelicData = load("res://Content/Relics/straw_hat/straw_hat.tres")
 static var WALLFLOWER: RelicData = load("res://Content/Relics/wallflower/wallflower.tres")
 static var SIMPLE_BLADE: RelicData = load("res://Content/Relics/simple_blade/simple_blade.tres")
+static var SPINNING_TOP: RelicData = load("res://Content/Relics/spinning_top/spinning_top.tres")
+static var ALCHEMISTS_STONE: RelicData = load("res://Content/Relics/alchemists_stone/alchemists_stone.tres")
+static var WEREGILD: RelicData = load("res://Content/Relics/weregild/weregild.tres")
+static var EPIDEMIC: RelicData = load("res://Content/Relics/epidemic/epidemic.tres")
+static var RUPTURED_HEART: RelicData = load("res://Content/Relics/ruptured_heart/ruptured_heart.tres")
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {} ##relics indexed by type, loaded by reward_service

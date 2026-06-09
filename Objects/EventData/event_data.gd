@@ -2,6 +2,32 @@ extends RefCounted
 class_name EventData
 #see child classes i.e. hit_data, etc.
 var recursion: int = 0 #counter to prevent infinite recursion loops, stops at recursion_limit (see Effect.RECURSION_LIMIT)
+var lineage: EventLineage = EventLineage.new()
+
+func seed_root_lineage(producer: Object) -> void:
+	lineage = EventLineage.new()
+	lineage.push_producer(producer)
+	recursion = 0
+
+func copy_lineage_from(parent_data: EventData) -> void:
+	if not is_instance_valid(parent_data):
+		lineage = EventLineage.new()
+		recursion = 0
+		return
+
+	lineage = parent_data.lineage.duplicate()
+	recursion = parent_data.recursion
+
+func derive_lineage_from(parent_data: EventData, producer: Object) -> bool:
+	copy_lineage_from(parent_data)
+
+	if lineage.has_producer(producer):
+		return false
+
+	lineage.push_producer(producer)
+	recursion += 1
+	_clear_derived_attack_identity()
+	return true
 
 func duplicate() -> EventData: ##deep duplicates to create an unrelated, unique eventdata
 	#1. create a new instance of the *actual* subclass (e.g., hitdata, celldata).
@@ -33,6 +59,8 @@ func duplicate() -> EventData: ##deep duplicates to create an unrelated, unique 
 		#if the value is another duplicatable object, call its duplicate method recursively.
 		if value is EventData:
 			new_instance.set(prop_name, value.duplicate())
+		elif value is EventLineage:
+			new_instance.set(prop_name, value.duplicate())
 		#if it's a dictionary or array, use their built-in deep duplicate.
 		elif value is Dictionary or value is Array:
 			new_instance.set(prop_name, value.duplicate(true))
@@ -41,3 +69,11 @@ func duplicate() -> EventData: ##deep duplicates to create an unrelated, unique 
 			new_instance.set(prop_name, value)
 
 	return new_instance
+
+func _clear_derived_attack_identity() -> void:
+	if self is HitData:
+		var hit_data: HitData = self as HitData
+		hit_data.attack_id = 0
+	elif self is HitReportData:
+		var hit_report: HitReportData = self as HitReportData
+		hit_report.attack_id = 0

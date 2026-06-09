@@ -3,89 +3,135 @@ class_name PrismBehavior
 
 const PRISM_LASER_SCENE: PackedScene = preload("res://Units/Towers/prism/prism_laser.tscn")
 
-#lasers that this tower instantiated and manages (right & down only)
 var _owned_lasers: Dictionary[Tower, Node2D] = {}
-
-#all valid connections (up, down, left, right) - useful for calculating network size
 var _all_connected_prisms: Array[Tower] = []
+var _is_attached: bool = false
 
 func start() -> void:
-	Run.references.island.island_changed.connect(_recalculate_links)
-	_recalculate_links()
+	attach()
+
+func attach() -> void:
+	if _is_attached:
+		return
+
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return
+
+	_is_attached = true
+	if not island.island_changed.is_connected(_recalculate_links):
+		island.island_changed.connect(_recalculate_links)
+	island.island_changed.emit()
+
+func detach() -> void:
+	var island: Island = null
+	if is_instance_valid(Run.references.island):
+		island = Run.references.island
+		if island.island_changed.is_connected(_recalculate_links):
+			island.island_changed.disconnect(_recalculate_links)
+
+	_is_attached = false
+	_all_connected_prisms.clear()
+	_clear_prism_lasers()
+	if is_instance_valid(island):
+		island.island_changed.emit()
 
 func update(_delta: float) -> void:
-	#tick damage for the lasers we own
 	if _is_attack_possible(false):
-		for partner in _owned_lasers:
-			var laser = _owned_lasers[partner]
-			if is_instance_valid(laser) and laser.has_method("damage_tick"):
+		var partners: Array[Tower] = []
+		partners.assign(_owned_lasers.keys())
+		for partner: Tower in partners:
+			if not _is_valid_active_prism(partner):
+				_remove_prism_laser(partner)
+				continue
+
+			var laser: Node2D = _owned_lasers[partner]
+			if not is_instance_valid(laser) or laser.is_queued_for_deletion():
+				_owned_lasers.erase(partner)
+				continue
+
+			if laser.has_method("damage_tick"):
 				laser.damage_tick()
 		attack_component.refresh_cooldown()
 
 func _recalculate_links() -> void:
-	var tower = unit as Tower
-	if not is_instance_valid(tower) or tower.abstractive: return
+	if not _is_attached:
+		return
+
+	var tower: Tower = unit as Tower
+	if not _is_valid_active_prism(tower):
+		_clear_prism_lasers()
+		return
 
 	var new_owned: Array[Tower] = []
 	_all_connected_prisms.clear()
 
-	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var dirs: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
 
-	for d in dirs:
-		var partner = _scan_direction(d)
+	for d: Vector2i in dirs:
+		var partner: Tower = _scan_direction(d)
 		if is_instance_valid(partner):
 			_all_connected_prisms.append(partner)
 
-			#directional ownership: we only spawn the physical laser if it's right or down.
-			#the other tower will handle left and up.
 			if d == Vector2i.RIGHT or d == Vector2i.DOWN:
 				new_owned.append(partner)
 
-	#1. clean up broken links
 	var to_remove: Array[Tower] = []
-	for old_partner in _owned_lasers:
+	var old_partners: Array[Tower] = []
+	old_partners.assign(_owned_lasers.keys())
+	for old_partner: Tower in old_partners:
 		if not new_owned.has(old_partner):
 			to_remove.append(old_partner)
 
-	for p in to_remove:
-		_remove_prism_laser(p)
+	for partner: Tower in to_remove:
+		_remove_prism_laser(partner)
 
-	#2. create new links
-	for p in new_owned:
-		if not _owned_lasers.has(p):
-			_create_prism_laser(p)
+	for partner: Tower in new_owned:
+		if not _owned_lasers.has(partner):
+			_create_prism_laser(partner)
 
 func _scan_direction(dir: Vector2i) -> Tower:
-	var island = Run.references.island
-	var current_cell = (unit as Tower).tower_position + dir
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return null
 
-	#scan until edge of map or hit a tower
+	var tower: Tower = unit as Tower
+	if not _is_valid_active_prism(tower):
+		return null
+
+	var current_cell: Vector2i = tower.tower_position + dir
+
 	while island.terrain_base_grid.has(current_cell):
 		var check_tower: Tower = island.get_tower_on_tile(current_cell) as Tower
 
 		if is_instance_valid(check_tower):
-			#if it's a prism, return it. if it's anything else (wall), block line of sight.
-			if check_tower.type == (unit as Tower).type and (not check_tower.disabled):
+			if _is_valid_active_prism(check_tower) and check_tower.type == tower.type:
 				return check_tower
-			else:
-				return null
+
+			return null
 
 		current_cell += dir
 	return null
 
-#--- laser instantiation ---
-
 func _create_prism_laser(partner: Tower) -> void:
-	var prism_a: Tower = unit
-	var laser = PRISM_LASER_SCENE.instantiate()
+	var prism_a: Tower = unit as Tower
+	if not _is_valid_active_prism(prism_a) or not _is_valid_active_prism(partner):
+		return
+
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return
+
+	var laser: PrismLaser = PRISM_LASER_SCENE.instantiate() as PrismLaser
+	if not is_instance_valid(laser):
+		return
 
 	laser.prism_a = prism_a
 	laser.prism_b = partner
 	_owned_lasers[partner] = laser
 
-	Run.references.island.add_child.call_deferred(laser)
+	island.add_child(laser)
 
-	#math
 	var pos_a_world: Vector2 = Island.cell_to_position(prism_a.tower_position)
 	var pos_b_world: Vector2 = Island.cell_to_position(partner.tower_position)
 	var vector: Vector2 = pos_b_world - pos_a_world
@@ -94,21 +140,30 @@ func _create_prism_laser(partner: Tower) -> void:
 	laser.rotation = vector.angle()
 
 	var shape: RectangleShape2D = RectangleShape2D.new()
-	shape.size = Vector2(vector.length(), 3) #width = 8
+	shape.size = Vector2(vector.length(), 3)
 
-	#assuming your laser scene has a variable for this
 	laser.collision_shape.shape = shape
 
 func _remove_prism_laser(partner: Tower) -> void:
-	if _owned_lasers.has(partner):
-		if is_instance_valid(_owned_lasers[partner]):
-			_owned_lasers[partner].queue_free()
-		_owned_lasers.erase(partner)
+	if not _owned_lasers.has(partner):
+		return
+
+	var laser: Node2D = _owned_lasers[partner]
+	_owned_lasers.erase(partner)
+	if is_instance_valid(laser):
+		laser.queue_free()
+
+func _clear_prism_lasers() -> void:
+	var partners: Array[Tower] = []
+	partners.assign(_owned_lasers.keys())
+	for partner: Tower in partners:
+		_remove_prism_laser(partner)
+
+func _is_valid_active_prism(tower: Tower) -> bool:
+	return is_instance_valid(tower) and not tower.is_queued_for_deletion() and not tower.abstractive and not tower.disabled
 
 func _exit_tree() -> void:
-	#cleanup owned lasers on destruction
-	for p in _owned_lasers:
-		_remove_prism_laser(p)
+	detach()
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var tower = unit as Tower

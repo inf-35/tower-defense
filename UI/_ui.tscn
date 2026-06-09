@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://cusv1l6vww08n" path="res://UI/relic_display.gd" id="10_aasu8"]
 [ext_resource type="PackedScene" uid="uid://4vsohvgu4bte" path="res://UI/wave_timeline/timeline_pip.tscn" id="10_m8qfw"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="11_gdbfk"]
+[ext_resource type="Script" uid="uid://86c5kwc3gnjx" path="res://UI/incoming_enemy_bar.gd" id="11_nnaea"]
 [ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="12_tsiox"]
 [ext_resource type="Texture2D" uid="uid://b3hbychxfqjdx" path="res://Assets/pause_icon.png" id="12_x42ai"]
 [ext_resource type="Texture2D" uid="uid://dnbhfdu0a4g3p" path="res://Assets/play_icon.png" id="14_m8qfw"]
@@ -34,6 +35,8 @@ shader_parameter/color = Color(0, 0, 0, 0.1764706)
 shader_parameter/spotlight_center = Vector2(0.5, 0.5)
 shader_parameter/spotlight_size = Vector2(0.1, 0.1)
 shader_parameter/is_active = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_33vnq"]
 
 [node name="UI" type="CanvasLayer" unique_id=605534676]
 process_mode = 3
@@ -67,6 +70,7 @@ offset_right = 74.0
 offset_bottom = 34.0
 
 [node name="LoadingScreen" parent="." unique_id=1318486233 instance=ExtResource("24_1")]
+visible = false
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=878017124]
 anchors_preset = 15
@@ -183,6 +187,7 @@ mouse_filter = 2
 
 [node name="game_over_screen" type="Control" parent="Margin/ui_space" unique_id=346739799 node_paths=PackedStringArray("title_label", "wave_label", "relic_container", "tower_container", "restart_button", "quit_button")]
 process_mode = 3
+visible = false
 z_index = 2
 layout_mode = 1
 anchors_preset = 15
@@ -581,6 +586,30 @@ fit_content = true
 horizontal_alignment = 1
 script = ExtResource("6_b5f40")
 
+[node name="IncomingEnemyPanel" type="PanelContainer" parent="Margin/ui_space/TimeControls" unique_id=1563197209]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -99.0
+offset_top = 188.0
+offset_right = -19.0
+offset_bottom = 472.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"simple_panel"
+theme_override_styles/panel = SubResource("StyleBoxEmpty_33vnq")
+
+[node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel" unique_id=1650848154]
+layout_mode = 2
+theme_type_variation = &"MarginSuperminor"
+
+[node name="IncomingEnemyBar" type="VBoxContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer" unique_id=1786013886]
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+script = ExtResource("11_nnaea")
+icon_size = Vector2(50, 50)
+
 [node name="Inspector" parent="Margin/ui_space" unique_id=2009911858 instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 size_flags_vertical = 8
@@ -609,6 +638,7 @@ alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
+visible = false
 
 [node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button")]
 visible = false

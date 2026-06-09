@@ -37,9 +37,9 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 		return
 
 	#4. spawn shards
-	_spawn_shards(dead_unit, report.source, report.velocity)
+	_spawn_shards(_instance, report, dead_unit, report.source, report.velocity)
 
-func _spawn_shards(center_unit: Unit, source: Unit, velocity: Vector2) -> void:
+func _spawn_shards(instance: EffectInstance, parent_report: HitReportData, center_unit: Unit, source: Unit, velocity: Vector2) -> void:
 	if attack_data == null: return
 
 	var start_pos = center_unit.global_position
@@ -56,6 +56,8 @@ func _spawn_shards(center_unit: Unit, source: Unit, velocity: Vector2) -> void:
 		var final_dir: Vector2 = Vector2.from_angle(base_angle + offset_angle)
 
 		var hit_data := attack_data.generate_generic_hit_data()
+		if not hit_data.derive_lineage_from(parent_report, instance):
+			continue
 		hit_data.source = source
 		hit_data.damage = center_unit.get_stat(Attributes.id.MAX_HEALTH) * damage_multiplier
 		hit_data.target = null #untargeted projectile

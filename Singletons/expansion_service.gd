@@ -8,6 +8,8 @@ const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is f
 const GENERATION_ATTEMPTS: int = 24
 const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
+const FRONTIER_EVENING_BIAS: float = 0.75
+const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
 class TerrainGenRule extends Resource:
@@ -358,9 +360,10 @@ func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary:
 	var best_land_count: int = -1
 	for _attempt in GENERATION_ATTEMPTS:
 		var start := _pick_origin_biased_shore_start(island)
-		var result := _grow_expansion_from_start(island, start, land_target)
+		var adjusted_land_target: int = _get_frontier_evened_land_target(island, start, land_target)
+		var result := _grow_expansion_from_start(island, start, adjusted_land_target)
 		var land_count: int = result.land.size()
-		if land_count >= land_target:
+		if land_count >= adjusted_land_target:
 			return result
 		if land_count > best_land_count:
 			best_result = result
@@ -383,6 +386,26 @@ func _pick_origin_biased_shore_start(island: Island) -> Vector2i:
 		if roll <= 0.0:
 			return island.shore_boundary_tiles[i]
 	return island.shore_boundary_tiles[island.shore_boundary_tiles.size() - 1]
+
+func _get_frontier_evened_land_target(island: Island, start: Vector2i, base_land_target: int) -> int:
+	var average_radius: float = _get_average_shore_radius(island)
+	if average_radius <= 0.0:
+		return base_land_target
+
+	var start_radius: float = Vector2(start).length()
+	var inward_bias: float = clampf((average_radius - start_radius) / average_radius, 0.0, 1.0)
+	var multiplier: float = minf(1.0 + inward_bias * FRONTIER_EVENING_BIAS, FRONTIER_EVENING_MAX_MULTIPLIER)
+	return ceili(float(base_land_target) * multiplier)
+
+func _get_average_shore_radius(island: Island) -> float:
+	if island.shore_boundary_tiles.is_empty():
+		return 0.0
+
+	var total_radius: float = 0.0
+	for cell: Vector2i in island.shore_boundary_tiles:
+		total_radius += Vector2(cell).length()
+
+	return total_radius / float(island.shore_boundary_tiles.size())
 
 func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: int) -> Dictionary: ##terrain canvas generator, determines land/water, and which tiles to visit
 	var water_cap := int(ceil(float(land_target) * WATER_EXTRA_RATIO))

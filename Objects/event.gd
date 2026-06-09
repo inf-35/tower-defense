@@ -15,7 +15,8 @@ enum EventType {
 
 	CHANGED_CELL, ##fires whenever any unit changes cells (attached with ChangedCellData)
 
-	WAVE_STARTED, ##global wave start update (attached with WaveData)
+	WAVE_PREP_STARTED, ##global wave prep start update (attached with WaveData)
+	WAVE_STARTED, ##global combat wave start update (attached with WaveData)
 	WAVE_ENDED, ##global wave end update (attached with WaveData)
 
 	ADJACENCY_UPDATED, ##for towers only

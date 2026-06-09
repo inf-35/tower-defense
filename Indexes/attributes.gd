@@ -64,7 +64,7 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 		id.REGENERATION, -0.5, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.5 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_REMAINDER_PERCENT, -0.1, 0.0, true, Color(0, 1, 0, 0.5) #-10% remaining hp per second
+		id.REGEN_REMAINDER_PERCENT, -0.08, 0.0, true, Color(0, 1, 0, 0.5) #-8% remaining hp per second
 	),
 	Status.HEAT: StatusEffectData.new(
 		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST
@@ -76,7 +76,7 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 		id.FLAT_DAMAGE_TAKEN, 0.5, 0.0, true, Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.1, false, Color(1, 1, 0.5) #completely stops enemies
+		id.MAX_SPEED, 0.0, 0.2, false, Color(1, 1, 0.5) #80% mvmt reduction
 	)
 }
 

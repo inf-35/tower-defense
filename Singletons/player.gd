@@ -134,25 +134,24 @@ func start() -> void:
 func begin_new_game() -> void:
 	#initial state setup
 	self.unlocked_towers = {
-		Towers.Type.PALISADE: true,
-		Towers.Type.GENERATOR: true,
 		Towers.Type.TURRET: true,
+		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
-		Towers.Type.CANNON: true,
+		Towers.Type.GENERATOR: true,
 		Towers.Type.POISON: true,
-		Towers.Type.SIPHON: true,
-		Towers.Type.RESONATOR: true,
+		Towers.Type.FROST_TOWER: true,
 	}
 
 	var reward := Reward.new()
-	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_HASTE
-	RewardService.apply_reward(reward)
-	reward.rite_type = Towers.Type.RITE_SACRIFICE
-	RewardService.apply_reward(reward)
-	#reward.relic = Relics.MACUAHUITL
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_GLASS
 	#RewardService.apply_reward(reward)
-	#reward.relic = Relics.EARLY_BIRD
+	#reward.rite_type = Towers.Type.RITE_SACRIFICE
+	#RewardService.apply_reward(reward)
+	#reward.type = Reward.Type.ADD_RELIC
+	#reward.relic = Relics.EPIDEMIC
+	#RewardService.apply_reward(reward)
+	#reward.relic = Relics.RUPTURED_HEART
 	#RewardService.apply_reward(reward)
 
 	flux = 30.0

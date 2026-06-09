@@ -18,7 +18,7 @@
 [sub_resource type="Resource" id="Resource_kbsww"]
 script = ExtResource("5_hwitw")
 attribute = 8
-override = 0.0
+override = 10000.0
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [node name="Outpost" type="Node2D" unique_id=530628292 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
@@ -36,7 +36,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="OutpostBehavior" type="Node" parent="." unique_id=1213460094]
 script = ExtResource("4_ters3")
 suppression_modifier = SubResource("Resource_kbsww")
-attacks_required = null
+max_commands_per_second = 10.0
 metadata/_custom_type_script = "uid://ujin37rk7ep2"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1448418258]

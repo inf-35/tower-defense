@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://dg335as7vws1r"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_n5huk"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_8yy2n"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_fai6p"]
+[ext_resource type="Script" uid="uid://cujepupb1ip0x" path="res://Units/Towers/rite_salt/salt_rite_behavior.gd" id="4_qmbet"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="5_lcwwx"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_fh85p"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_hefqv"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_6cb3n"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="9_x4fyd"]
+[ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="10_lbj88"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_h5317"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_q7tqo"]
+
+[sub_resource type="Resource" id="Resource_1p4ur"]
+script = ExtResource("5_lcwwx")
+attribute = 6
+multiplicative = 1.3
+
+[sub_resource type="Resource" id="Resource_f00g0"]
+script = ExtResource("5_lcwwx")
+attribute = 8
+multiplicative = 1.5
+
+[sub_resource type="Resource" id="Resource_fbrjq"]
+script = ExtResource("9_x4fyd")
+max_health = 20.0
+regeneration = null
+regen_percent = null
+
+[node name="RiteSalt" type="Node2D" unique_id=1194004420 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_n5huk")
+type = 70
+stat_displays = Array[ExtResource("2_8yy2n")]([ExtResource("3_fai6p")])
+behavior = NodePath("SaltRiteBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+
+[node name="SaltRiteBehavior" type="Node" parent="." unique_id=421285904]
+script = ExtResource("4_qmbet")
+damage_modifier = SubResource("Resource_1p4ur")
+attack_rate_modifier = SubResource("Resource_f00g0")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=883355453]
+script = ExtResource("6_fh85p")
+movement_data = ExtResource("7_hefqv")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1191451321]
+script = ExtResource("8_6cb3n")
+health_data = SubResource("Resource_fbrjq")
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1028107773]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10_lbj88")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=847363558]
+script = ExtResource("11_h5317")
+height_multiplier = 0.5
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=780640317]
+script = ExtResource("12_q7tqo")

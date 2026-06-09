@@ -47,6 +47,7 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 
 	func _on_timeout() -> void:
 		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
+		VFXManager.play_aoe_field(hit_data.vfx_on_impact, intercept_position, hit_data.radius)
 		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
 		var target: Unit = hit_data.target #NOTE: this might be null
 
@@ -238,6 +239,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				return
 			unit.take_hit(hit_copy)
 		else:
+			VFXManager.play_aoe_field(hit_data.vfx_on_impact, impact_pos, hit_data.radius)
 			#trigger aoe at this point
 			var units_in_aoe: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_pos, target_affiliation)
 			for hit_unit: Unit in units_in_aoe:
@@ -328,13 +330,15 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			Targeting.add_damage(target, -hit_data.expected_damage)
 
 		DeliveryData.DeliveryMethod.CONE_AOE:
-			VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
+			if hit_data.source: VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
+			var aim_direction: Vector2 = (intercept_position - source_position).normalized()
+			VFXManager.play_aoe_field(hit_data.vfx_on_spawn, source_position, hit_data.radius, delivery_data.cone_angle, aim_direction)
 			var potential_targets: Array[Unit] = get_units_in_radius(hit_data.radius, source_position, hit_data.target_affiliation)
 			if potential_targets.is_empty():
 				return #no potential targets
 
 			#narrow-phase: filter the units to find those within the cone's angle.
-			var aim_direction: Vector2 = (intercept_position - source_position).normalized()
+			
 			var cone_half_angle_rad: float = deg_to_rad(delivery_data.cone_angle * 0.5)
 
 			for unit: Unit in potential_targets:

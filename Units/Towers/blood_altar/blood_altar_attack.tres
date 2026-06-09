@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://dg16lp7dymyk"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_60vy2"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_uqjfa"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="2_j4lpn"]
+[ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="3_8bifx"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_jwymb"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_jwymb"]
+
+[sub_resource type="Resource" id="Resource_t0kqn"]
+script = ExtResource("2_j4lpn")
+texture = ExtResource("3_8bifx")
+radius = 2.0
+scale = 0.1
+rotation_mode = 1
+
+[resource]
+script = ExtResource("1_uqjfa")
+delivery_method = 1
+range = 25.0
+damage = 1.5
+breaking = true
+vfx_on_spawn = SubResource("Resource_t0kqn")
+projectile_speed = 80.0

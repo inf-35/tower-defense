@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/rite_blood.png" id="1_cp52n"]
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_mwpf0"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/destroy.tres" id="3_f6cmi"]
+[ext_resource type="PackedScene" path="res://Units/Towers/rite_scales/rite_scales.tscn" id="4_mxli8"]
+
+[resource]
+script = ExtResource("2_mwpf0")
+target_type_name = "RITE_SCALES"
+id = 67
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+tower_name = "Rite of Scales"
+tower_description = "{RITE_LABEL}. Adjacent towers turn overkill damage into seeking bolts."
+icon = ExtResource("1_cp52n")
+preview = ExtResource("1_cp52n")
+inspector_actions = Array[InspectorAction]([ExtResource("3_f6cmi")])
+tower_scene = ExtResource("4_mxli8")

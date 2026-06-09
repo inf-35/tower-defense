@@ -9,6 +9,7 @@ const AXIS_RIGHT: int = 2
 const AXIS_DOWN: int = 4
 const AXIS_LEFT: int = 8
 const _LEGACY_AXIS_MASK: int = AXIS_UP | AXIS_RIGHT | AXIS_DOWN | AXIS_LEFT
+const ALL_DIRECTIONS: int = _LEGACY_AXIS_MASK
 
 class Query extends RefCounted: ##request object
 	var kind: int

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://bfoxhem44o0ot"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://bfoxhem44o0ot"]
 
 [ext_resource type="Texture2D" uid="uid://33ys88kaqt2d" path="res://Assets/firewall_icon.png" id="1_j2xu8"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_j2xu8"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cugao7d74y70i"]
+[gd_scene format=3 uid="uid://cugao7d74y70i"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_nm2o6"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_76a65"]
@@ -18,7 +18,7 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_e3h2a"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_hqaik"]
 
-[node name="Poison" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Poison" type="Node2D" unique_id=2014235611 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_nm2o6")
 type = 14
@@ -34,48 +34,48 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="DefaultTowerBehavior" type="Node" parent="."]
+[node name="DefaultTowerBehavior" type="Node" parent="." unique_id=1787631118]
 script = ExtResource("3_ravva")
 metadata/_custom_type_script = "uid://cs61b35p7jme8"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1120477325]
 script = ExtResource("4_xdvk6")
 movement_data = ExtResource("5_wigto")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=916356469]
 script = ExtResource("6_ww33m")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1352341342]
 script = ExtResource("7_n8088")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+[node name="AttackComponent" type="Node" parent="." unique_id=478479036 node_paths=PackedStringArray("muzzle")]
 script = ExtResource("8_fywk1")
 attack_data = ExtResource("9_rofbp")
 muzzle = NodePath("../Graphics/Turret/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=87499130]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_70v42")
 
-[node name="Turret" type="Sprite2D" parent="Graphics"]
+[node name="Turret" type="Sprite2D" parent="Graphics" unique_id=1969910126]
 z_index = 1
 position = Vector2(-1.9073486e-06, 0)
 texture = ExtResource("11_mi3sl")
 offset = Vector2(20, 0)
 
-[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
+[node name="Muzzle" type="Marker2D" parent="Graphics/Turret" unique_id=1266520803]
 position = Vector2(51.0289, 0)
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1448225239]
 script = ExtResource("16_hqaik")
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1808612726]
 script = ExtResource("12_e3h2a")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1119147518]

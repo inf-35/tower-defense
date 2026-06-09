@@ -27,7 +27,7 @@ func _handle_attach(_instance: EffectInstance) -> void:
 func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
-func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.DIED:
 		return
 
@@ -51,7 +51,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	var target = _find_cursed_target(dead_unit)
 
 	if target:
-		_attack(dead_unit, target, killer, event.data.recursion)
+		_attack(instance, hit_report, dead_unit, target, killer)
 
 func _find_cursed_target(origin_unit: Unit) -> Unit:
 	#get all enemies in range
@@ -75,7 +75,7 @@ func _find_cursed_target(origin_unit: Unit) -> Unit:
 	#pick random or closest
 	return valid_targets.pick_random()
 
-func _attack(killed_unit: Unit, target: Unit, killer: Unit, recursion: int) -> void:
+func _attack(instance: EffectInstance, hit_report: HitReportData, killed_unit: Unit, target: Unit, killer: Unit) -> void:
 	#generate payload
 	var hit_data: HitData = projectile_data.generate_generic_hit_data()
 
@@ -83,7 +83,8 @@ func _attack(killed_unit: Unit, target: Unit, killer: Unit, recursion: int) -> v
 	hit_data.target = target
 	hit_data.damage = killed_unit.get_stat(Attributes.id.MAX_HEALTH) * 0.2
 	hit_data.target_affiliation = true #hostile
-	hit_data.recursion = recursion + 1
+	if not hit_data.derive_lineage_from(hit_report, instance):
+		return
 
 	#configure delivery
 	var delivery_data := projectile_data.generate_generic_delivery_data()

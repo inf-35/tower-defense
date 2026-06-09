@@ -6,6 +6,7 @@ class_name DrumRiteBehavior
 
 #tracks currently connected towers to avoid double connections
 var _connected_neighbors: Dictionary[Tower, bool] = {}
+var _seen_attack_ids: Dictionary[int, bool] = {}
 
 func start() -> void:
 	var tower = unit as Tower
@@ -25,6 +26,8 @@ func detach() -> void: #disconnect all
 
 	for t in to_remove:
 		_connected_neighbors.erase(t)
+
+	_seen_attack_ids.clear()
 
 func attach() -> void:
 	_refresh_connections((unit as Tower).get_adjacent_towers())
@@ -58,7 +61,11 @@ func _refresh_connections(adj_map: Dictionary[Vector2i, Tower]) -> void:
 
 #this handler is only called when a direct neighbor fires
 func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
-	if event.event_type != GameEvent.EventType.HIT_DEALT:
+	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
+		return
+
+	var hit_data: HitData = event.data as HitData
+	if not HitData.consume_attack_id(hit_data, _seen_attack_ids):
 		return
 
 	#1. roll chance
@@ -66,12 +73,13 @@ func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
 
 	#2. trigger others
 	#we iterate our known list (which we know are valid neighbors)
-	_trigger_all_except(source_neighbor)
+	_trigger_all_except(source_neighbor, hit_data)
 
-func _trigger_all_except(exception: Tower) -> void:
+func _trigger_all_except(exception: Tower, parent_data: EventData) -> void: ##arms neighboring towers so their forced follow-up attack derives from the triggering attack rather than restarting a fresh branch
 	for t in _connected_neighbors:
 		if t == exception: continue
 		if is_instance_valid(t) and is_instance_valid(t.attack_component):
+			t.attack_component.queue_next_attack_context(parent_data, self)
 			t.attack_component.current_cooldown = 0.0
 			UI.floating_text_manager.show_icon(icon, t.global_position)
 

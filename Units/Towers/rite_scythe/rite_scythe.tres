@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://bxyvdkntfrlxv"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://bxyvdkntfrlxv"]
 
 [ext_resource type="Texture2D" uid="uid://cktlj2yb8d4iu" path="res://Assets/rite_scythe_full.png" id="1_i3722"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_enere"]
@@ -17,7 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Scythe Rite"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 2% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has lost."
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 1% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has lost., up to 100%."
 icon = ExtResource("1_i3722")
 preview = ExtResource("1_i3722")
 inspector_actions = Array[ExtResource("2_enere")]([ExtResource("3_qpsoe")])

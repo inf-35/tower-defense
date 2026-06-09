@@ -6,4 +6,5 @@
 script = ExtResource("1_srf07")
 id_name = "mortar"
 tower_type = 22
+base_weight = 200.0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

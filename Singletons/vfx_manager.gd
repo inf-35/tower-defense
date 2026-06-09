@@ -124,6 +124,24 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	_active_vfx.append(vfx)
 	return vfx
 
+func play_aoe_field(info: VFXInfo, position: Vector2, radius: float, cone_angle_deg: float = 360.0, aim_direction: Vector2 = Vector2.RIGHT) -> AoeParticleFieldVFX: ##spawns a dense marker field for circular or cone aoes using the per-resource authored particle settings
+	if not info or not info.aoe_particles_enabled:
+		return null
+
+	if radius <= 0.0 or not is_instance_valid(info.aoe_particle_texture):
+		return null
+
+	var field := AoeParticleFieldVFX.new()
+
+	var parent: Node = Run.references.projectiles if is_instance_valid(Run.references.projectiles) else Run.references.island
+	if not is_instance_valid(parent):
+		parent = self
+
+	parent.add_child(field)
+	field.global_position = position
+	field.setup_from_info(info, radius, cone_angle_deg, aim_direction)
+	return field
+
 func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vector2, host: Node2D) -> Node2D:
 	if not info.scene:
 		push_warning("VFX: ", host, " tried to create vfx without valid scene")
@@ -135,19 +153,15 @@ func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vect
 		#use a unique meta key based on the VFXInfo resource ID to track the instance
 		var meta_key: String = "vfx_persist_" + str(abs(info.get_instance_id()))
 		#NOTE: abs is to filter out hyphens, which form invalid keys
-		print(meta_key)
 		if host.has_meta(meta_key):
 			instance = host.get_meta(meta_key)
 			if not is_instance_valid(instance):
 				instance = null #instance freed somehow?
-			else:
-				print("retrieved ", instance)
 		if not instance:
 			instance = info.scene.instantiate() as Node2D
 			host.add_child(instance)
 			host.set_meta(meta_key, instance)
 			is_new = true
-			print("instantiated ", instance)
 	else:
 		instance = info.scene.instantiate() as Node2D
 		if is_instance_valid(Run.references.island):
@@ -158,11 +172,9 @@ func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vect
 	instance.global_position = pos
 	instance.scale = scale * 0.06
 	#setup
-	print("host is ", host, " ", host is Unit, " ", host.attack_component, " ", instance is RadialPulseVFX)
 	var host_unit: Unit = host as Unit
 	if is_instance_valid(host_unit) and is_instance_valid(host.attack_component):
 		if instance is RadialPulseVFX:
-			print("setup...")
 			host_unit.attack_component.setup_radial_pulse(instance as RadialPulseVFX, info)
 
 	if "velocity" in instance:

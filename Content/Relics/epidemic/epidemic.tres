@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://b7d3xa6vfpdq1"]
+
+[ext_resource type="Script" uid="uid://f02nn0j7gu8n" path="res://Content/Relics/epidemic/epidemic_effect.gd" id="1_0b832"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_c1p07"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_n04sn"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_dpdl1"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_l8gxq"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_2yq27"]
+[ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="5_o4tnb"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="7_1xsox"]
+
+[sub_resource type="Resource" id="Resource_mphwl"]
+script = ExtResource("4_2yq27")
+texture = ExtResource("5_o4tnb")
+radius = 1.5
+scale = 0.12
+rotation_mode = 1
+
+[sub_resource type="Resource" id="Resource_v1o2s"]
+script = ExtResource("3_l8gxq")
+delivery_method = 1
+vfx_on_spawn = SubResource("Resource_mphwl")
+projectile_speed = 160.0
+
+[sub_resource type="Resource" id="Resource_5aaoq"]
+script = ExtResource("1_0b832")
+search_radius = 20.0
+projectile_data = SubResource("Resource_v1o2s")
+
+[resource]
+script = ExtResource("2_n04sn")
+type = 36
+global_effect = SubResource("Resource_5aaoq")
+title = "Epidemic"
+description = "When a {POISON|label=Poisoned} enemy is hit, it sends a venom bolt to a nearby enemy within 2 tiles, inflicting the same poison stacks for 1 second."
+icon = ExtResource("5_o4tnb")

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TowerData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/mage_provisional.png" id="1_i30hm"]
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_d0xwe"]
+[ext_resource type="PackedScene" path="res://Units/Towers/blood_altar/blood_altar.tscn" id="3_ve1od"]
+
+[resource]
+script = ExtResource("2_d0xwe")
+target_type_name = "BLOOD_ALTAR"
+id = 65
+cost = 8.0
+required_capacity = 1.0
+element = 5
+tower_name = "Blood Altar"
+tower_description = "Damages adjacent allied structures when it attacks. Each structure actually damaged releases one delayed projectile at the target."
+icon = ExtResource("1_i30hm")
+preview = ExtResource("1_i30hm")
+tower_scene = ExtResource("3_ve1od")

@@ -6,4 +6,5 @@
 script = ExtResource("1_hiomq")
 id_name = "cannon"
 tower_type = 4
+base_weight = 200.0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1_8c215")
 max_jumps = 8
-jump_radius = 50.0
-damage_falloff_multiplier = 0.8
+jump_radius = 60.0
+damage_falloff_multiplier = 0.85
 metadata/_custom_type_script = "uid://bqevvdjq5qm6s"

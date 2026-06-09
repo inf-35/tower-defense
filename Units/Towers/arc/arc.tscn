@@ -1,74 +1,216 @@
-[gd_scene load_steps=18 format=3 uid="uid://xgtw052r2kk2"]
+[gd_scene format=3 uid="uid://xgtw052r2kk2"]
 
-[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_l4bmy"]
-[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_klhr7"]
-[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/_default_tower_behavior.gd" id="3_h78w6"]
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_stat"]
+[ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/_default_tower_behavior.gd" id="3_behavior"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="3_jgw8d"]
-[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_pywwn"]
-[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_3jmj5"]
-[ext_resource type="Resource" uid="uid://r4bihlb2bunn" path="res://Content/Effects/chain_lightning.tres" id="4_4h5wn"]
-[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_t1kei"]
-[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_4wmvv"]
-[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_mqeb3"]
-[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_w3e4p"]
-[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_gj741"]
-[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_jsp04"]
-[ext_resource type="Resource" uid="uid://3kkugsgnd7e7" path="res://Units/Towers/arc/arc_attack.tres" id="9_gboks"]
-[ext_resource type="Texture2D" uid="uid://cahdmbsvhjiad" path="res://Assets/turret_base.svg" id="10_t5o8f"]
-[ext_resource type="Texture2D" uid="uid://smy5mjubaho0" path="res://Assets/turret_head.svg" id="11_8jr81"]
-[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_1v5t0"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="4_damage"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="5_rate"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="6_range"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="6_x8d4c"]
+[ext_resource type="Resource" uid="uid://dopk0o68jwkr8" path="res://Units/Towers/arc/arc_lightning_effect.tres" id="7_effect"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="8_move"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="9_move_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="10_health"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_range_component"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_attack"]
+[ext_resource type="Resource" uid="uid://3kkugsgnd7e7" path="res://Units/Towers/arc/arc_attack.tres" id="13_attack_data"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_modifiers"]
+[ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="15_base"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_shadow"]
+[ext_resource type="Texture2D" uid="uid://co8no1mocxejn" path="res://Assets/ballista_turret_base.png" id="17_turret_base"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="18_health_data"]
+[ext_resource type="Texture2D" uid="uid://4smmqg2tegf8" path="res://Assets/ballista_turret_bow.png" id="19_bow"]
 
-[node name="Lightning" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ref"]
+size = Vector2(10, 10)
+
+[sub_resource type="Animation" id="Animation_reset"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics:position:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_attack"]
+resource_name = "attack"
+length = 0.25
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(2.9802322e-08, 0.05000004, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.35, 0.7), Vector2(0.5, 1.2), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_attack_windup"]
+resource_name = "attack_windup"
+length = 0.3
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.049999997, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.3, 0.8), Vector2(1.3500005, 0.6999997)]
+}
+
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_arc"]
+_data = {
+&"RESET": SubResource("Animation_reset"),
+&"attack": SubResource("Animation_attack"),
+&"attack_windup": SubResource("Animation_attack_windup"),
+&"hit": SubResource("Animation_hit")
+}
+
+[sub_resource type="Resource" id="Resource_health"]
+script = ExtResource("18_health_data")
+max_health = 20.0
+
+[node name="Arc" type="Node2D" unique_id=728849256 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
-script = ExtResource("1_l4bmy")
+script = ExtResource("1_tower")
 type = 16
-turret = NodePath("Graphics/Turret")
-stat_displays = Array[ExtResource("2_klhr7")]([ExtResource("3_pywwn"), ExtResource("4_3jmj5"), ExtResource("5_mqeb3")])
+turret = NodePath("Graphics/TurretFrame")
+stat_displays = Array[ExtResource("2_stat")]([ExtResource("4_damage"), ExtResource("5_rate"), ExtResource("6_range"), ExtResource("6_x8d4c")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
-intrinsic_effects = Array[ExtResource("3_jgw8d")]([ExtResource("4_4h5wn")])
-metadata/_custom_type_script = "uid://glk50fqtygyn"
+intrinsic_effects = Array[ExtResource("3_jgw8d")]([ExtResource("7_effect")])
 
-[node name="DefaultTowerBehavior" type="Node" parent="."]
-script = ExtResource("3_h78w6")
-metadata/_custom_type_script = "uid://cs61b35p7jme8"
+[node name="RangeComponent" type="Node" parent="." unique_id=1129093541]
+script = ExtResource("11_range_component")
+targeting_mode = 4
 
-[node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("4_t1kei")
-movement_data = ExtResource("5_4wmvv")
-metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+[node name="DefaultTowerBehavior" type="Node" parent="." unique_id=1551249566]
+script = ExtResource("3_behavior")
 
-[node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("6_w3e4p")
-metadata/_custom_type_script = "uid://b016qjmysn53e"
+[node name="reference" type="Sprite2D" parent="." unique_id=1857706463]
+visible = false
+texture = SubResource("PlaceholderTexture2D_ref")
 
-[node name="RangeComponent" type="Node" parent="."]
-script = ExtResource("7_gj741")
-metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+[node name="Graphics" type="Sprite2D" parent="." unique_id=462621171]
+modulate = Color(1, 0.94, 0.68, 1)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("15_base")
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
-script = ExtResource("8_jsp04")
-attack_data = ExtResource("9_gboks")
-muzzle = NodePath("../Graphics/Turret/Muzzle")
-metadata/_custom_type_script = "uid://detgar3t50qgi"
-
-[node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.083000004, 0.083000004)
-texture = ExtResource("10_t5o8f")
-
-[node name="Turret" type="Sprite2D" parent="Graphics"]
+[node name="TurretFrame" type="Node2D" parent="Graphics" unique_id=1288716455]
 z_index = 1
-texture = ExtResource("11_8jr81")
-offset = Vector2(28, 0)
 
-[node name="Muzzle" type="Marker2D" parent="Graphics/Turret"]
-position = Vector2(51.0289, 0)
+[node name="Base" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=1849598664]
+texture = ExtResource("17_turret_base")
 
-[node name="ModifiersComponent" type="Node" parent="."]
-script = ExtResource("12_1v5t0")
-metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=1905520570]
+position = Vector2(33.333332, 1.1920929e-07)
+scale = Vector2(1.3162339, 0.769)
+
+[node name="Bow" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=123065625]
+position = Vector2(28.571423, 0)
+texture = ExtResource("19_bow")
+offset = Vector2(-30, 0)
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1348130805]
+script = ExtResource("16_shadow")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2025880005]
+root_motion_local = true
+libraries/ = SubResource("AnimationLibrary_arc")
+
+[node name="AttackComponent" type="Node" parent="." unique_id=93376727 node_paths=PackedStringArray("muzzle")]
+script = ExtResource("12_attack")
+attack_data = ExtResource("13_attack_data")
+muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1305232399]
+script = ExtResource("14_modifiers")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=784176300]
+script = ExtResource("10_health")
+health_data = SubResource("Resource_health")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1617383203]
+script = ExtResource("8_move")
+movement_data = ExtResource("9_move_data")

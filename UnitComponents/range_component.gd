@@ -104,6 +104,10 @@ func are_priority_targets_available() -> bool:
 		if _enemies_in_range.has(priority_target_override):
 			return true
 
+	var global_priority_target: Unit = Targeting.get_priority_target()
+	if is_target_valid(global_priority_target) and _enemies_in_range.has(global_priority_target):
+		return true
+
 	for enemy: Unit in _enemies_in_range:
 		if not is_target_valid(enemy):
 			continue
@@ -116,33 +120,29 @@ func get_target() -> Unit:
 	if _enemies_in_range.is_empty():
 		return null
 
-	#handle priority override
 	if is_instance_valid(priority_target_override):
 		if _enemies_in_range.has(priority_target_override):
 			return priority_target_override
 
-	#NOTE: when we are blocked, the blocking unit will be priority target override
-	#thus, if we reach here, the blocking unit is not in range,
-	#and we should not hit anything
 	if unit.attack_only_when_blocked:
 		return null
 
-	#sort targets into two buckets: preferred and fallback
+	var global_priority_target: Unit = Targeting.get_priority_target()
+	if is_target_valid(global_priority_target) and _enemies_in_range.has(global_priority_target):
+		return global_priority_target
+
 	var primary_candidates: Array[Unit] = []
 	var overkilled_candidates: Array[Unit] = []
 
-	for enemy in _enemies_in_range:
+	for enemy: Unit in _enemies_in_range:
 		if not is_target_valid(enemy):
 			continue
 
-		#check soft constraint
 		if Targeting.is_unit_overkilled(enemy):
 			overkilled_candidates.append(enemy)
 		else:
 			primary_candidates.append(enemy)
-	#logic: try to find a target in the primary list.
-	#if primary list is empty, try the overkilled list.
-	#if both are empty, return null
+
 	if not primary_candidates.is_empty():
 		return _find_best_candidate(primary_candidates)
 	elif not overkilled_candidates.is_empty():
@@ -154,11 +154,17 @@ func get_targets(count: int) -> Array[Unit]:
 	if _enemies_in_range.is_empty():
 		return []
 
+	var priority_candidates: Array[Unit] = []
 	var valid_candidates: Array[Unit] = []
 	var overkilled_candidates: Array[Unit] = []
+	var global_priority_target: Unit = Targeting.get_priority_target()
 
-	for enemy in _enemies_in_range:
+	for enemy: Unit in _enemies_in_range:
 		if not is_target_valid(enemy):
+			continue
+
+		if enemy == global_priority_target:
+			priority_candidates.append(enemy)
 			continue
 
 		if Targeting.is_unit_overkilled(enemy):
@@ -168,14 +174,14 @@ func get_targets(count: int) -> Array[Unit]:
 
 	if valid_candidates.size() < count:
 		var needed: int = count - valid_candidates.size()
-		#append up to 'needed' amount from overkilled
 		valid_candidates.append_array(overkilled_candidates.slice(0, needed))
 
 	if valid_candidates.is_empty():
-		return []
+		return priority_candidates.slice(0, count)
 
 	if targeting_mode == TargetingMode.SCATTER:
 		valid_candidates.shuffle()
+		valid_candidates = priority_candidates + valid_candidates
 		return valid_candidates.slice(0, count)
 
 	valid_candidates.sort_custom(func(a: Unit, b: Unit):
@@ -197,7 +203,7 @@ func get_targets(count: int) -> Array[Unit]:
 		return false
 	)
 
-	#return top n
+	valid_candidates = priority_candidates + valid_candidates
 	return valid_candidates.slice(0, count)
 
 #helper function to reduce code repetition.

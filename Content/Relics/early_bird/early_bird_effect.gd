@@ -12,6 +12,7 @@ class EarlyBirdState extends RefCounted:
 
 func _init() -> void:
 	event_hooks = [
+		GameEvent.EventType.WAVE_PREP_STARTED,
 		GameEvent.EventType.WAVE_STARTED,
 		GameEvent.EventType.HIT_DEALT,
 		GameEvent.EventType.WAVE_ENDED
@@ -31,8 +32,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var state: EarlyBirdState = instance.state as EarlyBirdState
 
 	match event.event_type:
-		GameEvent.EventType.WAVE_STARTED:
-			#reset trigger flag
+		GameEvent.EventType.WAVE_PREP_STARTED, GameEvent.EventType.WAVE_STARTED:
+			_clear_buffs(state)
 			state.triggered_this_wave = false
 
 		GameEvent.EventType.HIT_DEALT:
@@ -58,8 +59,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 			#VFXManager.play_vfx(ID.Particles.LEVEL_UP, attacker.global_position, Vector2.UP)
 
 		GameEvent.EventType.WAVE_ENDED:
-			#remove buffs (cleanup)
 			_clear_buffs(state)
+			state.triggered_this_wave = false
 
 func _apply_buff(state: EarlyBirdState, tower: Tower) -> void:
 	if not is_instance_valid(tower.modifiers_component):

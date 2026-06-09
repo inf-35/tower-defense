@@ -16,6 +16,14 @@ script = ExtResource("4_lqdqp")
 vfx_type = 1
 radius = 2.0
 rotation_mode = 1
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.47058824, 0.8392157, 0.28627452, 0.38)
+aoe_particles_per_cell = 4.25
+aoe_particle_lifetime = 0.5
+aoe_particle_scale_min = 0.42
+aoe_particle_scale_max = 0.78
+aoe_particle_spin_speed_min = -30.0
+aoe_particle_spin_speed_max = 30.0
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]

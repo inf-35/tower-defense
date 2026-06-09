@@ -68,6 +68,7 @@ func _on_damage_tick() -> void:
 		hit_copy.target = target
 		#the laser has no single source, so we can leave it null
 		hit_copy.source = _source_unit_ref.get_ref() if _source_unit_ref else null
+		hit_copy.seed_root_lineage(self)
 
 		#use a simple hitscan delivery
 		var delivery_data := DeliveryData.new()

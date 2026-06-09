@@ -30,9 +30,9 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if not Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE:
 		return
 
-	_trigger_explosion(dying_unit as Tower)
+	_trigger_explosion(_instance, event.data as HitReportData, dying_unit as Tower)
 
-func _trigger_explosion(tower: Tower) -> void:
+func _trigger_explosion(instance: EffectInstance, hit_report: HitReportData, tower: Tower) -> void:
 	if attack_data == null:
 		push_warning("DynamiteEffect: No AttackData assigned!")
 		return
@@ -49,6 +49,8 @@ func _trigger_explosion(tower: Tower) -> void:
 
 	#create the reaction hit
 	var hit_data: HitData = attack_data.generate_generic_hit_data()
+	if not hit_data.derive_lineage_from(hit_report, instance):
+		return
 	hit_data.target = null #targetless aoe
 	hit_data.target_affiliation = not tower.hostile
 	hit_data.damage = final_dmg

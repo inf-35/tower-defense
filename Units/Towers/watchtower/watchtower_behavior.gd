@@ -17,50 +17,23 @@ func detach() -> void:
 	_revoke_buff()
 
 func _recalculate_target() -> void:
-	var tower = unit as Tower
+	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower) or tower.abstractive or tower.disabled:
 		return
 
-	var island = Run.references.island
-	if not is_instance_valid(island): return
-
-	#1. determine forward vector
-	var forward_dir: Vector2i = Vector2i.ZERO
-	match tower.facing:
-		Tower.Facing.UP: forward_dir = Vector2i(0, -1)
-		Tower.Facing.RIGHT: forward_dir = Vector2i(1, 0)
-		Tower.Facing.DOWN: forward_dir = Vector2i(0, 1)
-		Tower.Facing.LEFT: forward_dir = Vector2i(-1, 0)
-
-	#2. scan forward tile by tile
-	var current_cell = tower.tower_position + forward_dir
-	var distance_tiles: int = 1
-	var found_tower: Tower = null
-
-	while distance_tiles < 50:
-		if not island.terrain_base_grid.has(current_cell):
-			break
-
-		var check_tower = island.get_tower_on_tile(current_cell)
-		if is_instance_valid(check_tower):
-			#don't buff other watchtowers (optional design choice to prevent infinite loops)
-			if check_tower != tower:
-				found_tower = check_tower
-			break
-
-		current_cell += forward_dir
-		distance_tiles += 1
+	var scan: Tower.ForwardScanResult = tower.scan_forward(49)
+	var found_tower: Tower = scan.hit_tower
 
 	#3. apply diff
 	if found_tower != _currently_buffed_tower:
 		_revoke_buff()
 
 		if is_instance_valid(found_tower):
-			_grant_buff(found_tower, distance_tiles)
+			_grant_buff(found_tower, scan.distance_tiles)
 			_currently_buffed_tower = found_tower
 
 	elif is_instance_valid(_currently_buffed_tower):
-		_grant_buff(_currently_buffed_tower, distance_tiles)
+		_grant_buff(_currently_buffed_tower, scan.distance_tiles)
 
 func _grant_buff(target: Tower, distance: int) -> void:
 	if not is_instance_valid(target.modifiers_component):
@@ -93,58 +66,26 @@ func _exit_tree() -> void:
 	_revoke_buff()
 
 func draw_visuals(canvas: RangeIndicator) -> void:
-	var tower = unit as Tower
+	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower): return
 
-	var island = Run.references.island
-	if not is_instance_valid(island): return
-
-	var target_tower: Tower = null
-	var impact_cell: Vector2i
-
-	#1. determine forward vector
-	var forward_dir: Vector2i = Vector2i.ZERO
-	match tower.facing:
-		Tower.Facing.UP: forward_dir = Vector2i(0, -1)
-		Tower.Facing.RIGHT: forward_dir = Vector2i(1, 0)
-		Tower.Facing.DOWN: forward_dir = Vector2i(0, 1)
-		Tower.Facing.LEFT: forward_dir = Vector2i(-1, 0)
-
-	#2. scanning logic (we do this for both preview and live to get the exact impact cell)
-	var current_cell = tower.tower_position + forward_dir
-	var distance_tiles: int = 1
-	var max_scan_distance = 20 #fallback distance if nothing is hit
-
-	while distance_tiles <= max_scan_distance:
-		#if we hit the edge of the charted map, we can stop the ray
-		if not island.terrain_base_grid.has(current_cell):
-			break
-
-		var check_tower = island.get_tower_on_tile(current_cell)
-		if is_instance_valid(check_tower) and check_tower != tower:
-			target_tower = check_tower
-			impact_cell = current_cell #the exact tile we hit, not the tower origin
-			break
-
-		current_cell += forward_dir
-		distance_tiles += 1
+	var scan: Tower.ForwardScanResult = tower.scan_forward(20)
+	var target_tower: Tower = scan.hit_tower
 
 	#3. draw
-	var start_pos = Island.cell_to_position(tower.tower_position)
+	var start_pos: Vector2 = Island.cell_to_position(tower.tower_position)
 
 	if is_instance_valid(target_tower):
 		#hit a tower
-		var end_pos = Island.cell_to_position(impact_cell)
+		var end_pos: Vector2 = Island.cell_to_position(scan.impact_cell)
 		canvas.draw_line(start_pos, end_pos, canvas.highlight_color, 2.0)
-		canvas.draw_cell(impact_cell, canvas.highlight_color)
+		canvas.draw_cell(scan.impact_cell, canvas.highlight_color)
 	else:
 		#missed / hit nothing. draw a faded line up to the last checked cell.
-		#back up one step so we don't draw into the void/edge
-		var last_valid_cell = current_cell - forward_dir
-		var end_pos = Island.cell_to_position(last_valid_cell)
+		var end_pos: Vector2 = Island.cell_to_position(scan.last_valid_cell)
 
 		#use a faded version of the highlight color
-		var fade_color = canvas.highlight_color
+		var fade_color: Color = canvas.highlight_color
 		fade_color.a *= 0.8
 
 		canvas.draw_line(start_pos, end_pos, fade_color, 2.0)

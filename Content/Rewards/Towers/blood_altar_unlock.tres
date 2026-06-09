@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+
+[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="1_p7y7y"]
+
+[resource]
+script = ExtResource("1_p7y7y")
+id_name = "blood_altar"
+description = "relic tower unlock"
+tower_type = 65
+base_weight = 200.0

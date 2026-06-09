@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+
+[ext_resource type="Resource" path="res://Content/Relics/weregild/weregild.tres" id="1_6lroi"]
+[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="2_et4s5"]
+
+[resource]
+script = ExtResource("2_et4s5")
+id_name = "weregild"
+description = "relic reward"
+type = 2
+relic_data = ExtResource("1_6lroi")
