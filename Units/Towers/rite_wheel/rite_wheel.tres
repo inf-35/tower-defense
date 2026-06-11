@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://b77axsvk4six"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://b77axsvk4six"]
 
 [ext_resource type="Texture2D" uid="uid://dpmsiiym8s3rg" path="res://Assets/rite_wheel.png" id="1_nk3c6"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_c2tuf"]
@@ -17,7 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Wheel Rite"
-tower_description = "{RITE_LABEL}. Adjacent towers have +400% {UNIT_HITRATE}, but deal no direct damage."
+tower_description = "{RITE_LABEL}. Adjacent towers have +300% {UNIT_HITRATE}, but deal no direct damage."
 icon = ExtResource("1_nk3c6")
 preview = ExtResource("1_nk3c6")
 inspector_actions = Array[ExtResource("2_c2tuf")]([ExtResource("3_h1d2w")])

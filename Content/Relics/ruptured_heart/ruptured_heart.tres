@@ -5,14 +5,15 @@
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_qli73"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_e5o8n"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_n7ndb"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_715if"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_q5l2d"]
-[ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="5_if6d7"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="6_715if"]
+[ext_resource type="Texture2D" uid="uid://cpucpl01qfn6v" path="res://Assets/ruptured_heart.png" id="7_715if"]
 
 [sub_resource type="Resource" id="Resource_r0qec"]
 script = ExtResource("4_q5l2d")
 aoe_particles_enabled = true
-aoe_particle_color = Color(0.64313728, 0.93333334, 0.40392157, 0.45)
+aoe_particle_color = Color(0.6431373, 0.93333334, 0.40392157, 0.45)
 aoe_particles_per_cell = 5.5
 aoe_particle_lifetime = 0.42
 aoe_particle_scale_min = 0.48
@@ -38,5 +39,5 @@ script = ExtResource("2_qli73")
 type = 37
 global_effect = SubResource("Resource_xk5qc")
 title = "Ruptured Heart"
-description = "When a {POISON|label=Poisoned} enemy dies, it bursts in a small explosion, dealing 2 damage per poison stack."
-icon = ExtResource("5_if6d7")
+description = "When a {POISON|label=Poisoned} enemy dies, it bursts in a small explosion, dealing 1 damage per poison stack."
+icon = ExtResource("7_715if")

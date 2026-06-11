@@ -1,5 +1,5 @@
 extends EffectPrototype
-class_name ScalesRiteEffect
+class_name BalanceRiteEffect
 
 @export var search_radius: float = 120.0
 @export var projectile_data: AttackData

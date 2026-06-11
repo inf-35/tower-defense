@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://b4jjm1837mjs3"]
+[gd_scene format=3 uid="uid://b4jjm1837mjs3"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_mpu13"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_b88dd"]
@@ -89,7 +89,7 @@ _data = {
 &"hit": SubResource("Animation_yr17l")
 }
 
-[node name="Firewall" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Firewall" type="Node2D" unique_id=1537539923 node_paths=PackedStringArray("behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_mpu13")
 type = 23
@@ -104,61 +104,59 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="FirewallBehavior" type="Node" parent="."]
+[node name="FirewallBehavior" type="Node" parent="." unique_id=1439443989]
 script = ExtResource("3_tds48")
 metadata/_custom_type_script = "uid://bn051b65hjvrv"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=390524816]
 script = ExtResource("4_owxfk")
 movement_data = ExtResource("5_qsd2p")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=913310251]
 script = ExtResource("6_sa5r4")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1185546638]
 script = ExtResource("7_u4q0k")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+[node name="AttackComponent" type="Node" parent="." unique_id=141929966 node_paths=PackedStringArray("muzzle")]
 script = ExtResource("8_8swcr")
 attack_data = ExtResource("9_vqe15")
 muzzle = NodePath("../Graphics/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="reference" type="Sprite2D" parent="."]
+[node name="reference" type="Sprite2D" parent="." unique_id=1824114190]
 visible = false
 texture = SubResource("PlaceholderTexture2D_i3qpa")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=952952763]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("13_6nj57")
 
-[node name="Muzzle" type="Marker2D" parent="Graphics"]
+[node name="Muzzle" type="Marker2D" parent="Graphics" unique_id=192399547]
 position = Vector2(0.47718075, 1.6484104)
 scale = Vector2(1.3162339, 0.769)
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1791195618]
 script = ExtResource("14_w76k3")
 height_multiplier = 1.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=1723420974]
 z_index = 50
 z_as_relative = false
 texture = ExtResource("15_mi2ft")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D" unique_id=1499829608]
 script = ExtResource("14_w76k3")
 height_multiplier = 0.2
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=606508787]
 script = ExtResource("12_a5hl3")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_uhk0q")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1256323341]
+libraries/ = SubResource("AnimationLibrary_uhk0q")

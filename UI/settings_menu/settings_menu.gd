@@ -35,6 +35,9 @@ const AUDIO_POWER: float = 2.0 ##root of power curve of the audio
 signal closed()
 
 func _ready() -> void:
+	if not Run.is_run_ready():
+		await Run.references_ready
+		
 	#1. cache audio bus indices (safety check if names change)
 	_bus_master = AudioServer.get_bus_index("Master")
 	_bus_sfx = AudioServer.get_bus_index("SFX")

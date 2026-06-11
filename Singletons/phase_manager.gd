@@ -100,6 +100,8 @@ func begin_new_game(progress_callback: Callable = Callable()) -> void:
 	await get_tree().process_frame
 	SaveLoad.load_profile()
 	await Run.references.island.generate_new_island()
+	if not Run.references.island.tower_created.is_connected(_on_tower_created):
+		Run.references.island.tower_created.connect(_on_tower_created)
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
 
@@ -130,11 +132,15 @@ func start_tutorial() -> void:
 	select.desired_parameters = []
 
 	var turret: TutorialStep = load("res://UI/tutorial/place_turret.tres")
-	turret.trigger_signal = UI.place_tower_requested
+	turret.trigger_signal = Run.player.tower_placed
 	turret.desired_parameters = [Towers.Type.TURRET]
 
+	var palisade: TutorialStep = load("res://UI/tutorial/place_palisade.tres")
+	palisade.trigger_signal = Run.player.tower_placed
+	palisade.desired_parameters = [Towers.Type.PALISADE]
+
 	var farm: TutorialStep = load("res://UI/tutorial/place_farm.tres")
-	farm.trigger_signal = UI.place_tower_requested
+	farm.trigger_signal = Run.player.tower_placed
 	farm.desired_parameters = [Towers.Type.FARM]
 
 	var gold_population: TutorialStep = load("res://UI/tutorial/gold_population_explanation.tres")
@@ -150,6 +156,7 @@ func start_tutorial() -> void:
 
 	steps.append(select)
 	steps.append(turret)
+	steps.append(palisade)
 	steps.append(farm)
 	steps.append(gold_population)
 	steps.append(hover_player_stats)
@@ -429,3 +436,17 @@ func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:
 		return
 	print("Phases: ", str)
+
+func _on_tower_created(tower: Tower) -> void: ##starts the ruin tutorial only when a ruin structure is actually instantiated in the run
+	if not is_instance_valid(tower):
+		return
+	if tower.type != Towers.Type.RUINS:
+		return
+	if Run.player.completed_tutorials[Run.player.TutorialFlag.RUINS]:
+		return
+	if not is_instance_valid(UI.tutorial_manager):
+		return
+	if UI.tutorial_manager.visible:
+		return
+
+	UI.tutorial_manager.start_sequence([load("res://UI/tutorial/ruins.tres")], Run.player.TutorialFlag.RUINS)

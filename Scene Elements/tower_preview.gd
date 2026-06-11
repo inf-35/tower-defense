@@ -37,5 +37,8 @@ func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i) -> vo
 	queue_redraw()
 
 func _get_preview_scale() -> Vector2: ##scales preview art by the authored tower footprint so oversized towers no longer render like 1x1 placements
-	var base_size: Vector2i = Towers.get_tower_size(tower_type)
-	return Vector2(base_size) * BASE_PREVIEW_SCALE
+	var prototype: Tower = Towers.get_tower_prototype(tower_type)
+	if is_instance_valid(prototype) and is_instance_valid(prototype.graphics):
+		return prototype.graphics.scale
+
+	return Vector2.ONE * BASE_PREVIEW_SCALE

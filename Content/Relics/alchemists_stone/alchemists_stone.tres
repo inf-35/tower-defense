@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dmkovl5vdrirg"]
 
 [ext_resource type="Script" uid="uid://bytr5p7qqn0c0" path="res://Content/Relics/alchemists_stone/alchemists_stone_effect.gd" id="1_ucf7i"]
+[ext_resource type="Texture2D" uid="uid://08p532n6yrkj" path="res://Assets/alchemist's stone.png" id="2_23c7i"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_nilt8"]
-[ext_resource type="Texture2D" uid="uid://cuhsw8o5nes3h" path="res://Assets/amethyst_skull_icon.png" id="3_1r4dy"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_23c7i"]
 
 [sub_resource type="Resource" id="Resource_eayoc"]
@@ -15,4 +15,4 @@ type = 34
 global_effect = SubResource("Resource_eayoc")
 title = "Alchemist's Stone"
 description = "Enemies take 30% more damage for each unique {STATUS} beyond the first."
-icon = ExtResource("3_1r4dy")
+icon = ExtResource("2_23c7i")

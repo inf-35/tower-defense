@@ -6,6 +6,20 @@
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_8w58d"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_500ne"]
 
+[sub_resource type="Resource" id="Resource_m0o9m"]
+script = ExtResource("4_8w58d")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.8509804, 0.7411765, 0.48235294, 0.36)
+aoe_particle_lifetime = 0.3
+aoe_particle_scale_min = 0.44
+aoe_particle_scale_max = 0.84
+aoe_particle_spin_speed_min = -40.0
+aoe_particle_spin_speed_max = 40.0
+aoe_particle_drift_speed_min = 8.0
+aoe_particle_drift_speed_max = 20.0
+aoe_particle_drift_angle_noise_deg = 24.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_8w58d")
 vfx_type = 1
@@ -22,5 +36,6 @@ radius = 10.0
 damage = 2.0
 breaking = true
 vfx_on_spawn = SubResource("Resource_e3651")
+vfx_on_impact = SubResource("Resource_m0o9m")
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

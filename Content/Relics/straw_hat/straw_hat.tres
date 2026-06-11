@@ -9,7 +9,7 @@ script = ExtResource("4_fd2sd")
 target_filter = 3
 required_type = 53
 key = &"farm_adjacent_bonus"
-additive = 0.25
+additive = 0.1
 metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [resource]
@@ -17,6 +17,6 @@ script = ExtResource("5_joo2b")
 type = 30
 modifier_prototypes = Array[ExtResource("4_fd2sd")]([SubResource("Resource_nrgp3")])
 title = "Straw Hat"
-description = "{T_FARM|label=Farms} earn 0.25 {GOLD} more for each adjacent farm."
+description = "{T_FARM|label=Farms} earn 0.1 {GOLD} more for each adjacent farm."
 icon = ExtResource("1_ili8f")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

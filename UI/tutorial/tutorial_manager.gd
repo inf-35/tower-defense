@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name TutorialManager
 
+signal start_wave_lock_changed(locked: bool)
+
 #--- configuration ---
 @export var overlay_color_rect: ColorRect
 @export var instruction_panel: TutorialPanel
@@ -34,6 +36,7 @@ var _world_hint_open: bool = false
 var _world_hint_target: Tower
 var _world_hint_previous_speed: float = Clock.BASE_SPEED
 var _default_instruction_label_min_size: Vector2
+var _start_wave_locked: bool = false
 
 #--- internal ---
 var _shader_mat: ShaderMaterial
@@ -85,6 +88,9 @@ func _process_overlay_input(input_event: InputEvent) -> void:
 
 func _has_active_sequence() -> bool:
 	return _current_step_index != -1
+
+func is_start_wave_locked() -> bool:
+	return _start_wave_locked
 
 func _is_world_hint_active() -> bool:
 	return _world_hint_open
@@ -186,6 +192,8 @@ func _advance_step() -> void:
 		return
 
 	var step := _active_sequence[_current_step_index]
+	if step.override_start_wave_lock:
+		_set_start_wave_locked(step.start_wave_locked)
 	if step.highlight_target != TutorialStep.Reference.NONE:
 		_target_node = _registered_ui_elements[step.highlight_target]
 	else:
@@ -294,10 +302,16 @@ func _on_trigger_signal(...args) -> void:
 	var desired_parameters: Array = _active_sequence[_current_step_index].desired_parameters
 	print(args, " / ", desired_parameters)
 	var valid: bool = true
-	for i: int in len(desired_parameters):
-		if (not args.has(i)) or desired_parameters[i] != args[i]:
+	for i: int in range(desired_parameters.size()):
+		if i >= args.size() or desired_parameters[i] != args[i]:
 			valid = false
 			break
 
 	if valid:
 		_complete_step()
+
+func _set_start_wave_locked(locked: bool) -> void:
+	if _start_wave_locked == locked:
+		return
+	_start_wave_locked = locked
+	start_wave_lock_changed.emit(locked)

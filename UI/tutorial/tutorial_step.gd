@@ -48,3 +48,5 @@ enum Reference { ##reference ids to control nodes
 #for camera_pan: distance in pixels
 #for camera_zoom: ignored (any zoom counts)
 @export var trigger_amount: float = 0.0
+@export var override_start_wave_lock: bool = false ##whether entering this step should force a start-wave lock state
+@export var start_wave_locked: bool = false ##target start-wave lock state applied when override_start_wave_lock is enabled

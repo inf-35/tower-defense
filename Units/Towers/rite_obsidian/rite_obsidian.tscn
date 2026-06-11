@@ -9,7 +9,7 @@
 [ext_resource type="Resource" path="res://Content/Movement/immobile_mvmt.tres" id="7_t3qls"]
 [ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="8_67gd8"]
 [ext_resource type="Script" path="res://Content/health_data.gd" id="9_24tku"]
-[ext_resource type="Texture2D" path="res://Assets/rite_blood.png" id="10_1jxet"]
+[ext_resource type="Texture2D" path="res://Assets/rite_obsidian_icon.png" id="10_1jxet"]
 [ext_resource type="Script" path="res://UnitComponents/shadow_component.gd" id="11_54bb0"]
 [ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="12_6t0ga"]
 

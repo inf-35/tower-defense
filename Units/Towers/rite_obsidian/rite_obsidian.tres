@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3]
 
-[ext_resource type="Texture2D" path="res://Assets/rite_blood.png" id="1_qkpkg"]
+[ext_resource type="Texture2D" path="res://Assets/rite_obsidian_icon.png" id="1_qkpkg"]
 [ext_resource type="Script" path="res://Content/tower_data.gd" id="2_et2vc"]
 [ext_resource type="Resource" path="res://Content/InspectorActions/destroy.tres" id="3_3pwn1"]
 [ext_resource type="PackedScene" path="res://Units/Towers/rite_obsidian/rite_obsidian.tscn" id="4_d8qo1"]

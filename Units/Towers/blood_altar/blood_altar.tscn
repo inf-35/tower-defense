@@ -4,15 +4,16 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_gj0rb"]
 [ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_dvy80"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_gqk4d"]
+[ext_resource type="Resource" uid="uid://cybuicau0bb6i" path="res://Content/StatDisplays/radius.tres" id="4_krp3i"]
 [ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_p67g3"]
-[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="6_72edb"]
 [ext_resource type="Script" uid="uid://cqcp0b8vap5ai" path="res://Units/Towers/blood_altar/blood_altar_behavior.gd" id="7_eu6my"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="7_ko5d2"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="8_isxa0"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="9_0urfb"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="10_30gck"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_k6pic"]
 [ext_resource type="Resource" uid="uid://dg16lp7dymyk" path="res://Units/Towers/blood_altar/blood_altar_attack.tres" id="12_q7wor"]
-[ext_resource type="Texture2D" uid="uid://ceb7ksik3lia2" path="res://Assets/mage_provisional.png" id="13_7lp3i"]
+[ext_resource type="Texture2D" uid="uid://ko0ax2ifprq" path="res://Assets/blood_altar.png" id="13_krp3i"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_535ep"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="15_y5qgt"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="16_xphg0"]
@@ -21,7 +22,7 @@
 z_index = 100
 script = ExtResource("1_yolso")
 type = 65
-stat_displays = Array[ExtResource("2_gj0rb")]([ExtResource("3_dvy80"), ExtResource("4_gqk4d"), ExtResource("5_p67g3"), ExtResource("6_72edb")])
+stat_displays = Array[ExtResource("2_gj0rb")]([ExtResource("3_dvy80"), ExtResource("4_krp3i"), ExtResource("4_gqk4d"), ExtResource("5_p67g3"), ExtResource("7_ko5d2")])
 behavior = NodePath("BloodAltarBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -46,7 +47,7 @@ attack_data = ExtResource("12_q7wor")
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1482733337]
 scale = Vector2(0.065, 0.065)
-texture = ExtResource("13_7lp3i")
+texture = ExtResource("13_krp3i")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=186968954]
 script = ExtResource("14_535ep")

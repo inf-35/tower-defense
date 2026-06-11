@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cyvifd18amlet"]
 
-[ext_resource type="Resource" path="res://Content/Relics/epidemic/epidemic.tres" id="1_3afnp"]
-[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="2_67xfx"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_0ugbs"]
+[ext_resource type="Resource" uid="uid://b7d3xa6vfpdq1" path="res://Content/Relics/epidemic/epidemic.tres" id="1_3afnp"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_67xfx"]
 
 [resource]
 script = ExtResource("2_67xfx")

@@ -9,7 +9,7 @@
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_14trh"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_dobb4"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="9_8mfc0"]
-[ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="10_s0pvo"]
+[ext_resource type="Texture2D" path="res://Assets/rite_glass_icon.png" id="10_s0pvo"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_f6abi"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_ltm88"]
 

@@ -45,7 +45,6 @@ func _trigger_explosion(instance: EffectInstance, hit_report: HitReportData, tow
 		)
 
 	var final_dmg: float = base_dmg * damage_multiplier
-	print(final_dmg)
 
 	#create the reaction hit
 	var hit_data: HitData = attack_data.generate_generic_hit_data()

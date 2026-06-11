@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://daqxrw1i4lig0"]
+[gd_scene format=3 uid="uid://daqxrw1i4lig0"]
 
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_53kp5"]
 [ext_resource type="Script" uid="uid://dvq73xdi1f01j" path="res://UI/trade_menu/shop_option_card.gd" id="2_yrrol"]
@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="4_yrrol"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_tq8hd"]
 
-[node name="shop_card" type="Control" node_paths=PackedStringArray("price_text", "_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "description")]
+[node name="shop_card" type="Control" unique_id=1022920763 node_paths=PackedStringArray("price_text", "_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "description")]
 custom_minimum_size = Vector2(1200, 300)
 layout_mode = 3
 anchors_preset = 0
@@ -25,7 +25,7 @@ title = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContai
 description = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer/description")
 metadata/_custom_type_script = "uid://dvq73xdi1f01j"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=306079909]
 custom_minimum_size = Vector2(600, 150)
 layout_mode = 1
 anchors_preset = 15
@@ -35,7 +35,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"hbox_10"
 
-[node name="icon_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
+[node name="icon_target" type="Control" parent="HBoxContainer" unique_id=1749929300 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 mouse_filter = 1
@@ -47,7 +47,7 @@ idle_sway_angle = 3.0
 idle_sway_duration = 8.0
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
-[node name="real_icon_panel" type="PanelContainer" parent="HBoxContainer/icon_target"]
+[node name="real_icon_panel" type="PanelContainer" parent="HBoxContainer/icon_target" unique_id=370504150]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -56,21 +56,21 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/icon_target/real_icon_panel"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/icon_target/real_icon_panel" unique_id=358395358]
 layout_mode = 2
 theme = ExtResource("1_53kp5")
 theme_type_variation = &"MarginMajor"
 
-[node name="AspectRatioSolid" type="AspectRatioContainer" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer"]
+[node name="AspectRatioSolid" type="AspectRatioContainer" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer" unique_id=1471522411]
 layout_mode = 2
 
-[node name="icon" type="TextureRect" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioSolid"]
+[node name="icon" type="TextureRect" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioSolid" unique_id=35851040]
 layout_mode = 2
 texture = ExtResource("4_yrrol")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="panel_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
+[node name="panel_target" type="Control" parent="HBoxContainer" unique_id=1676230923 node_paths=PackedStringArray("content")]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
@@ -79,7 +79,7 @@ content = NodePath("real_description_panel")
 auto_play_entrance = true
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
-[node name="real_description_panel" type="PanelContainer" parent="HBoxContainer/panel_target"]
+[node name="real_description_panel" type="PanelContainer" parent="HBoxContainer/panel_target" unique_id=464504969]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -88,24 +88,24 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/panel_target/real_description_panel"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/panel_target/real_description_panel" unique_id=425045117]
 layout_mode = 2
 theme = ExtResource("1_53kp5")
 theme_type_variation = &"MarginMinor"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer" unique_id=782422639]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"vbox_5"
 
-[node name="Title" type="HBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer"]
+[node name="Title" type="HBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer" unique_id=157033808]
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"hbox_5"
 
-[node name="inspector_title" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/Title"]
+[node name="inspector_title" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/Title" unique_id=1847489594]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
@@ -118,11 +118,11 @@ vertical_alignment = 1
 script = ExtResource("5_tq8hd")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer" unique_id=1274258703]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="description" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="description" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer" unique_id=2016533360]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -135,7 +135,7 @@ fit_content = true
 script = ExtResource("5_tq8hd")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="price_tag" type="PanelContainer" parent="HBoxContainer/panel_target"]
+[node name="price_tag" type="PanelContainer" parent="HBoxContainer/panel_target" unique_id=2140020270]
 layout_mode = 0
 offset_left = 631.0
 offset_top = 261.0
@@ -143,7 +143,7 @@ offset_right = 931.0
 offset_bottom = 343.0
 theme_type_variation = &"simple_panel"
 
-[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="HBoxContainer/panel_target/price_tag"]
+[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="HBoxContainer/panel_target/price_tag" unique_id=130357235]
 layout_mode = 2
 bbcode_enabled = true
 text = "34 gold."

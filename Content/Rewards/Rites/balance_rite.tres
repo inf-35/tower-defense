@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_jmbfj")
-id_name = "scales_rite"
+id_name = "balance_rite"
 description = "rite reward"
 type = 3
 rite_type = 67

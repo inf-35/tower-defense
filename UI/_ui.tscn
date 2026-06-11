@@ -640,7 +640,7 @@ metadata/_edit_use_anchors_ = true
 [node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
 visible = false
 
-[node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button")]
+[node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button", "title_label")]
 visible = false
 z_index = 1
 anchors_preset = 15
@@ -653,6 +653,7 @@ script = ExtResource("4_q3aj2")
 card_list = NodePath("CenterContainer/main_container/card_list")
 card_scene = ExtResource("5_m8qfw")
 reroll_button = NodePath("CenterContainer/main_container/reroll")
+title_label = NodePath("CenterContainer/main_container/title")
 
 [node name="CenterContainer" type="CenterContainer" parent="Reward" unique_id=94962506]
 layout_mode = 1

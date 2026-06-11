@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dl12ubucxpimx"]
+
+[ext_resource type="Script" uid="uid://8hedhuioh5aw" path="res://Content/Relics/sapphire_idol/sapphire_idol_effect.gd" id="1_vfx"]
+[ext_resource type="Texture2D" uid="uid://bue22ucrfoxev" path="res://Assets/sapphire_idol.png" id="2_nq4vw"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_relic"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_global"]
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("1_vfx")
+
+[resource]
+script = ExtResource("2_relic")
+type = 38
+global_effect = SubResource("Resource_effect")
+title = "Sapphire Idol"
+description = "When enemies are inflicted with {FROST}, all their timed {STATUS} are prolonged to at least 1 second."
+icon = ExtResource("2_nq4vw")

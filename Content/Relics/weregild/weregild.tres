@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="RelicData" format=3]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://bi0urs84h5hqm"]
 
-[ext_resource type="Script" path="res://Content/Relics/weregild/weregild_effect.gd" id="1_xfaq6"]
-[ext_resource type="Script" path="res://Content/Relics/_relic_data.gd" id="2_k6h1x"]
-[ext_resource type="Texture2D" path="res://Assets/gold_icon.png" id="3_qmugo"]
+[ext_resource type="Script" uid="uid://c4p72nktljdlm" path="res://Content/Relics/weregild/weregild_effect.gd" id="1_xfaq6"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_k6h1x"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_i1b6c"]
+[ext_resource type="Texture2D" uid="uid://buvna5fq4nwp2" path="res://Assets/gold_icon.png" id="3_qmugo"]
 
 [sub_resource type="Resource" id="Resource_o5w7d"]
 script = ExtResource("1_xfaq6")

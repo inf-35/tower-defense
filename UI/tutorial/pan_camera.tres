@@ -11,4 +11,6 @@ Pan the camera with WASD.
 Q to continue."
 trigger_type = 2
 trigger_amount = 2.0
+override_start_wave_lock = true
+start_wave_locked = true
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

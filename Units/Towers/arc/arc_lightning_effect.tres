@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_chain")
-max_jumps = 4
+max_jumps = 5
 jump_radius = 25.0
-damage_falloff_multiplier = 0.667
+damage_falloff_multiplier = 0.75
 jump_feedback_width = 2.0

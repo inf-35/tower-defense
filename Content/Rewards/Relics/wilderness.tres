@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://cswn1yoa4e8w8"]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cswn1yoa4e8w8"]
 
 [ext_resource type="Resource" uid="uid://ddu0kih5o36wt" path="res://Content/Relics/wilderness/wilderness.tres" id="1_f7wol"]
 [ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_wusxj"]

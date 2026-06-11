@@ -23,6 +23,7 @@ var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
 var tower_grid: Dictionary[Vector2i, Tower] = {}
 var lake_seed: int = 0
 var lake_cells: Dictionary[Vector2i, bool] = {}
+var _ruin_sites: Dictionary[Vector2i, bool] = {}
 
 var shore_boundary_tiles: Array[Vector2i] = []
 
@@ -46,6 +47,10 @@ const LAKE_THRESHOLD: float = 0.68
 const LAKE_WARP_FREQUENCY: float = 0.015
 const LAKE_WARP_STRENGTH: float = 0.0
 const LAKE_MIN_NEIGHBORS: int = 2
+const RUIN_MIN_SPACING_RATIO: float = 0.8
+const RUIN_ATTEMPTS_PER_SITE: int = 20
+
+@export var ruin_average_spacing: float = 10.0 ##average tile spacing used when pregenerating ruin sites across the unexplored field
 
 func _enter_tree() -> void:
 	Run.begin_run(self)
@@ -80,6 +85,11 @@ func generate_new_island() -> void:
 	_set_loading_status("Sketching lakes...", 0.74)
 	lake_seed = randi()
 	_generate_lake_cells()
+	await get_tree().process_frame
+
+	_set_loading_status("Scattering ruins...", 0.79)
+	_generate_ruin_sites()
+	update_lake_preview()
 	await get_tree().process_frame
 
 	_set_loading_status("Growing island...", 0.84)
@@ -286,7 +296,10 @@ func is_lake_cell(cell: Vector2i) -> bool:
 func update_lake_preview() -> void:
 	if not is_instance_valid(lake_preview_renderer):
 		return
+	lake_preview_renderer.clear_decorations()
 	lake_preview_renderer.reset_grid(get_nearby_lake_cells())
+	for cell: Vector2i in get_visible_ruin_sites():
+		lake_preview_renderer.set_preview_feature(cell, Towers.Type.RUINS)
 
 func get_nearby_lake_cells() -> Array[Vector2i]:
 	if terrain_base_grid.is_empty():
@@ -301,6 +314,24 @@ func get_nearby_lake_cells() -> Array[Vector2i]:
 		if cell.x >= min_cell.x and cell.y >= min_cell.y and cell.x <= max_cell.x and cell.y <= max_cell.y:
 			visible_cells.append(cell)
 	return visible_cells
+
+func get_visible_ruin_sites() -> Array[Vector2i]: ##returns the uncharted pregenerated ruin sites close enough to the explored frontier to preview
+	if terrain_base_grid.is_empty():
+		return []
+
+	var bounds := get_island_bounds()
+	var min_cell := position_to_cell(bounds.position) - Vector2i.ONE * LAKE_PREVIEW_MARGIN
+	var max_cell := position_to_cell(bounds.end) + Vector2i.ONE * LAKE_PREVIEW_MARGIN
+	var visible_sites: Array[Vector2i] = []
+
+	for cell: Vector2i in _ruin_sites:
+		if terrain_base_grid.has(cell):
+			continue
+		if cell.x < min_cell.x or cell.y < min_cell.y or cell.x > max_cell.x or cell.y > max_cell.y:
+			continue
+		visible_sites.append(cell)
+
+	return visible_sites
 
 func _generate_lake_cells() -> void:
 	lake_cells.clear()
@@ -345,6 +376,47 @@ func _prune_lake_speckles() -> void:
 			removed.append(cell)
 	for cell: Vector2i in removed:
 		lake_cells.erase(cell)
+
+func _generate_ruin_sites() -> void: ##pregenerates ruin sites on the outer field so expansion generation can consume a stable source of truth
+	_ruin_sites.clear()
+
+	var average_spacing: float = maxf(ruin_average_spacing, 1.0)
+	var radius_limit: float = float(LAKE_FIELD_RADIUS - LAKE_PREVIEW_MARGIN)
+	var field_area: float = PI * maxf((radius_limit * radius_limit) - float(LAKE_SAFE_RADIUS * LAKE_SAFE_RADIUS), 0.0)
+	var target_sites: int = maxi(int(round(field_area / (average_spacing * average_spacing))), 0)
+	var min_spacing_squared: float = pow(average_spacing * RUIN_MIN_SPACING_RATIO, 2.0)
+	var max_attempts: int = maxi(target_sites * RUIN_ATTEMPTS_PER_SITE, RUIN_ATTEMPTS_PER_SITE)
+	var attempts: int = 0
+
+	while _ruin_sites.size() < target_sites and attempts < max_attempts:
+		attempts += 1
+		var candidate: Vector2i = _roll_ruin_candidate(radius_limit)
+		if not _is_valid_ruin_site(candidate, min_spacing_squared):
+			continue
+		_ruin_sites[candidate] = true
+
+func _roll_ruin_candidate(radius_limit: float) -> Vector2i:
+	var radius: float = sqrt(randf()) * radius_limit
+	var angle: float = randf() * TAU
+	return Vector2i(roundi(cos(angle) * radius), roundi(sin(angle) * radius))
+
+func _is_valid_ruin_site(cell: Vector2i, min_spacing_squared: float) -> bool: ##keeps ruin sites off lakes, away from the keep, and reasonably spaced from each other
+	var radius_squared: int = cell.x * cell.x + cell.y * cell.y
+	if radius_squared <= LAKE_SAFE_RADIUS * LAKE_SAFE_RADIUS:
+		return false
+	if radius_squared >= LAKE_FIELD_RADIUS * LAKE_FIELD_RADIUS:
+		return false
+	if lake_cells.has(cell):
+		return false
+
+	for existing_cell: Vector2i in _ruin_sites:
+		if existing_cell.distance_squared_to(cell) < min_spacing_squared:
+			return false
+
+	return true
+
+func has_ruin_site(cell: Vector2i) -> bool: ##checks whether a ruin site was pregenerated at this cell and has not yet been charted
+	return _ruin_sites.has(cell)
 
 func update_previews(choices_by_id: Dictionary[int, ExpansionChoice]) -> void:
 	_preview_choices = choices_by_id
@@ -495,6 +567,7 @@ func get_save_data() -> Dictionary:
 		terrain_export[key] = terrain_base_grid[cell] #enum int
 	data["terrain"] = terrain_export
 	data["lake_seed"] = lake_seed
+	data["ruin_sites"] = _serialize_ruin_sites()
 
 	data["maximum_unit_id"] = Run.references.current_unit_id
 	data["maximum_stat_id"] = Run.references.current_stat_id
@@ -525,6 +598,8 @@ func load_save_data(data: Dictionary) -> void:
 	_clear_island_state()
 	lake_seed = int(data.get("lake_seed", randi()))
 	_generate_lake_cells()
+	_generate_ruin_sites()
+	_deserialize_ruin_sites(data.get("ruin_sites", []))
 	#restore terrain
 	var terrain_import: Dictionary = data.get("terrain", {})
 	var edits: Dictionary[Vector2i, Terrain.CellData] = {}
@@ -570,6 +645,7 @@ func _clear_island_state() -> void:
 	terrain_base_grid.clear()
 	tower_grid.clear()
 	lake_cells.clear()
+	_ruin_sites.clear()
 	_towers_by_type.clear()
 	if is_instance_valid(topology_service):
 		topology_service.clear()
@@ -584,6 +660,25 @@ func _clear_island_state() -> void:
 		terrain_renderer.reset_grid([])
 	if is_instance_valid(lake_preview_renderer):
 		lake_preview_renderer.reset_grid([])
+
+func _serialize_ruin_sites() -> Array[String]:
+	var output: Array[String] = []
+	for cell: Vector2i in _ruin_sites:
+		output.append("%d,%d" % [cell.x, cell.y])
+	return output
+
+func _deserialize_ruin_sites(serialized_cells: Array) -> void:
+	if serialized_cells.is_empty():
+		return
+
+	_ruin_sites.clear()
+	for value: Variant in serialized_cells:
+		var text: String = str(value)
+		var parts: PackedStringArray = text.split(",")
+		if parts.size() != 2:
+			continue
+		var cell := Vector2i(int(parts[0]), int(parts[1]))
+		_ruin_sites[cell] = true
 
 #static position helpers
 static func position_to_cell(_position: Vector2) -> Vector2i:

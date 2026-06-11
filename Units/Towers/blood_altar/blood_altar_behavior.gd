@@ -58,14 +58,12 @@ func _damage_adjacent_structures(attack_id: int, attack_context: AttackComponent
 		if not _can_damage_structure(adjacent_tower):
 			continue
 
-		var health_before: float = adjacent_tower.health_component.health
 		var structure_hit: HitData = _create_structure_hit(adjacent_tower, attack_id, attack_context)
 		if not is_instance_valid(structure_hit):
 			continue
 
 		adjacent_tower.take_hit(structure_hit)
-		if adjacent_tower.health_component.health < health_before:
-			damaged_structure_positions.append(adjacent_tower.global_position)
+		damaged_structure_positions.append(adjacent_tower.global_position)
 
 	return damaged_structure_positions
 
@@ -104,8 +102,8 @@ func _create_structure_hit(target: Tower, attack_id: int, attack_context: Attack
 func _fire_projectile(target: Unit, source_position: Vector2, attack_id: int, attack_context: AttackComponent.AttackLineageContext) -> void: ##fires one projectile that inherits the shared lineage stamp for this altar attack
 	var delivery_data: DeliveryData = attack_component.generate_delivery_data()
 	delivery_data.target = target
-	delivery_data.use_source_position_override = true
-	delivery_data.source_position = source_position
+	#delivery_data.use_source_position_override = true
+	#delivery_data.source_position = source_position
 	delivery_data.intercept_position = AttackComponent.predict_intercept_position(unit, target, delivery_data.projectile_speed)
 
 	var hit_data: HitData = attack_component.generate_hit_data(delivery_data)

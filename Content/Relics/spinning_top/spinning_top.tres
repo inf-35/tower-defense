@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="RelicData" format=3]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://ubyaif5hyw5"]
 
-[ext_resource type="Script" path="res://Content/Relics/spinning_top/spinning_top_effect.gd" id="1_tgxg4"]
-[ext_resource type="Script" path="res://Content/Relics/_relic_data.gd" id="2_j64i1"]
-[ext_resource type="Texture2D" path="res://Assets/rite_wheel.png" id="3_x6e6j"]
+[ext_resource type="Script" uid="uid://c6odv1w0fx868" path="res://Content/Relics/spinning_top/spinning_top_effect.gd" id="1_tgxg4"]
+[ext_resource type="Texture2D" uid="uid://bo7j6o0jfkwa1" path="res://Assets/spinning_top.png" id="2_hpssc"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_j64i1"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_n0pyr"]
 
 [sub_resource type="Resource" id="Resource_5v2kd"]
 script = ExtResource("1_tgxg4")
+damage_bonus_per_attack = 0.04
 schedule = 1
 
 [resource]
@@ -13,5 +15,5 @@ script = ExtResource("2_j64i1")
 type = 33
 global_effect = SubResource("Resource_5v2kd")
 title = "Spinning Top"
-description = "Whenever a tower attacks, it gains +8% {UNIT_DAMAGE} until the end of the wave."
-icon = ExtResource("3_x6e6j")
+description = "Whenever a tower attacks, it gains +4% {UNIT_DAMAGE} until the end of the wave."
+icon = ExtResource("2_hpssc")

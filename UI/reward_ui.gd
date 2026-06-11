@@ -5,6 +5,7 @@ class_name RewardPanel
 @export var card_list: VBoxContainer ##the container where cards are spawned
 @export var card_scene: PackedScene ##must contain rewardoptioncard script
 @export var reroll_button: Button
+@export var title_label: InteractiveRichTextLabel ##shared title text driven by RewardService for each reward source
 
 var active_cards: Array[RewardOptionCard] = []
 
@@ -28,6 +29,8 @@ func _present_options(choices: Array[Reward]) -> void:
 	_clear_options()
 
 	visible = true
+	reroll_button.visible = RewardService.current_reroll_enabled
+	title_label.set_parsed_text(RewardService.current_choice_title)
 
 	for i: int in choices.size():
 		var reward_data: Reward = choices[i]

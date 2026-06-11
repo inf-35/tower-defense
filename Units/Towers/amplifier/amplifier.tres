@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://uenttfgkleio"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://uenttfgkleio"]
 
 [ext_resource type="Texture2D" uid="uid://msgb740b4isk" path="res://Assets/workshop.png" id="1_7qglk"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_y5gus"]
@@ -15,7 +15,7 @@ cost = 6.0
 required_capacity = 0.8
 element = 5
 tower_name = "Workshop"
-tower_description = "Adjacent towers attack 40% {UNIT_HITRATE|label=Faster} (stacks)."
+tower_description = "Adjacent towers attack with 33% more {UNIT_DAMAGE} (stacks)."
 icon = ExtResource("1_7qglk")
 preview = ExtResource("5_7qglk")
 tower_scene = ExtResource("2_12f5q")

@@ -8,6 +8,7 @@ signal hp_changed(new_health: float)
 signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
+signal tower_placed(tower_type: Towers.Type, tower: Tower) ##fires only after a tower placement request succeeds and the runtime tower exists
 
 signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
 #and relevant towers
@@ -59,12 +60,14 @@ enum TutorialFlag {
 	MAIN,
 	TROLL,
 	TOWER_DESTROYED,
+	RUINS,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
 	TutorialFlag.MAIN: false,
 	TutorialFlag.TROLL: false,
 	TutorialFlag.TOWER_DESTROYED: false,
+	TutorialFlag.RUINS: false,
 }
 
 #various services (which are children of this node)
@@ -138,21 +141,28 @@ func begin_new_game() -> void:
 		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
 		Towers.Type.GENERATOR: true,
-		Towers.Type.POISON: true,
-		Towers.Type.FROST_TOWER: true,
 	}
 
-	var reward := Reward.new()
+	#var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_GLASS
+	#reward.rite_type = Towers.Type.RITE_SALT
 	#RewardService.apply_reward(reward)
 	#reward.rite_type = Towers.Type.RITE_SACRIFICE
 	#RewardService.apply_reward(reward)
 	#reward.type = Reward.Type.ADD_RELIC
+	##reward.relic = Relics.EPIDEMIC
+	##RewardService.apply_reward(reward)
+	#reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
+	#RewardService.apply_reward(reward)
+	#reward.relic = Relics.ALCHEMISTS_STONE
+	#RewardService.apply_reward(reward)
+	##reward.relic = Relics.SPINNING_TOP
+	##RewardService.apply_reward(reward)
 	#reward.relic = Relics.EPIDEMIC
 	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.RUPTURED_HEART
 	#RewardService.apply_reward(reward)
+
 
 	flux = 30.0
 	hp = 20.0
@@ -281,6 +291,9 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 	#3. if the island confirms placement, deduct resources.
 	if success:
 		Audio.play_sound(ID.Sounds.TOWER_PLACED_SOUND, 0.0, Island.cell_to_position(cell))
+		var placed_tower: Tower = Run.references.island.get_tower_on_tile(cell)
+		if is_instance_valid(placed_tower):
+			tower_placed.emit(tower_type, placed_tower)
 
 		if Towers.is_tower_rite(tower_type):
 			self.add_rite(tower_type, -1)

@@ -316,6 +316,8 @@ func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
 
 	if _is_uncharted_lake_cell(island, cell):
 		return "Uncharted Water\n(Blocks building and movement once revealed)"
+	if island.has_ruin_site(cell):
+		return "Uncharted {T_RUINS}\n(Search it for one reward once uncovered)"
 
 	return "Uncharted"
 

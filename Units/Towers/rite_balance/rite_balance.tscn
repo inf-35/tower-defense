@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://Content/stat_display_info.gd" id="2_3tlyq"]
 [ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="3_ocp3w"]
 [ext_resource type="Script" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="4_e31o4"]
-[ext_resource type="Script" path="res://Units/Towers/rite_scales/scales_rite_effect.gd" id="5_c4gr8"]
+[ext_resource type="Script" path="res://Units/Towers/rite_balance/balance_rite_effect.gd" id="5_c4gr8"]
 [ext_resource type="Script" path="res://Content/attack_data.gd" id="6_n8msu"]
 [ext_resource type="Script" path="res://Content/vfx_info.gd" id="7_ee5lu"]
 [ext_resource type="Texture2D" path="res://Assets/magic_missile.png" id="8_i5fy8"]
@@ -12,7 +12,7 @@
 [ext_resource type="Resource" path="res://Content/Movement/immobile_mvmt.tres" id="10_qn8yx"]
 [ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="11_xsfg1"]
 [ext_resource type="Script" path="res://Content/health_data.gd" id="12_h4lng"]
-[ext_resource type="Texture2D" path="res://Assets/rite_blood.png" id="13_6teme"]
+[ext_resource type="Texture2D" path="res://Assets/rite_balance_icon.png" id="13_6teme"]
 [ext_resource type="Script" path="res://UnitComponents/shadow_component.gd" id="14_gukjm"]
 [ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="15_48cg8"]
 
@@ -41,7 +41,7 @@ max_health = 20.0
 regeneration = null
 regen_percent = null
 
-[node name="RiteScales" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="RiteBalance" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_wqvmb")
 type = 67

@@ -23,6 +23,7 @@ func setup_from_info(info: VFXInfo, radius: float, cone_angle_deg: float = 360.0
 	_base_color = info.aoe_particle_color
 	_lifetime = info.aoe_particle_lifetime
 	_particles = _generate_particles(info, radius, cone_angle_deg, aim_direction)
+	z_as_relative = false
 	z_index = info.graphical_layer
 	_age = 0.0
 	set_process(true)

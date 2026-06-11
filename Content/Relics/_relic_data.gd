@@ -51,6 +51,7 @@ enum Type {
 	WEREGILD,
 	EPIDEMIC,
 	RUPTURED_HEART,
+	SAPPHIRE_IDOL,
 }
 
 @export var type: Type

@@ -4,6 +4,7 @@ class_name CommandPostBehavior
 @export var suppression_modifier: ModifierDataPrototype
 @export var attacks_required: int = 1
 @export var max_commands_per_second: float = 3.0
+@export var command_beam_vfx: VFXInfo ##authored pulse beam settings used when this outpost forces its linked tower to attack
 
 var _target_tower: Tower = null
 var _target_suppression_modifier: Modifier
@@ -94,7 +95,7 @@ func _release_target() -> void:
 	_target_tower = null
 	_last_trigger_hit = null
 
-func _command_target_to_fire() -> void:
+func _command_target_to_fire() -> void: ##forces the linked tower to fire and briefly pulses the support beam so the trigger reads in-world
 	if not is_instance_valid(_target_tower) or not is_instance_valid(_target_tower.attack_component): return
 	if not _can_command:
 		return
@@ -102,6 +103,7 @@ func _command_target_to_fire() -> void:
 	if is_instance_valid(_last_trigger_hit):
 		_target_tower.attack_component.queue_next_attack_context(_last_trigger_hit, self)
 	_target_tower.attack_component.current_cooldown = 0.0
+	VFXManager.play_swirl_line_info(command_beam_vfx, unit.global_position, _target_tower.global_position)
 
 	if is_instance_valid(animation_player):
 		_play_animation(&"cast")

@@ -16,7 +16,7 @@
 [sub_resource type="Resource" id="Resource_ph75r"]
 resource_name = "liberty_effect"
 script = ExtResource("4_ph75r")
-fire_rate_bonus_per_empty = 0.333
+fire_rate_bonus_per_empty = 0.25
 schedule = 0
 metadata/_custom_type_script = "uid://benhmk7lyo4r0"
 

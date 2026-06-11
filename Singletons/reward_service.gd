@@ -5,6 +5,7 @@ signal reward_process_complete
 
 #--- configuration ---
 const REWARD_DIRECTORY: String = "res://Content/Rewards/"
+const DEFAULT_CHOICE_TITLE: String = "Choose a reward"
 
 #populated automatically at startup
 var reward_pool: Array[Reward] = []
@@ -19,6 +20,10 @@ var rerolls_this_phase: int = 0:
 
 var _last_choice_count: int
 var _last_type_filter: Array[Reward.Type]
+var current_choice_title: String = DEFAULT_CHOICE_TITLE
+var current_reroll_enabled: bool = true
+var _current_choice_config: RewardChoiceConfig
+var _owns_choice_signal: bool = false
 
 func _ready() -> void:
 	_load_all_rewards()
@@ -68,57 +73,29 @@ func _scan_directory_recursive(path: String) -> void:
 
 	dir.list_dir_end()
 
-func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.Type] = []) -> void:
-	var rewards: Array[Reward] = get_rewards(choice_count, type_filter)
+func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.Type] = []) -> bool: ##uses the global reward pool to roll a standard choice screen
+	var config := RewardChoiceConfig.new()
+	config.choice_count = choice_count
+	config.type_filter = type_filter
+	config.allow_reroll = true
+	config.include_global_pool = true
+	return _present_rewards_from_config(config, false)
 
-	for i: int in len(rewards):
-		_current_reward_options_by_id[i] = rewards[i]
+func generate_and_present_configured_choices(config: RewardChoiceConfig) -> bool: ##uses an authored config and lets RewardService own the reward selection flow directly
+	return _present_rewards_from_config(config, true)
 
-	is_choosing_reward = true
-
-	_last_choice_count = choice_count
-	_last_type_filter = type_filter
-	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
-
-func reroll() -> void:
-	generate_and_present_choices(_last_choice_count, _last_type_filter)
+func reroll() -> void: ##re-rolls the most recently presented reward config
+	if not is_instance_valid(_current_choice_config):
+		return
+	if not _present_rewards_from_config(_current_choice_config, _owns_choice_signal):
+		return
 	rerolls_this_phase += 1
 
-func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Array[Reward]:
-	var rewards: Array[Reward] = []
+func get_rewards(choice_count: int, type_filter: Array[Reward.Type] = []) -> Array[Reward]: ##rolls rewards from the global reward pool, optionally constrained by reward type
+	return get_rewards_from_candidates(choice_count, _build_global_candidates(type_filter))
 
-	var candidates: Array[Reward] = []
-	var weights: Array[float] = []
-	var total_weight: float = 0.0
-
-	#loop through all loaded rewards
-	for reward: Reward in reward_pool:
-		#filter by requested type
-		if (not type_filter.is_empty()) and (not type_filter.has(reward.type)):
-			continue
-		if _player_already_has_reward(reward):
-			continue
-
-		var weight: float = _calculate_reward_weight(reward)
-
-		if weight > 0.0:
-			candidates.append(reward)
-			weights.append(weight)
-			total_weight += weight
-
-	for i: int in choice_count:
-		if total_weight <= 0: break
-
-		var chosen_index: int = _pick_weighted_index(weights, total_weight)
-		var chosen_reward: Reward = candidates[chosen_index]
-
-		rewards.append(chosen_reward)
-		#remove from pool to prevent duplicates in the same choice screen
-		total_weight -= weights[chosen_index]
-		candidates.remove_at(chosen_index)
-		weights.remove_at(chosen_index)
-
-	return rewards
+func get_rewards_from_candidates(choice_count: int, candidate_rewards: Array[Reward]) -> Array[Reward]: ##rolls rewards from an arbitrary candidate pool while preserving the normal ownership and weighting rules
+	return _roll_rewards(candidate_rewards, choice_count)
 
 func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 	return reward_pool.filter(func(reward: Reward): return reward.type == type_filter)
@@ -173,6 +150,7 @@ func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
 func select_reward(choice_id: int) -> void: #concludes reward phase
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
+		_disconnect_owned_choice_signal()
 		reward_process_complete.emit()
 		return
 
@@ -182,6 +160,10 @@ func select_reward(choice_id: int) -> void: #concludes reward phase
 	_current_reward_options_by_id.clear()
 	is_choosing_reward = false
 	rerolls_this_phase = 0
+	current_choice_title = DEFAULT_CHOICE_TITLE
+	current_reroll_enabled = true
+	_current_choice_config = null
+	_disconnect_owned_choice_signal()
 
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
@@ -205,3 +187,94 @@ func apply_reward(reward: Reward) -> void:
 		Reward.Type.ADD_RITE:
 			var rite_type: Towers.Type = reward.rite_type
 			Run.player.add_rite(rite_type, 1)
+
+func _present_rewards_from_config(config: RewardChoiceConfig, owns_choice_signal: bool) -> bool:
+	if not is_instance_valid(config):
+		return false
+
+	var rewards: Array[Reward] = _roll_rewards(_build_reward_candidates(config), config.choice_count)
+	if rewards.is_empty():
+		return false
+
+	_current_reward_options_by_id.clear()
+	for i: int in range(rewards.size()):
+		_current_reward_options_by_id[i] = rewards[i]
+
+	is_choosing_reward = true
+	_last_choice_count = config.choice_count
+	_last_type_filter = config.type_filter
+	current_choice_title = config.title if config.title != "" else DEFAULT_CHOICE_TITLE
+	current_reroll_enabled = config.allow_reroll
+	_current_choice_config = config
+	_owns_choice_signal = owns_choice_signal
+
+	if owns_choice_signal and not UI.choice_selected.is_connected(_on_owned_choice_selected):
+		UI.choice_selected.connect(_on_owned_choice_selected)
+
+	UI.display_reward_choices.emit(_current_reward_options_by_id.values())
+	return true
+
+func _build_reward_candidates(config: RewardChoiceConfig) -> Array[Reward]:
+	var candidates: Array[Reward] = []
+
+	if config.include_global_pool:
+		candidates.append_array(_build_global_candidates(config.type_filter))
+
+	for candidate: Reward in config.candidate_rewards:
+		if not is_instance_valid(candidate):
+			continue
+		candidates.append(candidate.duplicate_deep())
+
+	return candidates
+
+func _build_global_candidates(type_filter: Array[Reward.Type]) -> Array[Reward]:
+	var candidates: Array[Reward] = []
+	for reward: Reward in reward_pool:
+		if (not type_filter.is_empty()) and (not type_filter.has(reward.type)):
+			continue
+		candidates.append(reward)
+	return candidates
+
+func _roll_rewards(candidate_rewards: Array[Reward], choice_count: int) -> Array[Reward]:
+	var rewards: Array[Reward] = []
+	var candidates: Array[Reward] = []
+	var weights: Array[float] = []
+	var total_weight: float = 0.0
+
+	for reward: Reward in candidate_rewards:
+		if not is_instance_valid(reward):
+			continue
+		if _player_already_has_reward(reward):
+			continue
+
+		var weight: float = _calculate_reward_weight(reward)
+		if weight <= 0.0:
+			continue
+
+		candidates.append(reward)
+		weights.append(weight)
+		total_weight += weight
+
+	for _index: int in range(choice_count):
+		if total_weight <= 0.0:
+			break
+
+		var chosen_index: int = _pick_weighted_index(weights, total_weight)
+		rewards.append(candidates[chosen_index])
+		total_weight -= weights[chosen_index]
+		candidates.remove_at(chosen_index)
+		weights.remove_at(chosen_index)
+
+	return rewards
+
+func _on_owned_choice_selected(choice_id: int) -> void:
+	if not _owns_choice_signal:
+		return
+	if not is_choosing_reward:
+		return
+	select_reward(choice_id)
+
+func _disconnect_owned_choice_signal() -> void:
+	if _owns_choice_signal and UI.choice_selected.is_connected(_on_owned_choice_selected):
+		UI.choice_selected.disconnect(_on_owned_choice_selected)
+	_owns_choice_signal = false

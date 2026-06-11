@@ -3,13 +3,34 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_60vy2"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_uqjfa"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="2_j4lpn"]
-[ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="3_8bifx"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_jwymb"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_jwymb"]
+[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="6_jwymb"]
+
+[sub_resource type="Resource" id="Resource_jwymb"]
+script = ExtResource("3_jwymb")
+type = 5
+cooldown = 1.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_oxvma"]
+script = ExtResource("2_j4lpn")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.9098039, 0.24313726, 0.24313726, 0.44)
+aoe_particles_per_cell = 5.25
+aoe_particle_lifetime = 0.36
+aoe_particle_scale_min = 0.46
+aoe_particle_scale_max = 0.88
+aoe_particle_spin_speed_min = -65.0
+aoe_particle_spin_speed_max = 65.0
+aoe_particle_drift_speed_min = 8.0
+aoe_particle_drift_speed_max = 22.0
+aoe_particle_drift_angle_noise_deg = 24.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [sub_resource type="Resource" id="Resource_t0kqn"]
 script = ExtResource("2_j4lpn")
-texture = ExtResource("3_8bifx")
+texture = ExtResource("6_jwymb")
 radius = 2.0
 scale = 0.1
 rotation_mode = 1
@@ -18,7 +39,10 @@ rotation_mode = 1
 script = ExtResource("1_uqjfa")
 delivery_method = 1
 range = 25.0
-damage = 1.5
+radius = 4.0
+damage = 1.0
 breaking = true
+status_effects = Array[ExtResource("3_jwymb")]([SubResource("Resource_jwymb")])
 vfx_on_spawn = SubResource("Resource_t0kqn")
+vfx_on_impact = SubResource("Resource_oxvma")
 projectile_speed = 80.0

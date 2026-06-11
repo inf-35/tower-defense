@@ -10,6 +10,7 @@ const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
 const FRONTIER_EVENING_BIAS: float = 0.75
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
+const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
 class TerrainGenRule extends Resource:
@@ -353,7 +354,18 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 				if candidate_cells.has(target_cell): candidate_cells.erase(target_cell)
 			placed_features += 1
 
+	_place_forced_ruins(island, block_data)
+
 	return block_data
+
+func _place_forced_ruins(island: Island, block_data: Dictionary[Vector2i, Terrain.CellData]) -> void: ##forces pregenerated ruin sites into any generated block that reaches them
+	for cell: Vector2i in block_data:
+		if not island.has_ruin_site(cell):
+			continue
+
+		block_data[cell].terrain = Terrain.Base.EARTH
+		block_data[cell].feature = Towers.Type.RUINS
+		block_data[cell].initial_state = {&"_ruins_data": DEFAULT_RUINS_DATA}
 
 func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary: ##wrapper for _grow_expansion_from_start, quality control (number of tiles of each type, size)
 	var best_result: Dictionary = {"land": [], "water": []}

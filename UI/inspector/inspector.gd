@@ -259,6 +259,19 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 				btn.text += " (%.2f)" % sell_value
 				btn.pressed.connect(UI.sell_tower_requested.emit.bind(tower))
 
+		InspectorAction.ActionType.CUSTOM:
+			if action.custom_signal_key == &"":
+				is_disabled = true
+			btn.pressed.connect(func():
+				if not is_instance_valid(tower):
+					return
+				if not is_instance_valid(tower.behavior):
+					return
+				if not tower.behavior.has_method(&"on_inspector_action"):
+					return
+				tower.behavior.on_inspector_action(action.custom_signal_key)
+			)
+
 	btn.disabled = is_disabled
 
 func _on_inspected_tower_health_update(unit: Unit, max_hp : float, hp : float) -> void:

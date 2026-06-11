@@ -56,7 +56,7 @@ func _find_target(origin_unit: Unit) -> Unit:
 
 	candidates.shuffle()
 	for candidate: Unit in candidates:
-		if is_instance_valid(candidate) and is_instance_valid(candidate.health_component):
+		if _is_valid_target(candidate):
 			return candidate
 
 	return null
@@ -85,11 +85,16 @@ func _fire_projectile(instance: EffectInstance, origin_unit: Unit, target: Unit,
 		CombatManager.resolve_hit(hit_data, delivery_data)
 
 func _get_status_stacks(unit: Unit, status: Attributes.Status) -> float:
-	if not unit.modifiers_component._status_effects.has(status):
+	if not is_instance_valid(unit) or not is_instance_valid(unit.modifiers_component):
 		return 0.0
 
-	var status_effect: StatusEffect = unit.modifiers_component._status_effects[status]
-	return status_effect.stack
+	return unit.modifiers_component.get_status_count(status)
 
 func _get_effect_stacks(instance: EffectInstance) -> int:
 	return maxi(instance.stacks, 1)
+
+func _is_valid_target(candidate: Unit) -> bool: ##keeps epidemic focused on fresh hosts so one poisoned enemy does not keep recirculating poison into another
+	if not is_instance_valid(candidate) or not is_instance_valid(candidate.health_component):
+		return false
+
+	return _get_status_stacks(candidate, poison_status) <= 0.0

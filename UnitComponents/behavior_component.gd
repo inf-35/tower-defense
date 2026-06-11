@@ -81,6 +81,9 @@ func update(delta: float) -> void: ##main update loop; delta is already game del
 func get_display_data() -> Dictionary:
 	return {} #return an empty dictionary by default
 
+func on_inspector_action(_action_key: StringName) -> void: ##optional hook for authored inspector custom actions like ruins search buttons
+	pass
+
 func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 	var tower: Tower = unit as Tower
 	if not tower.get_stat(Attributes.id.RANGE):

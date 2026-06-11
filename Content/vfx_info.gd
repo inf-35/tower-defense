@@ -34,6 +34,17 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var line_width: float = 3.0
 @export var line_length: float = 20.0
 
+@export_group("Swirl Line")
+@export var swirl_particle_texture: Texture2D = preload("res://Assets/particle_whirl.png") ##sprite used by authored swirl-line effects when no bespoke texture is supplied
+@export var swirl_color: Color = Color(1.0, 1.0, 1.0, 0.35) ##base tint and opacity applied to every swirl particle before lifetime fade
+@export var swirl_width: float = 10.0 ##world-space beam thickness used when sampling lateral offsets around the line segment
+@export var swirl_particles_per_tile: float = 2.0 ##density budget measured against island cell length so longer links naturally receive more particles
+@export var swirl_scale_min: float = 0.45 ##minimum per-particle sprite scale for the authored line effect
+@export var swirl_scale_max: float = 0.85 ##maximum per-particle sprite scale for the authored line effect
+@export var swirl_drift_speed_min: float = 4.0 ##minimum particle drift speed after spawn so the line can feel soft or energetic
+@export var swirl_drift_speed_max: float = 12.0 ##maximum particle drift speed after spawn so the line can feel soft or energetic
+@export var swirl_drift_angle_noise_deg: float = 35.0 ##random angular wobble applied to particle drift so the line does not collapse into a rigid laser
+
 @export_group("Aoe Particles")
 @export var aoe_particles_enabled: bool = false ##when true, aoe-capable attacks can stamp a dense particle field across their affected shape
 @export var aoe_particle_texture: Texture2D = preload("res://Assets/particle_whirl.png") ##base sprite used for each particle in the aoe field

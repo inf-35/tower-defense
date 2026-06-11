@@ -4,7 +4,9 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_kkahb"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_qfl1w"]
 [ext_resource type="Script" uid="uid://d3t7jmfgpyrle" path="res://Units/Towers/watchtower/watchtower_behavior.gd" id="4_kkahb"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="5_f60pv"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_bduef"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="6_xjxg0"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_qmgf2"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_dkcg7"]
 [ext_resource type="Texture2D" uid="uid://rr4mh5ivom5u" path="res://Assets/watchtower_floor.png" id="9_qfl1w"]
@@ -13,6 +15,18 @@
 [ext_resource type="Texture2D" uid="uid://de3dgvvh1lqjx" path="res://Assets/watchtower_decor.png" id="11_f5ll1"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_d6e4w"]
 [ext_resource type="Texture2D" uid="uid://c6gsq57rd3y8o" path="res://Assets/watchtower_roof.png" id="12_f60pv"]
+
+[sub_resource type="Resource" id="Resource_beam_vfx"]
+script = ExtResource("6_xjxg0")
+swirl_color = Color(1, 0.825, 0.65, 0.79607844)
+swirl_width = 4.0
+swirl_particles_per_tile = 1.5
+swirl_scale_max = 0.9
+swirl_drift_speed_min = 2.0
+swirl_drift_speed_max = 4.0
+swirl_drift_angle_noise_deg = 20.0
+lifetime = 0.4
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [node name="Watchtower" type="Node2D" unique_id=530628292 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
@@ -30,6 +44,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 script = ExtResource("4_kkahb")
 buff_per_tile = 10.0
 base_buff = 10.0
+beam_vfx = SubResource("Resource_beam_vfx")
 metadata/_custom_type_script = "uid://d3t7jmfgpyrle"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1448418258]

@@ -69,10 +69,11 @@ enum Type {
 	RESONATOR,
 	BLOOD_ALTAR,
 	SOUL_LINK,
-	RITE_SCALES,
+	RITE_BALANCE,
 	RITE_OBSIDIAN,
 	RITE_GLASS,
 	RITE_SALT,
+	RUINS,
 }
 
 enum Element {
@@ -153,7 +154,7 @@ func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT t
 						else tower_stats[tower_type].cost_scaling_override
 	var final_cost: float = base_cost * pow(scaling, current_count)
 
-	return snappedf(final_cost, TOWER_COST_INCREMENT)
+	return snappedf(base_cost, TOWER_COST_INCREMENT)
 
 func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund value for selling one tower of this type right now (cost of last tower built)
 	if not tower_stats.has(tower_type):

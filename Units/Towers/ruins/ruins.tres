@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/wall.png" id="1_1"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/search_ruins.tres" id="2_2"]
+[ext_resource type="Script" path="res://Content/tower_data.gd" id="3_3"]
+[ext_resource type="PackedScene" path="res://Units/Towers/ruins/ruins.tscn" id="4_4"]
+[ext_resource type="Resource" path="res://Content/InspectorActions/default_clear.tres" id="5_5"]
+
+[resource]
+script = ExtResource("3_3")
+target_type_name = "RUINS"
+id = 70
+cost = 0.0
+required_capacity = 0.0
+element = 5
+is_environmental = true
+tower_name = "Ruins"
+tower_description = "Collapsed ruins. Search them to choose one reward."
+icon = ExtResource("1_1")
+preview = ExtResource("1_1")
+inspector_actions = Array[ExtResource("2_2")]([ExtResource("2_2"), ExtResource("5_5")])
+tower_scene = ExtResource("4_4")

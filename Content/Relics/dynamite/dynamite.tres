@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_bng1e"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5kivb"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_ww8l2"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_hq7m0"]
 [ext_resource type="Texture2D" uid="uid://cfufr2y0oau2c" path="res://Assets/dynamite_icon.png" id="5_5kivb"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="6_fhrps"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="6_ww8l2"]
@@ -14,11 +15,27 @@ type = 6
 cooldown = 1.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
+[sub_resource type="Resource" id="Resource_hk3e9"]
+script = ExtResource("4_hq7m0")
+aoe_particles_enabled = true
+aoe_particle_color = Color(1, 0.85490197, 0.47058824, 0.4)
+aoe_particles_per_cell = 5.0
+aoe_particle_lifetime = 0.32
+aoe_particle_scale_min = 0.45
+aoe_particle_scale_max = 0.9
+aoe_particle_spin_speed_min = -50.0
+aoe_particle_spin_speed_max = 50.0
+aoe_particle_drift_speed_min = 10.0
+aoe_particle_drift_speed_max = 26.0
+aoe_particle_drift_angle_noise_deg = 28.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
 [sub_resource type="Resource" id="Resource_vdoi0"]
 script = ExtResource("2_5kivb")
 delivery_method = 3
 radius = 18.0
 status_effects = Array[ExtResource("3_ww8l2")]([SubResource("Resource_0hwag")])
+vfx_on_spawn = SubResource("Resource_hk3e9")
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 

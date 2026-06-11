@@ -6,6 +6,7 @@ class_name SidebarUI
 @export var trade_button: Button
 
 var tower_option_prototype: PackedScene = preload("res://UI/tower_option.tscn")
+var _tutorial_start_wave_locked: bool = false
 
 func _ready() -> void:
 	#initial population and updates are handled by connecting to the signal.
@@ -18,7 +19,7 @@ func _ready() -> void:
 
 	UI.show_building_ui.connect(func():
 		start_wave_button.text = "Start Wave" #more descriptive
-		start_wave_button.disabled = false
+		_update_start_wave_button_state()
 	)
 	UI.hide_building_ui.connect(func():
 		start_wave_button.text = "Wave in Progress" #more descriptive
@@ -27,6 +28,10 @@ func _ready() -> void:
 
 	start_wave_button.pressed.connect(func():
 		UI.building_phase_ended.emit()
+	)
+	UI.tutorial_manager.start_wave_lock_changed.connect(func(locked: bool):
+		_tutorial_start_wave_locked = locked
+		_update_start_wave_button_state()
 	)
 
 	trade_button.pressed.connect(func():
@@ -42,6 +47,11 @@ func _ready() -> void:
 		_clear_towers_bar() #ensure it's empty if no towerss initially
 
 	UI.tutorial_manager.register_element(TutorialStep.Reference.START_WAVE_BUTTON, start_wave_button)
+
+func _update_start_wave_button_state() -> void:
+	if start_wave_button.text != "Start Wave":
+		return
+	start_wave_button.disabled = _tutorial_start_wave_locked
 
 
 func _clear_towers_bar() -> void:

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dk2lelo6y7a7j"]
 
-[ext_resource type="Texture2D" uid="uid://bosvsns7pfcwu" path="res://Assets/rite_blood.png" id="1_ux0rt"]
+[ext_resource type="Texture2D" path="res://Assets/rite_salt_icon.png" id="1_ux0rt"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_5j0f6"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_nnthe"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_n0i0m"]

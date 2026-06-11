@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardChoiceConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Content/reward_choice_config.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+title = "Search the ruins"
+choice_count = 3
+include_global_pool = true
+type_filter = Array[int]([0, 1, 2, 3])

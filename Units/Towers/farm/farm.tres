@@ -10,7 +10,7 @@
 [resource]
 script = ExtResource("5_mtsrh")
 id = 53
-cost = 3.5
+cost = 3.2
 cost_scaling_override = 1.04
 required_capacity = 0.5
 element = 5

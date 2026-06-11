@@ -104,7 +104,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"STATUS": {
 		"title": "Status",
 		"display": "Status",
-		"description": "A temporary modifier that affects a unit or tower's stats. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
+		"description": "A temporary modifier that affects a unit or tower's stats i.e. {BLEED} or {POISON}. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
 		"icon": null,
 	},
 	"STATUS_EFFECT_LABEL": {

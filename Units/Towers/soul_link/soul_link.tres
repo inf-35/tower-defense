@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="TowerData" format=3]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://d3p6gdyumbm4e"]
 
-[ext_resource type="Texture2D" path="res://Assets/mage_provisional.png" id="1_7bchs"]
-[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_84niy"]
-[ext_resource type="PackedScene" path="res://Units/Towers/soul_link/soul_link.tscn" id="3_ocoj4"]
+[ext_resource type="Texture2D" uid="uid://ccanrpi2mb0c1" path="res://Assets/soul_link.png" id="1_sdqo4"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_84niy"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_qqcmk"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_em013"]
+[ext_resource type="PackedScene" uid="uid://b7n6wwi314850" path="res://Units/Towers/soul_link/soul_link.tscn" id="3_ocoj4"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_k5027"]
 
 [resource]
 script = ExtResource("2_84niy")
@@ -13,6 +16,6 @@ required_capacity = 0.8
 element = 5
 tower_name = "Soul Link"
 tower_description = "Faces a protected tower. Hits on that forward tower are negated and transferred to the tower behind Soul Link while the link is active."
-icon = ExtResource("1_7bchs")
-preview = ExtResource("1_7bchs")
+icon = ExtResource("1_sdqo4")
+preview = ExtResource("1_sdqo4")
 tower_scene = ExtResource("3_ocoj4")

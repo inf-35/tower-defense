@@ -3,12 +3,28 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_hjdhm"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_34tis"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_c8vvd"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_c8vvd"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_u6j7g"]
 
 [sub_resource type="Resource" id="Resource_h67ia"]
 script = ExtResource("3_c8vvd")
 stack = 2.0
 cooldown = 2.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_jxw76"]
+script = ExtResource("4_u6j7g")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.6666667, 0.92941177, 1, 0.42)
+aoe_particles_per_cell = 5.25
+aoe_particle_lifetime = 0.5
+aoe_particle_scale_min = 0.48
+aoe_particle_scale_max = 0.92
+aoe_particle_spin_speed_min = -65.0
+aoe_particle_spin_speed_max = 65.0
+aoe_particle_drift_speed_max = 16.0
+aoe_particle_drift_angle_noise_deg = 18.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
 script = ExtResource("2_34tis")
@@ -17,5 +33,6 @@ range = 18.0
 radius = 18.0
 damage = 0.5
 status_effects = Array[ExtResource("3_c8vvd")]([SubResource("Resource_h67ia")])
+vfx_on_spawn = SubResource("Resource_jxw76")
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

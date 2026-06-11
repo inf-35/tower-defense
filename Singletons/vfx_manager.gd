@@ -61,7 +61,7 @@ func _draw_vfx() -> void:
 		match info.vfx_type:
 			VFXInfo.VFXType.TEXTURE:
 				if not is_instance_valid(info.texture):
-					return #abort
+					continue #abort
 				transform = transform.scaled(vfx.scale * current_scale_val)
 
 				var frame := int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
@@ -142,6 +142,134 @@ func play_aoe_field(info: VFXInfo, position: Vector2, radius: float, cone_angle_
 	field.setup_from_info(info, radius, cone_angle_deg, aim_direction)
 	return field
 
+func play_swirl_line(
+	start_position: Vector2,
+	end_position: Vector2,
+	color: Color,
+	width: float = 10.0,
+	lifetime: float = 0.35,
+	particles_per_tile: float = 2.0,
+	scale_min: float = 0.45,
+	scale_max: float = 0.85,
+	drift_speed_min: float = 4.0,
+	drift_speed_max: float = 12.0,
+	drift_angle_noise_deg: float = 35.0,
+	graphical_layer: int = Layers.ALLIED_PROJECTILES
+) -> SwirlLineVFX: ##spawns a short-lived swirl-particle line with one compact call so support links can telegraph themselves without bespoke scene setup
+	if start_position.is_equal_approx(end_position):
+		return null
+
+	var line := SwirlLineVFX.new()
+	line.z_index = graphical_layer
+	line.z_as_relative = false
+
+	var parent: Node = Run.references.projectiles if is_instance_valid(Run.references.projectiles) else Run.references.island
+	if not is_instance_valid(parent):
+		parent = self
+
+	parent.add_child(line)
+	line.global_position = Vector2.ZERO
+	line.configure(
+		start_position,
+		end_position,
+		color,
+		width,
+		lifetime,
+		particles_per_tile,
+		scale_min,
+		scale_max,
+		drift_speed_min,
+		drift_speed_max,
+		drift_angle_noise_deg
+	)
+	return line
+
+func play_swirl_line_info(info: VFXInfo, start_position: Vector2, end_position: Vector2) -> SwirlLineVFX: ##spawns a pulse swirl line from one authored resource so behaviors do not have to inline beam tuning
+	if not is_instance_valid(info):
+		return null
+
+	var line: SwirlLineVFX = play_swirl_line(
+		start_position,
+		end_position,
+		info.swirl_color,
+		info.swirl_width,
+		info.lifetime,
+		info.swirl_particles_per_tile,
+		info.swirl_scale_min,
+		info.swirl_scale_max,
+		info.swirl_drift_speed_min,
+		info.swirl_drift_speed_max,
+		info.swirl_drift_angle_noise_deg,
+		info.graphical_layer
+	)
+	if is_instance_valid(line):
+		line.set_texture(info.swirl_particle_texture)
+	return line
+
+func create_swirl_beam(
+	start_position: Vector2,
+	end_position: Vector2,
+	color: Color,
+	width: float = 10.0,
+	particle_lifetime: float = 0.35,
+	particles_per_tile: float = 2.0,
+	scale_min: float = 0.45,
+	scale_max: float = 0.85,
+	drift_speed_min: float = 4.0,
+	drift_speed_max: float = 12.0,
+	drift_angle_noise_deg: float = 35.0,
+	graphical_layer: int = Layers.ALLIED_PROJECTILES
+) -> SwirlLineVFX: ##spawns a persistent diffuse swirl beam that the caller can keep repositioning while a link stays active
+	if start_position.is_equal_approx(end_position):
+		return null
+
+	var beam := SwirlLineVFX.new()
+	beam.z_index = graphical_layer
+	beam.z_as_relative = false
+
+	var parent: Node = Run.references.projectiles if is_instance_valid(Run.references.projectiles) else Run.references.island
+	if not is_instance_valid(parent):
+		parent = self
+
+	parent.add_child(beam)
+	beam.global_position = Vector2.ZERO
+	beam.configure_persistent(
+		start_position,
+		end_position,
+		color,
+		width,
+		particle_lifetime,
+		particles_per_tile,
+		scale_min,
+		scale_max,
+		drift_speed_min,
+		drift_speed_max,
+		drift_angle_noise_deg
+	)
+	return beam
+
+func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position: Vector2) -> SwirlLineVFX: ##spawns a persistent swirl beam from one authored resource so linked supports stay data-driven
+	if not is_instance_valid(info):
+		return null
+
+	var beam: SwirlLineVFX = create_swirl_beam(
+		start_position,
+		end_position,
+		info.swirl_color,
+		info.swirl_width,
+		info.lifetime,
+		info.swirl_particles_per_tile,
+		info.swirl_scale_min,
+		info.swirl_scale_max,
+		info.swirl_drift_speed_min,
+		info.swirl_drift_speed_max,
+		info.swirl_drift_angle_noise_deg,
+		info.graphical_layer
+	)
+	if is_instance_valid(beam):
+		beam.set_texture(info.swirl_particle_texture)
+	return beam
+
 func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vector2, host: Node2D) -> Node2D:
 	if not info.scene:
 		push_warning("VFX: ", host, " tried to create vfx without valid scene")
@@ -169,6 +297,7 @@ func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vect
 
 	#contract
 	instance.z_index = Layers.ALLIED_PROJECTILES
+	instance.z_as_relative = false
 	instance.global_position = pos
 	instance.scale = scale * 0.06
 	#setup

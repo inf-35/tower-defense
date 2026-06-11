@@ -10,20 +10,21 @@
 [ext_resource type="Script" uid="uid://ck5g2oyg3bfft" path="res://Units/Towers/rite_haste/haste_rite_effect.gd" id="6_blors"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_5ipgc"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_eu423"]
-[ext_resource type="Texture2D" uid="uid://5jvbyn2rc8yf" path="res://Assets/liberty_rite.png" id="9_g1coh"]
+[ext_resource type="Texture2D" uid="uid://d03qxat2xvlao" path="res://Assets/rite_haste_icon.png" id="9_g1coh"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_xgigw"]
+[ext_resource type="Texture2D" uid="uid://dcsdlu508opq5" path="res://Assets/rite_blank.png" id="11_blors"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_mua8a"]
 
 [sub_resource type="Resource" id="Resource_8djvc"]
 script = ExtResource("5_0diy1")
 attribute = 8
-multiplicative = 0.333
+multiplicative = 0.5
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_abxx4"]
 script = ExtResource("6_blors")
 buff_modifier = SubResource("Resource_8djvc")
-self_damage = 1.0
+self_damage = 0.5
 metadata/_custom_type_script = "uid://ck5g2oyg3bfft"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
@@ -123,12 +124,15 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1088437472]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("9_g1coh")
+texture = ExtResource("11_blors")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1522411435]
 script = ExtResource("10_xgigw")
 height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=95564864]
+texture = ExtResource("9_g1coh")
 
 [node name="ModifiersComponent" type="Node" parent="." unique_id=1549737217]
 script = ExtResource("11_mua8a")

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_qp08h"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_2aaqs"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_x1i2k"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_2lhg6"]
 [ext_resource type="Script" uid="uid://b3pxsdqsg7fgg" path="res://Content/Relics/contagion/status_inflict_causes_hit.gd" id="4_1xrdm"]
 [ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="5_x1i2k"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="6_1xrdm"]
@@ -14,11 +15,27 @@ type = 2
 cooldown = 1.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
+[sub_resource type="Resource" id="Resource_2lhg6"]
+script = ExtResource("4_2lhg6")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.65490198, 0.94901961, 0.42352942, 0.36)
+aoe_particles_per_cell = 4.75
+aoe_particle_lifetime = 0.34
+aoe_particle_scale_min = 0.42
+aoe_particle_scale_max = 0.84
+aoe_particle_spin_speed_min = -45.0
+aoe_particle_spin_speed_max = 45.0
+aoe_particle_drift_speed_min = 8.0
+aoe_particle_drift_speed_max = 20.0
+aoe_particle_drift_angle_noise_deg = 24.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
 [sub_resource type="Resource" id="Resource_mww4f"]
 script = ExtResource("2_qnr0w")
 delivery_method = 3
 radius = 20.0
 status_effects = Array[ExtResource("3_x1i2k")]([SubResource("Resource_6ewx0")])
+vfx_on_spawn = SubResource("Resource_2lhg6")
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 

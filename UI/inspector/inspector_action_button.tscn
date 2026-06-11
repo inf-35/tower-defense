@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://xce2w3es51dx"]
+[gd_scene format=3 uid="uid://xce2w3es51dx"]
 
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_oxcn6"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="2_2xcvw"]
 
-[node name="InspectorActionButton" type="Button"]
+[node name="InspectorActionButton" type="Button" unique_id=461822251]
 custom_minimum_size = Vector2(240, 80)
 offset_right = 240.0
 offset_bottom = 80.0
