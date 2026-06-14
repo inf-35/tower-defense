@@ -28,6 +28,8 @@
 [ext_resource type="Shader" uid="uid://filx1mvi3oje" path="res://Shaders/tutorial_spotlight.gdshader" id="22_b47fn"]
 [ext_resource type="PackedScene" uid="uid://cbdyajq0i6jec" path="res://UI/cursor_info/cursor_info.tscn" id="23_vlen6"]
 [ext_resource type="PackedScene" uid="uid://wv1a4nst6xfl" path="res://UI/loading_screen/loading_screen.tscn" id="24_1"]
+[ext_resource type="Script" uid="uid://bv8bb3j1duuj6" path="res://UI/ui_panel_motion_controller.gd" id="25_panel_motion"]
+[ext_resource type="PackedScene" uid="uid://ctvr3nc8sdjbw" path="res://UI/damage_tracker/damage_tracker_panel.tscn" id="26_damage_tracker"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
 shader = ExtResource("22_b47fn")
@@ -388,6 +390,20 @@ vertical_alignment = 1
 script = ExtResource("3_aw3sh")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
+[node name="DamageTrackerPanel" parent="Margin/ui_space" unique_id=412024282 instance=ExtResource("26_damage_tracker")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -250.0
+offset_right = 0.0
+offset_bottom = 250.0
+grow_horizontal = 0
+grow_vertical = 2
+
 [node name="TimeControls" type="Control" parent="Margin/ui_space" unique_id=1232310798]
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 1
@@ -613,6 +629,14 @@ icon_size = Vector2(50, 50)
 [node name="Inspector" parent="Margin/ui_space" unique_id=2009911858 instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 size_flags_vertical = 8
+
+[node name="PanelMotionController" type="Node" parent="Margin/ui_space" unique_id=1534411001 node_paths=PackedStringArray("sidebar_panel", "stats_panel", "damage_tracker_panel", "time_controls_panel", "inspector_panel")]
+script = ExtResource("25_panel_motion")
+sidebar_panel = NodePath("../building_bar")
+stats_panel = NodePath("../Stats")
+damage_tracker_panel = NodePath("../DamageTrackerPanel")
+time_controls_panel = NodePath("../TimeControls")
+inspector_panel = NodePath("../Inspector")
 
 [node name="Expansion" type="Panel" parent="." unique_id=1600268793 node_paths=PackedStringArray("_vbox")]
 visible = false

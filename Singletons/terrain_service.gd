@@ -85,18 +85,22 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 	return true
 
 #returns an empty string if valid, or an error description if invalid
-func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower) -> String:
+func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower) -> String: ##returns the first placement failure reason using shared keyword formatting for actionable resource shortfalls
 	var tower_type: Towers.Type = tower.type
 	#1. check costs
 	if Run.player.flux < Towers.get_tower_cost(tower_type):
-		return "Insufficient Gold"
+		return KeywordService.wrap_bad_text("Insufficient Gold")
 
 	#2. check capacity
 	#skip capacity check for generators usually, or if limit logic applies
 	if not (tower_type == Towers.Type.GENERATOR and island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
 		var cap_cost = Towers.get_tower_capacity(tower_type)
 		if Run.player.used_capacity + cap_cost > Run.player.tower_capacity and not is_zero_approx(cap_cost):
-			return "Not enough {POPULATION|icon_size=20|label=Population|color=red} (build more {T_GENERATOR|icon_size=24|label=Villages|color=red}"
+			return KeywordService.wrap_bad_text("Not enough") + " {POPULATION|icon_size=20|label=Population|color=%s} (%s %s)" % [
+				KeywordService.get_bad_color_hex(),
+				KeywordService.wrap_highlight_action_text("build"),
+				"{T_GENERATOR|icon_size=24|label=Villages|color=%s}" % KeywordService.get_highlight_action_color_hex()
+			]
 
 	#3. check limits
 	var limit = Run.player.get_tower_limit(tower_type)

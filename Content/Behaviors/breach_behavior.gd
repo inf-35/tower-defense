@@ -57,11 +57,13 @@ func get_display_data() -> Dictionary:
 	#we use stringnames (&) for performance and to avoid typos.
 	if _waves_left_in_state == 0: #not initialised
 		return { #for preview inspection
-			ID.UnitState.WAVES_LEFT_IN_PHASE: seed_duration_waves
+			ID.UnitState.WAVES_LEFT_IN_PHASE: seed_duration_waves,
+			ID.UnitState.BREACH_WAVE_PREVIEW: "",
 		}
 
 	return {
-		ID.UnitState.WAVES_LEFT_IN_PHASE: _waves_left_in_state
+		ID.UnitState.WAVES_LEFT_IN_PHASE: _waves_left_in_state,
+		ID.UnitState.BREACH_WAVE_PREVIEW: Run.waves.get_breach_wave_preview(unit) if is_instance_valid(Run.waves) else "",
 	}
 
 func get_save_data() -> Dictionary:

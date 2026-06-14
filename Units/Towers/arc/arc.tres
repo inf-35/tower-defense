@@ -20,7 +20,7 @@ upgrades_into = Dictionary[int, float]({
 45: 25.0
 })
 tower_name = "Arc"
-tower_description = "Fires a bolt that chains through nearby enemies, {UNIT_DAMAGE} diminishes by 25% each enemy of the chain."
+tower_description = "Fires a bolt that chains through nearby enemies, {STUN|label=Stunning} them briefly.  {UNIT_DAMAGE} diminishes by 33% each enemy of the chain."
 icon = ExtResource("1_2fh55")
 preview = ExtResource("1_2fh55")
 inspector_actions = Array[ExtResource("2_tq6l5")]([ExtResource("3_gfvjv"), ExtResource("4_o5d7s"), ExtResource("5_2fh55")])

@@ -2,6 +2,7 @@ extends Resource
 class_name RewardPrototype #see Reward
 
 @export var id_name: String = "" ##optional unique id for debugging
+@export var title: String = "" ##optional authored title copied onto the runtime reward for ui that wants a named reward
 @export_multiline var description: String = ""
 
 @export var type: Reward.Type = Reward.Type.UNLOCK_TOWER
@@ -18,6 +19,7 @@ class_name RewardPrototype #see Reward
 func generate_reward() -> Reward:
 	var reward := Reward.new()
 	reward.type = type
+	reward.title = title
 	reward.description = description
 	reward.base_weight = base_weight
 	reward.bias_rules = bias_rules

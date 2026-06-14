@@ -37,11 +37,11 @@ func _load_all_rewards() -> void:
 
 	for reward in reward_pool:
 		if reward.type == Reward.Type.UNLOCK_TOWER:
-			reward.price = snappedf(randf_range(6.0, 12.0), 0.1)
+			reward.price = snappedf(randf_range(6.0, 10.0), 0.1)
 		else:
 			reward.price = snappedf(randf_range(3.0, 7.0), 0.1)
 
-func _scan_directory_recursive(path: String) -> void:
+func _scan_directory_recursive(path: String) -> void: ##loads authored reward prototypes into the shared runtime pool
 	var dir := DirAccess.open(path)
 	if not dir:
 		push_error("RewardService: Failed to open directory: " + path)

@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://b4drbsc0tmvm0"]
+[gd_resource type="Resource" script_class="TutorialStep" format=3 uid="uid://b4drbsc0tmvm0"]
 
 [ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_nof3e"]
 
 [resource]
 script = ExtResource("1_nof3e")
-instruction_text = "Hover over wave icons here to foresee events, including the number and type of enemies in future waves."
-success_text = "Hover over wave icons here to foresee events, including the number and type of enemies in future waves.
-Q to continue."
+instruction_text = "[Hover] over the wave icons in the banner above to foresee events, including the number and type of enemies in future waves."
+success_text = "[Hover] over the wave icons in the banner above to foresee events, including the number and type of enemies in future waves.
+[Q to continue.]"
 panel_anchor = 3
 highlight_target = 4
 highlight = false

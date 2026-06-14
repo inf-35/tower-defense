@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_tnhaf")
-instruction_text = "Open the trade menu to view and purchase upgrades and towers."
-success_text = "Pressing T also opens and closes the menu.
-Q to continue."
+instruction_text = "[Open] the trade menu to view and purchase upgrades and towers."
+success_text = "Pressing [T] also opens and closes the menu.
+[Q to continue.]"
 panel_anchor = 2
 trigger_action = &"0"
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

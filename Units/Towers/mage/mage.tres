@@ -14,7 +14,7 @@ cost = 12.0
 element = 5
 allowed_terrain = Array[int]([2])
 tower_name = "Mage"
-tower_description = "Mages energise adjacent contiguous {T_PALISADE|label=Palisades}, inflicting {CURSED}"
+tower_description = "Mages energise adjacent contiguous {T_PALISADE|label=Walls}, inflicting {CURSED}"
 icon = ExtResource("1_4g74q")
 preview = ExtResource("1_4g74q")
 tower_scene = ExtResource("3_2trff")

@@ -48,14 +48,14 @@ func setup(entry: WaveTimeline.TimelineEntry) -> void:
 		animatable_wrapper.auto_play_entrance = true
 		animatable_wrapper.scale = Vector2.ZERO
 
-func move_to_slot(slot: Control, duration: float = 0.5) -> void:
+func move_to_slot(slot: Control, target_position: Vector2, duration: float = 0.5) -> void: ##moves the pip inside the overlay's local space so panel tweens carry it along
 	target_slot = slot
 
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
-	#tween global_position to match the slot's global_position
-	tween.tween_property(self, "global_position", slot.global_position, duration)
+	#use local positioning because the whole timeline may itself be sliding
+	tween.tween_property(self, "position", target_position, duration)
 
 	if is_instance_valid(animatable_wrapper):
 		#scale icon up to normal size
@@ -84,7 +84,7 @@ func _on_mouse_entered() -> void:
 
 		#enemy preview
 		#query the waveenemies class to see what spawns on this wave
-		var enemies: Array[Array] = WaveEnemies.get_enemies_for_wave(_entry.wave_number)
+		var enemies: Array[Array] = Run.waves.get_planned_enemies_for_wave(_entry.wave_number) if is_instance_valid(Run.waves) else WaveEnemies.get_enemies_for_wave(_entry.wave_number)
 
 		if enemies.is_empty():
 			desc_text += "\nNo enemies incoming."

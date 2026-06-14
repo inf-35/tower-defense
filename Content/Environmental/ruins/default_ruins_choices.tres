@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="RewardChoiceConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RewardChoiceConfig" format=3 uid="uid://owmd4j044auk"]
 
-[ext_resource type="Script" path="res://Content/reward_choice_config.gd" id="1_1"]
+[ext_resource type="Script" uid="uid://cbmgjrfxxauja" path="res://Objects/reward.gd" id="1_0v8sk"]
+[ext_resource type="Script" uid="uid://co6d1n1dc75vx" path="res://Content/reward_choice_config.gd" id="1_1"]
 
 [resource]
 script = ExtResource("1_1")
 title = "Search the ruins"
-choice_count = 3
-include_global_pool = true
 type_filter = Array[int]([0, 1, 2, 3])

@@ -3,13 +3,14 @@
 [ext_resource type="Script" uid="uid://ck72bv1wva51a" path="res://UI/settings_menu/settings_menu.gd" id="1_1syaf"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_gdbu8"]
 
-[node name="SettingsMenu" type="CanvasLayer" node_paths=PackedStringArray("master_slider", "sfx_slider", "music_slider", "fullscreen_toggle", "back_button", "resume_button", "settings_button", "save_and_quit_button", "settings_root", "pause_root")]
+[node name="SettingsMenu" type="CanvasLayer" node_paths=PackedStringArray("master_slider", "sfx_slider", "music_slider", "fullscreen_toggle", "show_all_health_bars_toggle", "back_button", "resume_button", "settings_button", "save_and_quit_button", "settings_root", "pause_root")]
 layer = 5
 script = ExtResource("1_1syaf")
 master_slider = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer/master_slider")
 sfx_slider = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer3/sfx_slider")
 music_slider = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer2/music_slider")
 fullscreen_toggle = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer4/fullscreen_toggle")
+show_all_health_bars_toggle = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer5/show_all_health_bars_toggle")
 back_button = NodePath("Settings/Button/Button")
 resume_button = NodePath("Pause/VBoxContainer/resume")
 settings_button = NodePath("Pause/VBoxContainer/settings")
@@ -135,6 +136,20 @@ layout_mode = 2
 text = "Fullscreen"
 
 [node name="fullscreen_toggle" type="CheckButton" parent="Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"hbox_20"
+
+[node name="Label" type="Label" parent="Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer5"]
+layout_mode = 2
+text = "Show All Health Bars"
+
+[node name="show_all_health_bars_toggle" type="CheckButton" parent="Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer5"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 10

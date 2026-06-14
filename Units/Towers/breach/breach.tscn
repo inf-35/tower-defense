@@ -10,8 +10,13 @@
 
 [sub_resource type="Resource" id="Resource_shlxc"]
 script = ExtResource("2_llxgu")
-suffix = " waves"
+suffix = " waves left"
 special_modifier = 8
+metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+
+[sub_resource type="Resource" id="Resource_breach_preview"]
+script = ExtResource("2_llxgu")
+special_modifier = 11
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
 [node name="Breach" type="Node2D" unique_id=800539370 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "movement_component")]
@@ -21,7 +26,7 @@ type = 9
 blocking = false
 environmental = true
 hostile = true
-stat_displays = Array[ExtResource("2_llxgu")]([SubResource("Resource_shlxc")])
+stat_displays = Array[ExtResource("2_llxgu")]([SubResource("Resource_shlxc"), SubResource("Resource_breach_preview")])
 behavior = NodePath("BreachBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

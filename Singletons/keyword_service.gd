@@ -1,5 +1,10 @@
 extends Node
 
+const BAD_COLOR: Color = Color("b53643ff")
+const HIGHLIGHT_ACTION_COLOR: Color = Color("1a6fc9ff")
+const POSITIVE_HIGHLIGHT_COLOR: Color = Color(0.35, 1.0, 0.45, 0.48)
+const NEGATIVE_HIGHLIGHT_COLOR: Color = Color(1.0, 0.2, 0.2, 0.48)
+
 var ICON_SIZE: int = 40
 #NOTE:
 #parameters: icon_size, color, label
@@ -22,6 +27,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"display": "",
 		"description": "Towers require population to operate. Cap is increased by building {T_GENERATOR|label=Villages}.",
 		"icon": preload("res://Assets/population_icon.png")
+	},
+	"SIZE": {
+		"title": "Size",
+		"display": "Size",
+		"description": "How many tiles this structure occupies on the grid.",
+		"icon": null,
 	},
 	"UNIT_HP": {
 		"title": "Unit health",
@@ -92,13 +103,13 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"POISON": {
 		"title": "Poison",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 8% remaining HP as damage per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 6% remaining HP as damage per second per stack",
 		"icon": preload("res://Assets/poison_icon.png"),
 	},
 	"STUN": {
 		"title": "Stun",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 10% speed.",
+		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 20% speed.",
 		"icon": preload("res://Assets/stun_icon.png"),
 	},
 	"STATUS": {
@@ -147,6 +158,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 var TOOLTIP_PANEL: PackedScene = load("res://UI/_tooltip_panel.tscn")
 
 var _regex: RegEx
+var _tutorial_action_regex: RegEx
 
 func _ready() -> void:
 	_verify_keywords()
@@ -154,6 +166,8 @@ func _ready() -> void:
 	#initialize regex for parsing {keyword} patterns
 	_regex = RegEx.new()
 	_regex.compile("\\{([^}]+)\\}")
+	_tutorial_action_regex = RegEx.new()
+	_tutorial_action_regex.compile("\\[([^\\]]+)\\]")
 
 #the main public api for other scripts to query
 #now supports dynamic lookup for t_ (tower) and r_ (relic) prefixes
@@ -176,6 +190,52 @@ func get_keyword_data(keyword: String) -> Dictionary:
 		return _resolve_relic_data(upper_key.trim_prefix("R_"))
 
 	return {}
+
+func get_bad_color_hex() -> String: ##returns the shared muted failure color as a bbcode-ready hex string
+	return BAD_COLOR.to_html(false)
+
+func get_highlight_action_color_hex() -> String: ##returns the shared tutorial/action color as a bbcode-ready hex string
+	return HIGHLIGHT_ACTION_COLOR.to_html(false)
+
+func get_positive_highlight_color_hex() -> String: ##returns the shared positive selection color used by range indicators
+	return POSITIVE_HIGHLIGHT_COLOR.to_html(false)
+
+func get_negative_highlight_color_hex() -> String: ##returns the shared negative selection color used by range indicators
+	return NEGATIVE_HIGHLIGHT_COLOR.to_html(false)
+
+func wrap_bad_text(text: String) -> String: ##wraps arbitrary text in the shared failure color so ui call sites stay data-light
+	return "[color=#%s]%s[/color]" % [get_bad_color_hex(), text]
+
+func wrap_highlight_action_text(text: String) -> String: ##wraps tutorial-facing action prompts in the shared highlight color
+	return "[color=#%s]%s[/color]" % [get_highlight_action_color_hex(), text]
+
+func wrap_positive_highlight_text(text: String) -> String: ##wraps text with the same positive color used by supportive preview overlays
+	return "[color=#%s]%s[/color]" % [get_positive_highlight_color_hex(), text]
+
+func wrap_negative_highlight_text(text: String) -> String: ##wraps text with the same negative color used by punitive preview overlays
+	return "[color=#%s]%s[/color]" % [get_negative_highlight_color_hex(), text]
+
+func style_tutorial_text(text: String) -> String: ##colors bracketed tutorial action terms while leaving keyword placeholders untouched for the normal parser
+	if text.is_empty():
+		return ""
+
+	var styled_text: String = text
+	var matches: Array[RegExMatch] = _tutorial_action_regex.search_all(text)
+	var processed_tokens: Dictionary[String, bool] = {}
+
+	for match_result: RegExMatch in matches:
+		var full_placeholder: String = match_result.get_string(0)
+		if processed_tokens.has(full_placeholder):
+			continue
+
+		var content: String = match_result.get_string(1)
+		if content.begins_with("/") or content.contains("="):
+			continue
+
+		processed_tokens[full_placeholder] = true
+		styled_text = styled_text.replace(full_placeholder, wrap_highlight_action_text(content))
+
+	return styled_text
 
 #converts text with {markers} into rich bbcode
 func parse_text_for_bbcode(text: String) -> String:

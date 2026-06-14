@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_1")
-instruction_text = "Walls can redirect enemies. Place down a {T_PALISADE}."
+instruction_text = "Walls can redirect enemies. [Build] a {T_PALISADE}."
 success_text = "Walls are cheap and can reshape enemy paths.
-Q to continue."
+[Q to continue.]"
 panel_anchor = 1
 highlight = false
 trigger_action = &"0"

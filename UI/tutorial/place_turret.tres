@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_wa6jf")
-instruction_text = "Selecting a {T_TURRET}, place down the turret with LMB."
-success_text = "Selecting a tower, you can also deselect with RMB, or rotate with R.
-Q to continue."
+instruction_text = "Selecting a {T_TURRET}, [build] the turret with [LMB]."
+success_text = "Selecting a tower, you can also [deselect] with [RMB], or [rotate] with [R].
+[Q to continue.]"
 panel_anchor = 1
 highlight = false
 trigger_action = &"0"

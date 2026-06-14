@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_1")
-success_text = "Ancient {T_RUINS} can be spotted in the uncharted wilds before you expand into them. Once uncovered, click one and search it to choose a reward.\nQ to continue."
+success_text = "Ancient {T_RUINS} can be spotted in the uncharted wilds before you expand into them. Once uncovered, [click] one and [search] it to choose a reward.\n[Q to continue.]"
 highlight = false
 trigger_type = 5
 trigger_action = &"0"

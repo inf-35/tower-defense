@@ -42,8 +42,8 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="WatchtowerBehavior" type="Node" parent="." unique_id=533359326]
 script = ExtResource("4_kkahb")
-buff_per_tile = 10.0
-base_buff = 10.0
+buff_per_tile = 0.333
+max_bonus_multiplier = 3.0
 beam_vfx = SubResource("Resource_beam_vfx")
 metadata/_custom_type_script = "uid://d3t7jmfgpyrle"
 

@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_4p1h4")
-instruction_text = "{GOLD} is used to build towers, and {POPULATION} is used to maintain them.
+instruction_text = "[Hover] over the {GOLD} and {POPULATION} icons in the banner to see what they mean.
 "
 success_text = "{GOLD} is used to build towers, and {POPULATION} is used to operate them.
-Q to continue."
+[Q to continue.]"
 panel_anchor = 2
 highlight_target = 6
 highlight = false

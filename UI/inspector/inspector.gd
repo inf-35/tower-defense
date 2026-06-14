@@ -41,6 +41,10 @@ func _ready() -> void:
 
 
 func _on_inspector_contents_tower_update(unit : Unit) -> void:
+	if not is_instance_valid(unit):
+		_clear_inspector()
+		return
+
 	if not unit.is_ready:
 		await unit.components_ready
 
@@ -68,6 +72,22 @@ func _on_inspector_contents_tower_update(unit : Unit) -> void:
 
 	_refresh_actions(unit) #update actions
 	_update_status_display(unit)
+
+func _clear_inspector() -> void: ##drops the currently inspected unit reference and clears transient ui state so hidden inspector transitions do not keep stale actions around
+	current_unit = null
+	_preview_upgrade_type = Towers.Type.VOID
+	inspector_title.text = ""
+	subtitle.text = ""
+	description.set_parsed_text("")
+	healthbar.max_value = 0.0
+	healthbar.value = 0.0
+
+	for child: Node in button_container.get_children():
+		child.queue_free()
+	for child: Control in stats.get_children():
+		child.free()
+	for child: Node in status_container.get_children():
+		child.queue_free()
 
 func _update_header_visuals(unit: Unit) -> void:
 	if unit is Tower:
@@ -111,7 +131,9 @@ func _render_live_stats() -> void: #for standard stat displays
 			if value == null: continue
 
 			value = apply_display_modifiers(value, display_info) #format
-			var text: String = display_info.label + " " + str(value) + display_info.suffix
+			var text: String = str(value) + display_info.suffix
+			if display_info.label != "":
+				text = display_info.label + " " + text
 
 			var label := InteractiveRichTextLabel.new()
 			label.bbcode_enabled = true
@@ -295,7 +317,8 @@ enum DisplayStatModifier {
 	CAPACITY_GENERATION,
 	WAVES_LEFT_IN_PHASE,
 	ANOMALY_REWARD_PREVIEW,
-	DISPLAY_ATTACK_STATUSES
+	DISPLAY_ATTACK_STATUSES,
+	BREACH_WAVE_PREVIEW,
 }
 
 func _update_status_display(unit: Unit) -> void:
@@ -426,6 +449,8 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 				value = Towers.get_tower_name(reward.rite_type) + " in " + str(waves_left_to_reward) + " waves."
 
 			return value
+		DisplayStatModifier.BREACH_WAVE_PREVIEW:
+			return tower.get_behavior_attribute(ID.UnitState.BREACH_WAVE_PREVIEW)
 		DisplayStatModifier.DISPLAY_ATTACK_STATUSES:
 			if not is_instance_valid(tower.attack_component):
 				return null

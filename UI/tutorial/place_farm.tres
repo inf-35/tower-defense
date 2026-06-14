@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_e0nke")
-instruction_text = "Similarly, place down a {T_FARM}"
+instruction_text = "Similarly, [build] a {T_FARM}."
 success_text = "It's important to invest in one's economy.
-Q to continue."
+[Q to continue.]"
 panel_anchor = 1
 highlight = false
 trigger_action = &"0"

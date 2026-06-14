@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_cdvy7")
 success_text = "Certain enemies, like {U_TROLL|label=Trolls}, ignore towers and head straight for your keep. Their routes are marked in red.
-Q to continue."
+[Q to continue.]"
 panel_anchor = 3
 highlight_target = 4
 highlight = false

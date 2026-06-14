@@ -35,6 +35,9 @@ func get_spawn_points() -> Array[Vector2i]:
 		points.append(breach.tower_position)
 	return points
 
+func get_active_breaches() -> Array[Tower]:
+	return _active_breaches.duplicate()
+
 func _track_breach(breach_tower: Tower) -> void:
 	if _tracked_breaches.has(breach_tower):
 		return

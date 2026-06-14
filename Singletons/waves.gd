@@ -13,6 +13,8 @@ var _total_enemies_planned: int = 0:
 var _enemies_spawned: int = 0
 var _enemies_killed: int = 0
 var _enemies_planned: Array[Array] = []
+var _wave_enemy_preview_cache: Dictionary[int, Array] = {}
+var _breach_enemy_assignments: Dictionary[int, Array] = {}
 
 #--- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
@@ -25,6 +27,11 @@ var _reconciliation_timer: Timer
 
 
 func _ready() -> void:
+	if is_instance_valid(Run.phases) and not Run.phases.wave_cycle_started.is_connected(_on_wave_cycle_started):
+		Run.phases.wave_cycle_started.connect(_on_wave_cycle_started)
+	if not SpawnPointService.spawn_points_changed.is_connected(_refresh_breach_enemy_assignments):
+		SpawnPointService.spawn_points_changed.connect(_refresh_breach_enemy_assignments)
+
 	wave_started.connect(func(wave: int):
 		var wave_data := WaveData.new()
 		wave_data.wave = wave
@@ -54,6 +61,44 @@ func _ready() -> void:
 	_reconciliation_timer.start(3.0)
 	_reconciliation_timer.timeout.connect(_reconcile_enemy_count)
 
+func get_planned_enemies_for_wave(wave: int) -> Array[Array]: ##returns the stable planned enemy roster for the active wave cycle and falls back to generated data otherwise
+	if wave <= 0:
+		return []
+
+	if _wave_enemy_preview_cache.has(wave):
+		var cached_wave_stacks: Array[Array] = _wave_enemy_preview_cache[wave]
+		return cached_wave_stacks.duplicate(true)
+
+	if is_instance_valid(Run.phases) and wave == Run.phases.current_wave_number:
+		_cache_wave_enemy_plan(wave)
+		var current_wave_stacks: Array[Array] = _wave_enemy_preview_cache.get(wave, [])
+		return current_wave_stacks.duplicate(true)
+
+	return WaveEnemies.get_enemies_for_wave(wave)
+
+func get_breach_wave_preview(breach: Tower) -> String: ##returns one compact comma-delimited preview of the next wave roster assigned to this active breach
+	if not is_instance_valid(breach):
+		return ""
+
+	var assigned_stacks: Array[Array] = _breach_enemy_assignments.get(breach.unit_id, [])
+	if assigned_stacks.is_empty():
+		return ""
+
+	assigned_stacks.sort_custom(func(a: Array, b: Array) -> bool:
+		return int(a[0]) < int(b[0])
+	)
+
+	var parts: Array[String] = []
+	for enemy_stack: Array in assigned_stacks:
+		var unit_type: Units.Type = enemy_stack[0]
+		var unit_count: int = int(enemy_stack[1])
+		if unit_count <= 0:
+			continue
+
+		parts.append("{U_%s} x%d" % [Units.Type.keys()[unit_type], unit_count])
+
+	return "\n" + ", ".join(parts)
+
 #main function called by phases.gd to start a combat wave
 func start_combat_wave(wave_num_to_spawn: int) -> void:
 	if current_combat_wave_number > 0:
@@ -66,10 +111,12 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 	current_combat_wave_number = wave_num_to_spawn
 
 	#reset all counters for the new wave
-	_enemies_planned = WaveEnemies.get_enemies_for_wave(current_combat_wave_number)
+	_cache_wave_enemy_plan(current_combat_wave_number)
+	_enemies_planned = get_planned_enemies_for_wave(current_combat_wave_number)
 	_total_enemies_planned = WaveEnemies.get_enemy_count(_enemies_planned)
 	_enemies_spawned = 0
 	_enemies_killed = 0
+	_refresh_breach_enemy_assignments()
 
 
 	print("Waves: Starting combat for wave %d with %d planned enemies." % [current_combat_wave_number, _total_enemies_planned])
@@ -120,6 +167,63 @@ func spawn_enemy(unit_type: Units.Type, position: Vector2) -> Unit:
 	#increment the spawned counter only after the unit is created
 	_enemies_spawned += 1
 	return unit
+
+func _on_wave_cycle_started(wave_number: int) -> void: ##seeds a stable roster for the newly prepared wave and rebuilds any per-breach previews against it
+	_cache_wave_enemy_plan(wave_number)
+	_refresh_breach_enemy_assignments()
+
+func _cache_wave_enemy_plan(wave: int) -> void:
+	if wave <= 0:
+		return
+	if _wave_enemy_preview_cache.has(wave):
+		return
+
+	_wave_enemy_preview_cache[wave] = WaveEnemies.get_enemies_for_wave(wave).duplicate(true)
+
+func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy assignments whenever the active breach set changes so previews stay valid through spawn-point churn
+	_breach_enemy_assignments.clear()
+
+	if not is_instance_valid(Run.phases):
+		return
+	if Run.phases.current_wave_number <= 0:
+		return
+
+	var active_breaches: Array[Tower] = SpawnPointService.get_active_breaches()
+	if active_breaches.is_empty():
+		return
+
+	var planned_stacks: Array[Array] = get_planned_enemies_for_wave(Run.phases.current_wave_number)
+	if planned_stacks.is_empty():
+		return
+
+	var breach_streams: Dictionary[int, Array] = {}
+	for breach: Tower in active_breaches:
+		if not is_instance_valid(breach):
+			continue
+		breach_streams[breach.unit_id] = []
+
+	var active_breach_count: int = active_breaches.size()
+	var breach_index: int = 0
+	for enemy_stack: Array in planned_stacks:
+		var unit_type: Units.Type = enemy_stack[0]
+		var unit_count: int = int(enemy_stack[1])
+		for _stack_index: int in range(unit_count):
+			var breach: Tower = active_breaches[breach_index % active_breach_count]
+			breach_index += 1
+			if not is_instance_valid(breach):
+				continue
+
+			var assigned_units: Array[Units.Type]
+			assigned_units.assign(breach_streams.get(breach.unit_id, []))
+			assigned_units.append(unit_type)
+			breach_streams[breach.unit_id] = assigned_units
+
+	for breach: Tower in active_breaches:
+		if not is_instance_valid(breach):
+			continue
+		var assigned_units: Array[Units.Type] = breach_streams.get(breach.unit_id, [])
+		_breach_enemy_assignments[breach.unit_id] = WaveEnemies._consolidate_enemy_list(assigned_units)
+		UI.update_unit_state.emit(breach)
 
 #the primary, high-frequency update method
 func _on_enemy_died(_died_unit: Unit) -> void:

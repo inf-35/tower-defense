@@ -7,7 +7,7 @@
 [ext_resource type="Resource" path="res://Content/Movement/immobile_mvmt.tres" id="5_5"]
 [ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="6_6"]
 [ext_resource type="Script" path="res://Content/health_data.gd" id="7_7"]
-[ext_resource type="Texture2D" path="res://Assets/wall.png" id="8_8"]
+[ext_resource type="Texture2D" path="res://Assets/ruins.png" id="8_8"]
 [ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="9_9"]
 [ext_resource type="Script" path="res://Units/Towers/ruins/ruins_behavior.gd" id="10_10"]
 

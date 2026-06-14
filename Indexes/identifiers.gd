@@ -6,6 +6,7 @@ class UnitState: ##for ui/attribute resolution
 	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves"
 	const AMPLIFIER_MODIFIER: StringName = &"modifier" #for amplifier
 	const REWARD_PREVIEW: StringName = &"reward_preview"
+	const BREACH_WAVE_PREVIEW: StringName = &"breach_wave_preview"
 
 	const CAPACITY_GENERATED: StringName = &"capacity_generated"
 	const LAST_CAPACITY_GENERATION: StringName = &"last_capacity_generation"

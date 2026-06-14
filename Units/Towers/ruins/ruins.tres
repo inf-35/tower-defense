@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3]
 
-[ext_resource type="Texture2D" path="res://Assets/wall.png" id="1_1"]
+[ext_resource type="Texture2D" path="res://Assets/ruins.png" id="1_1"]
 [ext_resource type="Resource" path="res://Content/InspectorActions/search_ruins.tres" id="2_2"]
 [ext_resource type="Script" path="res://Content/tower_data.gd" id="3_3"]
 [ext_resource type="PackedScene" path="res://Units/Towers/ruins/ruins.tscn" id="4_4"]

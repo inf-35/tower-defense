@@ -17,6 +17,7 @@ signal unhovered()
 
 @export var icon: TextureRect
 @export var title: InteractiveRichTextLabel
+@export var tower_meta: InteractiveRichTextLabel
 @export var description: InteractiveRichTextLabel
 
 var _reward_data: Reward
@@ -61,7 +62,7 @@ func _apply_visuals(reward: Reward) -> void:
 			#fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
-			desc_text = KeywordService.resolve_tower_description_from_type(type)
+			desc_text = _build_tower_card_description(type)
 
 		Reward.Type.ADD_RELIC:
 			var relic: RelicData = reward.relic
@@ -74,12 +75,14 @@ func _apply_visuals(reward: Reward) -> void:
 			#fetch tower preview/icon
 			icon_tex = Towers.get_tower_icon(type)
 			title_text = "New Tower: [color=#ffcc66]%s[/color]" % Towers.get_tower_name(type)
-			desc_text = KeywordService.resolve_tower_description_from_type(type)
+			desc_text = _build_tower_card_description(type)
 
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount
-			title_text = "Resource Cache"
-			##TODO: icon?
+			var gold_data: Dictionary = KeywordService.get_keyword_data("GOLD")
+			icon_tex = gold_data.get("icon", null)
+			title_text = reward.title if reward.title != "" else "Gold Cache"
+			desc_text = reward.description if reward.description != "" else "Gain %.0f {GOLD} immediately." % amount
 
 	if icon:
 		icon.texture = icon_tex
@@ -87,8 +90,26 @@ func _apply_visuals(reward: Reward) -> void:
 	if title:
 		title.set_parsed_text(title_text)
 
+	if tower_meta:
+		tower_meta.visible = false
+		tower_meta.set_parsed_text("")
+
 	if description:
 		description.set_parsed_text(desc_text)
+
+func _get_tower_meta_text(tower_type: Towers.Type) -> String:
+	var size: Vector2i = Towers.get_tower_size(tower_type)
+	return "{GOLD} %.2f    {SIZE} %dx%d" % [
+		Towers.get_tower_base_cost(tower_type),
+		size.x,
+		size.y,
+	]
+
+func _build_tower_card_description(tower_type: Towers.Type) -> String:
+	return "%s\n%s" % [
+		_get_tower_meta_text(tower_type),
+		KeywordService.resolve_tower_description_from_type(tower_type),
+	]
 
 #--- input handling ---
 

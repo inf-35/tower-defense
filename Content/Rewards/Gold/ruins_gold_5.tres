@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://djj0nqy252uvb"]
+
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_4qgpi"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
+
+[resource]
+script = ExtResource("1_reward")
+id_name = "ruins_gold_5"
+title = "Gold Cache"
+description = "Gain 5 {GOLD} immediately."
+type = 0
+flux_amount = 5.0
+base_weight = 800.0

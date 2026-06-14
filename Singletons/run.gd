@@ -15,6 +15,7 @@ const PLAYER_SCRIPT := preload("res://Singletons/player.gd")
 const WAVES_SCRIPT := preload("res://Singletons/waves.gd")
 const PHASES_SCRIPT := preload("res://Singletons/phase_manager.gd")
 const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
+const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
 
 var _run_root: Node
 var _run_owner: Island
@@ -31,6 +32,7 @@ var player: Player
 var waves: Waves
 var phases: Phases
 var power_service: PowerService
+var damage_tracker: DamageTrackerService
 
 signal references_ready ##emitted once the current run is fully booted and safe to use
 
@@ -55,12 +57,14 @@ func begin_run(island: Island) -> void:
 	waves = WAVES_SCRIPT.new()
 	phases = PHASES_SCRIPT.new()
 	power_service = POWER_SERVICE_SCRIPT.new()
+	damage_tracker = DAMAGE_TRACKER_SERVICE_SCRIPT.new()
 
 	_run_root.add_child(references)
 	_run_root.add_child(player)
 	_run_root.add_child(waves)
 	_run_root.add_child(phases)
 	_run_root.add_child(power_service)
+	_run_root.add_child(damage_tracker)
 
 	current_game_difficulty = pending_game_difficulty
 	current_game_scaling = 1.0
@@ -89,6 +93,20 @@ func set_pending_game_difficulty(game_difficulty: GameDifficulty) -> void:
 	pending_game_difficulty = game_difficulty
 	current_game_difficulty = game_difficulty
 
+func get_save_data() -> Dictionary:
+	return {
+		"pending_game_difficulty": int(pending_game_difficulty),
+		"current_game_difficulty": int(current_game_difficulty),
+		"current_game_scaling": current_game_scaling,
+		"current_game_environment": int(current_game_environment),
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	pending_game_difficulty = int(data.get("pending_game_difficulty", GameDifficulty.NORMAL))
+	current_game_difficulty = int(data.get("current_game_difficulty", pending_game_difficulty))
+	current_game_scaling = float(data.get("current_game_scaling", 1.0))
+	current_game_environment = int(data.get("current_game_environment", GameEnvironment.WOODS))
+
 func _prime_run_references(island: Island, run_generation: int) -> void:
 	if run_generation != _run_generation:
 		return
@@ -113,3 +131,4 @@ func _clear_run_handles() -> void:
 	waves = null
 	phases = null
 	power_service = null
+	damage_tracker = null

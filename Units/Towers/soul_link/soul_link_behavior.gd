@@ -31,6 +31,9 @@ func _connect_island_updates() -> void:
 	island.island_changed.connect(_refresh_links)
 
 func _disconnect_island_updates() -> void:
+	if not Run.references:
+		return
+	
 	var island: Island = Run.references.island
 	if not is_instance_valid(island):
 		return

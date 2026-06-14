@@ -58,7 +58,7 @@ func display(is_victory: bool) -> void:
 		title_label.text = DEFEAT_TITLE
 		#title_label.modulate = DEFEAT_COLOR
 
-	wave_label.text = "Reached Wave %d" % Run.phases.current_wave_number
+	wave_label.text = "Reached Wave %d / %d" % [Run.phases.current_wave_number, Run.phases.FINAL_WAVE]
 
 	_populate_relics()
 	_populate_towers()

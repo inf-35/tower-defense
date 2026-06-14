@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://c8grn8x6m1kta"]
+[gd_scene format=3 uid="uid://c8grn8x6m1kta"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_5gwp7"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_7c8ug"]
@@ -23,7 +23,7 @@ dynamic_attribute = &"farm_adjacent_bonus"
 label = "{FARM_ADJACENT_BONUS}"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
-[node name="Farm" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Farm" type="Node2D" unique_id=1786711533 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_5gwp7")
 type = 53
@@ -35,33 +35,34 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="FarmBehavior" type="Node" parent="."]
+[node name="FarmBehavior" type="Node" parent="." unique_id=966735356]
 script = ExtResource("4_7c8ug")
+income_per_wave = 1.5
 metadata/_custom_type_script = "uid://djqe37wfw77og"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1023761601]
 script = ExtResource("4_88tye")
 movement_data = ExtResource("5_b344s")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=775527033]
 script = ExtResource("6_7835c")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1317749673]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("6_5gwp7")
 
-[node name="Graphics2" type="Sprite2D" parent="Graphics"]
+[node name="Graphics2" type="Sprite2D" parent="Graphics" unique_id=901661488]
 z_index = -3
 scale = Vector2(0.99999994, 0.99999994)
 texture = ExtResource("7_5gwp7")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1265465547]
 script = ExtResource("8_gsk4i")
 height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1615646323]
 script = ExtResource("9_yamgq")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

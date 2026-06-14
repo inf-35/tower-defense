@@ -89,7 +89,8 @@ var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
-const TOWER_COST_SCALING: float = 1.05 ##how much price scales per existing tower. i.e. 1.5 = +50% cost per tower
+const TOWER_COST_BASE_SCALING: float = 0.05 ##0.05 = +5% cost per existing tower, 0.0 disables scaling
+const TOWER_COST_SCALING_MULTIPLIER: float = 0.0 ##0.0 -> no scaling, 1.0 -> normal scaling
 const TOWER_COST_INCREMENT: float = 0.05  ##smallest increment to which tower price values will snap to
 
 const VERBOSE: bool = false
@@ -131,18 +132,27 @@ func get_tower_navcost(tower_type: Type) -> int:
 func get_tower_icon(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].icon
 
+func get_tower_base_cost(tower_type: Type) -> float:
+	return tower_stats[tower_type].cost
+
 func get_tower_actions(tower_type: Type) -> Array[InspectorAction]:
 	return tower_stats[tower_type].inspector_actions
 
 func get_tower_element(tower_type: Type) -> Towers.Element:
 	return tower_stats[tower_type].element
 
+func get_cost_scaling(tower_type: Type) -> float:
+	if tower_stats[tower_type].cost_scaling_override == INF:
+		return TOWER_COST_BASE_SCALING
+	else:
+		return tower_stats[tower_type].cost_scaling_override
+
 func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT tower to be built
 	if not tower_stats.has(tower_type):
 		push_warning("Towers: tried to get tower cost of non-existing tower-type")
 		return 0.0
 
-	var base_cost = tower_stats[tower_type].cost
+	var base_cost: float = tower_stats[tower_type].cost
 	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
 		return base_cost
 
@@ -150,11 +160,9 @@ func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT t
 	if is_instance_valid(Run.references.island):
 		current_count = Run.references.island.get_towers_by_type(tower_type).size()
 
-	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
-						else tower_stats[tower_type].cost_scaling_override
-	var final_cost: float = base_cost * pow(scaling, current_count)
+	var final_cost: float = base_cost * pow(1.0 + get_cost_scaling(tower_type) * TOWER_COST_SCALING_MULTIPLIER, current_count)
 
-	return snappedf(base_cost, TOWER_COST_INCREMENT)
+	return snappedf(final_cost, TOWER_COST_INCREMENT)
 
 func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund value for selling one tower of this type right now (cost of last tower built)
 	if not tower_stats.has(tower_type):
@@ -171,10 +179,8 @@ func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund val
 	if current_count == 0:
 		return tower_stats[tower_type].cost ##nothing to sell; fallback to base cost
 
-	var base_cost = tower_stats[tower_type].cost
-	var scaling: float = TOWER_COST_SCALING if is_zero_approx(tower_stats[tower_type].cost_scaling_override) \
-						else tower_stats[tower_type].cost_scaling_override
-	var refund_value: float = base_cost * pow(scaling, current_count - 1)
+	var base_cost: float = tower_stats[tower_type].cost
+	var refund_value: float = base_cost * pow(1.0 +  get_cost_scaling(tower_type) * TOWER_COST_SCALING_MULTIPLIER, current_count - 1)
 
 	return snappedf(refund_value, TOWER_COST_INCREMENT)
 

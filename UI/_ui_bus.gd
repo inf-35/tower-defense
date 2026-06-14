@@ -58,8 +58,10 @@ signal update_flux(flux: float)
 signal update_capacity(used: float, total: float)
 signal update_health(health: float)
 signal update_relics()
+signal update_damage_tracker(entries: Array[Dictionary], max_damage: float)
+signal reset_damage_tracker(wave_number: int)
 #Handler/Sidebar -> Inspector
-signal update_inspector_bar(tower: Tower)
+signal update_inspector_bar(unit: Unit)
 
 static var tutorial_manager: TutorialManager
 static var cursor_info: CursorInfo

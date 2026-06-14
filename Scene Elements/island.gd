@@ -94,7 +94,7 @@ func generate_new_island() -> void:
 
 	_set_loading_status("Growing island...", 0.84)
 	#initial terrain generation
-	var starting_block: Dictionary = expansion_service.generate_initial_island_block(self, 50)
+	var starting_block: Dictionary = expansion_service.generate_initial_island_block(self, 100)
 	await get_tree().process_frame
 
 	_set_loading_status("Painting terrain...", 0.9)

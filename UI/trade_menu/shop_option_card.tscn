@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://73c4xem1fbxf" path="res://Assets/firewall.png" id="4_yrrol"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_tq8hd"]
 
-[node name="shop_card" type="Control" unique_id=1022920763 node_paths=PackedStringArray("price_text", "_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "description")]
+[node name="shop_card" type="Control" unique_id=1022920763 node_paths=PackedStringArray("price_text", "_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "tower_meta", "description")]
 custom_minimum_size = Vector2(1200, 300)
 layout_mode = 3
 anchors_preset = 0
@@ -22,6 +22,7 @@ _real_icon_panel = NodePath("HBoxContainer/icon_target/real_icon_panel")
 _real_description_panel = NodePath("HBoxContainer/panel_target/real_description_panel")
 icon = NodePath("HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioSolid/icon")
 title = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/Title/inspector_title")
+tower_meta = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/TowerMeta")
 description = NodePath("HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer/description")
 metadata/_custom_type_script = "uid://dvq73xdi1f01j"
 
@@ -115,6 +116,18 @@ text = "aea"
 fit_content = true
 scroll_active = false
 vertical_alignment = 1
+script = ExtResource("5_tq8hd")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="TowerMeta" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer" unique_id=210492444]
+visible = false
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 1
+theme_type_variation = &"rt_s15"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 script = ExtResource("5_tq8hd")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 

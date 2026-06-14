@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://ctvr3nc8sdjbw"]
+
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://di0uqn2i3jmgi" path="res://UI/damage_tracker/damage_tracker_panel.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://UI/damage_tracker/damage_tracker_row.tscn" id="3_row"]
+
+[node name="DamageTrackerPanel" type="Control" unique_id=2128005903 node_paths=PackedStringArray("rows_container")]
+custom_minimum_size = Vector2(280, 300)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 280.0
+offset_bottom = 300.0
+mouse_filter = 2
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+rows_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/Rows")
+row_scene = ExtResource("3_row")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1109195042]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=983363929]
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1007249473]
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=746575613]
+layout_mode = 2
+theme_type_variation = &"LabelDescriptive"
+text = "Damage"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=335839673]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Rows" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=795796288]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"vbox_5"

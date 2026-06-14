@@ -93,6 +93,10 @@ func _advance_one_step() -> void:
 
 #--- visualization core ---
 
+func _get_slot_local_position(slot: Control) -> Vector2: ##maps a slot into the pips overlay's local space so pips follow panel motion cleanly
+	var slot_global_position: Vector2 = slot.get_global_transform_with_canvas().origin
+	return pips_layer.get_global_transform_with_canvas().affine_inverse() * slot_global_position
+
 func _set_head_index(new_index: int) -> void:
 	#prevent scrolling past end
 	if new_index >= _full_schedule.size():
@@ -124,7 +128,7 @@ func _set_head_index(new_index: int) -> void:
 		for i: int in range(target_entries.size()):
 			if target_entries[i].id == pip.entry_id: #assume pip stores this id
 				new_active_pips[i] = pip
-				pip.move_to_slot(_slots[i]) #animate to new position
+				pip.move_to_slot(_slots[i], _get_slot_local_position(_slots[i])) #animate within the timeline's local space
 				claimed_pips[pip] = true
 				found_match = true
 				break
@@ -143,14 +147,14 @@ func _set_head_index(new_index: int) -> void:
 			#if we just advanced, new items slide in from right.
 			#if we jumped, maybe they just appear?
 			#let's assume slide-in from right for consistency.
-			var spawn_pos = _slots[slot_count - 1].global_position + Vector2(100, 0)
+			var spawn_pos: Vector2 = _get_slot_local_position(_slots[slot_count - 1]) + Vector2(100, 0)
 
 			#special case: if this is a huge jump (reset), just spawn in place
 			if abs(new_index - old_index) > 1:
-				spawn_pos = _slots[i].global_position
+				spawn_pos = _get_slot_local_position(_slots[i])
 
-			pip.global_position = spawn_pos
-			pip.move_to_slot(_slots[i])
+			pip.position = spawn_pos
+			pip.move_to_slot(_slots[i], _get_slot_local_position(_slots[i]))
 			new_active_pips[i] = pip
 
 	_active_pips = new_active_pips

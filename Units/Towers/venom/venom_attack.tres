@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_x7527"]
 script = ExtResource("3_qjnyu")
 type = 2
-stack = 3.0
+stack = 4.0
 cooldown = 0.8
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 

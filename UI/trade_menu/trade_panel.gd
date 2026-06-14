@@ -1,10 +1,20 @@
 class_name TradePanel
 extends RewardPanel
 
-@export var wave_text: InteractiveRichTextLabel
-@export var exit_button: Button
+@export var wave_text: InteractiveRichTextLabel ##status label that shows the automatic restock countdown
+@export var exit_button: Button ##button that closes the trader without buying anything
 
-func _ready() -> void:
+func _set_restock_affordability(restock_cost: float) -> void: ##keeps the trader restock button opaque while still marking insufficient gold through its label color and disabled state
+	var has_gold: bool = Run.player.flux >= restock_cost
+	reroll_button.disabled = not has_gold
+
+	if has_gold:
+		reroll_button.remove_theme_color_override("font_disabled_color")
+		return
+
+	reroll_button.add_theme_color_override("font_disabled_color", KeywordService.BAD_COLOR)
+
+func _ready() -> void: ##binds the trader panel to the live stock, restock, and close flows
 	visible = false
 
 	UI.trader_open.connect(func(): visible = true)
@@ -29,6 +39,7 @@ func _present_options(choices: Array[Reward]) -> void:
 
 func _update_restock_cost(restock_cost: float) -> void:
 	reroll_button.text = "Restock (%.2f)" % restock_cost
+	_set_restock_affordability(restock_cost)
 
 func _update_restock_waves(waves: int) -> void:
 	wave_text.text = "Restocks automatically in %d wave(s)." % waves

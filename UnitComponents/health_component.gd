@@ -84,6 +84,7 @@ func _tick(delta: float) -> void:
 	var benchmark = health
 	health += regeneration * delta + regen_percent * max_health * delta + regen_remainder_percent * max_health * delta
 	var difference = benchmark - health
+	_record_status_damage(difference, delta)
 	if difference > 0.1:
 		UI.floating_text_manager.show_value(difference, unit.global_position, Color.WHITE, 0.8)
 
@@ -91,6 +92,46 @@ func _tick(delta: float) -> void:
 		unit.died.emit(HitReportData.blank_hit_report)
 
 	_accumulated_delta = 0.0
+
+##allocates net tick damage across any active status effects that directly drive regen-based attrition
+func _record_status_damage(net_damage: float, delta: float) -> void:
+	if net_damage <= 0.0:
+		return
+	if not is_instance_valid(_modifiers_component):
+		return
+	if not Run.has_active_run() or not is_instance_valid(Run.damage_tracker):
+		return
+
+	var contributions: Dictionary[Attributes.Status, float] = {}
+	var total_negative_contribution: float = 0.0
+	for status_type: Attributes.Status in _modifiers_component._status_effects:
+		var status: StatusEffect = _modifiers_component._status_effects[status_type]
+		var status_data: Attributes.StatusEffectData = Attributes.status_effects[status.type]
+		if not DamageTrackerService.STATUS_DAMAGE_ATTRIBUTES.has(status_data.attribute):
+			continue
+
+		var contribution: float = 0.0
+		match status_data.attribute:
+			Attributes.id.REGENERATION:
+				contribution = -(status_data.additive_per_stack * status.stack * delta)
+			Attributes.id.REGEN_PERCENT:
+				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
+			Attributes.id.REGEN_REMAINDER_PERCENT:
+				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
+
+		if contribution <= 0.0:
+			continue
+
+		contributions[status_type] = contribution
+		total_negative_contribution += contribution
+
+	if total_negative_contribution <= 0.0:
+		return
+
+	var clamped_damage: float = minf(net_damage, total_negative_contribution)
+	for status_type: Attributes.Status in contributions:
+		var share: float = contributions[status_type] / total_negative_contribution
+		Run.damage_tracker.record_status_damage(status_type, clamped_damage * share)
 
 func get_save_data() -> Dictionary:
 	return {

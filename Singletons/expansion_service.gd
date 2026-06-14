@@ -16,7 +16,7 @@ const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins
 class TerrainGenRule extends Resource:
 	@export var terrain_type: Terrain.Base ##what type of terrain is being placed
 	@export var probability: float ##probability of a seed appearing at any given tile
-	@export var cluster_size_min: int = 1 ##minimum size of cluster
+	@export var cluster_size_min: int = 1 ##minimum ssize of cluster
 	@export var cluster_size_max: int = 1 ##maximum size of cluster
 	@export var allowed_on: Array[Terrain.Base] = [] ##terrains which this one is allowed to substitute. if empty, can spawn on 'raw' ground (earth)
 
@@ -62,7 +62,7 @@ func _init() -> void:
 
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
 	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.04, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.01))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.007))
 
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -241,14 +241,11 @@ func _on_exit() -> void:
 	UI.hide_expansion_choices.emit()
 	UI.hide_expansion_confirmation.emit()
 
-func _clear_expansion_state(island: Island) -> void:
+func _clear_expansion_state(island: Island) -> void: ##resets the expansion preview state without rewinding the player's camera once manual control is restored
 	_current_state = State.IDLE
 	_choices_by_id.clear()
 	_hovered_choice_id = -1
 	island.update_previews({}) #clear all previews from the island
-
-	var camera: Camera = Run.references.camera
-	camera.release_override()
 
 #procedural generation logic
 func _generate_block(island: Island, block_size: int, params: GenerationParameters) -> Dictionary[Vector2i, Terrain.CellData]:
@@ -512,7 +509,7 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 
 	return result
 
-func _trigger_camera_overview(island: Island) -> void:
+func _trigger_camera_overview(island: Island) -> void: ##snaps once to a framed overview of all expansion options while leaving camera input unlocked afterward
 	#1. get references and handle invalid states
 	var camera: Camera = Run.references.camera
 	if not is_instance_valid(camera) or not is_instance_valid(island):
@@ -534,11 +531,11 @@ func _trigger_camera_overview(island: Island) -> void:
 	#5. calculate the target position (offset such that the rightmots edge of the island appears at the centre of the screen, offset by overview_island_offset
 	var target_position: Vector2 = island_bounds.get_center() + Vector2(island_bounds.size.x * 0.5, 0) + Vector2(OVERVIEW_ISLAND_OFFSET * viewport_size.x / required_zoom_level, 0)
 
-	#6. command the camera to execute the transition
-	camera.override_camera(target_position, target_zoom, 0.75)
+	#6. snap once without entering the override lock state
+	camera.soft_snap_camera(target_position, target_zoom, 0.75)
 
 #new helper to calculate bounds and focus on a single choice
-func _trigger_camera_focus_on_choice(_island: Island, choice_id: int) -> void:
+func _trigger_camera_focus_on_choice(_island: Island, choice_id: int) -> void: ##snaps once to the currently focused expansion option without suppressing manual camera control
 	var camera: Camera = Run.references.camera
 	if not is_instance_valid(camera) or not _choices_by_id.has(choice_id):
 		return
@@ -570,5 +567,5 @@ func _trigger_camera_focus_on_choice(_island: Island, choice_id: int) -> void:
 	#4. calculate the target position (see above, but this time for the selection in particular)
 	var target_position: Vector2 = world_bounds.get_center() + Vector2(world_bounds.size.x * 0.5, 0) + Vector2(OVERVIEW_ISLAND_OFFSET * viewport_size.x / required_zoom_level, 0)
 
-	#5. command the camera to execute the transition
-	camera.override_camera(target_position, target_zoom, 0.5)
+	#5. snap once without entering the override lock state
+	camera.soft_snap_camera(target_position, target_zoom, 0.5)

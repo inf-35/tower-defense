@@ -115,7 +115,14 @@ func _generate_stock() -> void:
 	#implementation assumes rewardservice.get_random_rewards(count) exists.
 	#if not, we manually sample:
 
-	var pool = RewardService.get_rewards(SLOT_COUNT)
+	var pool: Array[Reward] = RewardService.get_rewards(
+		SLOT_COUNT,
+		[
+			Reward.Type.UNLOCK_TOWER,
+			Reward.Type.ADD_RELIC,
+			Reward.Type.ADD_RITE,
+		]
+	)
 	if pool.is_empty():
 		return
 

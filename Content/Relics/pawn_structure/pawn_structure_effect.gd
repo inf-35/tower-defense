@@ -49,10 +49,8 @@ func _evaluate(instance: EffectInstance, is_being_built: bool = false) -> void:
 
 	var neighbors = tower.get_diagonal_towers()
 	var stacks: int = 0
-	print(tower, " updating...")
 	for n: Tower in neighbors.values():
 		if is_instance_valid(n) and n.type == target_type and (not n.disabled) and (not n.is_queued_for_deletion()):
-			print(tower, " counting ", n)
 			stacks += 1
 
 	if is_being_built: #proc relevant towers to also update

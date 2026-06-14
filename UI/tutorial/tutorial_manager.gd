@@ -14,10 +14,6 @@ signal start_wave_lock_changed(locked: bool)
 @export var timeline_anchor: Control
 @export var start_wave_anchor: Control
 
-const DESTROYED_TOWER_HINT_TEXT: String = "[b]Tutorial[/b]\nDestroyed - revives next wave.\nQ to continue."
-const DESTROYED_TOWER_HINT_OFFSET: Vector2 = Vector2(56.0, -96.0)
-const DESTROYED_TOWER_HINT_LABEL_MIN_SIZE: Vector2 = Vector2(280.0, 0.0)
-
 #--- state ---
 var _registered_ui_elements: Dictionary[TutorialStep.Reference, Control] = {} #{ "id": controlnode }
 var _current_step_index: int = -1
@@ -63,7 +59,7 @@ func _process(_delta: float) -> void:
 		_update_spotlight_position(_target_node)
 
 	if is_instance_valid(instruction_panel) and instruction_panel.visible:
-		if _world_hint_open:
+		if _has_active_world_target():
 			_update_world_hint_panel()
 		elif is_instance_valid(_anchor_node):
 			instruction_panel.position = _anchor_node.position
@@ -78,10 +74,7 @@ func _input(event: InputEvent) -> void:
 	#new: handle q confirmation
 	if _waiting_for_confirmation:
 		if event.is_action_pressed("interact"): #map 'q' to this action
-			if _world_hint_open and not _has_active_sequence():
-				_dismiss_world_hint()
-			else:
-				_advance_step()
+			_advance_step()
 
 func _process_overlay_input(input_event: InputEvent) -> void:
 	print(input_event)
@@ -89,11 +82,20 @@ func _process_overlay_input(input_event: InputEvent) -> void:
 func _has_active_sequence() -> bool:
 	return _current_step_index != -1
 
+func _has_active_world_target() -> bool:
+	if not _has_active_sequence():
+		return false
+	if not is_instance_valid(_world_hint_target):
+		return false
+	if _current_step_index < 0 or _current_step_index >= _active_sequence.size():
+		return false
+	return _active_sequence[_current_step_index].panel_anchor == TutorialStep.Anchor.TARGET_OFFSET
+
 func is_start_wave_locked() -> bool:
 	return _start_wave_locked
 
 func _is_world_hint_active() -> bool:
-	return _world_hint_open
+	return _has_active_world_target()
 
 func _hide_world_hint() -> void:
 	if _world_hint_open:
@@ -115,13 +117,14 @@ func _update_world_hint_panel() -> void:
 		_hide_world_hint()
 		return
 
+	var step: TutorialStep = _active_sequence[_current_step_index]
 	var screen_pos := _world_hint_target.get_global_transform_with_canvas().origin
 	screen_pos.x += float(_world_hint_target.size.x) * Island.CELL_SIZE * 0.35
 	screen_pos.y -= float(_world_hint_target.size.y) * Island.CELL_SIZE * 0.45
 
 	instruction_panel.reset_size()
 	var viewport_size := get_viewport().get_visible_rect().size
-	var panel_pos := screen_pos + DESTROYED_TOWER_HINT_OFFSET
+	var panel_pos : Vector2 = screen_pos + step.target_offset
 	panel_pos.x = clampf(panel_pos.x, 12.0, viewport_size.x - instruction_panel.size.x - 12.0)
 	panel_pos.y = clampf(panel_pos.y, 12.0, viewport_size.y - instruction_panel.size.y - 12.0)
 	instruction_panel.position = panel_pos
@@ -146,34 +149,24 @@ func start_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFl
 	_current_tutorial_type = tutorial_type
 	_advance_step()
 
-func show_destroyed_tower_hint(tower: Tower) -> void:
+func start_world_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFlag, tower: Tower) -> void: ##starts a normal tutorial resource sequence, but anchors its panel beside a world tower target instead of a ui control
 	if not is_instance_valid(tower):
 		return
-	if Run.player.completed_tutorials[Run.player.TutorialFlag.TOWER_DESTROYED]:
-		return
-	if _has_active_sequence():
+	if Run.player.completed_tutorials[tutorial_type]:
 		return
 
-	_target_node = null
-	_anchor_node = null
-	_waiting_for_confirmation = false
-	_monitoring_active = false
-	overlay_color_rect.visible = false
-	_shader_mat.set_shader_parameter(&"is_active", false)
-
+	_hide_world_hint()
 	_world_hint_target = tower
-	_world_hint_open = true
-	_world_hint_previous_speed = Clock.speed_multiplier
-	Clock.speed_multiplier = Clock.PAUSE_SPEED
-	_waiting_for_confirmation = true
+	_active_sequence = steps
+	_current_step_index = -1
+	visible = true
+	overlay_color_rect.visible = true
 	instruction_panel.visible = true
-	instruction_panel.label.custom_minimum_size = DESTROYED_TOWER_HINT_LABEL_MIN_SIZE
-	instruction_panel.label.set_parsed_text(DESTROYED_TOWER_HINT_TEXT)
-	instruction_panel.reset_size()
-	Run.player.completed_tutorials[Run.player.TutorialFlag.TOWER_DESTROYED] = true
-	_update_world_hint_panel()
+	_current_tutorial_type = tutorial_type
+	_advance_step()
 
 func end_tutorial() -> void:
+	_hide_world_hint()
 	visible = false
 	instruction_panel.visible = false
 	overlay_color_rect.visible = false
@@ -183,7 +176,7 @@ func end_tutorial() -> void:
 	#reset shader
 	_shader_mat.set_shader_parameter("is_active", false)
 
-func _advance_step() -> void:
+func _advance_step() -> void: ##activates the next authored step, applying any lock state and tutorial text styling before monitoring completion
 	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND)
 	_waiting_for_confirmation = false
 	_current_step_index += 1
@@ -192,6 +185,13 @@ func _advance_step() -> void:
 		return
 
 	var step := _active_sequence[_current_step_index]
+	if step.pause_clock and not _world_hint_open:
+		_world_hint_open = true
+		_world_hint_previous_speed = Clock.speed_multiplier
+		Clock.speed_multiplier = Clock.PAUSE_SPEED
+	elif not step.pause_clock and _world_hint_open:
+		_hide_world_hint()
+
 	if step.override_start_wave_lock:
 		_set_start_wave_locked(step.start_wave_locked)
 	if step.highlight_target != TutorialStep.Reference.NONE:
@@ -203,7 +203,7 @@ func _advance_step() -> void:
 		_shader_mat.set_shader_parameter(&"is_active", true)
 	else:
 		_shader_mat.set_shader_parameter(&"is_active", false)
-	instruction_panel.label.set_parsed_text(step.instruction_text)
+	instruction_panel.label.set_parsed_text(KeywordService.style_tutorial_text(step.instruction_text))
 
 	_monitoring_active = true
 	var cam := Run.references.camera
@@ -237,6 +237,8 @@ func _advance_step() -> void:
 			_anchor_node = timeline_anchor
 		TutorialStep.Anchor.START_WAVE_ANCHOR:
 			_anchor_node = start_wave_anchor
+		TutorialStep.Anchor.TARGET_OFFSET:
+			_anchor_node = null
 
 
 func _check_step_completion() -> void:
@@ -281,7 +283,7 @@ func _complete_step() -> void:
 	if step.require_confirmation:
 		Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND)
 		_waiting_for_confirmation = true
-		instruction_panel.label.set_parsed_text(step.success_text)
+		instruction_panel.label.set_parsed_text(KeywordService.style_tutorial_text(step.success_text))
 	else:
 		_advance_step()
 

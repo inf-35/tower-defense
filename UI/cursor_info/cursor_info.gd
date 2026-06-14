@@ -29,15 +29,15 @@ func _process(_delta: float) -> void:
 
 		global_position = final_pos
 
-func display_message(text: String, is_error: bool = false) -> void:
+func display_message(text: String, is_error: bool = false) -> void: ##shows the current hover or placement message and tints error states with the shared bad color
 	if text == "":
 		visible = false
 		return
 
 	visible = true
-	label.set_parsed_text(text)
+	label.set_parsed_text(KeywordService.style_tutorial_text(text))
 
 	if is_error:
-		label.add_theme_color_override("default_color", Color(1.0, 0.4, 0.4))
+		label.add_theme_color_override("default_color", KeywordService.BAD_COLOR)
 	else:
 		label.remove_theme_color_override("default_color")

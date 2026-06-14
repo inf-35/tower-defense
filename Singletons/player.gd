@@ -141,6 +141,9 @@ func begin_new_game() -> void:
 		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
 		Towers.Type.GENERATOR: true,
+		Towers.Type.POISON: true,
+		Towers.Type.WATCHTOWER: true,
+		Towers.Type.ARC: true,
 	}
 
 	#var reward := Reward.new()
@@ -285,7 +288,8 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		if used_capacity + Towers.get_tower_capacity(tower_type) > tower_capacity and not is_zero_approx(Towers.get_tower_capacity(tower_type)):
 			#note: you could add a ui warning here about insufficient capacity.
 			return
-	self.flux -= Towers.get_tower_cost(tower_type)
+	var attempted_cost: float = Towers.get_tower_cost(tower_type)
+	self.flux -= attempted_cost
 	var success = Run.references.island.request_tower_placement(cell, tower_type, facing)
 
 	#3. if the island confirms placement, deduct resources.
@@ -298,7 +302,7 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		if Towers.is_tower_rite(tower_type):
 			self.add_rite(tower_type, -1)
 	else:
-		self.flux += Towers.get_tower_refund_value(tower_type)
+		self.flux += attempted_cost
 
 func _on_sell_tower_requested(tower) -> void:
 	if not is_instance_valid(tower):

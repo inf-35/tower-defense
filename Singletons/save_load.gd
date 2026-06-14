@@ -10,6 +10,8 @@ func save_game() -> void:
 
 	var save_dict: Dictionary = {}
 
+	save_dict["run"] = Run.get_save_data()
+
 	#player context
 	save_dict["player"] = Run.player.get_save_data()
 	save_dict["phases"] = Run.phases.get_save_data()
@@ -57,6 +59,9 @@ func load_game() -> bool:
 
 	var save_dict: Dictionary = json.data
 
+	if save_dict.has("run"):
+		Run.load_save_data(save_dict["run"])
+
 	#restore phases
 	if save_dict.has("phases"):
 		Run.phases.load_save_data(save_dict["phases"])
@@ -80,8 +85,13 @@ func load_game() -> bool:
 func save_profile() -> void:
 	print("SaveLoad: Saving profile...")
 
-	var profile_dict: Dictionary = {}
-	profile_dict["player"] = Run.player.get_profile()
+	var profile_dict: Dictionary = {
+		"settings": {
+			"show_all_health_bars": Pause.show_all_health_bars,
+		}
+	}
+	if is_instance_valid(Run.player):
+		profile_dict["player"] = Run.player.get_profile()
 	var json_string = JSON.stringify(profile_dict)
 
 	#write to file
@@ -113,7 +123,11 @@ func load_profile() -> bool:
 
 	var save_dict: Dictionary = json.data
 
-	if save_dict.has("player"):
+	if save_dict.has("settings"):
+		var settings_data: Dictionary = save_dict["settings"]
+		Pause.show_all_health_bars = bool(settings_data.get("show_all_health_bars", false))
+
+	if save_dict.has("player") and is_instance_valid(Run.player):
 		Run.player.load_profile(save_dict["player"])
 	return true
 

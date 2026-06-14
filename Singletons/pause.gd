@@ -2,9 +2,11 @@ extends Node
 
 const menu_scene := preload("res://UI/settings_menu/settings_menu.tscn")
 var _current_menu_instance: SettingsMenu
+var show_all_health_bars: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	SaveLoad.load_profile()
 
 func _input(event) -> void:
 	if event.is_action_pressed("menu"):
@@ -24,7 +26,7 @@ func open_menu() -> void:
 
 	_current_menu_instance.open_menu()
 
-	if Run.phases.in_game:
+	if is_instance_valid(Run.phases) and Run.phases.in_game:
 		_current_menu_instance.enter_state(SettingsMenu.State.PAUSE)
 	else:
 		_current_menu_instance.enter_state(SettingsMenu.State.SETTINGS)

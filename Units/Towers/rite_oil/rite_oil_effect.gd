@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name OilRiteEffect
 
-@export var duration_bonus: float = 2.5
+@export var duration_bonus: float = 3.0
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]
@@ -22,7 +22,9 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	for status in hit_data.status_effects:
 		var payload: Vector2 = hit_data.status_effects[status]
-		#x=stacks, y=duration
-		payload.y += (duration_bonus * instance.stacks)
+		if payload.y <= 0.0:
+			continue
+
+		payload.y *= 1.0 + (duration_bonus * instance.stacks)
 
 		hit_data.status_effects[status] = payload

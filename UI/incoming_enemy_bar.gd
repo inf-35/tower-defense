@@ -34,7 +34,7 @@ func _refresh() -> void:
 
 func _get_sorted_wave_entries(wave: int) -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
-	var wave_stacks: Array[Array] = WaveEnemies.get_enemies_for_wave(wave)
+	var wave_stacks: Array[Array] = Run.waves.get_planned_enemies_for_wave(wave) if is_instance_valid(Run.waves) else WaveEnemies.get_enemies_for_wave(wave)
 	var counts: Dictionary[Units.Type, int] = {}
 
 	for stack: Array in wave_stacks:

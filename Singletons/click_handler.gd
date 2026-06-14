@@ -97,7 +97,7 @@ func _update_preview_tooltip() -> void:
 			msg += "Rite Available: %d\n" % count
 
 		msg += _get_cell_tooltip(island, cell)
-		msg += "\nLMB to place\nRMB to deselect\nR to rotate"
+		msg += "\n[place] with [LMB]\n[deselect] with [RMB]\n[rotate] with [R]"
 		UI.cursor_info.display_message(msg, false)
 	else:
 		#if invalid, get the specific reason
@@ -111,7 +111,7 @@ func _update_preview_tooltip() -> void:
 				preview_tower_position,
 				preview_tower_prototype
 			)
-		error_msg += "\nLMB to place\nRMB to deselect\nR to rotate"
+		error_msg += "\n[place] with [LMB]\n[deselect] with [RMB]\n[rotate] with [R]"
 		UI.cursor_info.display_message(error_msg, true)
 
 func _get_clicked_enemy(mouse_pos: Vector2) -> Unit: ##helper to find enemy under mouse
@@ -174,6 +174,7 @@ func _enter_idle_state() -> void:
 	if is_instance_valid(current_preview):
 		current_preview.hide()
 
+	UI.update_inspector_bar.emit(null)
 	current_state = State.IDLE
 
 func _enter_preview_state(tower: Tower) -> void:
@@ -401,3 +402,14 @@ func _prioritize_selected_enemy() -> void:
 		return
 
 	Targeting.set_priority_target(selected_entity)
+
+func select_entity(entity: Unit) -> void: ##public entry point for external ui elements that want to inspect an existing runtime unit
+	if not is_instance_valid(entity):
+		_enter_idle_state()
+		return
+
+	if entity is Tower:
+		_enter_tower_selected_state(entity)
+		return
+
+	_enter_entity_selected_state(entity)

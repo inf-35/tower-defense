@@ -2,6 +2,8 @@ extends ProgressBar
 class_name UnitHPBar
 
 var bar_size: Vector2 = Vector2(5, 1.2)
+const AUTO_IMPORTANT_UNIT_THRESHOLD: int = 30
+const VISIBILITY_REFRESH_INTERVAL_FRAMES: int = 10
 
 var _health_component: HealthComponent
 var _parent_unit: Node2D
@@ -11,6 +13,10 @@ var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon] = {}
 var _is_hovered: bool = false
 var _is_selected: bool = false
 var _is_important: bool = false
+var _visibility_refresh_frames: int = 0
+
+static var _cached_screen_unit_count_frame: int = -1
+static var _cached_screen_unit_count: int = 0
 
 const VERTICAL_OFFSET: Vector2 = Vector2(0,-5)
 const STATUS_ICON_SCENE: PackedScene = preload("res://UI/unit_hp_bar/status_icon.tscn")
@@ -61,14 +67,22 @@ func _exit_tree() -> void:
 		UI.update_inspector_bar.disconnect(_on_global_selection_changed)
 
 func _evaluate_visibility() -> void:
-	var is_damaged = value < max_value
-	var has_intent = _is_hovered or _is_selected or (_is_important and is_damaged)
+	var is_damaged: bool = value < max_value
+	var has_intent: bool = _is_hovered or _is_selected or ((_is_important or _is_conditionally_important()) and is_damaged)
 
 	visible = has_intent
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(_parent_unit) and visible:
 		rotation = -_parent_unit.rotation
+
+	_visibility_refresh_frames += 1
+	if _visibility_refresh_frames < VISIBILITY_REFRESH_INTERVAL_FRAMES:
+		return
+
+	_visibility_refresh_frames = 0
+	if value < max_value:
+		_evaluate_visibility()
 
 func _on_health_changed(new_health: float) -> void:
 	value = new_health
@@ -132,6 +146,48 @@ func on_mouse_exited() -> void:
 func _on_global_selection_changed(selected_unit) -> void:
 	_is_selected = (selected_unit == _parent_unit)
 	_evaluate_visibility()
+
+func _is_conditionally_important() -> bool: ##applies the low-population and settings-driven hp bar visibility rules for otherwise unimportant units
+	if Pause.show_all_health_bars:
+		return true
+
+	return _get_cached_screen_unit_count() < AUTO_IMPORTANT_UNIT_THRESHOLD
+
+static func _get_cached_screen_unit_count() -> int: ##counts real units in the current camera view once per frame so hp bar visibility checks stay cheap
+	var current_frame: int = Engine.get_process_frames()
+	if _cached_screen_unit_count_frame == current_frame:
+		return _cached_screen_unit_count
+
+	_cached_screen_unit_count_frame = current_frame
+	_cached_screen_unit_count = _count_screen_units()
+	return _cached_screen_unit_count
+
+static func _count_screen_units() -> int:
+	if not is_instance_valid(Run.references):
+		return 0
+	if not is_instance_valid(Run.references.camera):
+		return 0
+
+	var camera: Camera = Run.references.camera
+	var viewport_size: Vector2 = camera.get_viewport_rect().size / camera.zoom
+	var view_rect := Rect2(camera.position - viewport_size * 0.5, viewport_size)
+	var unit_count: int = 0
+	var scene_tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if not is_instance_valid(scene_tree):
+		return 0
+
+	for unit_node: Node in scene_tree.get_nodes_in_group(DebugAssistant.GROUP_UNITS):
+		var unit: Unit = unit_node as Unit
+		if not is_instance_valid(unit):
+			continue
+		if unit.abstractive or unit.disabled:
+			continue
+		if not view_rect.has_point(unit.global_position):
+			continue
+
+		unit_count += 1
+
+	return unit_count
 
 func _reposition_icons() -> void:
 	var active_icons: Array[UnitStatusIcon] = _status_icons.values()

@@ -11,7 +11,7 @@
 script = ExtResource("1_2oild")
 id = 5
 cost = 8.0
-cost_scaling_override = 1.2
+cost_scaling_override = 0.2
 required_capacity = 0.0
 element = 5
 allowed_terrain = Array[int]([1])

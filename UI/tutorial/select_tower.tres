@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_5aftf")
-instruction_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below."
-success_text = "Select a tower by clicking on it in the tower bar with LMB. Its details are shown in the inspector below.
-Q to continue."
+instruction_text = "[Click] a tower in the tower bar with [LMB]. Its details are shown in the inspector below."
+success_text = "[Click] a tower in the tower bar with [LMB]. Its details are shown in the inspector below.
+[Q to continue.]"
 panel_anchor = 1
 trigger_action = &"0"
 metadata/_custom_type_script = "uid://d1grmccg0j1e0"

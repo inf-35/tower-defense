@@ -2,8 +2,8 @@ extends Behavior
 class_name WatchtowerBehavior
 
 #--- configuration ---
-@export var buff_per_tile: float = 20 ##e.g., +20 range per tile
-@export var base_buff: float = 20 ##e.g., base +20 range
+@export var buff_per_tile: float = 0.5 ##e.g., 0.5 = +50% range per tile
+@export var max_bonus_multiplier: float = 2.5 ##caps the additive range bonus at +250%
 @export var beam_vfx: VFXInfo ##authored persistent beam settings used while this tower is actively linked to a forward target
 
 #--- state ---
@@ -48,18 +48,14 @@ func _grant_buff(target: Tower, distance: int) -> void: ##applies one persistent
 	if not is_instance_valid(target.modifiers_component):
 		return
 
-	#calculate multiplier: base + (distance * buffpertile)
-	#e.g. distance 3 = 1.0 (base) + 0.5 + (3 * 0.2) = 1.0 + 1.1 = 2.1x range
-	var final_bonus = base_buff + ((distance-1) * buff_per_tile)
+	var final_multiplier: float = 1.0 + minf(float(distance) * buff_per_tile, max_bonus_multiplier)
 
 	if is_instance_valid(_active_modifier):
-		#we already have a modifier on this target, just update the math
-		if not is_equal_approx(_active_modifier.additive, final_bonus):
-			_active_modifier.additive = final_bonus
+		if not is_equal_approx(_active_modifier.multiplicative, final_multiplier):
+			_active_modifier.multiplicative = final_multiplier
 			target.modifiers_component.change_modifier(_active_modifier)
 	else:
-		#create a fresh modifier and push it to the target
-		_active_modifier = Modifier.new(Attributes.id.RANGE, 1.0, final_bonus, -1.0)
+		_active_modifier = Modifier.new(Attributes.id.RANGE, final_multiplier, 0.0, -1.0)
 		target.modifiers_component.add_modifier(_active_modifier)
 
 func _revoke_buff() -> void: ##removes the active stat link and tears down any beam still pointing at the old target

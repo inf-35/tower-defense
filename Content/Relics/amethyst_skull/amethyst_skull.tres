@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_2oygm"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_c17k8"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_2l3en"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_x6ns0"]
 [ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="5_x6ns0"]
 [ext_resource type="Script" uid="uid://bp6do8b78pj4k" path="res://Content/Relics/amethyst_skull/amethyst_skull_effect.gd" id="6_058vl"]
 [ext_resource type="Texture2D" uid="uid://cuhsw8o5nes3h" path="res://Assets/amethyst_skull_icon.png" id="7_5tggy"]

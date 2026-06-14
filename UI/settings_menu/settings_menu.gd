@@ -6,6 +6,7 @@ class_name SettingsMenu
 @export var sfx_slider: HSlider
 @export var music_slider: HSlider
 @export var fullscreen_toggle: CheckButton
+@export var show_all_health_bars_toggle: CheckButton ##toggles whether all damaged units should always show their health bars
 @export var back_button: Button
 
 @export var resume_button: Button
@@ -35,7 +36,7 @@ const AUDIO_POWER: float = 2.0 ##root of power curve of the audio
 signal closed()
 
 func _ready() -> void:
-	if not Run.is_run_ready():
+	if Run.has_active_run() and not Run.is_run_ready():
 		await Run.references_ready
 		
 	#1. cache audio bus indices (safety check if names change)
@@ -52,12 +53,14 @@ func _ready() -> void:
 	music_slider.value_changed.connect(_on_volume_changed.bind(_bus_music))
 
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
+	show_all_health_bars_toggle.toggled.connect(_on_show_all_health_bars_toggled)
 	back_button.pressed.connect(back)
 	resume_button.pressed.connect(func(): close_menu())
 	settings_button.pressed.connect(func(): enter_state(State.SETTINGS))
 	save_and_quit_button.pressed.connect(func(): _on_save_and_quit())
 
-	Run.phases.phase_advanced.connect(_evaluate_save_validity)
+	if is_instance_valid(Run.phases) and not Run.phases.phase_advanced.is_connected(_evaluate_save_validity):
+		Run.phases.phase_advanced.connect(_evaluate_save_validity)
 
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	#start hidden
@@ -74,7 +77,7 @@ func close_menu() -> void:
 	closed.emit()
 
 func back() -> void:
-	if state == State.SETTINGS and Run.phases.in_game:
+	if state == State.SETTINGS and is_instance_valid(Run.phases) and Run.phases.in_game:
 		enter_state(State.PAUSE)
 		return
 
@@ -94,6 +97,10 @@ func enter_state(input_state: State) -> void:
 #--- internal logic ---
 
 func _evaluate_save_validity() -> void:
+	if not is_instance_valid(Run.phases):
+		save_and_quit_button.disabled = true
+		return
+
 	#if not state == State.PAUSE:
 		#return
 
@@ -112,6 +119,7 @@ func _load_current_settings() -> void:
 	#fullscreen
 	var mode = DisplayServer.window_get_mode()
 	fullscreen_toggle.button_pressed = (mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+	show_all_health_bars_toggle.button_pressed = Pause.show_all_health_bars
 
 func _on_volume_changed(value: float, bus_index: int) -> void:
 	#convert linear slider (0-1) to decibels
@@ -129,7 +137,13 @@ func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
 		#optional: center window
 		#displayserver.window_set_position(...)
 
+func _on_show_all_health_bars_toggled(is_enabled: bool) -> void: ##applies the hp-bar visibility preference immediately and persists it to the profile store
+	Pause.show_all_health_bars = is_enabled
+	SaveLoad.save_profile()
+
 func _on_save_and_quit() -> void:
+	if not is_instance_valid(Run.phases):
+		return
 	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
 		return
 	Run.phases.in_game = false

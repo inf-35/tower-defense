@@ -113,7 +113,7 @@ func _scan_direction(dir: Vector2i) -> Tower:
 		current_cell += dir
 	return null
 
-func _create_prism_laser(partner: Tower) -> void:
+func _create_prism_laser(partner: Tower) -> void: ##reserves a prism link immediately, then defers node insertion until the tree is out of any teardown/setup critical section
 	var prism_a: Tower = unit as Tower
 	if not _is_valid_active_prism(prism_a) or not _is_valid_active_prism(partner):
 		return
@@ -129,13 +129,34 @@ func _create_prism_laser(partner: Tower) -> void:
 	laser.prism_a = prism_a
 	laser.prism_b = partner
 	_owned_lasers[partner] = laser
+	call_deferred("_finalize_prism_laser_creation", partner, laser)
 
-	island.add_child(laser)
+func _finalize_prism_laser_creation(partner: Tower, laser: PrismLaser) -> void: ##finishes the deferred prism laser spawn only if the reserved link still exists and both endpoint prisms remain valid
+	if not _owned_lasers.has(partner):
+		if is_instance_valid(laser):
+			laser.queue_free()
+		return
+
+	if _owned_lasers[partner] != laser:
+		if is_instance_valid(laser):
+			laser.queue_free()
+		return
+
+	var prism_a: Tower = unit as Tower
+	if not _is_valid_active_prism(prism_a) or not _is_valid_active_prism(partner):
+		_remove_prism_laser(partner)
+		return
+
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		_remove_prism_laser(partner)
+		return
 
 	var pos_a_world: Vector2 = Island.cell_to_position(prism_a.tower_position)
 	var pos_b_world: Vector2 = Island.cell_to_position(partner.tower_position)
 	var vector: Vector2 = pos_b_world - pos_a_world
 
+	island.add_child(laser)
 	laser.global_position = pos_a_world + vector / 2.0
 	laser.rotation = vector.angle()
 
