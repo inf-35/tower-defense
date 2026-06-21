@@ -11,6 +11,9 @@ var disable_shadows: bool = false
 var disable_hp_bars: bool = false
 var disable_status_icons: bool = false
 var disable_floating_text: bool = false
+var allied_graphics_tint: Color = Color(1.05, 1.05, 1.05, 1.0)
+var enemy_graphics_tint: Color = Color(0.92, 0.846, 0.846, 1.0)
+
 func reset_visual_debug_flags() -> void:
 	hide_unit_graphics = false
 	disable_shadows = false

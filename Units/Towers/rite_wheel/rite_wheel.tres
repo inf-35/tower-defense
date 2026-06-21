@@ -17,6 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Wheel Rite"
+rite_short_name = "wheel"
 tower_description = "{RITE_LABEL}. Adjacent towers have +300% {UNIT_HITRATE}, but deal no direct damage."
 icon = ExtResource("1_nk3c6")
 preview = ExtResource("1_nk3c6")

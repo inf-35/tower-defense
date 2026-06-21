@@ -13,6 +13,7 @@ signal start_wave_lock_changed(locked: bool)
 @export var player_stats_anchor: Control
 @export var timeline_anchor: Control
 @export var start_wave_anchor: Control
+@export var time_controls_anchor: Control
 
 #--- state ---
 var _registered_ui_elements: Dictionary[TutorialStep.Reference, Control] = {} #{ "id": controlnode }
@@ -239,6 +240,8 @@ func _advance_step() -> void: ##activates the next authored step, applying any l
 			_anchor_node = start_wave_anchor
 		TutorialStep.Anchor.TARGET_OFFSET:
 			_anchor_node = null
+		TutorialStep.Anchor.TIME_CONTROLS_ANCHOR:
+			_anchor_node = time_controls_anchor
 
 
 func _check_step_completion() -> void:

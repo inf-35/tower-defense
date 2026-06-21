@@ -119,8 +119,8 @@ func _draw_cell_highlight(canvas: RangeIndicator, cell: Vector2i, half: Vector2,
 	var color = canvas.attack_area_color
 	if is_blocked:
 		color.a *= 1.0 #solid hit
-		canvas.draw_rect(rect, color, false, canvas.line_width) #thick border
+		canvas.preview_rect(rect, color, false, canvas.line_width) #thick border
 
 	else:
 		color.a *= 0.5 #path
-		canvas.draw_rect(rect, color, false, canvas.line_width)
+		canvas.preview_rect(rect, color, false, canvas.line_width)

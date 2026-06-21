@@ -9,6 +9,7 @@ signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
 signal tower_placed(tower_type: Towers.Type, tower: Tower) ##fires only after a tower placement request succeeds and the runtime tower exists
+signal rite_excavated(tower: Tower) ##fires after a rite is successfully returned to inventory through excavation
 
 signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
 #and relevant towers
@@ -58,16 +59,20 @@ var _active_effects_container: Node
 #tutorial
 enum TutorialFlag {
 	MAIN,
+	PAUSE,
 	TROLL,
 	TOWER_DESTROYED,
 	RUINS,
+	RITE,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
 	TutorialFlag.MAIN: false,
+	TutorialFlag.PAUSE: false,
 	TutorialFlag.TROLL: false,
 	TutorialFlag.TOWER_DESTROYED: false,
 	TutorialFlag.RUINS: false,
+	TutorialFlag.RITE: false,
 }
 
 #various services (which are children of this node)
@@ -141,30 +146,30 @@ func begin_new_game() -> void:
 		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
 		Towers.Type.GENERATOR: true,
-		Towers.Type.POISON: true,
 		Towers.Type.WATCHTOWER: true,
-		Towers.Type.ARC: true,
+		Towers.Type.SHIELD: true,
+		Towers.Type.OUTPOST: true,
 	}
 
 	#var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_SALT
+	#reward.rite_type = Towers.Type.RITE_FLAME
 	#RewardService.apply_reward(reward)
-	#reward.rite_type = Towers.Type.RITE_SACRIFICE
+	#reward.rite_type = Towers.Type.RITE_FROST
 	#RewardService.apply_reward(reward)
 	#reward.type = Reward.Type.ADD_RELIC
-	##reward.relic = Relics.EPIDEMIC
+	###reward.relic = Relics.EPIDEMIC
+	###RewardService.apply_reward(reward)
+	##reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
 	##RewardService.apply_reward(reward)
-	#reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
-	#RewardService.apply_reward(reward)
-	#reward.relic = Relics.ALCHEMISTS_STONE
-	#RewardService.apply_reward(reward)
-	##reward.relic = Relics.SPINNING_TOP
+	##reward.relic = Relics.ALCHEMISTS_STONE
 	##RewardService.apply_reward(reward)
+	###reward.relic = Relics.SPINNING_TOP
+	###RewardService.apply_reward(reward)
 	#reward.relic = Relics.EPIDEMIC
 	#RewardService.apply_reward(reward)
-	#reward.relic = Relics.RUPTURED_HEART
-	#RewardService.apply_reward(reward)
+	##reward.relic = Relics.RUPTURED_HEART
+	##RewardService.apply_reward(reward)
 
 
 	flux = 30.0
@@ -321,6 +326,7 @@ func _on_excavate_rite_requested(tower) -> void:
 
 	self.flux -= RITE_EXCAVATION_COST
 	add_rite(tower.type, 1)
+	rite_excavated.emit(tower)
 	tower.excavate()
 
 func _on_upgrade_tower_requested(old_tower: Tower, upgrade_type: Towers.Type) -> void:

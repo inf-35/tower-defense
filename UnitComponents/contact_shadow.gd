@@ -9,7 +9,7 @@ class_name ContactShadow
 		shadow_size = value
 		queue_redraw() #redraw immediately when changed in editor
 
-@export var color: Color = Color("2d31473c"):
+@export var color: Color = Color("2d314756"):
 	set(value):
 		color = value
 		queue_redraw()

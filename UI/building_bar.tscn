@@ -1,11 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://d0k84g7agsotx"]
+[gd_scene format=3 uid="uid://d0k84g7agsotx"]
 
 [ext_resource type="Script" uid="uid://csymfdpw41oh5" path="res://UI/sidebar_ui.gd" id="1_08diq"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_uep1a"]
 [ext_resource type="PackedScene" uid="uid://f6bwjb8pybpm" path="res://UI/tower_option.tscn" id="3_uep1a"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_tkmsn"]
+[ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_rich"]
 
-[node name="building_bar" type="Control" node_paths=PackedStringArray("towers_bar", "start_wave_button", "trade_button")]
+[node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "start_wave_button", "trade_button", "trade_button_label")]
 custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
 anchor_top = 0.2
@@ -19,8 +20,9 @@ script = ExtResource("1_08diq")
 towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
 start_wave_button = NodePath("HBoxContainer/start_wave")
 trade_button = NodePath("HBoxContainer/trade")
+trade_button_label = NodePath("HBoxContainer/trade/label")
 
-[node name="HBoxContainer" type="VBoxContainer" parent="."]
+[node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=230116015]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,40 +32,58 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"vbox_10"
 
-[node name="trade" type="Button" parent="HBoxContainer"]
+[node name="trade" type="Button" parent="HBoxContainer" unique_id=674207593]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
-text = "Trade (T)"
 autowrap_mode = 2
 script = ExtResource("4_tkmsn")
+metadata/_custom_type_script = "uid://dmty142sb38lp"
 
-[node name="Panel" type="PanelContainer" parent="HBoxContainer"]
+[node name="label" type="RichTextLabel" parent="HBoxContainer/trade" unique_id=1430566132]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
+text = "Trade (T)"
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_rich")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="Panel" type="PanelContainer" parent="HBoxContainer" unique_id=1614997093]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel" unique_id=1947949510]
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/MarginContainer" unique_id=1484872741]
 layout_mode = 2
 
-[node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer"]
+[node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer" unique_id=769491345]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"vbox_10"
 
-[node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" instance=ExtResource("3_uep1a")]
+[node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" unique_id=132609132 instance=ExtResource("3_uep1a")]
 layout_mode = 2
 
-[node name="start_wave" type="Button" parent="HBoxContainer"]
+[node name="start_wave" type="Button" parent="HBoxContainer" unique_id=1108735127]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
+text = "Start Wave"
 autowrap_mode = 2
 script = ExtResource("4_tkmsn")

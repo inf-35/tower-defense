@@ -155,6 +155,8 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	_trigger_camera_overview(island) #initial overview of all choices
 
 func _pick_random_rite_type() -> Towers.Type:
+	if Run.phases.should_force_basic_tutorial_rites():
+		return Run.phases.pick_basic_tutorial_rite_type()
 	var rewards := RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
 	if rewards.is_empty():
 		return Towers.Type.VOID

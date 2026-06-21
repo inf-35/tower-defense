@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TutorialStep" format=3 uid="uid://qftm4we5p7gg"]
+
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+success_text = "{RITE_LABEL|label=Rites} modify the behavior of adjacent towers. Once uncovered, [click] a rite to inspect it. Rites can also be [repositioned], returning to the player's tower bar with a gold cost.
+[Q to continue.]"
+panel_anchor = 5
+highlight = false
+trigger_type = 5
+pause_clock = true
+target_offset = Vector2(56, -96)

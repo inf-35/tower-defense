@@ -37,22 +37,47 @@ func detach() -> void:
 		island.island_changed.emit()
 
 func update(_delta: float) -> void:
-	if _is_attack_possible(false):
-		var partners: Array[Tower] = []
-		partners.assign(_owned_lasers.keys())
-		for partner: Tower in partners:
-			if not _is_valid_active_prism(partner):
-				_remove_prism_laser(partner)
-				continue
+	if not _is_ready_to_pulse():
+		return
 
-			var laser: Node2D = _owned_lasers[partner]
-			if not is_instance_valid(laser) or laser.is_queued_for_deletion():
-				_owned_lasers.erase(partner)
-				continue
+	var targets: Array[Unit] = _collect_beam_targets()
+	if targets.is_empty():
+		return
+	
+	var attack_context: AttackComponent.AttackLineageContext = attack_component.pull_attack_context()
+	if not is_instance_valid(attack_context):
+		return
 
-			if laser.has_method("damage_tick"):
-				laser.damage_tick()
-		attack_component.refresh_cooldown()
+	attack_component.current_cooldown = attack_component.cooldown * 2.0
+	for target: Unit in targets:
+		attack_component.attack_with_context(target, attack_context, Vector2.ZERO, false)
+
+func _is_ready_to_pulse() -> bool: ##keeps prism firing on its own half-cooldown cadence rather than delegating cadence to the beam nodes
+	return is_instance_valid(attack_component) and not unit.disabled and attack_component.current_cooldown <= 0.0
+
+func _collect_beam_targets() -> Array[Unit]: ##collects targets from every beam this prism participates in so the prism remains the sole attack source
+	var targets: Array[Unit] = []
+	for partner: Tower in _all_connected_prisms:
+		if not _is_valid_active_prism(partner):
+			continue
+
+		var laser: PrismLaser = _get_laser_for_partner(partner)
+		if not is_instance_valid(laser):
+			continue
+
+		targets.append_array(laser.get_targets())
+	return targets
+
+func _get_laser_for_partner(partner: Tower) -> PrismLaser: ##resolves the shared beam node for a prism link regardless of which endpoint owns the visual node
+	if _owned_lasers.has(partner):
+		return _owned_lasers[partner] as PrismLaser
+
+	var partner_behavior: PrismBehavior = partner.behavior as PrismBehavior
+	if not is_instance_valid(partner_behavior):
+		return null
+	if not partner_behavior._owned_lasers.has(unit):
+		return null
+	return partner_behavior._owned_lasers[unit as Tower] as PrismLaser
 
 func _recalculate_links() -> void:
 	if not _is_attached:
@@ -224,13 +249,13 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		#evaluate what we hit
 		if is_instance_valid(hit_tower) and hit_tower.type == tower.type:
 			#successful link to another prism
-			canvas.draw_line(start_pos, end_pos, canvas.highlight_color, 2.0)
+			canvas.preview_line(start_pos, end_pos, canvas.highlight_color, 2.0)
 			canvas.draw_cell(impact_cell, canvas.highlight_color)
 		else:
 			#missed, or hit a blocking tower that isn't a prism
 			var fade_color = canvas.highlight_color
 			fade_color.a *= 0.3
-			canvas.draw_line(start_pos, end_pos, fade_color, 2.0)
+			canvas.preview_line(start_pos, end_pos, fade_color, 2.0)
 
 			#optional: if it hit a wall/non-prism, you could highlight the blockage in red
 			if is_instance_valid(hit_tower):

@@ -43,25 +43,19 @@ func _on_area_exited(area: Node2D) -> void:
 	if area is Hitbox and is_instance_valid(area.unit):
 		_targets_in_area.erase(area.unit)
 
-func damage_tick() -> void:
+func get_targets() -> Array[Unit]: ##returns the current valid units intersecting this beam without applying damage itself
 	if not _has_valid_prisms():
 		queue_free()
-		return
+		return []
 
-	if _targets_in_area.is_empty():
-		return
-
-	var attacking_prism: Tower = _get_attacking_prism()
-	if not is_instance_valid(attacking_prism) or not is_instance_valid(attacking_prism.attack_component):
-		return
-
+	var valid_targets: Array[Unit] = []
 	for i: int in range(_targets_in_area.size() - 1, -1, -1):
 		var target: Unit = _targets_in_area[i]
 		if not is_instance_valid(target):
 			_targets_in_area.remove_at(i)
 			continue
-
-		attacking_prism.attack_component.attack(target)
+		valid_targets.append(target)
+	return valid_targets
 
 func _draw() -> void:
 	if not is_instance_valid(collision_shape) or not collision_shape.shape is RectangleShape2D:
@@ -81,8 +75,3 @@ func _has_valid_prisms() -> bool:
 
 func _is_valid_prism(prism: Tower) -> bool:
 	return is_instance_valid(prism) and not prism.is_queued_for_deletion() and not prism.disabled
-
-func _get_attacking_prism() -> Tower:
-	if randf() > 0.5:
-		return prism_a
-	return prism_b

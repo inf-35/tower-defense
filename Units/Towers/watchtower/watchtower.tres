@@ -11,8 +11,7 @@
 script = ExtResource("6_eq7h6")
 target_type_name = "VOIDa"
 id = 55
-cost = 4.5
-required_capacity = 0.8
+cost = 7.0
 element = 5
 tower_name = "Watchtower"
 tower_description = "The tower in line of sight of the watchtower gains +33% {UNIT_RANGE} per tile between that tower and the watchtower, up to +300%,"

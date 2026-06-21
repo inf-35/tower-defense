@@ -17,6 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Scythe Rite"
+rite_short_name = "scythe"
 tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 1% {UNIT_DAMAGE|label=Damage} for every 1% of max HP the target enemy has lost., up to 100%."
 icon = ExtResource("1_i3722")
 preview = ExtResource("1_i3722")

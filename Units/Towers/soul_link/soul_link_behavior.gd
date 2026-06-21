@@ -155,5 +155,5 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 
 func _draw_adjacent_link(canvas: RangeIndicator, start_pos: Vector2, cell: Vector2i, color: Color) -> void:
 	var end_pos: Vector2 = Island.cell_to_position(cell)
-	canvas.draw_line(start_pos, end_pos, color, 2.0)
+	canvas.preview_line(start_pos, end_pos, color, 2.0)
 	canvas.draw_cell(cell, color)

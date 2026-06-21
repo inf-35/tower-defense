@@ -21,6 +21,7 @@ signal unhovered()
 @export var description: InteractiveRichTextLabel
 
 var _reward_data: Reward
+var _display_index: int = 0
 
 func _ready() -> void:
 	#ensure the container itself can catch mouse events
@@ -33,13 +34,14 @@ func _ready() -> void:
 #public setup function
 func setup(reward: Reward, index: int) -> void:
 	_reward_data = reward
+	_display_index = index
 
 	#apply data
 	_apply_visuals(reward)
+	play_entrance_animation()
 
-	#configure animation stagger
-	#access the animatableui script properties on the targets
-	var delay_base = index * 0.1
+func play_entrance_animation() -> void: ##replays the standard downward entrance animation so existing cards can animate again when a panel is reopened
+	var delay_base: float = _display_index * 0.1
 
 	if is_instance_valid(_icon_target) and "entrance_delay" in _icon_target:
 		_icon_target.entrance_delay = delay_base
@@ -47,7 +49,7 @@ func setup(reward: Reward, index: int) -> void:
 		_icon_target.animate_entrance()
 
 	if is_instance_valid(_panel_target) and "entrance_delay" in _panel_target:
-		_panel_target.entrance_delay = delay_base + 0.05 #slight offset for fluid feel
+		_panel_target.entrance_delay = delay_base + 0.05
 		_panel_target.auto_play_entrance = true
 		_panel_target.animate_entrance()
 

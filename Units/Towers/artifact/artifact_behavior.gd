@@ -24,17 +24,17 @@ func _enter_state(new_state: State) -> void:
 	match _current_state:
 		State.HIDDEN:
 			#visuals: dim / dusty
-			if is_instance_valid(unit.graphics):
-				unit.graphics.modulate = Color(0.6, 0.6, 0.6, 1.0)
+			unit.set_tint_layer(TintService.LAYER_STATE_VISUAL, Color(0.6, 0.6, 0.6, 1.0))
 
 		State.UNLOCKING:
 			#visuals: active / glowing
-			pass
+			unit.clear_tint_layer(TintService.LAYER_STATE_VISUAL)
 
 			#vfx: play "activation" sound/particle
 			#VFXManager.play_vfx(ID.Particles.CONSTRUCTION_PUFF, unit.global_position, Vector2.UP)
 
 		State.COMPLETE:
+			unit.clear_tint_layer(TintService.LAYER_STATE_VISUAL)
 			#grant loot
 			RewardService.apply_reward(reward)
 

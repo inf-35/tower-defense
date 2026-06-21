@@ -19,10 +19,10 @@ func _refresh_affordability(_flux: float) -> void: ##tints the price and fades t
 		return
 
 	var has_gold: bool = Run.player.flux >= _reward_data.price
-	var bad_color_hex: String = KeywordService.get_bad_color_hex()
+	var bad_color_hex: String = KeywordService.get_color_hex("bad")
 	var price_text_value: String = "%.2f {GOLD%s}" % [_reward_data.price, "|color=%s" % bad_color_hex if not has_gold else ""]
 	if not has_gold:
-		price_text_value = KeywordService.wrap_bad_text(price_text_value)
+		price_text_value = KeywordService.wrap_text(price_text_value, "bad")
 
 	price_text.set_parsed_text(price_text_value)
 	modulate.a = 1.0 if has_gold else UNAFFORDABLE_ALPHA

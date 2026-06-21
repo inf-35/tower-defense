@@ -1,6 +1,8 @@
 extends Node
 #Clock (autoload)
 
+signal speed_changed(new_speed: float)
+
 #--- private helper class for custom timers ---
 class GameTimer:
 	signal timeout
@@ -22,9 +24,13 @@ const FAST_FORWARD_SPEED: float = 3.0
 #this is the variable the ui will control (e.g., 1.0 for normal, 2.0 for double speed)
 var speed_multiplier: float = BASE_SPEED:
 	set(value):
-		speed_multiplier = max(0.0, value)
+		var clamped_value: float = max(0.0, value)
+		if is_equal_approx(speed_multiplier, clamped_value):
+			return
+		speed_multiplier = clamped_value
 		#if the multiplier is 0, pause the entire scene tree.
 		get_tree().paused = is_zero_approx(speed_multiplier)
+		speed_changed.emit(speed_multiplier)
 #these are the values that game logic components will read each frame
 var game_delta: float = 0.0 ##deltatime, adjusted for game speed
 var physics_game_delta: float = 0.0 ##physics dT, adjusted for game speed

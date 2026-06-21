@@ -17,6 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of Oil"
+rite_short_name = "oil"
 tower_description = "{RITE_LABEL}. {STATUS_EFFECT_LABEL|label=Status effects} inflicted by adjacent towers gain +300% duration."
 icon = ExtResource("1_pbx7b")
 preview = ExtResource("1_pbx7b")

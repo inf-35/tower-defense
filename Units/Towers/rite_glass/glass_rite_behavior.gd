@@ -94,6 +94,9 @@ func _sync_affected_towers(current_towers: Array[Tower]) -> void:
 		if not _affected_towers.has(tower):
 			_apply_modifiers(tower)
 
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(tower)
+
 func _can_affect_tower(tower: Tower) -> bool:
 	if not is_instance_valid(tower):
 		return false
@@ -156,4 +159,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		return
 
 	for cell: Vector2i in report.cells.values():
-		canvas.draw_cell(cell, canvas.highlight_color)
+		canvas.preview_cell(cell, canvas.highlight_color)

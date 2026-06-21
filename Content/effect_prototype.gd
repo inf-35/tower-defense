@@ -34,6 +34,31 @@ func _handle_stack_update(instance: EffectInstance) -> void:
 func on_tick(instance: EffectInstance, delta: float) -> void:
 	pass
 
+func trigger_source_tower_pulse(instance: EffectInstance) -> void: ##plays the shared rite squash-stretch feedback on the rite tower responsible for a successful proc
+	var source_tower: Tower = _resolve_source_tower(instance)
+	if not is_instance_valid(source_tower):
+		return
+
+	source_tower.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
+
+func _resolve_source_tower(instance: EffectInstance) -> Tower:
+	if is_instance_valid(instance.source) and instance.source is Tower:
+		return instance.source as Tower
+
+	if is_instance_valid(instance.host) and instance.host is Tower and Towers.is_tower_rite((instance.host as Tower).type):
+		return instance.host as Tower
+
+	return null
+
+func append_projectile_tint(hit_data: HitData, tint: Color) -> void: ##adds one projectile tint entry so multiple effects can cycle the base projectile visual without blending into a muddy color
+	if not is_instance_valid(hit_data):
+		return
+
+	if tint.a <= 0.0:
+		return
+
+	hit_data.projectile_tints.append(tint)
+
 @abstract func create_instance() -> EffectInstance
 
 func return_generic_instance() -> EffectInstance: ##helper for child classes (returns most generic instance)

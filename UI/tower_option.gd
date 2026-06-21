@@ -33,14 +33,14 @@ func _refresh_state() -> void: ##rebuilds the label so unavailable resource cost
 	if Towers.is_tower_rite(_tower_type):
 		text += " (%s)" % Run.player.get_rite_count(_tower_type)
 
-	var bad_color_hex: String = KeywordService.get_bad_color_hex()
+	var bad_color_hex: String = KeywordService.get_color_hex("bad")
 	var gold_text: String = "{GOLD|icon_size=40%s} %s" % ["|color=%s" % bad_color_hex if not has_gold else "", str(cost)]
 	if not has_gold:
-		gold_text = KeywordService.wrap_bad_text(gold_text)
+		gold_text = KeywordService.wrap_text(gold_text, "bad")
 
 	var capacity_text: String = "{POPULATION|icon_size=40%s} %s" % ["|color=%s" % bad_color_hex if not has_capacity else "", str(capacity_cost)]
 	if not has_capacity:
-		capacity_text = KeywordService.wrap_bad_text(capacity_text)
+		capacity_text = KeywordService.wrap_text(capacity_text, "bad")
 
 	text += "\n%s %s" % [gold_text, capacity_text]
 	tower_label.set_parsed_text(text)

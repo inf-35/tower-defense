@@ -83,6 +83,8 @@ func _on_topology_updated(report) -> void:
 	for tower: Tower in current_towers:
 		if not _applied_modifiers.has(tower) or _applied_modifiers[tower].is_empty():
 			_apply_modifier_to_tower(tower)
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(tower)
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var report = _last_report
@@ -96,4 +98,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
 	for cell: Vector2i in report.cells.values():
 		var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
-		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)

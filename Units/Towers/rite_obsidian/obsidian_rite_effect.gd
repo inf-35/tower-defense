@@ -57,6 +57,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	for status: Attributes.Status in CONVERTED_STATUSES:
 		target.modifiers_component.add_status(status, converted_stacks, duration, source_tower.unit_id)
 
+	trigger_source_tower_pulse(instance)
+
 func _get_remaining_duration(status: StatusEffect) -> float:
 	if is_instance_valid(status.timer):
 		return maxf(status.timer.duration - status.timer.time_elapsed, 0.1)

@@ -24,6 +24,7 @@ signal trader_close()
 signal trader_update_restock_cost(restock_cost: float)
 signal trader_update_stock(current_stock: Array[Reward])
 signal trader_update_waves_to_next_restock(waves: int)
+signal trader_unseen_stock_changed(has_unseen_stock: bool)
 signal trader_choice_selected(choice_id: int) ##called by trader ui
 signal trader_force_restock_requested() ##..
 #Phases -> UI

@@ -199,6 +199,35 @@ func get_tower_allowed_terrains(tower_type: Type) -> Array[Terrain.Base]:
 func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name
 
+func get_rite_short_name(tower_type: Type) -> String:
+	if not tower_stats.has(tower_type):
+		return ""
+
+	var authored_name: String = tower_stats[tower_type].rite_short_name.strip_edges()
+	if not authored_name.is_empty():
+		return authored_name.to_lower()
+
+	var tower_name: String = get_tower_name(tower_type)
+	if tower_name.begins_with("Rite of "):
+		return tower_name.trim_prefix("Rite of ").to_lower()
+	if tower_name.ends_with(" Rite"):
+		return tower_name.trim_suffix(" Rite").to_lower()
+	return tower_name.to_lower()
+
+func get_buff_short_name(tower_type: Type) -> String:
+	match tower_type:
+		Type.CAMPGROUNDS:
+			return "camp"
+		Type.WATCHTOWER:
+			return "watch"
+
+	if is_tower_rite(tower_type):
+		return get_rite_short_name(tower_type)
+
+	if not tower_stats.has(tower_type):
+		return ""
+	return get_tower_name(tower_type).to_lower()
+
 func get_tower_preview(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].preview
 
@@ -209,6 +238,15 @@ func is_tower_rite(tower_type: Type) -> bool:
 	if not tower_stats.has(tower_type):
 		return false
 	return tower_stats[tower_type].is_rite
+
+func is_tower_buff_source(tower_type: Type) -> bool:
+	return tower_type in [
+		Type.AMPLIFIER,
+		Type.CAMPGROUNDS,
+		Type.OUTPOST,
+		Type.SHIELD,
+		Type.WATCHTOWER,
+	] or is_tower_rite(tower_type)
 
 func is_tower_upgrade(tower_type: Type) -> bool:
 	if not tower_stats.has(tower_type):

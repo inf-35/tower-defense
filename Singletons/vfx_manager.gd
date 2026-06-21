@@ -1,6 +1,19 @@
 extends Node
 #VFXManager. Bypasses the scene tree and calls the renderingserver directly
+const PROJECTILE_TINT_CYCLE_PROPORTION: float = 0.4 ##per-tint blend duration expressed as a proportion of the projectile lifetime basis
+const MIN_PROJECTILE_TINT_CYCLE_TIME: float = 0.12 ##lower clamp for per-tint blend duration so short-lived projectiles do not flicker through colors too quickly
+const MAX_PROJECTILE_TINT_CYCLE_TIME: float = 0.6 ##upper clamp for per-tint blend duration so long-lived projectiles still cycle visibly before impact
+
+class SceneTintState extends RefCounted:
+	var canvas_item: CanvasItem
+	var base_modulate: Color = Color.WHITE
+	var projectile_tints: Array[Color] = []
+	var age: float = 0.0
+	var lifetime: float = 0.0
+	var tint_cycle_lifetime: float = -1.0
+
 var _active_vfx: Array[VFXInstance] = []
+var _active_scene_tints: Array[SceneTintState] = []
 #a flat array allows for optimal memory access
 
 func _ready() -> void:
@@ -9,7 +22,7 @@ func _ready() -> void:
 
 func _process(_d: float) -> void:
 	var delta: float = Clock.game_delta
-	if _active_vfx.is_empty():
+	if _active_vfx.is_empty() and _active_scene_tints.is_empty():
 		return
 
 	if delta == 0.0: #the game is paused, probably
@@ -37,16 +50,34 @@ func _process(_d: float) -> void:
 	for vfx : VFXInstance in vfx_to_remove: #deferred cleanup
 		_cleanup_vfx(vfx)
 
+	var scene_tints_to_remove: Array[SceneTintState] = []
+	for scene_tint: SceneTintState in _active_scene_tints:
+		if not is_instance_valid(scene_tint.canvas_item):
+			scene_tints_to_remove.append(scene_tint)
+			continue
+
+		scene_tint.age += delta
+		scene_tint.canvas_item.modulate = scene_tint.base_modulate * _get_projectile_tint(scene_tint.projectile_tints, scene_tint.age, scene_tint.tint_cycle_lifetime)
+
+		if scene_tint.lifetime > 0.0 and scene_tint.age >= scene_tint.lifetime:
+			scene_tints_to_remove.append(scene_tint)
+
+	for scene_tint: SceneTintState in scene_tints_to_remove:
+		_active_scene_tints.erase(scene_tint)
+
 func _draw_vfx() -> void:
 	for vfx : VFXInstance in _active_vfx:
 		var info: VFXInfo = vfx.vfx_info
-		var normalized_lifetime: float = vfx.age / info.lifetime
+		var normalized_lifetime: float = 0.0
+		if vfx.lifetime > 0.0:
+			normalized_lifetime = clampf(vfx.age / vfx.lifetime, 0.0, 1.0)
 		var canvas_item_rid: RID = vfx.canvas_item
 
 		#--- calculate common properties ---
 		var current_scale_val = 1.0 if not info.scale_over_lifetime else info.scale_over_lifetime.sample(normalized_lifetime)
 		current_scale_val *= info.scale
 		var current_color = Color.WHITE if not info.color_over_lifetime else info.color_over_lifetime.sample(normalized_lifetime)
+		current_color *= _get_projectile_tint(vfx.projectile_tints, vfx.age, vfx.projectile_tint_lifetime)
 		var transform: Transform2D = Transform2D(vfx.rotation, Vector2.ZERO).scaled(Vector2(current_scale_val, current_scale_val))
 		transform = transform.translated(vfx.position)
 
@@ -62,7 +93,10 @@ func _draw_vfx() -> void:
 			VFXInfo.VFXType.TEXTURE:
 				if not is_instance_valid(info.texture):
 					continue #abort
-				transform = transform.scaled(vfx.scale * current_scale_val)
+				RenderingServer.canvas_item_set_transform(
+					canvas_item_rid,
+					Transform2D(vfx.rotation, Vector2.ZERO).scaled(Vector2(current_scale_val, current_scale_val)).translated(vfx.position)
+				)
 
 				var frame := int(vfx.age * info.fps) % (info.h_frames * info.v_frames)
 				var fx: int = frame % info.h_frames
@@ -100,16 +134,27 @@ func _cleanup_vfx(vfx : VFXInstance) -> void:
 	_active_vfx.erase(vfx)
 
 #public api
-func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO, lifetime: float = INF, scale = Vector2.ONE, host: Node2D = null) -> Variant: ##returns either vfxinstance or instantiated node, dependent on whether vfx was a scene
+func play_vfx(
+	info: VFXInfo,
+	position: Vector2,
+	velocity: Vector2 = Vector2.ZERO,
+	lifetime: float = INF,
+	scale = Vector2.ONE,
+	host: Node2D = null,
+	projectile_tints: Array[Color] = [],
+	projectile_tint_lifetime: float = -1.0
+) -> Variant: ##returns either vfxinstance or instantiated node, dependent on whether vfx was a scene
 	if not info: return
 
 	if info.is_scene:
-		return _play_vfx_scene(info, position, velocity, scale, host)
+		return _play_vfx_scene(info, position, velocity, lifetime, scale, host, projectile_tints, projectile_tint_lifetime)
 	var vfx := VFXInstance.new()
 	vfx.vfx_info = info
 	vfx.position = position
 	vfx.velocity = velocity
 	vfx.scale = scale * 0.06
+	vfx.projectile_tints = projectile_tints.duplicate()
+	vfx.projectile_tint_lifetime = projectile_tint_lifetime
 
 	if lifetime == INF: #NOTE: INF means to use info.lifetime
 		vfx.lifetime = info.lifetime
@@ -124,7 +169,13 @@ func play_vfx(info: VFXInfo, position: Vector2, velocity: Vector2 = Vector2.ZERO
 	_active_vfx.append(vfx)
 	return vfx
 
-func play_aoe_field(info: VFXInfo, position: Vector2, radius: float, cone_angle_deg: float = 360.0, aim_direction: Vector2 = Vector2.RIGHT) -> AoeParticleFieldVFX: ##spawns a dense marker field for circular or cone aoes using the per-resource authored particle settings
+func play_aoe_field(
+	info: VFXInfo,
+	position: Vector2,
+	radius: float,
+	cone_angle_deg: float = 360.0,
+	aim_direction: Vector2 = Vector2.RIGHT
+) -> AoeParticleFieldVFX: ##spawns a dense marker field for circular or cone aoes using the per-resource authored particle settings
 	if not info or not info.aoe_particles_enabled:
 		return null
 
@@ -270,7 +321,7 @@ func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position
 		beam.set_texture(info.swirl_particle_texture)
 	return beam
 
-func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vector2, host: Node2D) -> Node2D:
+func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, lifetime: float, scale: Vector2, host: Node2D, projectile_tints: Array[Color], projectile_tint_lifetime: float) -> Node2D:
 	if not info.scene:
 		push_warning("VFX: ", host, " tried to create vfx without valid scene")
 
@@ -309,6 +360,9 @@ func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vect
 	if "velocity" in instance:
 		instance.velocity = velocity
 
+	if instance is CanvasItem and not projectile_tints.is_empty():
+		_register_scene_tint(instance as CanvasItem, lifetime, projectile_tints, projectile_tint_lifetime)
+
 	if instance.has_method("reset"):
 		instance.reset()
 	else:
@@ -319,3 +373,47 @@ func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, scale: Vect
 		push_warning("VFX: ", instance, " lacks start!")
 
 	return instance
+
+func _register_scene_tint(canvas_item: CanvasItem, lifetime: float, projectile_tints: Array[Color], projectile_tint_lifetime: float) -> void: ##tracks scene-backed projectile visuals in the same tint-cycle system used by procedural projectile sprites
+	for scene_tint: SceneTintState in _active_scene_tints:
+		if scene_tint.canvas_item != canvas_item:
+			continue
+
+		scene_tint.base_modulate = canvas_item.modulate
+		scene_tint.projectile_tints = projectile_tints.duplicate()
+		scene_tint.lifetime = lifetime
+		scene_tint.tint_cycle_lifetime = projectile_tint_lifetime
+		scene_tint.age = 0.0
+		return
+
+	var scene_tint := SceneTintState.new()
+	scene_tint.canvas_item = canvas_item
+	scene_tint.base_modulate = canvas_item.modulate
+	scene_tint.projectile_tints = projectile_tints.duplicate()
+	scene_tint.lifetime = lifetime
+	scene_tint.tint_cycle_lifetime = projectile_tint_lifetime
+	_active_scene_tints.append(scene_tint)
+
+func _get_projectile_tint(projectile_tints: Array[Color], age: float, lifetime_basis: float) -> Color: ##returns the current projectile tint by cycling across the authored palette instead of blending all effects into one muddy color
+	if projectile_tints.is_empty():
+		return Color.WHITE
+
+	if projectile_tints.size() == 1:
+		return projectile_tints[0]
+
+	var cycle_time: float = _get_projectile_tint_cycle_time(lifetime_basis)
+	var segment_progress: float = age / cycle_time
+	var current_index: int = int(floor(segment_progress)) % projectile_tints.size()
+	var next_index: int = (current_index + 1) % projectile_tints.size()
+	var blend_weight: float = segment_progress - floor(segment_progress)
+	return projectile_tints[current_index].lerp(projectile_tints[next_index], blend_weight)
+
+func _get_projectile_tint_cycle_time(lifetime_basis: float) -> float: ##derives the per-tint blend duration from projectile lifetime while clamping extreme short and long shots into a readable cadence
+	if lifetime_basis <= 0.0:
+		return MIN_PROJECTILE_TINT_CYCLE_TIME
+
+	return clampf(
+		lifetime_basis * PROJECTILE_TINT_CYCLE_PROPORTION,
+		MIN_PROJECTILE_TINT_CYCLE_TIME,
+		MAX_PROJECTILE_TINT_CYCLE_TIME
+	)

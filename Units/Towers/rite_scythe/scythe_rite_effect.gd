@@ -41,3 +41,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	#multiplier = 1.0 + (0.5 * 1.0) = 1.5
 	var multiplier = 1.0 + (factor * bonus_per_percent * instance.stacks)
 	hit_data.damage *= multiplier
+	trigger_source_tower_pulse(instance)

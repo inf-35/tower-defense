@@ -17,6 +17,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Liberty Rite"
+rite_short_name = "liberty"
 tower_description = "{RITE_LABEL}. All adjacent towers gain 25% {UNIT_HITRATE} per empty adjacent tile."
 icon = ExtResource("1_ob68q")
 preview = ExtResource("1_ob68q")

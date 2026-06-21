@@ -1,7 +1,6 @@
 extends Behavior
 class_name DrumRiteBehavior
 
-@export var icon: Texture2D
 @export var trigger_chance: float = 0.20
 
 #tracks currently connected towers to avoid double connections
@@ -45,6 +44,8 @@ func _refresh_connections(adj_map: Dictionary[Vector2i, Tower]) -> void:
 			#subscribe specifically to this neighbor's bus
 			neighbor.on_event.connect(_on_neighbor_event.bind(neighbor))
 			_connected_neighbors[neighbor] = true
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(neighbor)
 
 	#disconnect old neighbors
 	var to_remove = []
@@ -73,15 +74,18 @@ func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
 
 	#2. trigger others
 	#we iterate our known list (which we know are valid neighbors)
-	_trigger_all_except(source_neighbor, hit_data)
+	if _trigger_all_except(source_neighbor, hit_data):
+		unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
-func _trigger_all_except(exception: Tower, parent_data: EventData) -> void: ##arms neighboring towers so their forced follow-up attack derives from the triggering attack rather than restarting a fresh branch
+func _trigger_all_except(exception: Tower, parent_data: EventData) -> bool: ##arms neighboring towers so their forced follow-up attack derives from the triggering attack rather than restarting a fresh branch
+	var triggered_any: bool = false
 	for t in _connected_neighbors:
 		if t == exception: continue
 		if is_instance_valid(t) and is_instance_valid(t.attack_component):
 			t.attack_component.queue_next_attack_context(parent_data, self)
 			t.attack_component.current_cooldown = 0.0
-			UI.floating_text_manager.show_icon(icon, t.global_position)
+			triggered_any = true
+	return triggered_any
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	draw_visuals_adjacent_tiles(canvas)

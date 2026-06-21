@@ -56,9 +56,19 @@ func inject_components(modifiers_component: ModifiersComponent) -> void: ##regis
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])
+	_modifiers_component.stat_changed.connect(_on_stat_changed)
 
 func refresh_cooldown() -> void: ##resets the local cooldown using the current modified attack rate
 	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
+
+func _on_stat_changed(attribute: Attributes.id) -> void: 
+	#clamps any stale oversized remaining cooldown down to the current effective cooldown
+	if attribute != Attributes.id.COOLDOWN:
+		return
+
+	var new_cooldown: float = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
+	if new_cooldown < current_cooldown:
+		current_cooldown = new_cooldown
 
 func queue_next_attack_context(
 	parent_data: EventData,
@@ -188,6 +198,9 @@ func _attack_with_context(target: Unit, attack_context: AttackLineageContext, in
 
 	if not apply_attack_context(hit_data, attack_context):
 		return
+
+	if unit is Tower and not Towers.is_tower_rite((unit as Tower).type):
+		unit.play_action_squash_stretch()
 
 	unit.deal_hit(hit_data, delivery_data)
 

@@ -6,11 +6,13 @@ class_name GameOverScreen
 @export var relic_container: RelicDisplay
 @export var tower_container: RelicDisplay
 @export var restart_button: Button
+@export var feedback_button: Button
 @export var quit_button: Button
 @export var debug_game_over_icons: bool = false
 
 var _last_hovered_control_path: String = ""
 
+const FEEDBACK_FORM_URL: String = "https://docs.google.com/forms/d/e/1FAIpQLSdjTLjsxete1nBg6uRjVjMCB3220uPqmYzGuMnReDQ72I6yAg/viewform?usp=header"
 const VICTORY_TITLE: String = "Victory!"
 const VICTORY_COLOR: Color = Color("68bf8c") #greenish
 const DEFEAT_TITLE: String = "Defeat"
@@ -19,6 +21,7 @@ const DEFEAT_COLOR: Color = Color("bf6868") #reddish
 func _ready() -> void:
 	#connect buttons
 	restart_button.pressed.connect(_on_restart_pressed)
+	feedback_button.pressed.connect(_on_feedback_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
 
 	UI.display_game_over.connect(display)
@@ -108,6 +111,9 @@ func _on_quit_pressed() -> void:
 	#return to main menu
 	Run.phases.in_game = false
 	get_tree().change_scene_to_file.call_deferred("res://main_menu.tscn")
+
+func _on_feedback_pressed() -> void:
+	OS.shell_open(FEEDBACK_FORM_URL)
 
 func _debug_log(message: String) -> void:
 	if debug_game_over_icons:

@@ -38,6 +38,8 @@ func _recalculate_target() -> void: ##rescans the forward lane and keeps the mod
 		if is_instance_valid(found_tower):
 			_grant_buff(found_tower, scan.distance_tiles)
 			_currently_buffed_tower = found_tower
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(found_tower)
 
 	elif is_instance_valid(_currently_buffed_tower):
 		_grant_buff(_currently_buffed_tower, scan.distance_tiles)
@@ -107,7 +109,7 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 	if is_instance_valid(target_tower):
 		#hit a tower
 		var end_pos: Vector2 = Island.cell_to_position(scan.impact_cell)
-		canvas.draw_line(start_pos, end_pos, canvas.highlight_color, 2.0)
+		canvas.preview_line(start_pos, end_pos, canvas.highlight_color, 2.0)
 		canvas.draw_cell(scan.impact_cell, canvas.highlight_color)
 	else:
 		#missed / hit nothing. draw a faded line up to the last checked cell.
@@ -117,4 +119,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		var fade_color: Color = canvas.highlight_color
 		fade_color.a *= 0.8
 
-		canvas.draw_line(start_pos, end_pos, fade_color, 2.0)
+		canvas.preview_line(start_pos, end_pos, fade_color, 2.0)

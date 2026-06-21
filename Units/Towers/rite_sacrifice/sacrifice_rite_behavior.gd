@@ -1,7 +1,6 @@
 extends Behavior
 class_name SacrificeRiteBehavior
 
-@export var buff_icon: Texture2D
 @export var buff_modifier: ModifierDataPrototype
 @export var query_kind: TowerTopologyService.QueryKind = TowerTopologyService.QueryKind.CARDINAL_RING
 @export var max_range: int = 2
@@ -89,7 +88,7 @@ func _on_target_hit(event: GameEvent, victim: Tower) -> void:
 	var mod: Modifier = buff_modifier.generate_modifier()
 	mod.cooldown = -1.0 #managed manually via wave ends
 	chosen.modifiers_component.add_modifier(mod)
-	UI.floating_text_manager.show_icon(buff_icon, chosen.global_position)
+	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
 	_wave_buffs.append({ "tower": chosen, "modifier": mod })
 
@@ -137,4 +136,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 	for cell: Vector2i in report.cells.values():
 		var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
 		#drawing a light border around the affected topology area
-		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)

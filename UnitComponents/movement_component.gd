@@ -112,17 +112,20 @@ func _update_walk_cycle(delta: float) -> void:
 		var bounce = abs(sin(_walk_cycle_time)) * bounce_amount
 
 		#stretch y slightly, squash x slightly to preserve apparent volume
-		graphics.scale = Vector2(1.0 - (bounce * 0.3), 1.0 + bounce) * Vector2(0.096, 0.096)
+		unit.set_motion_graphics_scale(Vector2(1.0 - (bounce * 0.3), 1.0 + bounce))
 
 	else:
 		#return to neutral pose when stopped
 		var return_speed = delta * 10.0
 		graphics.rotation = lerp_angle(graphics.rotation, 0.0, return_speed)
-		graphics.scale = graphics.scale.lerp(Vector2.ONE * Vector2(0.096, 0.096), return_speed)
+		unit.set_motion_graphics_scale(_get_motion_scale().lerp(Vector2.ONE, return_speed))
 
 		#reset timer logic to keep phase consistent on restart
-		if graphics.scale.is_equal_approx(Vector2.ONE * Vector2(0.096, 0.096)):
+		if _get_motion_scale().is_equal_approx(Vector2.ONE):
 			_walk_cycle_time = 0.0
+
+func _get_motion_scale() -> Vector2:
+	return unit.get_motion_graphics_scale()
 
 func get_save_data() -> Dictionary:
 	return {} #everything here thats persistent is typically run by modifiers component

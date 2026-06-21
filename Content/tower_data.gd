@@ -38,6 +38,7 @@ func submit_tower_type() -> void:
 @export var navcost: int = 100
 
 @export var tower_name: String
+@export var rite_short_name: String = "" ##optional lower-friction label for rite-specific vfx such as "+drums"
 @export_multiline var tower_description: String
 
 @export var icon: Texture2D = preload("res://Assets/wall.png")

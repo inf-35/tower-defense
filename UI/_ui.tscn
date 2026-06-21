@@ -30,6 +30,8 @@
 [ext_resource type="PackedScene" uid="uid://wv1a4nst6xfl" path="res://UI/loading_screen/loading_screen.tscn" id="24_1"]
 [ext_resource type="Script" uid="uid://bv8bb3j1duuj6" path="res://UI/ui_panel_motion_controller.gd" id="25_panel_motion"]
 [ext_resource type="PackedScene" uid="uid://ctvr3nc8sdjbw" path="res://UI/damage_tracker/damage_tracker_panel.tscn" id="26_damage_tracker"]
+[ext_resource type="Script" uid="uid://750rn7tmpx2h" path="res://UI/player_damage_feedback.gd" id="27_damage_feedback"]
+[ext_resource type="Shader" uid="uid://cdnu76alxvtkf" path="res://Shaders/player_damage_vignette.gdshader" id="28_damage_vignette"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
 shader = ExtResource("22_b47fn")
@@ -38,13 +40,21 @@ shader_parameter/spotlight_center = Vector2(0.5, 0.5)
 shader_parameter/spotlight_size = Vector2(0.1, 0.1)
 shader_parameter/is_active = true
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_damage_vignette"]
+shader = ExtResource("28_damage_vignette")
+shader_parameter/vignette_color = Color(0.85, 0.08, 0.08, 0.82)
+shader_parameter/intensity = 0.0
+shader_parameter/inner_radius = 0.52
+shader_parameter/feather = 0.2
+shader_parameter/center = Vector2(0.5, 0.5)
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_33vnq"]
 
 [node name="UI" type="CanvasLayer" unique_id=605534676]
 process_mode = 3
 script = ExtResource("1_8wg1j")
 
-[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("overlay_color_rect", "instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor")]
+[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("overlay_color_rect", "instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor", "time_controls_anchor")]
 layer = 3
 script = ExtResource("21_7qncy")
 overlay_color_rect = NodePath("ColorRect")
@@ -54,6 +64,7 @@ tower_bar_anchor = NodePath("../Margin/ui_space/tutorial_anchors/tower_bar_ancho
 player_stats_anchor = NodePath("../Margin/ui_space/tutorial_anchors/stats_anchor")
 timeline_anchor = NodePath("../Margin/ui_space/tutorial_anchors/timeline_anchor")
 start_wave_anchor = NodePath("../Margin/ui_space/tutorial_anchors/start_wave_anchor")
+time_controls_anchor = NodePath("../Margin/ui_space/tutorial_anchors/time_controls_anchor")
 metadata/_custom_type_script = "uid://ddlb750e0o03a"
 
 [node name="ColorRect" type="ColorRect" parent="TutorialManager" unique_id=177295535]
@@ -73,6 +84,29 @@ offset_bottom = 34.0
 
 [node name="LoadingScreen" parent="." unique_id=1318486233 instance=ExtResource("24_1")]
 visible = false
+
+[node name="PlayerDamageFeedback" type="Control" parent="." unique_id=1883371124 node_paths=PackedStringArray("overlay_rect")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("27_damage_feedback")
+overlay_rect = NodePath("Overlay")
+peak_intensity = 1.0
+intensity_per_damage = 0.4
+
+[node name="Overlay" type="ColorRect" parent="PlayerDamageFeedback" unique_id=177141420]
+material = SubResource("ShaderMaterial_damage_vignette")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=878017124]
 anchors_preset = 15
@@ -187,7 +221,19 @@ offset_bottom = 347.0
 grow_horizontal = 0
 mouse_filter = 2
 
-[node name="game_over_screen" type="Control" parent="Margin/ui_space" unique_id=346739799 node_paths=PackedStringArray("title_label", "wave_label", "relic_container", "tower_container", "restart_button", "quit_button")]
+[node name="time_controls_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=200914322]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -710.0
+offset_top = 160.0
+offset_right = -269.0
+offset_bottom = 294.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="game_over_screen" type="Control" parent="Margin/ui_space" unique_id=346739799 node_paths=PackedStringArray("title_label", "wave_label", "relic_container", "tower_container", "restart_button", "feedback_button", "quit_button")]
 process_mode = 3
 visible = false
 z_index = 2
@@ -203,6 +249,7 @@ wave_label = NodePath("PanelContainer/MarginContainer/VBoxContainer/wave_text")
 relic_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/Relics/ScrollContainer/relics")
 tower_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/Towers/ScrollContainer/towers")
 restart_button = NodePath("PanelContainer/Control/buttons/restart_button")
+feedback_button = NodePath("PanelContainer/Control/buttons/feedback_button")
 quit_button = NodePath("PanelContainer/Control/buttons/main_menu_button")
 
 [node name="Background" type="Panel" parent="Margin/ui_space/game_over_screen" unique_id=1635600364]
@@ -326,6 +373,16 @@ offset_bottom = 28.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_type_variation = &"hbox_20"
+
+[node name="feedback_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons" unique_id=1402294511]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.14901961, 0.3254902, 0.7411765, 1)
+theme_override_colors/font_focus_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_hover_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
+text = "Feedback"
 
 [node name="restart_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons" unique_id=1242919575]
 layout_mode = 2

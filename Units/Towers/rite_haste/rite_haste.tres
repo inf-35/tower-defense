@@ -17,7 +17,8 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of Haste"
-tower_description = "{RITE_LABEL}. All adjacent towers gain 100% {UNIT_HITRATE}, but deal 0.5 damage to themselves upon attacking."
+rite_short_name = "haste"
+tower_description = "{RITE_LABEL}. All adjacent towers gain 100% {UNIT_HITRATE}, but deal 1 damage to themselves upon attacking."
 icon = ExtResource("1_v507s")
 preview = ExtResource("1_v507s")
 inspector_actions = Array[ExtResource("2_4txhu")]([ExtResource("3_ba8r3")])

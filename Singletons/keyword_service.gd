@@ -2,8 +2,18 @@ extends Node
 
 const BAD_COLOR: Color = Color("b53643ff")
 const HIGHLIGHT_ACTION_COLOR: Color = Color("1a6fc9ff")
+const HIGHLIGHT_COLOR: Color = Color(0.85, 0.669, 0.17, 1.0)
+const INPUT_COLOR: Color = Color(0.17, 0.28, 0.53, 1.0)
 const POSITIVE_HIGHLIGHT_COLOR: Color = Color(0.35, 1.0, 0.45, 0.48)
 const NEGATIVE_HIGHLIGHT_COLOR: Color = Color(1.0, 0.2, 0.2, 0.48)
+const TEXT_STYLES: Dictionary[String, Color] = {
+	"bad": BAD_COLOR,
+	"action": HIGHLIGHT_ACTION_COLOR,
+	"highlight": HIGHLIGHT_COLOR,
+	"input": INPUT_COLOR,
+	"positive": POSITIVE_HIGHLIGHT_COLOR,
+	"negative": NEGATIVE_HIGHLIGHT_COLOR,
+}
 
 var ICON_SIZE: int = 40
 #NOTE:
@@ -191,31 +201,21 @@ func get_keyword_data(keyword: String) -> Dictionary:
 
 	return {}
 
-func get_bad_color_hex() -> String: ##returns the shared muted failure color as a bbcode-ready hex string
-	return BAD_COLOR.to_html(false)
+func get_color_hex(style: String) -> String: ##returns one shared bbcode-ready color hex by style key so call sites do not need bespoke helpers per color
+	var normalized_style: String = style.to_lower()
+	if not TEXT_STYLES.has(normalized_style):
+		push_error("KeywordService: unknown text style '%s'" % style)
+		return BAD_COLOR.to_html(false)
 
-func get_highlight_action_color_hex() -> String: ##returns the shared tutorial/action color as a bbcode-ready hex string
-	return HIGHLIGHT_ACTION_COLOR.to_html(false)
+	return (TEXT_STYLES[normalized_style] as Color).to_html(false)
 
-func get_positive_highlight_color_hex() -> String: ##returns the shared positive selection color used by range indicators
-	return POSITIVE_HIGHLIGHT_COLOR.to_html(false)
-
-func get_negative_highlight_color_hex() -> String: ##returns the shared negative selection color used by range indicators
-	return NEGATIVE_HIGHLIGHT_COLOR.to_html(false)
-
-func wrap_bad_text(text: String) -> String: ##wraps arbitrary text in the shared failure color so ui call sites stay data-light
-	return "[color=#%s]%s[/color]" % [get_bad_color_hex(), text]
-
-func wrap_highlight_action_text(text: String) -> String: ##wraps tutorial-facing action prompts in the shared highlight color
-	return "[color=#%s]%s[/color]" % [get_highlight_action_color_hex(), text]
-
-func wrap_positive_highlight_text(text: String) -> String: ##wraps text with the same positive color used by supportive preview overlays
-	return "[color=#%s]%s[/color]" % [get_positive_highlight_color_hex(), text]
-
-func wrap_negative_highlight_text(text: String) -> String: ##wraps text with the same negative color used by punitive preview overlays
-	return "[color=#%s]%s[/color]" % [get_negative_highlight_color_hex(), text]
+func wrap_text(text: String, style: String) -> String: ##wraps arbitrary text in one shared named style so ui code can stay compact as the style set grows
+	return "[color=#%s]%s[/color]" % [get_color_hex(style), text]
 
 func style_tutorial_text(text: String) -> String: ##colors bracketed tutorial action terms while leaving keyword placeholders untouched for the normal parser
+	return _style_square_bracket_text(text)
+
+func _style_square_bracket_text(text: String) -> String: ##styles bracketed inline markers like [RMB], [highlight:tower], or [input:adjacent towers] before keyword parsing runs
 	if text.is_empty():
 		return ""
 
@@ -233,16 +233,28 @@ func style_tutorial_text(text: String) -> String: ##colors bracketed tutorial ac
 			continue
 
 		processed_tokens[full_placeholder] = true
-		styled_text = styled_text.replace(full_placeholder, wrap_highlight_action_text(content))
+		styled_text = styled_text.replace(full_placeholder, _resolve_square_bracket_style(content))
 
 	return styled_text
+
+func _resolve_square_bracket_style(content: String) -> String: ##maps inline square-bracket markers onto the shared text color wrappers while preserving legacy action markup
+	var separator_index: int = content.find(":")
+	if separator_index == -1:
+		return wrap_text(content, "action")
+
+	var marker_type: String = content.substr(0, separator_index).strip_edges().to_lower()
+	var marker_text: String = content.substr(separator_index + 1).strip_edges()
+	if not TEXT_STYLES.has(marker_type):
+		return wrap_text(content, "action")
+
+	return wrap_text(marker_text, marker_type)
 
 #converts text with {markers} into rich bbcode
 func parse_text_for_bbcode(text: String) -> String:
 	if text.is_empty():
 		return ""
 
-	var parsed_text: String = text
+	var parsed_text: String = _style_square_bracket_text(text)
 	var matches: Array[RegExMatch] = _regex.search_all(text)
 
 	#we use a dictionary to avoid processing the same keyword twice in one string.

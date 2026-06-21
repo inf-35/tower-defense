@@ -144,4 +144,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		#faint circle to show where it collects from
 		var radius_color = canvas.range_color
 		radius_color.a *= 0.8
-		canvas.draw_circle(unit.global_position, radius, radius_color, false, canvas.line_width)
+		canvas.preview_circle(unit.global_position, radius, radius_color, false, canvas.line_width)

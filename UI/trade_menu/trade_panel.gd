@@ -17,7 +17,10 @@ func _set_restock_affordability(restock_cost: float) -> void: ##keeps the trader
 func _ready() -> void: ##binds the trader panel to the live stock, restock, and close flows
 	visible = false
 
-	UI.trader_open.connect(func(): visible = true)
+	UI.trader_open.connect(func():
+		visible = true
+		_play_open_animation()
+	)
 	UI.trader_close.connect(func(): visible = false)
 	UI.trader_update_stock.connect(_present_options)
 	UI.trader_update_restock_cost.connect(_update_restock_cost)
@@ -43,6 +46,11 @@ func _update_restock_cost(restock_cost: float) -> void:
 
 func _update_restock_waves(waves: int) -> void:
 	wave_text.text = "Restocks automatically in %d wave(s)." % waves
+
+func _play_open_animation() -> void: ##replays the existing card entrance motion when the player opens the trader without changing stock
+	for card: RewardOptionCard in active_cards:
+		if is_instance_valid(card) and card.has_method(&"play_entrance_animation"):
+			card.play_entrance_animation()
 
 func _instantiate_card(data: Reward, index: int) -> void:
 	if not card_scene:

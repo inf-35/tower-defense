@@ -62,6 +62,8 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 	for tower: Tower in current_adjacent_towers:
 		if (not _applied_modifiers.has(tower)) or _applied_modifiers[tower].is_empty():
 			_apply_modifier_to_tower(tower)
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(tower)
 
 #this is the canonical cleanup function, called automatically when the tower is destroyed.
 func _exit_tree() -> void:
@@ -112,4 +114,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		var pos = Island.cell_to_position(cell)
 		var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
 
-		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)

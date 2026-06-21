@@ -40,14 +40,14 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 
 		hit_data.velocity = starting_velocity
 
-		VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, starting_velocity, delay)
+		CombatManager._play_spawn_vfx_set(hit_data, source_position, starting_velocity, delay)
 		Clock.await_game_time(delay).connect(func():
 			_on_timeout()
 		)
 
 	func _on_timeout() -> void:
-		VFXManager.play_vfx(hit_data.vfx_on_impact, intercept_position)
-		VFXManager.play_aoe_field(hit_data.vfx_on_impact, intercept_position, hit_data.radius)
+		CombatManager._play_impact_vfx_set(hit_data, intercept_position)
+		CombatManager._play_aoe_field_vfx_set(hit_data, intercept_position, hit_data.radius)
 		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
 		var target: Unit = hit_data.target #NOTE: this might be null
 
@@ -120,7 +120,16 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		if is_instance_valid(hit_data.source):
 			_exclude_colliders.append(hit_data.source.hitbox.get_rid())
 		 #we manage lifetime and velocity by ourselves
-		vfx_instance =  VFXManager.play_vfx(hit_data.vfx_on_spawn, projectile_position, Vector2.ZERO, VFXInfo.INFINITE_LIFETIME)
+		vfx_instance =  VFXManager.play_vfx(
+			hit_data.vfx_on_spawn,
+			projectile_position,
+			Vector2.ZERO,
+			VFXInfo.INFINITE_LIFETIME,
+			Vector2.ONE,
+			null,
+			hit_data.projectile_tints,
+			delivery_data.projectile_lifetime
+		)
 		if hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY:
 			vfx_instance.rotation = initial_velocity.angle()
 
@@ -140,10 +149,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			var move_vec := projectile_velocity * remaining_delta
 			var end_pos := start_pos + move_vec
 
-			if vfx_instance is VFXInstance:
-				vfx_instance.position = projectile_position #vfx update
-			else:
-				vfx_instance.global_position = projectile_position
+			_sync_projectile_visual()
 
 			#perform custom raycast
 			var result = _perform_raycast(start_pos, end_pos)
@@ -170,6 +176,21 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				_exclude_colliders.append(result.rid)
 		if projectile_age > delivery_data.projectile_lifetime and delivery_data.projectile_lifetime > 0.0: #timeout
 			_on_destruct()
+
+	func _sync_projectile_visual() -> void: ##keeps the base projectile visual locked to the simulated projectile position and facing throughout its flight
+		if not is_instance_valid(vfx_instance):
+			return
+
+		if vfx_instance is VFXInstance:
+			vfx_instance.position = projectile_position
+			if hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY and not projectile_velocity.is_zero_approx():
+				vfx_instance.rotation = projectile_velocity.angle()
+			return
+
+		vfx_instance.global_position = projectile_position
+		if vfx_instance is Node2D and hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY and not projectile_velocity.is_zero_approx():
+			var node_vfx: Node2D = vfx_instance
+			node_vfx.rotation = projectile_velocity.angle()
 
 	func _perform_raycast(from: Vector2, to: Vector2) -> Dictionary:
 		var space_state = Run.references.island.get_world_2d().direct_space_state
@@ -239,7 +260,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				return
 			unit.take_hit(hit_copy)
 		else:
-			VFXManager.play_aoe_field(hit_data.vfx_on_impact, impact_pos, hit_data.radius)
+			CombatManager._play_aoe_field_vfx_set(hit_data, impact_pos, hit_data.radius)
 			#trigger aoe at this point
 			var units_in_aoe: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_pos, target_affiliation)
 			for hit_unit: Unit in units_in_aoe:
@@ -250,22 +271,29 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				hit_unit.take_hit(aoe_hit)
 
 	func _apply_impact_vfx(pos: Vector2) -> void:
-		VFXManager.play_vfx(hit_data.vfx_on_impact, pos)
+		CombatManager._play_impact_vfx_set(hit_data, pos)
 		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), pos)
 
 	func _on_destruct(target: Unit = null) -> void:
 		CombatManager.simulated_projectiles.erase(self)
 
-		if is_instance_valid(vfx_instance):
-			if vfx_instance is VFXInstance:
-				vfx_instance.delete = true
-			elif vfx_instance is Node2D:
-				if vfx_instance.has_method("stop"):
-					vfx_instance.stop()
-				else:
-					vfx_instance.queue_free()
+		_destroy_vfx_instance(vfx_instance)
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage)
+
+	func _destroy_vfx_instance(vfx: Variant) -> void: ##tears down one runtime visual handle using the same ownership rules as the base projectile visual path
+		if not is_instance_valid(vfx):
+			return
+
+		if vfx is VFXInstance:
+			vfx.delete = true
+			return
+
+		if vfx is Node2D:
+			if vfx.has_method("stop"):
+				vfx.stop()
+			else:
+				vfx.queue_free()
 
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 	var target: Unit = hit_data.target #this will be null if the hit does not have a predestined target
@@ -330,9 +358,10 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			Targeting.add_damage(target, -hit_data.expected_damage)
 
 		DeliveryData.DeliveryMethod.CONE_AOE:
-			if hit_data.source: VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
 			var aim_direction: Vector2 = (intercept_position - source_position).normalized()
-			VFXManager.play_aoe_field(hit_data.vfx_on_spawn, source_position, hit_data.radius, delivery_data.cone_angle, aim_direction)
+			if hit_data.source:
+				VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
+			_play_aoe_field_vfx_set(hit_data, source_position, hit_data.radius, delivery_data.cone_angle, aim_direction, true)
 			var potential_targets: Array[Unit] = get_units_in_radius(hit_data.radius, source_position, hit_data.target_affiliation)
 			if potential_targets.is_empty():
 				return #no potential targets
@@ -367,6 +396,27 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 		DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
 			var resolver := ProjectileSimulatedResolver.new(hit_data, delivery_data)
 			resolver.start()
+
+static func _play_spawn_vfx_set(hit_data: HitData, position: Vector2, velocity: Vector2, lifetime: float) -> void:
+	if is_instance_valid(hit_data.vfx_on_spawn):
+		VFXManager.play_vfx(hit_data.vfx_on_spawn, position, velocity, lifetime, Vector2.ONE, null, hit_data.projectile_tints, lifetime)
+
+static func _play_impact_vfx_set(hit_data: HitData, position: Vector2) -> void:
+	if is_instance_valid(hit_data.vfx_on_impact):
+		VFXManager.play_vfx(hit_data.vfx_on_impact, position)
+
+static func _play_aoe_field_vfx_set(
+	hit_data: HitData,
+	position: Vector2,
+	radius: float,
+	cone_angle_deg: float = 360.0,
+	aim_direction: Vector2 = Vector2.RIGHT,
+	include_base: bool = false
+) -> void:
+	if include_base and is_instance_valid(hit_data.vfx_on_spawn):
+		VFXManager.play_aoe_field(hit_data.vfx_on_spawn, position, radius, cone_angle_deg, aim_direction)
+	elif is_instance_valid(hit_data.vfx_on_impact):
+		VFXManager.play_aoe_field(hit_data.vfx_on_impact, position, radius, cone_angle_deg, aim_direction)
 
 var simulated_projectiles: Array[ProjectileSimulatedResolver] = [] #projectileresolvers will automatically add and remove themselves as necessary
 func _process(_delta: float) -> void: #simulate all alive projectiles

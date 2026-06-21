@@ -3,7 +3,8 @@ class_name StatusInfusionEffect
 
 @export var status: Attributes.Status = Attributes.Status.FROST
 @export var bonus_stacks: float = 1.0
-@export var bonus_time: float = 0.8
+@export var bonus_time: float = 2.0
+@export var projectile_tint: Color = Color(0.5803922, 0.8980392, 1.0, 1.0) ##tint appended to the projectile palette so multi-rite attacks can cycle between distinct colors instead of blending them
 
 func _init() -> void:
 	#intercept hits before they leave the tower
@@ -34,3 +35,5 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	status_vector.y = maxf(status_vector.y, bonus_time)
 
 	hit_data.status_effects[status] = status_vector
+	append_projectile_tint(hit_data, projectile_tint)
+	trigger_source_tower_pulse(instance)

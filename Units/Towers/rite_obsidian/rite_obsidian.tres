@@ -14,6 +14,7 @@ required_capacity = 0.0
 element = 4
 is_rite = true
 tower_name = "Rite of Obsidian"
+rite_short_name = "obsidian"
 tower_description = "{RITE_LABEL}. Adjacent towers convert enemies' {BURN} into equal {FROST}, {BLEED}, and {CURSED} stacks on hit."
 icon = ExtResource("1_qkpkg")
 preview = ExtResource("1_qkpkg")

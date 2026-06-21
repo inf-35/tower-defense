@@ -26,4 +26,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	#inject stun
 	hit_data.status_effects[Attributes.Status.STUN] = Vector2(1.0, duration)
-	UI.floating_text_manager.show_icon(icon, hit_data.source.global_position)
+	trigger_source_tower_pulse(instance)

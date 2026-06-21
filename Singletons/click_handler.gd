@@ -173,6 +173,8 @@ func _enter_idle_state() -> void:
 
 	if is_instance_valid(current_preview):
 		current_preview.hide()
+	if is_instance_valid(Run.references.range_indicator):
+		Run.references.range_indicator.deselect()
 
 	UI.update_inspector_bar.emit(null)
 	current_state = State.IDLE

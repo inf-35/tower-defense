@@ -20,11 +20,15 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var hit_data = event.data as HitData
 	if not hit_data: return
 
+	var triggered: bool = false
 	for status in hit_data.status_effects:
 		var payload: Vector2 = hit_data.status_effects[status]
 		if payload.y <= 0.0:
 			continue
 
 		payload.y *= 1.0 + (duration_bonus * instance.stacks)
-
 		hit_data.status_effects[status] = payload
+		triggered = true
+
+	if triggered:
+		trigger_source_tower_pulse(instance)

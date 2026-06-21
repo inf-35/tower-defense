@@ -12,6 +12,7 @@ signal phase_advanced()
 signal combat_started(wave_number: int) ##combat wave started
 
 signal wave_schedule_updated() ##wave schedule updated
+signal guided_rite_placed(tower: Tower) ##fires when the onboarding rite is placed beside a valid allied tower
 
 #--- game state variables ---
 enum GamePhase { IDLE, CHOICE, BUILDING, COMBAT_WAVE, GAME_OVER }
@@ -43,6 +44,18 @@ class Wave: ##internal data container for a specific wave's configuration
 
 #tutorial tracking system
 var _troll_spawned: bool = false
+var _awaiting_guided_rite_from_expansion: bool = false
+var _guided_rite_tower: Tower
+var _guided_rite_type: Towers.Type = Towers.Type.VOID
+
+const TUTORIAL_FOLLOWUP_DELAY: float = 2.0
+const BASIC_TUTORIAL_RITE_TYPES: Array[Towers.Type] = [
+	Towers.Type.RITE_BLOOD,
+	Towers.Type.RITE_CURSES,
+	Towers.Type.RITE_POISONS,
+	Towers.Type.RITE_FROST,
+	Towers.Type.RITE_FLAME,
+]
 
 const DEBUG_PRINT_REPORTS: bool = true
 
@@ -52,6 +65,7 @@ func _ready() -> void:
 	combat_started.connect(UI.start_combat.emit)
 	wave_ended.connect(UI.end_wave.emit)
 	wave_schedule_updated.connect(UI.update_wave_schedule.emit)
+	Run.player.tower_placed.connect(_on_tower_placed)
 
 func _emit_wave_prep_event(wave: int) -> void:
 	var wave_data := WaveData.new()
@@ -109,6 +123,9 @@ func begin_new_game(progress_callback: Callable = Callable()) -> void:
 	choice_queue.clear()
 
 	is_game_over = false
+	_guided_rite_tower = null
+	_guided_rite_type = Towers.Type.VOID
+	_awaiting_guided_rite_from_expansion = false
 
 	_report("New game: Starting game flow.")
 	_generate_wave_plan()
@@ -277,6 +294,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 
 	match type:
 		ChoiceType.EXPANSION:
+			_prepare_guided_rite_capture()
 			#delegate the entire expansion process to the expansionservice.
 			#phases.gd should not know how expansions are generated or presented.
 			Run.references.island.expansion_service.start_expansion_phase()
@@ -312,6 +330,7 @@ func _on_choice_applied() -> void:
 		return
 
 	_report("a choice has been successfully applied by its handler.")
+	var should_start_guided_rite_tutorial: bool = current_choice_type == ChoiceType.EXPANSION and _should_start_guided_rite_tutorial()
 	#the service is responsible for hiding its own ui, so we don't need to do it here
 	if not choice_queue.is_empty(): #go to the next choice if there is one
 		UI.day_event_ended.emit()
@@ -319,6 +338,9 @@ func _on_choice_applied() -> void:
 		_start_choice_phase(next_choice)
 	else:
 		_advance_phase()
+
+	if should_start_guided_rite_tutorial:
+		_start_guided_rite_tutorial.call_deferred()
 
 #--- building phase logic ---
 func _start_building_phase() -> void:
@@ -333,6 +355,7 @@ func _on_player_ended_building_phase() -> void:
 	if current_phase != GamePhase.BUILDING:
 		return
 	_report("player ended building phase for wave " + str(current_wave_number) + ".")
+	_maybe_schedule_pause_tutorial(current_wave_number)
 	UI.hide_building_ui.emit()
 	SaveLoad.save_game()
 	await get_tree().create_timer(Run.waves.DELAY_AFTER_BUILDING_PHASE_ENDS).timeout
@@ -354,6 +377,13 @@ func _start_combat_wave() -> void:
 		push_error("Phases: Waves node not found. Cannot start combat wave.")
 		current_phase = GamePhase.IDLE
 		_advance_phase()
+
+func _maybe_schedule_pause_tutorial(wave_number: int) -> void: ##queues the pause tutorial off the start-wave tutorial completion instead of the later combat-start signal
+	if wave_number != 1:
+		return
+	if Run.player.completed_tutorials[Player.TutorialFlag.PAUSE]:
+		return
+	_schedule_pause_tutorial.call_deferred(wave_number)
 
 func _on_combat_wave_ended(_wave_number: int) -> void:
 	if current_phase != GamePhase.COMBAT_WAVE:
@@ -440,13 +470,116 @@ func _report(str: String) -> void:
 func _on_tower_created(tower: Tower) -> void: ##starts the ruin tutorial only when a ruin structure is actually instantiated in the run
 	if not is_instance_valid(tower):
 		return
-	if tower.type != Towers.Type.RUINS:
-		return
-	if Run.player.completed_tutorials[Run.player.TutorialFlag.RUINS]:
-		return
 	if not is_instance_valid(UI.tutorial_manager):
+		return
+
+	if _awaiting_guided_rite_from_expansion and _guided_rite_tower == null and _is_basic_tutorial_rite(tower.type):
+		_guided_rite_tower = tower
+		_guided_rite_type = tower.type
 		return
 	if UI.tutorial_manager.visible:
 		return
 
+	if Towers.is_tower_rite(tower.type):
+		if should_force_basic_tutorial_rites():
+			return
+		if Run.player.completed_tutorials[Run.player.TutorialFlag.RITE]:
+			return
+		UI.tutorial_manager.start_world_sequence([load("res://UI/tutorial/rite.tres")], Run.player.TutorialFlag.RITE, tower)
+		return
+
+	if tower.type != Towers.Type.RUINS:
+		return
+	if Run.player.completed_tutorials[Run.player.TutorialFlag.RUINS]:
+		return
+
 	UI.tutorial_manager.start_sequence([load("res://UI/tutorial/ruins.tres")], Run.player.TutorialFlag.RUINS)
+
+func should_force_basic_tutorial_rites() -> bool:
+	return not Run.player.completed_tutorials[Player.TutorialFlag.RITE]
+
+func pick_basic_tutorial_rite_type() -> Towers.Type:
+	return BASIC_TUTORIAL_RITE_TYPES.pick_random()
+
+func _prepare_guided_rite_capture() -> void:
+	_guided_rite_tower = null
+	_guided_rite_type = Towers.Type.VOID
+	_awaiting_guided_rite_from_expansion = should_force_basic_tutorial_rites()
+
+func _should_start_guided_rite_tutorial() -> bool:
+	if not _awaiting_guided_rite_from_expansion:
+		return false
+	_awaiting_guided_rite_from_expansion = false
+	return is_instance_valid(_guided_rite_tower) and not Run.player.completed_tutorials[Player.TutorialFlag.RITE]
+
+func _schedule_pause_tutorial(wave_number: int) -> void:
+	await get_tree().create_timer(TUTORIAL_FOLLOWUP_DELAY).timeout
+	if wave_number != current_wave_number:
+		return
+	while current_phase != GamePhase.COMBAT_WAVE:
+		if wave_number != current_wave_number:
+			return
+		await get_tree().process_frame
+	if Run.player.completed_tutorials[Player.TutorialFlag.PAUSE]:
+		return
+	while is_instance_valid(UI.tutorial_manager) and UI.tutorial_manager.visible:
+		await get_tree().process_frame
+
+	var step: TutorialStep = load("res://UI/tutorial/pause_controls.tres")
+	step.trigger_signal = Clock.speed_changed
+	step.desired_parameters = []
+	UI.tutorial_manager.start_sequence([step], Player.TutorialFlag.PAUSE)
+
+func _start_guided_rite_tutorial() -> void:
+	if not is_instance_valid(_guided_rite_tower):
+		return
+	if Run.player.completed_tutorials[Player.TutorialFlag.RITE]:
+		return
+
+	while is_instance_valid(UI.tutorial_manager) and UI.tutorial_manager.visible:
+		await get_tree().process_frame
+
+	var select_step: TutorialStep = load("res://UI/tutorial/rite_select.tres")
+	select_step.trigger_signal = ClickHandler.tower_was_selected
+	select_step.desired_parameters = [_guided_rite_tower]
+
+	var reposition_step: TutorialStep = load("res://UI/tutorial/rite_reposition.tres")
+	reposition_step.trigger_signal = Run.player.rite_excavated
+	reposition_step.desired_parameters = [_guided_rite_tower]
+
+	var place_step: TutorialStep = load("res://UI/tutorial/rite_place.tres")
+	place_step.trigger_signal = guided_rite_placed
+	place_step.desired_parameters = []
+
+	UI.tutorial_manager.start_world_sequence(
+		[select_step, reposition_step, place_step],
+		Player.TutorialFlag.RITE,
+		_guided_rite_tower
+	)
+
+func _on_tower_placed(tower_type: Towers.Type, tower: Tower) -> void:
+	if tower_type != _guided_rite_type:
+		return
+	if not is_instance_valid(tower):
+		return
+	if not _is_valid_guided_rite_placement(tower):
+		return
+
+	guided_rite_placed.emit(tower)
+	_guided_rite_type = Towers.Type.VOID
+	_guided_rite_tower = null
+
+func _is_valid_guided_rite_placement(rite_tower: Tower) -> bool:
+	for adjacent_tower: Tower in rite_tower.get_adjacent_towers().values():
+		if not is_instance_valid(adjacent_tower):
+			continue
+		if adjacent_tower.hostile or adjacent_tower.environmental:
+			continue
+		if adjacent_tower.type in [Towers.Type.PLAYER_CORE, Towers.Type.FARM, Towers.Type.PALISADE, Towers.Type.PALISADE_UPGRADE_1]:
+			continue
+		return true
+
+	return false
+
+func _is_basic_tutorial_rite(tower_type: Towers.Type) -> bool:
+	return BASIC_TUTORIAL_RITE_TYPES.has(tower_type)

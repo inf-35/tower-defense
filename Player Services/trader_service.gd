@@ -16,6 +16,10 @@ var _waves_since_restock: int = 0:
 	set(nw):
 		_waves_since_restock = nw
 		UI.trader_update_waves_to_next_restock.emit(AUTO_RESTOCK_INTERVAL - _waves_since_restock)
+var _has_unseen_stock: bool = false:
+	set(value):
+		_has_unseen_stock = value
+		UI.trader_unseen_stock_changed.emit(_has_unseen_stock)
 
 var _menu_open: bool = false
 
@@ -26,7 +30,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("trader"):
 		_menu_open = not _menu_open
 		if _menu_open:
-			UI.trader_open.emit()
+			_open_menu()
 		else:
 			UI.trader_close.emit()
 
@@ -42,19 +46,25 @@ func initialise() -> void:
 		UI.trader_force_restock_requested.connect(force_restock)
 
 	if _current_stock.is_empty():
-		_generate_stock()
+		_generate_stock(false)
 
 func start_game() -> void:
 	_menu_open = false
 	if _current_stock.is_empty():
-		_generate_stock()
+		_generate_stock(false)
 
 	UI.trader_update_waves_to_next_restock.emit(AUTO_RESTOCK_INTERVAL - _waves_since_restock)
+	UI.trader_unseen_stock_changed.emit(_has_unseen_stock)
 
 #--- public api ---
 
 func open_menu() -> void:
+	_open_menu()
+
+##opens the trader and clears the unseen-restock marker once the player has viewed it
+func _open_menu() -> void:
 	_menu_open = true
+	_has_unseen_stock = false
 	UI.trader_open.emit()
 
 func close_menu() -> void:
@@ -63,6 +73,10 @@ func close_menu() -> void:
 
 func get_stock() -> Array[Reward]:
 	return _current_stock
+
+##returns whether the current trader stock has appeared since the player last opened the menu
+func has_unseen_stock() -> bool:
+	return _has_unseen_stock
 
 func get_restock_cost() -> float:
 	return snappedf(pow(_manual_restocks, 2.0) * 2.0 + 2.0, 0.1)
@@ -92,7 +106,7 @@ func force_restock() -> bool:
 
 	Run.player.flux -= get_restock_cost()
 	_manual_restocks += 1
-	_generate_stock()
+	_generate_stock(false)
 	return true
 
 #--- logic ---
@@ -102,9 +116,10 @@ func _on_wave_ended(_wave: int) -> void:
 	if _waves_since_restock >= AUTO_RESTOCK_INTERVAL:
 		_waves_since_restock = 0
 		_manual_restocks = 0
-		_generate_stock()
+		_generate_stock(true)
 
-func _generate_stock() -> void:
+##rebuilds trader stock and optionally marks the new restock as unseen by the player
+func _generate_stock(mark_unseen: bool) -> void:
 	_current_stock.clear()
 
 	#we want 3 items. rewardservice usually generates options.
@@ -133,6 +148,7 @@ func _generate_stock() -> void:
 	while _current_stock.size() < SLOT_COUNT:
 		_current_stock.append(null)
 
+	_has_unseen_stock = mark_unseen
 	UI.trader_update_stock.emit(_current_stock)
 
 func get_save_data() -> Dictionary:
@@ -165,7 +181,7 @@ func load_save_data(data: Dictionary) -> void:
 	_waves_since_restock = int(data.get("waves_since", 0))
 
 	_current_stock.clear()
-	_generate_stock()
+	_generate_stock(false)
 	#var stock_data = data.get("stock", [])
 
 	#for entry in stock_data:

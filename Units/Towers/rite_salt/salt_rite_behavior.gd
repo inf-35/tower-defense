@@ -97,12 +97,16 @@ func _sync_affected_towers(current_modifiers: Dictionary[Tower, ModifierDataProt
 		var modifier_prototype: ModifierDataPrototype = current_modifiers[tower]
 		if not _affected_towers.has(tower):
 			_apply_modifier(tower, modifier_prototype)
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(tower)
 			continue
 
 		var current_modifier: Modifier = _affected_towers[tower]
 		if current_modifier.attribute != modifier_prototype.attribute:
 			_remove_modifier(tower)
 			_apply_modifier(tower, modifier_prototype)
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(tower)
 
 func _apply_modifier(tower: Tower, modifier_prototype: ModifierDataPrototype) -> void:
 	if modifier_prototype == null:
@@ -155,7 +159,7 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		var color: Color = canvas.positive_highlight_color
 		if side != tower.facing and side != _get_backward_facing(tower.facing):
 			color = canvas.negative_highlight_color
-		canvas.draw_cell(report.cells[offset], color)
+		canvas.preview_cell(report.cells[offset], color)
 
 func _get_backward_facing(facing: Tower.Facing) -> Tower.Facing:
 	return ((facing + 2) % 4) as Tower.Facing

@@ -27,3 +27,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if is_instance_valid(killer) and is_instance_valid(killer.attack_component):
 		killer.attack_component.queue_next_attack_context(hit_report, instance)
 		killer.attack_component.current_cooldown = 0.0
+		trigger_source_tower_pulse(instance)

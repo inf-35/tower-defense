@@ -146,21 +146,41 @@ func update_status(status: StatusEffect) -> void:
 
 #helper function to recalculate the visual overlay of units when under status effects
 func _recalculate_overlay_color() -> void:
-	if not is_instance_valid(unit) or not is_instance_valid(unit.graphics) or not is_instance_valid(unit.graphics.material):
+	if not is_instance_valid(unit):
 		return
 
-	var material: ShaderMaterial = unit.graphics.material as ShaderMaterial
 	var best_overlay: Color = Color.TRANSPARENT
+	var best_stack: float = -INF
+	
+	if has_status(Attributes.Status.STUN, 0.5):
+		unit.set_tint_layer(
+			TintService.LAYER_STATUS,
+			Attributes.status_effects[Attributes.Status.STUN].overlay_color,
+			1.0,
+			false,
+			TintService.BlendMode.OVERLAY
+		)
+		return
 
 	#find the dominant status effect to display visually
 	for status_type: Attributes.Status in _status_effects:
-		var status_color: Color = Attributes.status_effects[status_type].overlay_color
-		#prioritize the overlay with the highest alpha (intensity)
-		if status_color.a > best_overlay.a:
-			best_overlay = status_color
+		var status_effect: StatusEffect = _status_effects[status_type]
+		#prioritize the status with the highest stack count, then preserve the authored alpha/color of that status
+		if status_effect.stack > best_stack:
+			best_stack = status_effect.stack
+			best_overlay = Attributes.status_effects[status_type].overlay_color
 
-	#push the calculated color to the shader uniform
-	material.set_shader_parameter(&"overlay_color", best_overlay)
+	if best_overlay.a <= 0.0:
+		unit.clear_tint_layer(TintService.LAYER_STATUS)
+		return
+
+	unit.set_tint_layer(
+		TintService.LAYER_STATUS,
+		Color(best_overlay.r, best_overlay.g, best_overlay.b, 1.0),
+		best_overlay.a,
+		false,
+		TintService.BlendMode.MODULATE
+	)
 
 #checks all reactions that involve the newly updated status type to see if any have been triggered.
 func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:

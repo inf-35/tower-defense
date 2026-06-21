@@ -26,6 +26,7 @@ var velocity: Vector2 ##instantaneous velocity of the projectile, set by combatm
 
 var vfx_on_spawn: VFXInfo #see VFXManager and VFXInstance
 var vfx_on_impact: VFXInfo
+var projectile_tints: Array[Color] = [] ##ordered tint palette cycled across the base projectile visual while it is in flight
 #see unit.gd, deal_hit and take_hit and AttackData
 
 static func consume_attack_id(hit_data: HitData, seen_attack_ids: Dictionary[int, bool]) -> bool:

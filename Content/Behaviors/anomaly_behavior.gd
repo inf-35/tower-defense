@@ -55,18 +55,17 @@ func _enter_state(new_state: State) -> void:
 		State.INACTIVE:
 			#dormant
 			#e.g., low opacity, closed eye
-			if is_instance_valid(unit.graphics):
-				unit.graphics.modulate = Color(0.5, 0.5, 0.5, 0.8)
+			unit.set_tint_layer(TintService.LAYER_STATE_VISUAL, Color(0.5, 0.5, 0.5, 0.8), 1.0, true)
 
 		State.CHARGING:
 			#active
-			if is_instance_valid(unit.graphics):
-				unit.graphics.modulate = Color(1.0, 0.5, 1.0, 1.0) #pink glow
+			unit.set_tint_layer(TintService.LAYER_STATE_VISUAL, Color(1.0, 0.5, 1.0, 1.0))
 
 			#optional: play a sound effect indicating it "caught" the wave essence
 			#audio.play_sound(id.sounds.anomaly_activate, unit.global_position)
 
 		State.COMPLETE:
+			unit.clear_tint_layer(TintService.LAYER_STATE_VISUAL)
 			#apply reward
 			RewardService.apply_reward(_anomaly_data.reward)
 

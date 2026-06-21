@@ -272,7 +272,7 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 
 		InspectorAction.ActionType.SELL:
 			if Towers.is_tower_rite(tower.type): #TODO: un-manual this hardcoded override
-				btn.text = "Reposition (%.2f)" % Run.player.RITE_EXCAVATION_COST
+				btn.text = "Excavate (%.2f)" % Run.player.RITE_EXCAVATION_COST
 				if Run.player.flux < Run.player.RITE_EXCAVATION_COST or tower.current_state != Tower.State.ACTIVE:
 					is_disabled = true
 				btn.pressed.connect(UI.excavate_rite_requested.emit.bind(tower))

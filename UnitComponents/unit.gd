@@ -9,7 +9,6 @@ signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
 var HP_BAR_SCENE: PackedScene = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
-const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -33,6 +32,7 @@ const UNIT_EFFECT_SHADER := preload("res://Shaders/unit_effects.gdshader")
 @export var range_component: RangeComponent
 @export var attack_component: AttackComponent
 @export var corpse_component: CorpseComponent
+@export var buff_component: BuffComponent
 
 @export var intrinsic_effects: Array[EffectPrototype] #effect prototypes that come with the unit type
 
@@ -58,11 +58,17 @@ var abstractive: bool: #fathis unit is not an actual unit (see prototypes, Tower
 var disabled: bool:
 	set(nd):
 		disabled = nd
-		if graphics and graphics.material != null:
-			graphics.material.set_shader_parameter(&"overlay_color", Color(0.0, 0.0, 0.0, 1.0) if disabled else Color(0,0,0,0))
-			graphics.material.set_shader_parameter(&"transparency", 0.3 if disabled else 1.0)
+		if disabled:
+			set_tint_layer(TintService.LAYER_DISABLED, Color(0.0, 0.0, 0.0, 0.3), 1.0, true)
+		else:
+			clear_tint_layer(TintService.LAYER_DISABLED)
 
 var is_ready: bool = false
+var tint_service: TintService = TintService.new()
+var _base_graphics_scale: Vector2 = Vector2.ONE
+var _motion_graphics_scale: Vector2 = Vector2.ONE
+var _action_graphics_scale: Vector2 = Vector2.ONE
+var _action_graphics_tween: Tween
 
 const BEHAVIOR_CYCLE: int = 3
 var behavior_stagger: int = 0
@@ -134,8 +140,23 @@ func _create_components() -> void:
 		add_child(n_corpse_component)
 		corpse_component = n_corpse_component
 
+	if buff_component == null:
+		for child in get_children():
+			if child is BuffComponent:
+				buff_component = child
+				break
+
+	if buff_component == null and _needs_buff_component():
+		var n_buff_component := BuffComponent.new()
+		n_buff_component.name = "BuffComponent"
+		add_child(n_buff_component)
+		buff_component = n_buff_component
+
 func _needs_corpse_component() -> bool:
 	return hostile and not abstractive and is_instance_valid(graphics)
+
+func _needs_buff_component() -> bool:
+	return self is Tower and Towers.is_tower_buff_source((self as Tower).type)
 
 func _prepare_components() -> void:
 	unit_id = Run.references.assign_unit_id() #assign this unit a unit id
@@ -165,10 +186,14 @@ func _prepare_components() -> void:
 	)
 
 	if graphics != null:
-		var unit_effects_shader_material := ShaderMaterial.new()
-		unit_effects_shader_material.shader = UNIT_EFFECT_SHADER
-		graphics.material = unit_effects_shader_material
 		graphics.visible = not DebugAssistant.hide_unit_graphics
+		tint_service.initialise(self, graphics)
+		set_tint_layer(
+			TintService.LAYER_SIDE_TINT,
+			_resolve_tint_target_from_multiplier(DebugAssistant.enemy_graphics_tint if hostile else DebugAssistant.allied_graphics_tint)
+		)
+		_base_graphics_scale = graphics.scale
+		_apply_graphics_scale_layers()
 
 	if navigation_component != null:
 		navigation_component.inject_components(movement_component)
@@ -269,6 +294,105 @@ func _attach_health_bar() -> void:
 func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
 		apply_effect(effect_prototype)
+
+func set_motion_graphics_scale(scale_multiplier: Vector2) -> void: ##updates the locomotion-owned visual scale layer without disturbing transient action pulses
+	_motion_graphics_scale = scale_multiplier
+	_apply_graphics_scale_layers()
+
+func get_motion_graphics_scale() -> Vector2: ##returns the locomotion-owned graphics scale layer for systems that need to ease back toward neutral
+	return _motion_graphics_scale
+
+func play_action_squash_stretch(
+	stretch_scale: Vector2 = Vector2(0.84, 1.18),
+	rebound_scale: Vector2 = Vector2(1.05, 0.97),
+	stretch_duration: float = 0.045,
+	rebound_duration: float = 0.085
+) -> void: ##plays a short squash-stretch pulse on the unit graphics while preserving authored base scale and other scale channels
+	if not is_instance_valid(graphics):
+		return
+
+	if is_instance_valid(_action_graphics_tween):
+		_action_graphics_tween.kill()
+
+	_action_graphics_tween = create_tween()
+	_action_graphics_tween.tween_method(_set_action_graphics_scale, _action_graphics_scale, stretch_scale, stretch_duration)\
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_action_graphics_tween.tween_method(_set_action_graphics_scale, stretch_scale, rebound_scale, rebound_duration)\
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_action_graphics_tween.tween_method(_set_action_graphics_scale, rebound_scale, Vector2.ONE, rebound_duration)\
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+func _set_action_graphics_scale(scale_multiplier: Vector2) -> void: ##drives the transient action-owned visual scale layer during squash-stretch tweens
+	_action_graphics_scale = scale_multiplier
+	_apply_graphics_scale_layers()
+
+func _apply_graphics_scale_layers() -> void: ##combines authored base scale with locomotion and action scale layers before writing to the graphics node
+	if not is_instance_valid(graphics):
+		return
+
+	graphics.scale = Vector2(
+		_base_graphics_scale.x * _motion_graphics_scale.x * _action_graphics_scale.x,
+		_base_graphics_scale.y * _motion_graphics_scale.y * _action_graphics_scale.y
+	)
+
+func set_tint_layer(layer: int, color: Color, strength: float = 1.0, affect_alpha: bool = false, blend_mode: int = TintService.BlendMode.MODULATE) -> void: ##registers or updates one fixed tint layer under the shared unit tint interface
+	tint_service.set_tint_layer(layer, color, strength, affect_alpha, blend_mode)
+
+func clear_tint_layer(layer: int) -> void: ##removes one fixed tint layer and recomposes the remainder
+	tint_service.clear_tint_layer(layer)
+
+func tween_tint_layer(
+	layer: int,
+	from_color: Color,
+	to_color: Color,
+	duration: float,
+	affect_alpha: bool = false,
+	trans: Tween.TransitionType = Tween.TRANS_LINEAR,
+	ease: Tween.EaseType = Tween.EASE_IN_OUT,
+	ignore_pause: bool = false,
+	blend_mode: int = TintService.BlendMode.MODULATE
+) -> void: ##tweens the target color of one fixed tint layer through the shared tint service
+	tint_service.tween_tint_layer(layer, from_color, to_color, duration, affect_alpha, trans, ease, ignore_pause, blend_mode)
+
+func tween_tint_strength(
+	layer: int,
+	from: float,
+	to: float,
+	duration: float,
+	trans: Tween.TransitionType = Tween.TRANS_LINEAR,
+	ease: Tween.EaseType = Tween.EASE_IN_OUT,
+	ignore_pause: bool = false
+) -> void: ##tweens the strength of one fixed tint layer through the shared tint service
+	tint_service.tween_tint_strength(layer, from, to, duration, trans, ease, ignore_pause)
+
+func pulse_tint_layer(
+	layer: int,
+	color: Color,
+	peak_strength: float,
+	ramp_in_duration: float,
+	ramp_out_duration: float,
+	affect_alpha: bool = false,
+	trans: Tween.TransitionType = Tween.TRANS_LINEAR,
+	ease: Tween.EaseType = Tween.EASE_IN_OUT,
+	ignore_pause: bool = false,
+	blend_mode: int = TintService.BlendMode.MODULATE
+) -> void: ##plays a shared tint pulse on one fixed layer without bypassing the unit tint stack
+	tint_service.pulse_tint_layer(layer, color, peak_strength, ramp_in_duration, ramp_out_duration, affect_alpha, trans, ease, ignore_pause, blend_mode)
+
+func play_hit_flash(duration: float = 0.25, ignore_pause: bool = false) -> void: ##plays the standard hit flash through the shared unit tint service
+	tint_service.play_hit_flash(duration, ignore_pause)
+
+func _resolve_tint_target_from_multiplier(multiplier: Color) -> Color: ##converts legacy multiplier-style tint authored data into a root-modulate tint target under the new mix-based pipeline
+	if not is_instance_valid(graphics):
+		return Color.WHITE
+
+	var base_color: Color = graphics.modulate
+	return Color(
+		base_color.r * multiplier.r,
+		base_color.g * multiplier.g,
+		base_color.b * multiplier.b,
+		base_color.a * multiplier.a
+	)
 
 func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectInstance: ##negative for removing without clearing
 	if stacks < 0:
@@ -397,7 +521,7 @@ func take_hit(hit: HitData) -> void:
 	hit_report.overkill = maxf(damage - benchmark, 0.0) if unit_dead else 0.0
 	hit_report.statuses_applied = hit.status_effects.duplicate(true)
 
-	if unit_dead and not is_zero_approx(delta_health): #TODO: separation of logic (decouple shader)
+	if unit_dead and not is_zero_approx(delta_health):
 		hit_report.death_caused = true
 
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
@@ -405,13 +529,7 @@ func take_hit(hit: HitData) -> void:
 		died.emit(hit_report) #NOTE: this is when the unit dies
 	elif graphics:
 		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
-
-		var shader_material: ShaderMaterial = graphics.material as ShaderMaterial
-		shader_material.set_shader_parameter(&"flash_intensity", 1.0)
-
-		var flash_tween := create_tween()
-		flash_tween.tween_property(shader_material, "shader_parameter/flash_intensity", 0.0, 0.25)
-		flash_tween.play()
+		play_hit_flash()
 
 	for modifier: Modifier in hit.modifiers:
 		modifiers_component.add_modifier(modifier)

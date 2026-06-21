@@ -5,6 +5,11 @@ class_name Camera
 #configuration
 const RETURN_FROM_OVERRIDE_TIME: float = 0.5 #how long it takes for the camera to snap back to position from override
 
+@export var shake_decay: float = 5.5
+@export var shake_max_offset: Vector2 = Vector2(8.0, 8.0)
+@export var shake_noise_frequency: float = 30.0
+@export var placement_shake_amount: float = 0.25
+
 var _target_position: Vector2
 #--- private state for the override system ---
 #this flag will disable manual controls when true
@@ -15,10 +20,23 @@ var _active_tween: Tween
 #save camera state before override
 var camera_state_cache: Array[Vector2] #[ position, zoom ]
 var _is_drag_panning: bool = false
+var _shake_trauma: float = 0.0
+var _shake_time: float = 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_target_position = position
+	_connect_run_signals.call_deferred()
+
+func _connect_run_signals() -> void: ##subscribes to run-scoped events once the current run is fully booted
+	if not Run.is_run_ready():
+		await Run.references_ready
+
+	if not is_instance_valid(Run.player):
+		return
+	if Run.player.on_event.is_connected(_on_player_event):
+		return
+	Run.player.on_event.connect(_on_player_event)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_overridden:
@@ -53,6 +71,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
+	_update_shake(delta)
+
 	#only allow manual camera control if no override is active
 	if _is_overridden:
 		return
@@ -121,6 +141,12 @@ func focus_and_inspect_unit(unit: Unit, duration: float = 0.35) -> void: ##selec
 	ClickHandler.select_entity(unit)
 	soft_snap_camera(unit.global_position, zoom, duration)
 
+func add_shake(amount: float) -> void: ##adds camera trauma through the shared shake channel used by all lightweight feedback events
+	_shake_trauma = minf(1.0, _shake_trauma + amount)
+
+func add_damage_shake(amount: float) -> void:
+	add_shake(amount)
+
 #allows an external system (like a ui button) to cancel the override
 func release_override() -> void:
 	if is_instance_valid(_active_tween):
@@ -156,6 +182,19 @@ func _cancel_soft_snap() -> void:
 	_is_soft_snapping = false
 	_target_position = position
 
+func _update_shake(delta: float) -> void:
+	if _shake_trauma <= 0.0:
+		offset = Vector2.ZERO
+		return
+
+	_shake_time += delta * shake_noise_frequency
+	var strength: float = _shake_trauma * _shake_trauma
+	offset = Vector2(
+		sin(_shake_time * 1.13) * shake_max_offset.x * strength,
+		cos(_shake_time * 1.71) * shake_max_offset.y * strength
+	)
+	_shake_trauma = maxf(0.0, _shake_trauma - (shake_decay * delta))
+
 func _should_cancel_soft_snap(event: InputEvent) -> bool:
 	if event.is_action_pressed("zoom_in") or event.is_action_pressed("zoom_out"):
 		return true
@@ -166,3 +205,18 @@ func _should_cancel_soft_snap(event: InputEvent) -> bool:
 	if event is InputEventMouseMotion and _is_drag_panning:
 		return true
 	return false
+
+func _on_player_event(_unit: Unit, event: GameEvent) -> void: ##adds a small placement shake for real allied tower builds after the placement actually succeeds
+	if event.event_type != GameEvent.EventType.TOWER_BUILT:
+		return
+
+	var build_data: BuildTowerData = event.data as BuildTowerData
+	if not is_instance_valid(build_data) or not is_instance_valid(build_data.tower):
+		return
+
+	var tower: Tower = build_data.tower
+	if tower.hostile or tower.environmental or tower.abstractive:
+		return
+
+	var tower_area: float = float(maxi(tower.size.x * tower.size.y, 1))
+	add_shake(placement_shake_amount * sqrt(tower_area))

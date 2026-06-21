@@ -17,7 +17,8 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of Sacrifice"
-tower_description = "{RITE_LABEL}. When towers in range are damaged, another random tower in range gains +10% {UNIT_HITRATE} for this wave."
+rite_short_name = "sacrifice"
+tower_description = "{RITE_LABEL}. When [highlight:towers in range] are damaged, another random [highlight:tower in range] gains +10% {UNIT_HITRATE} for this wave."
 icon = ExtResource("1_vkwkj")
 preview = ExtResource("1_vkwkj")
 inspector_actions = Array[ExtResource("2_xnq48")]([ExtResource("3_3mxq6")])

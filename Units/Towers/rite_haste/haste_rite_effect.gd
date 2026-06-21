@@ -61,3 +61,5 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 		#apply directly so it mitigates through standard defensive layers
 		tower.take_hit(hit)
+
+	trigger_source_tower_pulse(instance)

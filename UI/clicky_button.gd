@@ -16,6 +16,8 @@ func _clicky_on_mouse_entered() -> void:
 
 	#delegate the actual playing of the sound to the central audioservice
 	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -5.0)
+	
+	
 #called when the button is pressed
 func _clicky_on_pressed() -> void:
 	#the 'disabled' check is handled by the button itself, so we don't need it here

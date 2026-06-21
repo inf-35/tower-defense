@@ -19,6 +19,7 @@ upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
 tower_name = "Rite of the Fist"
+rite_short_name = "fist"
 tower_description = "Attacks consume all {STATUS_EFFECT_LABEL} to deal +40% {UNIT_DAMAGE} per stack consumed."
 tower_scene = ExtResource("4_5v4fe")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

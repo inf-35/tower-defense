@@ -179,4 +179,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 			var pos = Island.cell_to_position(cell)
 			var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
 
-			canvas.draw_rect(rect, canvas.highlight_color, false, canvas.line_width)
+			canvas.preview_rect(rect, canvas.highlight_color, false, canvas.line_width)

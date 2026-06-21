@@ -43,3 +43,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var total_multiplier: float = 1.0 + (total_potential_stacks * damage_bonus_per_status_stack)
 	hit_data.damage *= total_multiplier #apply damage bonus
 	hit_data.status_effects.clear() #remove all status effects
+	trigger_source_tower_pulse(instance)

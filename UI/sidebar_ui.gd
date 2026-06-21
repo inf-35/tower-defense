@@ -4,6 +4,7 @@ class_name SidebarUI
 @export var towers_bar: VBoxContainer
 @export var start_wave_button: Button
 @export var trade_button: Button
+@export var trade_button_label: InteractiveRichTextLabel
 
 var tower_option_prototype: PackedScene = preload("res://UI/tower_option.tscn")
 var _tutorial_start_wave_locked: bool = false
@@ -11,6 +12,9 @@ var _tutorial_start_wave_locked: bool = false
 func _ready() -> void:
 	#initial population and updates are handled by connecting to the signal.
 	#player.towerss setter will emit the initial list.
+	
+	if not Run.is_run_ready():
+		await Run.references_ready
 
 	UI.update_tower_types.connect(_on_player_tower_types_update)
 	UI.update_tower_counts.connect(func():
@@ -37,6 +41,7 @@ func _ready() -> void:
 	trade_button.pressed.connect(func():
 		Run.player.trader_service.open_menu()
 	)
+	UI.trader_unseen_stock_changed.connect(_update_trade_button_notification)
 
 	#request initial state if player might have initialized before ui connected
 	#(though with autoload order or call_deferred this might not be strictly necessary,
@@ -47,11 +52,21 @@ func _ready() -> void:
 		_clear_towers_bar() #ensure it's empty if no towerss initially
 
 	UI.tutorial_manager.register_element(TutorialStep.Reference.START_WAVE_BUTTON, start_wave_button)
+	if Run.has_active_run() and is_instance_valid(Run.player):
+		_update_trade_button_notification(Run.player.trader_service.has_unseen_stock())
+	else:
+		_update_trade_button_notification(false)
 
 func _update_start_wave_button_state() -> void:
 	if start_wave_button.text != "Start Wave":
 		return
 	start_wave_button.disabled = _tutorial_start_wave_locked
+
+func _update_trade_button_notification(has_unseen_stock: bool) -> void: ##toggles the blue unseen-restock badge on the trade button
+	var label_text: String = "Trade (T)"
+	if has_unseen_stock:
+		label_text += "\n" + KeywordService.wrap_text("[restocked!]", "action")
+	trade_button_label.set_parsed_text(label_text)
 
 
 func _clear_towers_bar() -> void:

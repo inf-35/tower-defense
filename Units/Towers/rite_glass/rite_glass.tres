@@ -15,6 +15,7 @@ required_capacity = 0.0
 element = 4
 is_rite = true
 tower_name = "Rite of Glass"
+rite_short_name = "glass"
 tower_description = "{RITE_LABEL}. Towers within 2 tiles gain 25% {UNIT_HITRATE}, but lose 66% {UNIT_HP}."
 icon = ExtResource("1_vy2ek")
 preview = ExtResource("1_vy2ek")

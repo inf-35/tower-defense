@@ -25,21 +25,35 @@ func _ready() -> void:
 
 #--- public api ---
 
-func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, scale_mod: float = 1.0) -> void:
+func show_value(value: float, world_pos: Vector2, color: Color = Color.WHITE, scale_mod: float = 1.0, ignore_pause: bool = false) -> void:
 	if DebugAssistant.disable_floating_text:
 		return
 	var str_val = str(snappedf(value, 0.1))
 	var final_color = color
 	var scale_mult = scale_mod
 
-	_spawn_text(str_val, world_pos, final_color, scale_mult)
+	_spawn_text(str_val, world_pos, final_color, scale_mult, 1.0, 0.0, 0.3, ignore_pause)
 
-func show_text(text: String, world_pos: Vector2, color: Color) -> void:
+func show_text(text: String, world_pos: Vector2, color: Color, ignore_pause: bool = false) -> void:
 	if DebugAssistant.disable_floating_text:
 		return
-	_spawn_text(text, world_pos, color, 1.0)
+	_spawn_text(text, world_pos, color, 1.0, 1.0, 0.0, 0.3, ignore_pause)
 
-func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0) -> void:
+func show_text_with_profile(
+	text: String,
+	world_pos: Vector2,
+	color: Color,
+	peak_alpha: float = 1.0,
+	ramp_up_ratio: float = 0.0,
+	fade_out_ratio: float = 0.3,
+	scale_mod: float = 1.0,
+	ignore_pause: bool = false
+) -> void:
+	if DebugAssistant.disable_floating_text:
+		return
+	_spawn_text(text, world_pos, color, scale_mod, peak_alpha, ramp_up_ratio, fade_out_ratio, ignore_pause)
+
+func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0, ignore_pause: bool = false) -> void:
 	if DebugAssistant.disable_floating_text:
 		return
 	if not icon: return
@@ -58,9 +72,18 @@ func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0) -> v
 
 	var lifetime = 0.5 if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else 1.2
 	var color: Color = Color(1,1,1,0.5) if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else Color.WHITE
-	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self) #0 gravity
+	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self, ignore_pause) #0 gravity
 
-func _spawn_text(txt: String, pos: Vector2, col: Color, scale_mod: float) -> void:
+func _spawn_text(
+	txt: String,
+	pos: Vector2,
+	col: Color,
+	scale_mod: float,
+	peak_alpha: float = 1.0,
+	ramp_up_ratio: float = 0.0,
+	fade_out_ratio: float = 0.3,
+	ignore_pause: bool = false
+) -> void:
 	var instance: FloatingText
 
 	if _pool.is_empty():
@@ -77,7 +100,7 @@ func _spawn_text(txt: String, pos: Vector2, col: Color, scale_mod: float) -> voi
 
 	instance.scale = Vector2(0.06, 0.06) * scale_mod
 
-	instance.setup(txt, pos, col, vel, default_gravity, default_lifetime, self)
+	instance.setup(txt, pos, col, vel, default_gravity, default_lifetime, self, peak_alpha, ramp_up_ratio, fade_out_ratio, ignore_pause)
 
 func _create_new_text() -> FloatingText:
 	var t = text_scene.instantiate() as FloatingText

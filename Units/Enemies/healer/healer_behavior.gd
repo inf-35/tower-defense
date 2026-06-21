@@ -109,12 +109,13 @@ func _perform_heal_pulse() -> bool:
 #--- visuals ---
 
 func _spawn_heal_vfx(target: Unit) -> void:
-	#simple flash effect using the existing shader setup on units
-	if is_instance_valid(target.graphics) and target.graphics.material is ShaderMaterial:
-		#fallback: simple tween scale bounce
-		var tween = create_tween()
-		tween.tween_property(target, "scale", Vector2(1.2, 1.2), 0.1)
-		tween.tween_property(target, "scale", Vector2(1.0, 1.0), 0.1)
+	#simple scale pulse keeps this feedback independent from the shared tint stack
+	if not is_instance_valid(target.graphics):
+		return
+
+	var tween = create_tween()
+	tween.tween_property(target, "scale", Vector2(1.2, 1.2), 0.1)
+	tween.tween_property(target, "scale", Vector2(1.0, 1.0), 0.1)
 
 func _spawn_pulse_vfx() -> void:
 	#create a temporary expanding circle to visualize the aura

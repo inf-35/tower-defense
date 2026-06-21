@@ -8,7 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
-color = Color(0.81960785, 0.8666667, 0.74509805, 1)
+color = Color(0.82664496, 0.87, 0.7569, 1)
 wash_color = Color(0.82331, 0.87, 0.7482, 0.23529412)
 navigable = true
 constructable = true
@@ -41,7 +41,7 @@ metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_0duxl"]
 script = ExtResource("2_2st4k")
-color = Color(0.728, 0.8, 0.7892, 1)
+color = Color(0.75200003, 0.8, 0.7928, 1)
 wash_color = Color(0.728, 0.8, 0.78800005, 0.101960786)
 dominance_strength = 0.75
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"

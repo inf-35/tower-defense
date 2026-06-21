@@ -88,7 +88,7 @@ func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 	var tower: Tower = unit as Tower
 	if not tower.get_stat(Attributes.id.RANGE):
 		return
-	canvas.draw_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
+	canvas.preview_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
 
 func draw_visuals_adjacent_tiles(canvas: RangeIndicator) -> void:
 	var tower: Tower = unit as Tower
@@ -110,7 +110,7 @@ func draw_visuals_adjacent_tiles(canvas: RangeIndicator) -> void:
 		var pos = Island.cell_to_position(cell)
 		var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
 
-		canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)
 
 #a helper function for safe animation playback
 func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void:

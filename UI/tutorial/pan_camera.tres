@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_wohyo")
 instruction_text = "Tutorial
-Pan the camera with [WASD]."
+Move the camera with [WASD]."
 success_text = "Tutorial
-Pan the camera with [WASD].
+Move the camera with [WASD].
 [Q to continue.]"
 trigger_type = 2
 trigger_amount = 2.0

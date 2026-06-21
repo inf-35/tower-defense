@@ -89,17 +89,17 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 	var tower_type: Towers.Type = tower.type
 	#1. check costs
 	if Run.player.flux < Towers.get_tower_cost(tower_type):
-		return KeywordService.wrap_bad_text("Insufficient Gold")
+		return KeywordService.wrap_text("Insufficient Gold", "bad")
 
 	#2. check capacity
 	#skip capacity check for generators usually, or if limit logic applies
 	if not (tower_type == Towers.Type.GENERATOR and island.get_terrain_base(cell) == Terrain.Base.SETTLEMENT):
 		var cap_cost = Towers.get_tower_capacity(tower_type)
 		if Run.player.used_capacity + cap_cost > Run.player.tower_capacity and not is_zero_approx(cap_cost):
-			return KeywordService.wrap_bad_text("Not enough") + " {POPULATION|icon_size=20|label=Population|color=%s} (%s %s)" % [
-				KeywordService.get_bad_color_hex(),
-				KeywordService.wrap_highlight_action_text("build"),
-				"{T_GENERATOR|icon_size=24|label=Villages|color=%s}" % KeywordService.get_highlight_action_color_hex()
+			return KeywordService.wrap_text("Not enough", "bad") + " {POPULATION|icon_size=20|label=Population|color=%s} (%s %s)" % [
+				KeywordService.get_color_hex("bad"),
+				KeywordService.wrap_text("build", "action"),
+				"{T_GENERATOR|icon_size=24|label=Villages|color=%s}" % KeywordService.get_color_hex("action")
 			]
 
 	#3. check limits

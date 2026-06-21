@@ -75,6 +75,8 @@ func animate_entrance(custom_delay: float = -1.0) -> void:
 
 	#only kill the movement/fade tween, leave idle tween alone
 	if _current_tween: _current_tween.kill()
+	content.position = slide_offset
+	content.modulate.a = 0.0
 	_current_tween = create_tween().set_parallel(true)
 
 	#1. slide to (0,0)

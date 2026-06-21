@@ -55,6 +55,8 @@ func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
 	for new_tower: Tower in current_neighbors:
 		if not _buffed_neighbors.has(new_tower):
 			_modify_stack(new_tower, 1)
+			if is_instance_valid(unit.buff_component):
+				unit.buff_component.activate_new_link(new_tower)
 
 	_buffed_neighbors = current_neighbors
 

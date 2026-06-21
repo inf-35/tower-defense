@@ -155,4 +155,4 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		var report = topo.query(unit as Tower, query)
 		for cell: Vector2i in report.cells.values():
 			var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
-			canvas.draw_rect(rect, canvas.highlight_color, false, 1.0)
+			canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)

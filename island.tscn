@@ -146,6 +146,8 @@ metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
 z_index = 500
 z_as_relative = false
 script = ExtResource("18_aibdv")
+preview_fade_in_duration = 0.05
+preview_fade_out_duration = 0.27
 metadata/_custom_type_script = "uid://ibj2mt03m5av"
 
 [node name="InworldUI" type="Node2D" parent="." unique_id=2111889340]

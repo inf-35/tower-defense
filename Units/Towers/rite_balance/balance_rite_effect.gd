@@ -40,6 +40,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if not is_instance_valid(target):
 		return
 
+	trigger_source_tower_pulse(instance)
 	_fire_overkill_bolt(instance, source_tower, report, origin_position, target, report.overkill * _get_effect_stacks(instance))
 
 func _find_nearest_enemy(origin_position: Vector2, hostile: bool) -> Unit:

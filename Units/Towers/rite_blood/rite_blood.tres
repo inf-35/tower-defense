@@ -14,6 +14,7 @@ required_capacity = 0.0
 element = 4
 is_rite = true
 tower_name = "Rite of Blood"
+rite_short_name = "blood"
 tower_description = "{RITE_LABEL}: Adjacent towers' attacks gain 1 stack of {BLEED}"
 icon = ExtResource("1_sfu6v")
 preview = ExtResource("1_sfu6v")

@@ -88,6 +88,8 @@ func _bind_target(target: Tower) -> void:
 	_seen_attack_ids.clear()
 	_target_suppression_modifier = suppression_modifier.generate_modifier()
 	target.modifiers_component.add_modifier(_target_suppression_modifier)
+	if is_instance_valid(unit.buff_component):
+		unit.buff_component.activate_new_link(target)
 
 func _release_target() -> void:
 	if is_instance_valid(_target_tower):
@@ -133,7 +135,7 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 
 	var neighbors: Array[Vector2i] = tower.get_adjacent_cells()
 	for n: Vector2i in neighbors:
-		var fade_color: Color = canvas.highlight_color
+		var fade_color: Color = canvas.input_color
 		fade_color.a *= 0.5
 		canvas.draw_cell(n, fade_color)
 
@@ -142,10 +144,10 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 	var start_pos: Vector2 = Island.cell_to_position(tower.tower_position)
 	if is_instance_valid(target):
 		var end_pos: Vector2 = Island.cell_to_position(scan.impact_cell)
-		canvas.draw_line(start_pos, end_pos, canvas.highlight_color, 2.0)
+		canvas.preview_line(start_pos, end_pos, canvas.highlight_color, 2.0)
 		canvas.draw_cell(scan.impact_cell, canvas.highlight_color)
 	else:
 		var end_pos: Vector2 = Island.cell_to_position(scan.last_valid_cell)
 		var fade_color: Color = canvas.highlight_color
 		fade_color.a *= 0.3
-		canvas.draw_line(start_pos, end_pos, fade_color, 2.0)
+		canvas.preview_line(start_pos, end_pos, fade_color, 2.0)
