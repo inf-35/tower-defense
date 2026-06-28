@@ -107,9 +107,6 @@ func _can_affect_tower(tower: Tower) -> bool:
 	if tower.current_state != Tower.State.ACTIVE:
 		return false
 
-	if Towers.is_tower_rite(tower.type):
-		return false
-
 	if not is_instance_valid(tower.modifiers_component):
 		return false
 

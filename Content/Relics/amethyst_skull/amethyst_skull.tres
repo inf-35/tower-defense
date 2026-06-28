@@ -38,11 +38,12 @@ script = ExtResource("6_058vl")
 search_radius = 40.0
 damage_multiplier = 0.15
 projectile_data = SubResource("Resource_wyw1l")
-delay = 0.4
+delay = 0.3
 metadata/_custom_type_script = "uid://bp6do8b78pj4k"
 
 [resource]
 script = ExtResource("3_2oygm")
+type = 19
 global_effect = SubResource("Resource_2oygm")
 title = "Amethyst Skull"
 description = "When {CURSED|label=Cursed} units die, a magical bolt dealing 15% of the dead unit's {UNIT_HP} in damage is fired towards a nearby cursed unit (if there is one)."

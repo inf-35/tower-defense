@@ -68,14 +68,15 @@ func _continue_overlay_decay(corpse_root: Node2D, corpse_graphics: Sprite2D, ove
 	if not corpse_graphics.material is ShaderMaterial:
 		return
 
-	corpse_graphics.set_instance_shader_parameter(&"overlay_color", overlay_state.get(&"color", Color.WHITE))
-	corpse_graphics.set_instance_shader_parameter(&"overlay_intensity", overlay_intensity)
+	var material: ShaderMaterial = corpse_graphics.material as ShaderMaterial
+	material.set_shader_parameter(&"overlay_color", overlay_state.get(&"color", Color.WHITE))
+	material.set_shader_parameter(&"overlay_intensity", overlay_intensity)
 
 	var overlay_tween: Tween = corpse_root.create_tween()
 	overlay_tween.tween_method(
 		func(value: float) -> void:
 			if is_instance_valid(corpse_graphics):
-				corpse_graphics.set_instance_shader_parameter(&"overlay_intensity", value),
+				material.set_shader_parameter(&"overlay_intensity", value),
 		overlay_intensity,
 		0.0,
 		OVERLAY_DECAY_DURATION

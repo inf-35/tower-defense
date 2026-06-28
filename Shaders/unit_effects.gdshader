@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
-instance uniform vec4 overlay_color : source_color = vec4(0.0, 0.0, 0.0, 0.0);
-instance uniform float overlay_intensity = 0.0;
+uniform vec4 overlay_color : source_color = vec4(0.0, 0.0, 0.0, 0.0);
+uniform float overlay_intensity = 0.0;
 
 void fragment() {
 	//color already contains the sampled sprite after node modulate/self_modulate.

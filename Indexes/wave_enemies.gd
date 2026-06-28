@@ -18,7 +18,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	5 : [
 		[Units.Type.BASIC, 4],
-		[Units.Type.DRIFTER, 6],
+		[Units.Type.DRIFTER, 8],
 	],
 	6 : [
 		[Units.Type.BASIC, 6],
@@ -125,6 +125,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.HEALER, 5],
 		[Units.Type.WARRIOR, 28],
 		[Units.Type.ARCHER, 10],
+		[Units.Type.WARRIOR, 30],
 	],
 }
 #--- unit catalog ---

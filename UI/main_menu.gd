@@ -3,9 +3,12 @@ extends Node
 @export var play_button: Button
 @export var settings_button: Button
 @export var continue_button: Button
+@export var feedback_button: Button
 @export var difficulty_panel: Control
 @export var normal_difficulty: Button
 @export var hard_difficulty: Button
+
+const FEEDBACK_FORM_URL: String = "https://docs.google.com/forms/d/e/1FAIpQLSdjTLjsxete1nBg6uRjVjMCB3220uPqmYzGuMnReDQ72I6yAg/viewform?usp=header"
 
 func _ready() -> void:
 	difficulty_panel.visible = false
@@ -18,6 +21,10 @@ func _ready() -> void:
 
 	continue_button.pressed.connect(func():
 		get_tree().change_scene_to_file("res://island.tscn")
+	)
+
+	feedback_button.pressed.connect(func():
+		OS.shell_open(FEEDBACK_FORM_URL)
 	)
 
 	play_button.pressed.connect(func():

@@ -3,6 +3,9 @@
 [ext_resource type="Theme" path="res://UI/default_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://UI/damage_tracker/damage_tracker_row.gd" id="2_script"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_damage_tracker_background"]
+bg_color = Color(1, 1, 1, 0)
+
 [node name="DamageTrackerRow" type="Control" node_paths=PackedStringArray("tower_icon", "tower_name_label", "damage_bar", "damage_value_label")]
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 3
@@ -55,6 +58,7 @@ text = "Tower"
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 theme_type_variation = &"healthbar"
+theme_override_styles/background = SubResource("StyleBoxFlat_damage_tracker_background")
 show_percentage = false
 
 [node name="DamageValue" type="Label" parent="HBoxContainer"]

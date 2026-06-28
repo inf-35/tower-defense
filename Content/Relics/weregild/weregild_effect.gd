@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name WeregildEffect
 
-@export var flux_per_tower_death: float = 3.0
+@export var sell_value_proportion: float = 0.5
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.DIED]
@@ -33,7 +33,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if not report or not report.death_caused:
 		return
 
-	Run.player.flux += flux_per_tower_death * _get_effect_stacks(instance)
+	var sell_value: float = Towers.get_tower_refund_value(tower.type) * Tower.REFUND_PROPORTION
+	Run.player.flux += sell_value * sell_value_proportion * _get_effect_stacks(instance)
 
 func _get_effect_stacks(instance: EffectInstance) -> int:
 	return maxi(instance.stacks, 1)

@@ -36,28 +36,25 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var origin_position: Vector2 = report.target.global_position
 	var hostile: bool = report.target.hostile
 	await Clock.await_game_time(0.01)
-	var target: Unit = _find_nearest_enemy(origin_position, hostile)
+	var target: Unit = _find_random_enemy(origin_position, hostile)
 	if not is_instance_valid(target):
 		return
 
 	trigger_source_tower_pulse(instance)
 	_fire_overkill_bolt(instance, source_tower, report, origin_position, target, report.overkill * _get_effect_stacks(instance))
 
-func _find_nearest_enemy(origin_position: Vector2, hostile: bool) -> Unit:
+func _find_random_enemy(origin_position: Vector2, hostile: bool) -> Unit: ##rolls one valid hostile in the local search radius instead of biasing toward the nearest target
 	var candidates: Array[Unit] = CombatManager.get_units_in_radius(search_radius, origin_position, hostile, [])
-	var best_target: Unit
-	var best_distance: float = INF
+	var valid_targets: Array[Unit] = []
 
 	for candidate: Unit in candidates:
 		if not _is_valid_bolt_target(candidate):
 			continue
+		valid_targets.append(candidate)
 
-		var distance: float = candidate.global_position.distance_squared_to(origin_position)
-		if distance < best_distance:
-			best_distance = distance
-			best_target = candidate
-
-	return best_target
+	if valid_targets.is_empty():
+		return null
+	return valid_targets.pick_random()
 
 func _fire_overkill_bolt(instance: EffectInstance, source_tower: Tower, parent_report: HitReportData, source_position: Vector2, target: Unit, damage: float) -> void:
 	if projectile_data == null:

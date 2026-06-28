@@ -28,7 +28,7 @@ var hp: float:
 	set(value):
 		hp = value
 		hp_changed.emit(hp)
-
+		push_warning("hp changed!")
 		if hp < 0.0 or is_zero_approx(hp):
 			if not Run.phases.is_game_over:
 				Run.phases.start_game_over(false)
@@ -64,6 +64,7 @@ enum TutorialFlag {
 	TOWER_DESTROYED,
 	RUINS,
 	RITE,
+	ONBOARDING,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
@@ -73,6 +74,7 @@ var completed_tutorials: Dictionary[TutorialFlag, bool] = {
 	TutorialFlag.TOWER_DESTROYED: false,
 	TutorialFlag.RUINS: false,
 	TutorialFlag.RITE: false,
+	TutorialFlag.ONBOARDING: false,
 }
 
 #various services (which are children of this node)
@@ -138,6 +140,13 @@ func start() -> void:
 	add_child(trader_service)
 	trader_service.initialise()
 
+	#
+	#var reward := Reward.new()
+	#reward.type = Reward.Type.ADD_RITE
+	#reward.rite_type = Towers.Type.RITE_F
+	#
+	#RewardService.apply_reward(reward)
+
 
 func begin_new_game() -> void:
 	#initial state setup
@@ -146,20 +155,17 @@ func begin_new_game() -> void:
 		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
 		Towers.Type.GENERATOR: true,
-		Towers.Type.WATCHTOWER: true,
-		Towers.Type.SHIELD: true,
-		Towers.Type.OUTPOST: true,
 	}
-
+	
 	#var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_FLAME
+	#reward.rite_type = Towers.Type.RITE_POISONS
 	#RewardService.apply_reward(reward)
-	#reward.rite_type = Towers.Type.RITE_FROST
-	#RewardService.apply_reward(reward)
+	##reward.rite_type = Towers.Type.RITE_FROST
+	##RewardService.apply_reward(reward)
 	#reward.type = Reward.Type.ADD_RELIC
-	###reward.relic = Relics.EPIDEMIC
-	###RewardService.apply_reward(reward)
+	#reward.relic = Relics.AMBUSH
+	#RewardService.apply_reward(reward)
 	##reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
 	##RewardService.apply_reward(reward)
 	##reward.relic = Relics.ALCHEMISTS_STONE
@@ -412,5 +418,8 @@ func get_profile() -> Dictionary:
 	return profile_data
 
 func load_profile(profile_data: Dictionary) -> void:
-	for tutorial_key: String in profile_data.get("completed_tutorials"):
-		completed_tutorials[int(tutorial_key)] = profile_data.get("completed_tutorials")[tutorial_key]
+	var saved_tutorials: Dictionary = profile_data.get("completed_tutorials", {})
+	for tutorial_key: String in saved_tutorials:
+		completed_tutorials[int(tutorial_key)] = saved_tutorials[tutorial_key]
+	if not saved_tutorials.has(str(TutorialFlag.ONBOARDING)) and not saved_tutorials.has(TutorialFlag.ONBOARDING):
+		completed_tutorials[TutorialFlag.ONBOARDING] = completed_tutorials[TutorialFlag.MAIN] and completed_tutorials[TutorialFlag.PAUSE] and completed_tutorials[TutorialFlag.RITE]

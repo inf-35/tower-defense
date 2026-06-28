@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3 uid="uid://dk1tas04x5ba4"]
+[gd_resource type="Resource" script_class="TutorialStep" format=3 uid="uid://dk1tas04x5ba4"]
 
 [ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_tnhaf"]
 
 [resource]
 script = ExtResource("1_tnhaf")
 instruction_text = "[Open] the trade menu to view and purchase upgrades and towers."
-success_text = "Pressing [T] also opens and closes the menu.
+success_text = "Buy run upgrades in this menu. Pressing [T] also opens and closes the menu.
 [Q to continue.]"
 panel_anchor = 2
 trigger_action = &"0"

@@ -60,10 +60,11 @@ func start() -> void:
 #the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("pause"):
-		if not is_equal_approx(speed_multiplier, PAUSE_SPEED):
-			speed_multiplier = PAUSE_SPEED
-		else:
-			speed_multiplier = BASE_SPEED
+		speed_multiplier = PAUSE_SPEED
+	elif Input.is_action_just_pressed("play"):
+		speed_multiplier = BASE_SPEED
+	elif Input.is_action_just_pressed("fast_forward"):
+		speed_multiplier = FAST_FORWARD_SPEED
 
 	game_delta = delta * speed_multiplier
 

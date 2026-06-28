@@ -12,6 +12,9 @@ func _ready() -> void:
 
 		if not area.unit.hostile:
 			return
+			
+		if area.unit.abstractive:
+			return
 
 		Run.player.hp -= 1
 

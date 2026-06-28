@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/tutorial/tutorial_step.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+instruction_text = "Buy the [Ruptured Heart] relic from the trader.\nIt goes well with the {T_RITE_POISONS|label=Rite of Poisons}."
+panel_anchor = 0
+require_confirmation = false
+pause_clock = true

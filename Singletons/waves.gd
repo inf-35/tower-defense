@@ -15,10 +15,11 @@ var _enemies_killed: int = 0
 var _enemies_planned: Array[Array] = []
 var _wave_enemy_preview_cache: Dictionary[int, Array] = {}
 var _breach_enemy_assignments: Dictionary[int, Array] = {}
+var _frozen_raider_waypoints: Dictionary[int, Array] = {}
 
 #--- configuration ---
 const CONCURRENT_ENEMY_SPAWNS: int = 10
-const WAVES_PER_EXPANSION_CHOICE: int = 2 #testing
+const WAVES_PER_EXPANSION_CHOICE: int = 3
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
 
 #--- reconciliation system ---
@@ -117,6 +118,7 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 	_enemies_spawned = 0
 	_enemies_killed = 0
 	_refresh_breach_enemy_assignments()
+	_freeze_raider_waypoints()
 
 
 	print("Waves: Starting combat for wave %d with %d planned enemies." % [current_combat_wave_number, _total_enemies_planned])
@@ -179,6 +181,34 @@ func _cache_wave_enemy_plan(wave: int) -> void:
 		return
 
 	_wave_enemy_preview_cache[wave] = WaveEnemies.get_enemies_for_wave(wave).duplicate(true)
+
+func get_frozen_raider_waypoints(spawn_cell: Vector2i, ignore_walls: bool) -> Array[Vector2i]: ##returns the combat-wave-frozen ordered raid target list for one spawn/mode pair
+	var frozen_waypoints: Array[Vector2i] = []
+	frozen_waypoints.assign(_frozen_raider_waypoints.get(_make_raider_waypoint_key(spawn_cell, ignore_walls), []))
+	return frozen_waypoints.duplicate()
+
+func _freeze_raider_waypoints() -> void: ##captures the deterministic ordered raid target list for each active spawn before the combat wave begins
+	_frozen_raider_waypoints.clear()
+
+	var raider_wall_modes: Dictionary[bool, bool] = {}
+	for enemy_stack: Array in _enemies_planned:
+		var unit_type: Units.Type = enemy_stack[0]
+		if Units.get_unit_route_mode(unit_type) != NavigationComponent.RouteMode.RAIDER_CHAIN:
+			continue
+		raider_wall_modes[Units.get_unit_ignore_walls(unit_type)] = true
+
+	if raider_wall_modes.is_empty():
+		return
+
+	var raid_targets: Array[Tower] = Run.references.island.get_raid_targets()
+	for spawn_cell: Vector2i in SpawnPointService.get_spawn_points():
+		var waypoint_cells: Array[Vector2i] = RaiderRoutePlanner.get_waypoint_cells_for_spawn(spawn_cell, raid_targets)
+		for ignore_walls: bool in raider_wall_modes:
+			_frozen_raider_waypoints[_make_raider_waypoint_key(spawn_cell, ignore_walls)] = waypoint_cells.duplicate()
+
+func _make_raider_waypoint_key(spawn_cell: Vector2i, ignore_walls: bool) -> int:
+	var combined_coords: int = (int(spawn_cell.y) << 32) | (spawn_cell.x & 0xFFFFFFFF)
+	return (combined_coords << 1) | int(ignore_walls)
 
 func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy assignments whenever the active breach set changes so previews stay valid through spawn-point churn
 	_breach_enemy_assignments.clear()
@@ -271,4 +301,5 @@ func _end_combat_wave() -> void:
 		enemy.queue_free()
 
 	wave_ended.emit(current_combat_wave_number)
+	_frozen_raider_waypoints.clear()
 	current_combat_wave_number = 0

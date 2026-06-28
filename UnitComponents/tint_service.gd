@@ -19,8 +19,6 @@ const LAYER_COUNT: int = 8
 const HIT_FLASH_COLOR: Color = Color(1.0, 1.0, 1.0, 1.0)
 const UNIT_EFFECTS_SHADER: Shader = preload("res://Shaders/unit_effects.gdshader")
 
-static var _shared_unit_effects_material: ShaderMaterial
-
 var _owner: Node
 var _root_graphics: Sprite2D
 var _base_graphics_modulate: Color = Color.WHITE
@@ -260,20 +258,27 @@ func _apply_shader_overlay(overlay_color: Color, overlay_intensity: float) -> vo
 	_ensure_unit_effects_material()
 	if not _uses_unit_effects_shader():
 		return
-	_root_graphics.set_instance_shader_parameter(&"overlay_color", overlay_color)
-	_root_graphics.set_instance_shader_parameter(&"overlay_intensity", overlay_intensity)
+	var material: ShaderMaterial = _root_graphics.material as ShaderMaterial
+	material.set_shader_parameter(&"overlay_color", overlay_color)
+	material.set_shader_parameter(&"overlay_intensity", overlay_intensity)
 
-func _ensure_unit_effects_material() -> void: ##ensures units have the shared effects shader only when no bespoke material is already present
+func _ensure_unit_effects_material() -> void: ##ensures each unit graphics root owns a unique effects material so overlay writes stay local without relying on shader instance slots
 	if not is_instance_valid(_root_graphics):
+		return
+	if _uses_unit_effects_shader():
+		if not _root_graphics.material.resource_local_to_scene:
+			_root_graphics.material = (_root_graphics.material as ShaderMaterial).duplicate()
+			_root_graphics.material.resource_local_to_scene = true
 		return
 	if _root_graphics.material != null:
 		return
-	if _shared_unit_effects_material == null:
-		_shared_unit_effects_material = ShaderMaterial.new()
-		_shared_unit_effects_material.shader = UNIT_EFFECTS_SHADER
-	_root_graphics.material = _shared_unit_effects_material
 
-func _uses_unit_effects_shader() -> bool: ##returns whether the current root graphics material can receive overlay instance parameters
+	var material := ShaderMaterial.new()
+	material.shader = UNIT_EFFECTS_SHADER
+	material.resource_local_to_scene = true
+	_root_graphics.material = material
+
+func _uses_unit_effects_shader() -> bool: ##returns whether the current root graphics material can receive overlay uniform updates
 	if not (_root_graphics.material is ShaderMaterial):
 		return false
 	return (_root_graphics.material as ShaderMaterial).shader == UNIT_EFFECTS_SHADER

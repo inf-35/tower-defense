@@ -239,6 +239,9 @@ func is_tower_rite(tower_type: Type) -> bool:
 		return false
 	return tower_stats[tower_type].is_rite
 
+func is_raid_target(tower_type: Type) -> bool: ##returns whether enemies with raider routing should visit and destroy this tower type
+	return tower_type in [Type.GENERATOR, Type.HAMLET]
+
 func is_tower_buff_source(tower_type: Type) -> bool:
 	return tower_type in [
 		Type.AMPLIFIER,

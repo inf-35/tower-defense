@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="TutorialStep" format=3 uid="uid://by3po5rhx3u3i"]
 
-[ext_resource type="Script" path="res://UI/tutorial/tutorial_step.gd" id="1_1"]
+[ext_resource type="Script" uid="uid://d1grmccg0j1e0" path="res://UI/tutorial/tutorial_step.gd" id="1_1"]
 
 [resource]
 script = ExtResource("1_1")
-instruction_text = "Use the [pause] and [play] buttons, or press [Space], to toggle between paused and unpaused time."
+instruction_text = "Use the [pause], [play], and [fast forward] buttons, or press [1], [2], and [3], to switch time states."
 panel_anchor = 6
 highlight = false
 require_confirmation = false

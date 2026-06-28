@@ -9,6 +9,7 @@ class_name PathRenderer
 @export var stroke_scale: Vector2 = Vector2(0.1, 0.1)
 
 @export var line_color: Color = Color(0.2, 0.15, 0.1, 0.8) #standard path
+@export var raider_color: Color = Color(0.88, 0.45, 0.12, 0.82) #settlement-raiding route
 @export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) #wall-ignoring path
 @export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) #invalid path
 
@@ -30,6 +31,7 @@ class PathRender:
 	var path_cell_set: Dictionary
 	var points: PackedVector2Array
 	var is_phasing: bool
+	var route_mode: int
 	var is_valid: bool
 
 	func _init() -> void:
@@ -37,6 +39,7 @@ class PathRender:
 		path_cell_set = {}
 		points = PackedVector2Array()
 		is_phasing = false
+		route_mode = NavigationComponent.RouteMode.DIRECT_TO_GOAL
 		is_valid = true
 
 var _path_cache: Array[PathRender] = []
@@ -116,17 +119,14 @@ func _rebuild_committed_paths() -> void:
 	_path_cache_by_key.clear()
 
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	var modes: Dictionary = _get_current_wave_modes()
+	var route_variants: Array[Dictionary] = _get_current_wave_variants()
 
 	for start_cell: Vector2i in spawn_points:
-		if modes.normal:
-			_store_committed_path(_build_path_render(start_cell, false))
-
-		if modes.phasing:
-			_store_committed_path(_build_path_render(start_cell, true))
+		for variant: Dictionary in route_variants:
+			_store_committed_path(_build_path_render(start_cell, bool(variant.ignore_walls), int(variant.route_mode)))
 
 func _store_committed_path(path_render: PathRender) -> void:
-	_path_cache_by_key[_make_path_key(path_render.start_cell, path_render.is_phasing)] = path_render
+	_path_cache_by_key[_make_path_key(path_render.start_cell, path_render.is_phasing, path_render.route_mode)] = path_render
 	if path_render.is_valid:
 		_path_cache.append(path_render)
 
@@ -134,52 +134,59 @@ func _rebuild_preview_paths() -> void:
 	_preview_path_cache.clear()
 
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	var modes: Dictionary = _get_current_wave_modes()
+	var route_variants: Array[Dictionary] = _get_current_wave_variants()
 
 	for start_cell: Vector2i in spawn_points:
-		if modes.normal:
-			_preview_path_cache.append(_build_preview_path_render(start_cell, false))
+		for variant: Dictionary in route_variants:
+			_preview_path_cache.append(_build_preview_path_render(start_cell, bool(variant.ignore_walls), int(variant.route_mode)))
 
-		if modes.phasing:
-			_preview_path_cache.append(_build_preview_path_render(start_cell, true))
-
-func _build_preview_path_render(start_cell: Vector2i, ignore_walls: bool) -> PathRender:
-	var key: int = _make_path_key(start_cell, ignore_walls)
+func _build_preview_path_render(start_cell: Vector2i, ignore_walls: bool, route_mode: int) -> PathRender:
+	var key: int = _make_path_key(start_cell, ignore_walls, route_mode)
 	#assert(_path_cache_by_key.has(key), "Committed path cache missing preview source.")
 	var committed_path: PathRender = _path_cache_by_key.get(key)
 
 	if committed_path and (committed_path.is_phasing or not _intersects_blockers(committed_path)):
 		return committed_path
 
-	return _build_path_render(start_cell, false, _preview_blockers)
+	return _build_path_render(start_cell, ignore_walls, route_mode, _preview_blockers)
 
-func _get_current_wave_modes() -> Dictionary:
-	var modes: Dictionary[String, bool] = {"normal": false, "phasing": false}
+func _get_current_wave_variants() -> Array[Dictionary]:
+	var variants: Array[Dictionary] = []
+	var seen_variant_keys: Dictionary[int, bool] = {}
 
 	if Run.phases.current_wave_number <= 0:
-		modes.normal = true
-		return modes
+		return [{"route_mode": NavigationComponent.RouteMode.DIRECT_TO_GOAL, "ignore_walls": false}]
 
 	var enemies = WaveEnemies.get_enemies_for_wave(Run.phases.current_wave_number)
 	if enemies.is_empty():
-		modes.normal = true
-		return modes
+		return [{"route_mode": NavigationComponent.RouteMode.DIRECT_TO_GOAL, "ignore_walls": false}]
 
 	for stack in enemies:
-		var type = stack[0]
-		if type == Units.Type.TROLL or type == Units.Type.PHANTOM:
-			modes.phasing = true
-		else:
-			modes.normal = true
-	return modes
+		var type: Units.Type = stack[0]
+		var route_mode: int = Units.get_unit_route_mode(type)
+		var ignore_walls: bool = Units.get_unit_ignore_walls(type)
+		var variant_key: int = (route_mode << 1) | int(ignore_walls)
+		if seen_variant_keys.has(variant_key):
+			continue
+		seen_variant_keys[variant_key] = true
+		variants.append({
+			"route_mode": route_mode,
+			"ignore_walls": ignore_walls,
+		})
 
-func _build_path_render(start: Vector2i, ignore_walls: bool, blockers: Dictionary = {}) -> PathRender:
+	return variants
+
+func _build_path_render(start: Vector2i, ignore_walls: bool, route_mode: int, blockers: Dictionary = {}) -> PathRender:
 	var result := PathRender.new()
 	result.start_cell = start
 	result.is_phasing = ignore_walls
+	result.route_mode = route_mode
 
 	var path_struct: Navigation.PathData
-	if blockers.is_empty() or ignore_walls:
+	if route_mode == NavigationComponent.RouteMode.RAIDER_CHAIN:
+		var waypoint_cells: Array[Vector2i] = _get_raider_waypoints(start, ignore_walls)
+		path_struct = RaiderRoutePlanner.build_path(start, waypoint_cells, ignore_walls, blockers)
+	elif blockers.is_empty() or ignore_walls:
 		path_struct = Navigation.find_path(start, Vector2i.ZERO, ignore_walls)
 	else:
 		path_struct = Navigation.get_hypothetical_path(start, Vector2i.ZERO, blockers, false)
@@ -206,9 +213,17 @@ func _convert_path_to_world(start: Vector2i, path_cells: Array[Vector2i]) -> Pac
 		world_points.append(Island.cell_to_position(cell))
 	return world_points
 
-func _make_path_key(start_cell: Vector2i, ignore_walls: bool) -> int:
+func _make_path_key(start_cell: Vector2i, ignore_walls: bool, route_mode: int) -> int:
 	var combined_coords: int = (int(start_cell.y) << 32) | (start_cell.x & 0xFFFFFFFF)
-	return (combined_coords << 1) | int(ignore_walls)
+	return (combined_coords << 4) | (route_mode << 1) | int(ignore_walls)
+
+func _get_raider_waypoints(start_cell: Vector2i, ignore_walls: bool) -> Array[Vector2i]:
+	if Run.waves.current_combat_wave_number > 0:
+		var frozen_waypoints: Array[Vector2i] = Run.waves.get_frozen_raider_waypoints(start_cell, ignore_walls)
+		if not frozen_waypoints.is_empty():
+			return frozen_waypoints
+
+	return RaiderRoutePlanner.get_waypoint_cells_for_spawn(start_cell, Run.references.island.get_raid_targets())
 
 func _hash_blocker_cells(blocker_cells: Array[Vector2i]) -> int:
 	var hash_sum: int = 0
@@ -226,17 +241,20 @@ func _draw() -> void:
 		if data.points.size() <= 1:
 			continue
 
-		var draw_color: Color = phasing_color if data.is_phasing else line_color
+		var draw_color: Color = line_color
 		if not data.is_valid:
 			if _is_previewing:
 				draw_color = blocked_color
 			else:
 				continue
 		else:
-			draw_color = phasing_color if data.is_phasing else line_color
+			if data.route_mode == NavigationComponent.RouteMode.RAIDER_CHAIN:
+				draw_color = raider_color
+			elif data.is_phasing:
+				draw_color = phasing_color
 
 		draw_color.a = draw_color.a / max(1, list_to_draw.size() * 0.5)
-		if data.is_phasing:
+		if data.is_phasing and data.route_mode != NavigationComponent.RouteMode.RAIDER_CHAIN:
 			draw_color.a *= 3.0
 		_draw_stamped_path(data.points, draw_color)
 

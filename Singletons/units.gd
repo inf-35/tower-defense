@@ -32,7 +32,7 @@ func start() -> void:
 	_load_all_unit_stats()
 
 func get_unit_prototype(unit_type: Type) -> Unit:
-	if not unit_prototypes.has(unit_type): #if no prototype
+	if (not unit_prototypes.has(unit_type)) or (not is_instance_valid(unit_prototypes[unit_type])): #if no prototype
 		unit_prototypes[unit_type] = create_unit(unit_type) #create prototypical unit
 		unit_prototypes[unit_type].abstractive = true #disable all effects and events
 		unit_prototypes[unit_type].visible = false
@@ -63,6 +63,18 @@ func get_unit_strength(unit: Type) -> float:
 
 func get_unit_scene(unit: Type) -> PackedScene:
 	return unit_stats[unit].unit_scene
+
+func get_unit_route_mode(unit_type: Type) -> NavigationComponent.RouteMode: ##reads the unit's authored navigation route mode from its prototype navigation component
+	var prototype: Unit = get_unit_prototype(unit_type)
+	if not is_instance_valid(prototype.navigation_component):
+		return NavigationComponent.RouteMode.DIRECT_TO_GOAL
+	return prototype.navigation_component.route_mode
+
+func get_unit_ignore_walls(unit_type: Type) -> bool: ##reads whether the unit's authored navigation component ignores walls for route rendering and spawning previews
+	var prototype: Unit = get_unit_prototype(unit_type)
+	if not is_instance_valid(prototype.navigation_component):
+		return false
+	return prototype.navigation_component.ignore_walls
 
 func create_unit(unit_type: Type) -> Unit:
 	var _unit: Unit = get_unit_scene(unit_type).instantiate()

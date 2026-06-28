@@ -11,6 +11,8 @@ const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline se
 const FRONTIER_EVENING_BIAS: float = 0.75
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
+const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.0025
+const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.8
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
 class TerrainGenRule extends Resource:
@@ -62,7 +64,7 @@ func _init() -> void:
 
 	var terrain_rules: Array[TerrainGenRule] = STANDARD_EXPANSION_PARAMS.terrain_gen_rules
 	terrain_rules.append(TerrainGenRule.new(Terrain.Base.HIGHLAND, 0.04, 1, 2))
-	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, 0.007))
+	terrain_rules.append(TerrainGenRule.new(Terrain.Base.SETTLEMENT, DEFAULT_SETTLEMENT_PROBABILITY))
 
 	var breach_rule := PlacementRule.new()
 	breach_rule.tower_type = Towers.Type.BREACH
@@ -131,6 +133,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	for i: int in range(choice_count):
 		#generate the block data, which may now include a breach seed
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
+		_apply_difficulty_to_generation_params(expansion_params)
 		var rite_rule: PlacementRule = expansion_params.placement_rules[1]
 		rite_rule.tower_type = _pick_random_rite_type()
 		#var second_rite_rule: PlacementRule = rite_rule.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
@@ -155,8 +158,8 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	_trigger_camera_overview(island) #initial overview of all choices
 
 func _pick_random_rite_type() -> Towers.Type:
-	if Run.phases.should_force_basic_tutorial_rites():
-		return Run.phases.pick_basic_tutorial_rite_type()
+	if is_instance_valid(Run.tutorials) and Run.tutorials.should_force_basic_tutorial_rites():
+		return Run.tutorials.pick_basic_tutorial_rite_type()
 	var rewards := RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
 	if rewards.is_empty():
 		return Towers.Type.VOID
@@ -242,6 +245,18 @@ func _on_exit() -> void:
 	expansion_process_complete.emit()
 	UI.hide_expansion_choices.emit()
 	UI.hide_expansion_confirmation.emit()
+
+func _apply_difficulty_to_generation_params(params: GenerationParameters) -> void: ##applies run-difficulty tuning to authored generation params without hardcoding individual call sites
+	for rule: TerrainGenRule in params.terrain_gen_rules:
+		rule.probability *= _get_terrain_probability_multiplier(rule.terrain_type)
+
+func _get_terrain_probability_multiplier(terrain_type: Terrain.Base) -> float: ##returns the current difficulty multiplier for one terrain family
+	match terrain_type:
+		Terrain.Base.SETTLEMENT:
+			if Run.current_game_difficulty == Run.GameDifficulty.HARD:
+				return HARD_SETTLEMENT_PROBABILITY_MULTIPLIER
+
+	return 1.0
 
 func _clear_expansion_state(island: Island) -> void: ##resets the expansion preview state without rewinding the player's camera once manual control is restored
 	_current_state = State.IDLE

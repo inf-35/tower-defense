@@ -200,6 +200,7 @@ func _enter_tower_selected_state(tower: Tower) -> void:
 
 	current_state = State.ENTITY_SELECTED
 	selected_entity = tower
+	_bind_selected_entity_lifecycle(selected_entity)
 	tower_was_selected.emit(selected_entity)
 	UI.update_inspector_bar.emit(selected_entity)
 
@@ -212,6 +213,7 @@ func _enter_entity_selected_state(entity: Unit) -> void:
 
 	current_state = State.ENTITY_SELECTED
 	selected_entity = entity
+	_bind_selected_entity_lifecycle(selected_entity)
 
 	if entity is Tower:
 		tower_was_selected.emit(entity)
@@ -383,6 +385,7 @@ func _create_and_inspect_ghost_unit(cell_data: Terrain.CellData, cell_pos: Vecto
 	#clear the ghost; we just set the state and tell the inspector to update.
 	current_state = State.ENTITY_SELECTED
 	selected_entity = _ghost_unit_for_inspection
+	_bind_selected_entity_lifecycle(selected_entity)
 	tower_was_selected.emit(selected_entity)
 	UI.update_inspector_bar.emit(selected_entity)
 
@@ -392,6 +395,24 @@ func _on_build_tower_selected(tower: Tower) -> void:
 		await tower.components_ready
 	#the ui is requesting to start building a tower.
 	_enter_preview_state(tower)
+
+func _bind_selected_entity_lifecycle(entity: Unit) -> void: ##keeps map selection in sync with actual node lifetime so removed towers immediately drop out of the inspector
+	if not is_instance_valid(entity):
+		return
+
+	var entity_instance_id: int = entity.get_instance_id()
+	if not entity.tree_exited.is_connected(_on_selected_entity_tree_exited):
+		entity.tree_exited.connect(_on_selected_entity_tree_exited.bind(entity_instance_id), CONNECT_ONE_SHOT)
+
+func _on_selected_entity_tree_exited(entity_instance_id: int) -> void: ##clears selection only when the currently selected runtime node is the one that actually left the scene tree
+	if not is_instance_valid(selected_entity):
+		_enter_idle_state()
+		return
+
+	if selected_entity.get_instance_id() != entity_instance_id:
+		return
+
+	_enter_idle_state()
 
 func _prioritize_selected_enemy() -> void:
 	if not is_instance_valid(selected_entity):

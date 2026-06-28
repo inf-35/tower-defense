@@ -27,6 +27,7 @@ metadata/_custom_type_script = "uid://d4h1djnngjtxl"
 
 [resource]
 script = ExtResource("3_0l13k")
+type = 22
 global_effect = SubResource("Resource_1gyvc")
 title = "Early Bird"
 description = "The first tower to hit an enemy in a wave gains a +80% {UNIT_HITRATE} and {UNIT_DAMAGE} buff for that wave."

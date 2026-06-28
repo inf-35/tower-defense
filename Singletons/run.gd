@@ -16,6 +16,7 @@ const WAVES_SCRIPT := preload("res://Singletons/waves.gd")
 const PHASES_SCRIPT := preload("res://Singletons/phase_manager.gd")
 const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
 const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
+const TUTORIAL_DIRECTOR_SCRIPT := preload("res://Singletons/tutorial_director.gd")
 
 var _run_root: Node
 var _run_owner: Island
@@ -33,6 +34,7 @@ var waves: Waves
 var phases: Phases
 var power_service: PowerService
 var damage_tracker: DamageTrackerService
+var tutorials: TutorialDirector
 
 signal references_ready ##emitted once the current run is fully booted and safe to use
 
@@ -58,6 +60,7 @@ func begin_run(island: Island) -> void:
 	phases = PHASES_SCRIPT.new()
 	power_service = POWER_SERVICE_SCRIPT.new()
 	damage_tracker = DAMAGE_TRACKER_SERVICE_SCRIPT.new()
+	tutorials = TUTORIAL_DIRECTOR_SCRIPT.new()
 
 	_run_root.add_child(references)
 	_run_root.add_child(player)
@@ -65,6 +68,7 @@ func begin_run(island: Island) -> void:
 	_run_root.add_child(phases)
 	_run_root.add_child(power_service)
 	_run_root.add_child(damage_tracker)
+	_run_root.add_child(tutorials)
 
 	current_game_difficulty = pending_game_difficulty
 	current_game_scaling = 1.0
@@ -84,6 +88,7 @@ func finalize_run_setup() -> void:
 	references_ready.emit()
 
 func end_run() -> void:
+	_is_run_ready = false
 	_clear_run_handles()
 	
 	current_game_scaling = 1.0
@@ -99,6 +104,7 @@ func get_save_data() -> Dictionary:
 		"current_game_difficulty": int(current_game_difficulty),
 		"current_game_scaling": current_game_scaling,
 		"current_game_environment": int(current_game_environment),
+		"tutorials": tutorials.get_save_data() if is_instance_valid(tutorials) else {},
 	}
 
 func load_save_data(data: Dictionary) -> void:
@@ -106,6 +112,8 @@ func load_save_data(data: Dictionary) -> void:
 	current_game_difficulty = int(data.get("current_game_difficulty", pending_game_difficulty))
 	current_game_scaling = float(data.get("current_game_scaling", 1.0))
 	current_game_environment = int(data.get("current_game_environment", GameEnvironment.WOODS))
+	if data.has("tutorials") and is_instance_valid(tutorials):
+		tutorials.load_save_data(data["tutorials"])
 
 func _prime_run_references(island: Island, run_generation: int) -> void:
 	if run_generation != _run_generation:
@@ -132,3 +140,4 @@ func _clear_run_handles() -> void:
 	phases = null
 	power_service = null
 	damage_tracker = null
+	tutorials = null

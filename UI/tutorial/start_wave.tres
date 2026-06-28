@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_40tdq")
-instruction_text = "[Start] the wave when you're ready. Towers can still be built mid-battle."
+instruction_text = "[Start] the wave with the button or [Space] when you're ready. Towers can still be built mid-battle."
 panel_anchor = 4
 require_confirmation = false
 override_start_wave_lock = true

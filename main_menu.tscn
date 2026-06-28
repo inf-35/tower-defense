@@ -6,11 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
 
-[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
 continue_button = NodePath("UI/MarginContainer/Control/VBoxContainer/continue")
+feedback_button = NodePath("UI/MarginContainer/Control/VBoxContainer/feedback")
 difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
 normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
 hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
@@ -65,6 +66,18 @@ custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
 text = "Settings"
+script = ExtResource("4_jix8l")
+
+[node name="feedback" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 60
+theme_override_colors/font_color = Color(0.14901961, 0.3254902, 0.7411765, 1)
+theme_override_colors/font_focus_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_hover_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
+text = "Feedback"
 script = ExtResource("4_jix8l")
 
 [node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]

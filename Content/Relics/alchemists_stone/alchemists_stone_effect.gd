@@ -37,7 +37,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var extra_statuses: int = maxi(unique_statuses - 1, 0)
 	if extra_statuses <= 0:
 		return
-	print(1.0 + (extra_statuses * damage_bonus_per_extra_status * _get_effect_stacks(instance)))
+
 	hit_data.damage *= 1.0 + (extra_statuses * damage_bonus_per_extra_status * _get_effect_stacks(instance))
 
 func _count_unique_statuses(victim: Unit) -> int:

@@ -35,6 +35,7 @@ func _pulse_network() -> void: ##reuses one attack context across every emitted 
 	var attack_context: AttackComponent.AttackLineageContext = attack_component.pull_attack_context()
 	if not is_instance_valid(attack_context):
 		return
+	unit.play_action_squash_stretch()
 
 	#command connected palisades to attack
 	for palisade: Tower in _connected_palisades:

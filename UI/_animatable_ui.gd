@@ -29,6 +29,8 @@ class_name AnimatableUI
 #--- state ---
 var _current_tween: Tween
 var _idle_tween: Tween #track idle separately so entrance/hover don't kill it
+var _is_hovered: bool = false
+var _is_emphasized: bool = false
 
 func _ready() -> void:
 	#validation and setup
@@ -90,7 +92,7 @@ func animate_entrance(custom_delay: float = -1.0) -> void:
 func snap_to_default() -> void:
 	if _current_tween: _current_tween.kill()
 	content.position = Vector2.ZERO
-	content.scale = Vector2.ONE
+	content.scale = _get_target_scale()
 	content.rotation = 0.0
 	content.modulate.a = 1.0
 
@@ -121,18 +123,34 @@ func _start_idle_animation() -> void:
 
 func _on_mouse_entered() -> void:
 	if not hover_enabled or not content: return
-
-	#we use a separate tween for scale so it doesn't conflict with position/rotation
-	var hover_tween = create_tween()
-	hover_tween.tween_property(content, "scale", hover_scale, hover_duration)\
-		.set_trans(transition_type).set_ease(ease_type)
+	_is_hovered = true
+	_refresh_scale()
 
 func _on_mouse_exited() -> void:
 	if not hover_enabled or not content: return
+	_is_hovered = false
+	_refresh_scale()
 
-	var hover_tween = create_tween()
-	hover_tween.tween_property(content, "scale", Vector2.ONE, hover_duration)\
+
+func set_emphasized(is_emphasized: bool) -> void: ##pins the content to hover scale without fighting the regular hover tween
+	if _is_emphasized == is_emphasized:
+		return
+	_is_emphasized = is_emphasized
+	_refresh_scale()
+
+
+func _refresh_scale() -> void: ##keeps hover and persistent emphasis on the same scale target
+	if not content:
+		return
+	var hover_tween: Tween = create_tween()
+	hover_tween.tween_property(content, "scale", _get_target_scale(), hover_duration)\
 		.set_trans(transition_type).set_ease(ease_type)
+
+
+func _get_target_scale() -> Vector2: ##selected and hovered states intentionally share the same enlarged scale
+	if _is_hovered or _is_emphasized:
+		return hover_scale
+	return Vector2.ONE
 
 #--- manual control ---
 

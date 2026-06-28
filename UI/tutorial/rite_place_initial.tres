@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TutorialStep" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/tutorial/tutorial_step.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+instruction_text = "Place the rite [adjacent] to one of your towers (i.e. {T_TURRET}) to use it."
+panel_anchor = 1
+highlight = false
+require_confirmation = false
+pause_clock = true

@@ -32,6 +32,7 @@ func _start_attack_sequence(target: Unit) -> void: ##consumes one attack context
 
 	_is_firing_sequence = true
 	attack_component.refresh_cooldown()
+	unit.play_action_squash_stretch()
 	_play_animation(&"attack")
 
 	var interval: float = attack_component.cooldown * projectile_interval_proportion

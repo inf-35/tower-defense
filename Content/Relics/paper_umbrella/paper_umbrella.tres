@@ -13,6 +13,7 @@ metadata/_custom_type_script = "uid://bio1wo0lv0utn"
 
 [resource]
 script = ExtResource("3_5tldk")
+type = 25
 global_effect = SubResource("Resource_5tldk")
 title = "Paper Umbrella"
 description = "Blocks an incoming hit. Can only be used every 3 seconds per tower."

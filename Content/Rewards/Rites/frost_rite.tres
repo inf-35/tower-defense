@@ -9,5 +9,4 @@ id_name = "frost_rite"
 description = "this is a relic reward description"
 type = 3
 rite_type = 30
-base_weight = 100000.0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

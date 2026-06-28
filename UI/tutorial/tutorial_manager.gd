@@ -2,6 +2,12 @@ extends CanvasLayer
 class_name TutorialManager
 
 signal start_wave_lock_changed(locked: bool)
+signal sequence_finished(sequence_id: StringName)
+
+class SequenceState extends RefCounted:
+	var sequence_id: StringName = StringName()
+	var steps: Array[TutorialStep] = []
+	var world_target: Tower
 
 #--- configuration ---
 @export var overlay_color_rect: ColorRect
@@ -28,7 +34,7 @@ var _monitoring_active: bool = false ##are we currently monitoring for a camera 
 
 var _anchor_node: Control
 
-var _current_tutorial_type: Player.TutorialFlag
+var _current_sequence_id: StringName = StringName()
 var _world_hint_open: bool = false
 var _world_hint_target: Tower
 var _world_hint_previous_speed: float = Clock.BASE_SPEED
@@ -82,6 +88,15 @@ func _process_overlay_input(input_event: InputEvent) -> void:
 
 func _has_active_sequence() -> bool:
 	return _current_step_index != -1
+
+func has_active_sequence() -> bool:
+	return _has_active_sequence()
+
+func get_active_sequence_id() -> StringName: ##returns the currently displayed authored sequence id, or an empty id when idle
+	return _current_sequence_id
+
+func get_current_step_index() -> int: ##returns the zero-based step index currently being presented, or -1 when idle
+	return _current_step_index
 
 func _has_active_world_target() -> bool:
 	if not _has_active_sequence():
@@ -137,23 +152,18 @@ func register_element(id: TutorialStep.Reference, node: Control) -> void:
 	_registered_ui_elements[id] = node
 
 #--- public api: sequences ---
-func start_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFlag) -> void:
+func start_sequence(steps: Array[TutorialStep], sequence_id: StringName = StringName()) -> void:
 	_hide_world_hint()
-	#reject tutorials already completed
-	if Run.player.completed_tutorials[tutorial_type]:
-		return
 	_active_sequence = steps
 	_current_step_index = -1
 	visible = true
 	overlay_color_rect.visible = true
 	instruction_panel.visible = true
-	_current_tutorial_type = tutorial_type
+	_current_sequence_id = sequence_id
 	_advance_step()
 
-func start_world_sequence(steps: Array[TutorialStep], tutorial_type: Player.TutorialFlag, tower: Tower) -> void: ##starts a normal tutorial resource sequence, but anchors its panel beside a world tower target instead of a ui control
+func start_world_sequence(steps: Array[TutorialStep], sequence_id: StringName, tower: Tower) -> void: ##starts a normal tutorial resource sequence, but anchors its panel beside a world tower target instead of a ui control
 	if not is_instance_valid(tower):
-		return
-	if Run.player.completed_tutorials[tutorial_type]:
 		return
 
 	_hide_world_hint()
@@ -163,19 +173,59 @@ func start_world_sequence(steps: Array[TutorialStep], tutorial_type: Player.Tuto
 	visible = true
 	overlay_color_rect.visible = true
 	instruction_panel.visible = true
-	_current_tutorial_type = tutorial_type
+	_current_sequence_id = sequence_id
 	_advance_step()
 
 func end_tutorial() -> void:
+	var finished_sequence_id: StringName = _current_sequence_id
 	_hide_world_hint()
 	visible = false
 	instruction_panel.visible = false
 	overlay_color_rect.visible = false
 	_current_step_index = -1
 	_target_node = null
-	Run.player.completed_tutorials[_current_tutorial_type] = true
+	_anchor_node = null
+	_active_sequence.clear()
+	_current_sequence_id = StringName()
+	_set_start_wave_locked(false)
 	#reset shader
 	_shader_mat.set_shader_parameter("is_active", false)
+	sequence_finished.emit(finished_sequence_id)
+
+func take_active_sequence_state() -> SequenceState: ##captures the current sequence so a higher-priority tutorial can interrupt and later resume it from the current step
+	if not _has_active_sequence():
+		return null
+
+	var state := SequenceState.new()
+	state.sequence_id = _current_sequence_id
+	state.steps.assign(_active_sequence.slice(_current_step_index))
+	state.world_target = _world_hint_target
+
+	var step := _active_sequence[_current_step_index]
+	if step.trigger_signal and step.trigger_signal.is_connected(_on_trigger_signal):
+		step.trigger_signal.disconnect(_on_trigger_signal)
+
+	_hide_world_hint()
+	visible = false
+	instruction_panel.visible = false
+	overlay_color_rect.visible = false
+	_current_step_index = -1
+	_target_node = null
+	_anchor_node = null
+	_active_sequence.clear()
+	_current_sequence_id = StringName()
+	_set_start_wave_locked(false)
+	_shader_mat.set_shader_parameter(&"is_active", false)
+	_monitoring_active = false
+	return state
+
+func resume_sequence_state(state: SequenceState) -> void: ##restarts a previously interrupted sequence from its current step using the remaining authored steps
+	if not is_instance_valid(state):
+		return
+	if is_instance_valid(state.world_target):
+		start_world_sequence(state.steps, state.sequence_id, state.world_target)
+		return
+	start_sequence(state.steps, state.sequence_id)
 
 func _advance_step() -> void: ##activates the next authored step, applying any lock state and tutorial text styling before monitoring completion
 	Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND)

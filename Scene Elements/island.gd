@@ -523,6 +523,17 @@ func get_towers_by_type(type: Towers.Type) -> Array[Tower]:
 	typesafe.assign(_towers_by_type.get(type, []))
 	return typesafe
 
+func get_raid_targets() -> Array[Tower]: ##returns all live non-ruined settlement-style towers that raiders should visit before heading to the keep
+	var raid_targets: Array[Tower] = []
+	for tower_type: Towers.Type in [Towers.Type.GENERATOR, Towers.Type.HAMLET]:
+		for tower: Tower in get_towers_by_type(tower_type):
+			if not is_instance_valid(tower):
+				continue
+			if tower.current_state == Tower.State.RUINED:
+				continue
+			raid_targets.append(tower)
+	return raid_targets
+
 func get_tower_on_tile(cell: Vector2i) -> Tower:
 	return tower_grid.get(cell, null)
 

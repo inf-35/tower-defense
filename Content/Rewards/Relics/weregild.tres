@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://c1673iqed236x"]
 
-[ext_resource type="Resource" path="res://Content/Relics/weregild/weregild.tres" id="1_6lroi"]
-[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="2_et4s5"]
+[ext_resource type="Resource" uid="uid://bi0urs84h5hqm" path="res://Content/Relics/weregild/weregild.tres" id="1_6lroi"]
+[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_16k5j"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_et4s5"]
 
 [resource]
 script = ExtResource("2_et4s5")

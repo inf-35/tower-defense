@@ -73,6 +73,7 @@ func _fire_snowball(dir: Vector2, range_val: float) -> void: ##builds one untarg
 		return
 
 	#we have no predestined intercept nor target
+	unit.play_action_squash_stretch()
 	unit.deal_hit(hit_data, delivery_data)
 	#refresh cooldown for attackcomponent (since we're bypassing attack())
 	attack_component.current_cooldown = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN)

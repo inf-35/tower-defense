@@ -11,7 +11,6 @@ signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island f
 @export var turret: Node2D ##this is the part of the turret that turns to face and shoot
 #global configuration
 const REFUND_PROPORTION: float = 1.0 ##proportion of tower value refunded upon sale
-const DESTROYED_TOWER_TUTORIAL: TutorialStep = preload("res://UI/tutorial/destroyed_tower.tres")
 
 enum Facing {
 	UP,
@@ -116,8 +115,8 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 		return
 
 	Run.player.ruin_service.register_ruin(self, reason)
-	if not environmental and not abstractive and is_instance_valid(UI.tutorial_manager):
-		UI.tutorial_manager.start_world_sequence([DESTROYED_TOWER_TUTORIAL], Run.player.TutorialFlag.TOWER_DESTROYED, self)
+	if not environmental and not abstractive and is_instance_valid(Run.tutorials):
+		Run.tutorials.request_destroyed_tower_tutorial(self)
 
 	var rubble := Sprite2D.new()
 	rubble.texture = preload("res://Assets/rubble_grey.png")

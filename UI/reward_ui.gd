@@ -66,6 +66,7 @@ func _instantiate_card(data: Reward, index: int) -> void:
 	#2. connect signals
 	#we bind the index (choice_id) so the ui bus knows which reward was picked
 	card_instance.selected.connect(func():
+		card_instance.play_pickup_animation()
 		UI.choice_selected.emit(index)
 	)
 	card_instance.hovered.connect(func():

@@ -33,9 +33,8 @@ metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
 shader = ExtResource("6_balvs")
-shader_parameter/flash_intensity = 0.0
-shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
+shader_parameter/overlay_intensity = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
 size = Vector2(70, 85)

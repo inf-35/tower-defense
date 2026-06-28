@@ -13,5 +13,5 @@ script = ExtResource("2_k6h1x")
 type = 35
 global_effect = SubResource("Resource_o5w7d")
 title = "Weregild"
-description = "When a tower dies during combat, gain 3 gold. Selling never triggers this."
+description = "When a tower dies during combat, gain 50% of its sell value. Selling never triggers this."
 icon = ExtResource("3_qmugo")

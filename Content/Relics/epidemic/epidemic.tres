@@ -26,7 +26,6 @@ projectile_speed = 160.0
 
 [sub_resource type="Resource" id="Resource_5aaoq"]
 script = ExtResource("1_0b832")
-search_radius = 20.0
 projectile_data = SubResource("Resource_v1o2s")
 
 [resource]

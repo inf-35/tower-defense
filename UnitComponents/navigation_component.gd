@@ -8,12 +8,23 @@ var movement_component: MovementComponent
 var goal: Vector2i = Vector2i.ZERO
 @export var ignore_walls: bool = false
 
+enum RouteMode {
+	DIRECT_TO_GOAL,
+	RAIDER_CHAIN,
+}
+
+@export var route_mode: RouteMode = RouteMode.DIRECT_TO_GOAL ##controls how this unit chooses successive navigation goals on top of the low-level pathfinder
+
 #--- blocking state ---
 var blocking_tower: Tower = null
 
 #--- pathing state ---
 var _current_waypoint_index: int = 0
 var _path: Array[Vector2i] = []
+var _route_spawn_cell: Vector2i = Vector2i.ZERO
+var _route_spawn_cell_initialized: bool = false
+var _route_waypoints: Array[Vector2i] = []
+var _route_waypoint_index: int = 0
 
 #--- deviation state (visuals only) ---
 const DEVIATION_INTERVAL: float = 0.6
@@ -35,6 +46,9 @@ func _ready() -> void:
 	_stagger += randi_range(0, _STAGGER_CYCLE)
 
 func _process(delta: float) -> void:
+	if not Run.is_run_ready():
+		return
+
 	if movement_component == null:
 		return
 
@@ -48,11 +62,19 @@ func _process(delta: float) -> void:
 	if _stagger % _STAGGER_CYCLE != 0:
 		return
 
+	var route_goal_changed: bool = _sync_route_goal()
+	if route_goal_changed:
+		update_path()
+
 	#3. path maintenance
 	if _path.is_empty():
 		update_path()
 		if _path.is_empty():
-			movement_component.target_direction = Vector2.ZERO
+			_check_for_obstructions()
+			if is_instance_valid(blocking_tower):
+				_handle_blocked_state()
+			else:
+				movement_component.target_direction = Vector2.ZERO
 			return
 
 	#4. obstruction check
@@ -121,6 +143,7 @@ func _handle_moving_state() -> void:
 #--- navigation integration ---
 
 func update_path() -> void:
+	_sync_route_goal()
 	var path_data = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
 	_process_path_result(path_data)
 
@@ -229,6 +252,58 @@ func fast_get_position_in_future(t: float) -> Vector2: #returns predicted positi
 	var direction_of_final_segment = (next_waypoint_pos - last_safe_waypoint_pos).normalized()
 
 	return last_safe_waypoint_pos + direction_of_final_segment * total_distance_to_travel
+
+func _sync_route_goal() -> bool: ##keeps the effective navigation goal aligned with the component-owned route mode state
+	if route_mode != RouteMode.RAIDER_CHAIN:
+		return false
+
+	if not _route_spawn_cell_initialized:
+		_route_spawn_cell = movement_component.cell_position
+		_route_spawn_cell_initialized = true
+
+	if _route_waypoints.is_empty():
+		_route_waypoints = _load_route_waypoints()
+		_route_waypoint_index = 0
+
+	while _route_waypoint_index < _route_waypoints.size():
+		var target_cell: Vector2i = _route_waypoints[_route_waypoint_index]
+		var target_tower: Tower = _get_route_target_at(target_cell)
+		if is_instance_valid(target_tower):
+			if goal != target_cell:
+				goal = target_cell
+				return true
+			return false
+		_route_waypoint_index += 1
+
+	if goal != Vector2i.ZERO:
+		goal = Vector2i.ZERO
+		return true
+
+	return false
+
+func _load_route_waypoints() -> Array[Vector2i]: ##loads the frozen combat route for this spawn when available and otherwise falls back to the live raid target chain
+	if is_instance_valid(Run.waves):
+		var frozen_waypoints: Array[Vector2i] = Run.waves.get_frozen_raider_waypoints(_route_spawn_cell, ignore_walls)
+		if not frozen_waypoints.is_empty():
+			return frozen_waypoints
+
+	if not is_instance_valid(Run.references.island):
+		return []
+
+	return RaiderRoutePlanner.get_waypoint_cells_for_spawn(_route_spawn_cell, Run.references.island.get_raid_targets())
+
+func _get_route_target_at(cell: Vector2i) -> Tower: ##resolves the current waypoint anchor cell into a live raid target tower if one still exists there
+	if not is_instance_valid(Run.references.island):
+		return null
+
+	var tower: Tower = Run.references.island.get_tower_on_tile(cell)
+	if not is_instance_valid(tower):
+		return null
+	if tower.current_state == Tower.State.RUINED:
+		return null
+	if not Towers.is_raid_target(tower.type):
+		return null
+	return tower
 
 func get_save_data() -> Dictionary:
 	return {} #nothing to save!

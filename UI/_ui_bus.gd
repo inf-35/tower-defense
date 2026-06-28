@@ -6,6 +6,7 @@ signal tower_dying(tower: Tower) #called by towers before death
 signal gamespeed_toggled(speed: Clock.GameSpeed)
 #UI -> Phases
 signal tower_selected(tower: Tower) #called by sidebar_ui
+signal tower_option_selected(tower_type: Towers.Type)
 signal choice_hovered(choice_id: int) #generic choice ui handlers
 signal choice_unhovered(choice_id: int)
 signal choice_focused(choice_id: int) #used by expansion_ui
@@ -68,3 +69,4 @@ static var tutorial_manager: TutorialManager
 static var cursor_info: CursorInfo
 static var floating_text_manager: FloatingTextManager
 static var loading_screen: LoadingScreen
+static var reward_pickup_animator: RewardPickupAnimator

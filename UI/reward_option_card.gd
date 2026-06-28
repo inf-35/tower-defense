@@ -113,6 +113,20 @@ func _build_tower_card_description(tower_type: Towers.Type) -> String:
 		KeywordService.resolve_tower_description_from_type(tower_type),
 	]
 
+func get_pickup_origin() -> Vector2: ##returns the source point for pickup fly animations using the visible icon rather than the whole card bounds
+	if not is_instance_valid(icon):
+		return global_position + size * 0.5
+	return icon.get_global_rect().get_center()
+
+func play_pickup_animation() -> void: ##launches the shared hud pickup animation for reward types that persist into the relic bar or sidebar
+	if not is_instance_valid(_reward_data):
+		return
+	if not is_instance_valid(icon):
+		return
+	if not is_instance_valid(UI.reward_pickup_animator):
+		return
+	UI.reward_pickup_animator.play_reward_pickup(_reward_data, icon.texture, get_pickup_origin())
+
 #--- input handling ---
 
 func _on_gui_input(event: InputEvent) -> void:

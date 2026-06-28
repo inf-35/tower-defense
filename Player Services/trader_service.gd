@@ -1,6 +1,9 @@
 extends Node
 class_name TraderService
 
+signal item_purchased(reward: Reward, slot_index: int)
+signal stock_restocked(is_manual: bool)
+
 #--- configuration ---
 const SLOT_COUNT: int = 3
 const AUTO_RESTOCK_INTERVAL: int = 2 ##waves between free restocks
@@ -22,17 +25,18 @@ var _has_unseen_stock: bool = false:
 		UI.trader_unseen_stock_changed.emit(_has_unseen_stock)
 
 var _menu_open: bool = false
+var _tutorial_next_manual_restock_stock: Array[Reward] = []
 
 func _ready() -> void:
 	set_process(false)
+	set_process_mode(Node.PROCESS_MODE_ALWAYS)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("trader"):
-		_menu_open = not _menu_open
 		if _menu_open:
-			_open_menu()
+			close_menu()
 		else:
-			UI.trader_close.emit()
+			open_menu()
 
 func initialise() -> void:
 	#listen for wave progression
@@ -59,6 +63,8 @@ func start_game() -> void:
 #--- public api ---
 
 func open_menu() -> void:
+	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_open_trader():
+		return
 	_open_menu()
 
 ##opens the trader and clears the unseen-restock marker once the player has viewed it
@@ -68,6 +74,8 @@ func _open_menu() -> void:
 	UI.trader_open.emit()
 
 func close_menu() -> void:
+	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_close_trader():
+		return
 	_menu_open = false
 	UI.trader_close.emit()
 
@@ -89,25 +97,45 @@ func purchase_item(slot_index: int) -> bool:
 	var item = _current_stock[slot_index]
 	if item == null:
 		return false #already exhausted
+	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_purchase_trader_reward(item):
+		return false
 
 	if Run.player.flux < item.price:
 		return false
 
 	Run.player.flux -= item.price
 	RewardService.apply_reward(item)
+	item_purchased.emit(item, slot_index)
 
 	_current_stock[slot_index] = null
 	UI.trader_update_stock.emit(_current_stock)
 	return true
 
 func force_restock() -> bool:
+	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_force_restock():
+		return false
 	if Run.player.flux < get_restock_cost():
 		return false
 
 	Run.player.flux -= get_restock_cost()
 	_manual_restocks += 1
-	_generate_stock(false)
+	if _tutorial_next_manual_restock_stock.is_empty():
+		_generate_stock(false)
+	else:
+		_set_stock(_tutorial_next_manual_restock_stock, false)
+		_tutorial_next_manual_restock_stock.clear()
+	stock_restocked.emit(true)
 	return true
+
+func set_tutorial_stock(rewards: Array[Reward], mark_unseen: bool) -> void: ##replaces the live trader stock with a fixed scripted set without touching the normal reward pool
+	_set_stock(rewards, mark_unseen)
+
+func set_tutorial_next_manual_restock_stock(rewards: Array[Reward]) -> void: ##queues one scripted stock result for the next manual restock, after which normal stock generation resumes
+	_tutorial_next_manual_restock_stock.clear()
+	for reward: Reward in rewards:
+		if not is_instance_valid(reward):
+			continue
+		_tutorial_next_manual_restock_stock.append(reward)
 
 #--- logic ---
 
@@ -117,19 +145,10 @@ func _on_wave_ended(_wave: int) -> void:
 		_waves_since_restock = 0
 		_manual_restocks = 0
 		_generate_stock(true)
+		stock_restocked.emit(false)
 
 ##rebuilds trader stock and optionally marks the new restock as unseen by the player
 func _generate_stock(mark_unseen: bool) -> void:
-	_current_stock.clear()
-
-	#we want 3 items. rewardservice usually generates options.
-	#we can't use generate_and_present_choices because that affects the ui state directly.
-	#we need a helper in rewardservice to just get random rewards.
-
-	#assuming rewardservice has a pool we can sample, or we use a helper.
-	#implementation assumes rewardservice.get_random_rewards(count) exists.
-	#if not, we manually sample:
-
 	var pool: Array[Reward] = RewardService.get_rewards(
 		SLOT_COUNT,
 		[
@@ -140,14 +159,14 @@ func _generate_stock(mark_unseen: bool) -> void:
 	)
 	if pool.is_empty():
 		return
+	_set_stock(pool, mark_unseen)
 
-	for reward in pool:
+func _set_stock(rewards: Array[Reward], mark_unseen: bool) -> void:
+	_current_stock.clear()
+	for reward: Reward in rewards:
 		_current_stock.append(reward)
-
-	#fill remaining with null if pool is tiny
 	while _current_stock.size() < SLOT_COUNT:
 		_current_stock.append(null)
-
 	_has_unseen_stock = mark_unseen
 	UI.trader_update_stock.emit(_current_stock)
 
