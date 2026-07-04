@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cxxbumbm8x4no"]
 
+[ext_resource type="Texture2D" uid="uid://cgqoe6fa1amf" path="res://Assets/scouting_goggles.png" id="1_bu86w"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_modifier"]
 [ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="2_effect"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_relic"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_bu86w"]
-[ext_resource type="Texture2D" uid="uid://bi0v4sh3btwn5" path="res://Assets/stumbling_blocks_icon.png" id="4_icon"]
 
 [sub_resource type="Resource" id="Resource_range"]
 script = ExtResource("1_modifier")
@@ -21,7 +21,7 @@ script = ExtResource("2_effect")
 reference_tower_types = Array[int]([6, 26])
 min_count = 2
 modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_range"), SubResource("Resource_damage")])
-icon = ExtResource("4_icon")
+icon = ExtResource("1_bu86w")
 
 [resource]
 script = ExtResource("3_relic")
@@ -29,4 +29,4 @@ type = 40
 global_effect = SubResource("Resource_effect")
 title = "Scouting Goggles"
 description = "Towers adjacent to 2 or more {T_PALISADE|label=Walls} gain +40% {UNIT_RANGE} and +20% {UNIT_DAMAGE}."
-icon = ExtResource("4_icon")
+icon = ExtResource("1_bu86w")

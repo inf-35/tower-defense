@@ -162,7 +162,7 @@ func _enter_idle_state() -> void:
 
 	#critical: ensure the ghost unit is destroyed when leaving a selection state
 	if is_instance_valid(_ghost_unit_for_inspection):
-		_ghost_unit_for_inspection.free()
+		_ghost_unit_for_inspection.queue_free()
 		_ghost_unit_for_inspection = null
 
 	if is_instance_valid(preview_tower_prototype):
