@@ -1,6 +1,5 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cqiej2awtvh1w"]
 
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_ldsbg"]
 [ext_resource type="Resource" uid="uid://blhwymptgnx8p" path="res://Content/Relics/ruptured_heart/ruptured_heart.tres" id="1_sg4e5"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_8fyde"]
 
@@ -10,3 +9,4 @@ id_name = "ruptured_heart"
 description = "relic reward"
 type = 2
 relic_data = ExtResource("1_sg4e5")
+

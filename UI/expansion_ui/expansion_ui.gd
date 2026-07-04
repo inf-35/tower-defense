@@ -65,7 +65,7 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 		var btn: ExpansionOptionButton = preload("res://UI/expansion_ui/expansion_option_button.tscn").instantiate()
 		#generate dynamic text based on the choice data
 		btn.set_parsed_text(_generate_button_text(i, choice))
-		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		btn.name = "Btn_selection_%s" % str(i)
 		btn.pressed.connect(_on_choice_pressed.bind(i))
@@ -87,89 +87,55 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 	_finish_button.disabled = true
 	_vbox.add_child(_finish_button)
 
-func _generate_button_text(index: int, choice: ExpansionChoice) -> String:
-	var text: String = "Option %d" % (index + 1)
-
+func _generate_button_text(_index: int, choice: ExpansionChoice) -> String:
 	if choice.block_data.is_empty():
-		return text + " (Empty)"
+		return "Empty"
 
-	#tile count
-	if show_tile_count:
-		text += " %d Tiles" % _count_land_tiles(choice)
+	var settlement_count: int = 0
+	var ruin_count: int = 0
+	var feature_counts: Dictionary[Towers.Type, int] = {}
 
-	var terrain_counts: Dictionary[String, int] = {}
-	var standard_feature_counts: Dictionary[String, int] = {}
-	var distinct_anomaly_list: Array[String] = []
+	for cell_data: Terrain.CellData in choice.block_data.values():
+		if cell_data.terrain == Terrain.Base.SETTLEMENT:
+			settlement_count += 1
 
-	for cell: Vector2i in choice.block_data:
-		var cell_data: Terrain.CellData = choice.block_data[cell]
+		if cell_data.feature == Towers.Type.VOID:
+			continue
 
-		#terrain analysis
-		if show_special_terrain and cell_data.terrain != Terrain.Base.EARTH:
-			var t_name = Terrain.Base.keys()[cell_data.terrain].capitalize()
-			terrain_counts[t_name] = terrain_counts.get(t_name, 0) + 1
+		if cell_data.feature == Towers.Type.RUINS:
+			ruin_count += 1
+			continue
 
-		#feature analysis
-		if show_features and cell_data.feature != Towers.Type.VOID:
-			var feature_name = Towers.Type.keys()[cell_data.feature].capitalize()
+		if not _should_show_feature_type(cell_data.feature):
+			continue
 
-			if cell_data.feature == Towers.Type.ANOMALY:
-				#anomalies are always distinct
-				var anomaly_desc: String = feature_name
-				if show_anomaly_contents and cell_data.initial_state.has(&"_anomaly_data"):
-					var anomaly_data: AnomalyData = cell_data.initial_state[&"_anomaly_data"]
-					if anomaly_data.reward != null:
-						if anomaly_data.reward.type == Reward.Type.UNLOCK_TOWER:
-							var tower_type: Towers.Type = anomaly_data.reward.tower_type
-							anomaly_desc += " ({T_%s})" % Towers.Type.keys()[tower_type]
-						elif anomaly_data.reward.type == Reward.Type.ADD_RELIC:
-							var relic: RelicData = anomaly_data.reward.relic
-							anomaly_desc += " ({R_%s})" % str(relic.type)
-						elif anomaly_data.reward.type == Reward.Type.ADD_RITE:
-							var rite_type: Towers.Type = anomaly_data.reward.rite_type
-							anomaly_desc += " ({T_%s})" % Towers.Type.keys()[rite_type]
-						else:
-							anomaly_desc += " (%s)" % anomaly_data.reward.title
-				distinct_anomaly_list.append(anomaly_desc)
+		feature_counts[cell_data.feature] = feature_counts.get(cell_data.feature, 0) + 1
 
-			elif cell_data.feature == Towers.Type.ARTIFACT:
-				var artifact_desc: String = feature_name
-				if show_anomaly_contents and cell_data.initial_state.has(&"reward"):
-					var reward: Reward = cell_data.initial_state[&"reward"]
-					if reward.type == Reward.Type.UNLOCK_TOWER:
-						var tower_type: Towers.Type = reward.tower_type
-						artifact_desc += " ({T_%s})" % Towers.Type.keys()[tower_type]
-					elif reward.type == Reward.Type.ADD_RELIC:
-						var relic: RelicData = reward.relic
-						artifact_desc += " ({R_%s})" % str(relic.type)
-					elif reward.type == Reward.Type.ADD_RITE:
-						var rite_type: Towers.Type = reward.rite_type
-						artifact_desc += " ({T_%s})" % Towers.Type.keys()[rite_type]
-					else:
-						artifact_desc += " (%s)" % reward.title
+	var segments: Array[String] = []
+	if ruin_count > 0:
+		segments.append("%d {T_RUINS}" % ruin_count)
+	if settlement_count > 0:
+		segments.append("%d {SETTLEMENT}" % settlement_count)
 
-				distinct_anomaly_list.append(artifact_desc)
-			else:
-				#all other towers are consolidated
-				standard_feature_counts[feature_name] = standard_feature_counts.get(feature_name, 0) + 1
+	var sorted_feature_types: Array[int] = []
+	sorted_feature_types.assign(feature_counts.keys())
+	sorted_feature_types.sort()
+	for feature_type: Towers.Type in sorted_feature_types:
+		segments.append("%d {T_%s}" % [feature_counts[feature_type], Towers.Type.keys()[feature_type]])
 
-	#append terrain
-	if not terrain_counts.is_empty():
-		text += ""
-		for t_name in terrain_counts:
-			text += " %d %s" % [terrain_counts[t_name], t_name]
+	if segments.is_empty():
+		return "Empty"
+	return "    ".join(segments)
 
-	#append features
-	if not standard_feature_counts.is_empty() or not distinct_anomaly_list.is_empty():
-		text += ""
+func _should_show_feature_type(feature_type: Towers.Type) -> bool: ##filters expansion option listings down to player-meaningful non-environmental structures while leaving ruins and settlement terrain handled separately
+	if Towers.is_tower_environmental(feature_type):
+		return false
 
-		for f_name in standard_feature_counts:
-			text += " %d %s" % [standard_feature_counts[f_name], f_name]
+	var prototype: Tower = Towers.get_tower_prototype(feature_type)
+	if not is_instance_valid(prototype):
+		return false
 
-		for anomaly_desc in distinct_anomaly_list:
-			text += " %s" % anomaly_desc
-
-	return text
+	return not prototype.hostile
 
 func _count_land_tiles(choice: ExpansionChoice) -> int:
 	var count: int = 0

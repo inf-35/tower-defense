@@ -41,6 +41,26 @@ func trigger_source_tower_pulse(instance: EffectInstance) -> void: ##plays the s
 
 	source_tower.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
+func trigger_target_bonus_feedback(tower: Tower, override_icon: Texture2D = null) -> void: ##plays the shared relic-style icon popup plus tint pulse when a tower newly qualifies for a bonus
+	if not is_instance_valid(tower):
+		return
+
+	var display_icon: Texture2D = override_icon if is_instance_valid(override_icon) else icon
+	if is_instance_valid(display_icon):
+		UI.floating_text_manager.show_icon(display_icon, tower.global_position)
+
+	tower.pulse_tint_layer(
+		TintService.LAYER_RITE_PULSE,
+		BuffComponent.ACTIVATION_OVERLAY_COLOR,
+		BuffComponent.ACTIVATION_OVERLAY_PEAK_STRENGTH,
+		BuffComponent.ACTIVATION_RAMP_IN_DURATION,
+		BuffComponent.ACTIVATION_FADE_OUT_DURATION,
+		false,
+		Tween.TRANS_QUAD,
+		Tween.EASE_OUT,
+		true
+	)
+
 func _resolve_source_tower(instance: EffectInstance) -> Tower:
 	if is_instance_valid(instance.source) and instance.source is Tower:
 		return instance.source as Tower

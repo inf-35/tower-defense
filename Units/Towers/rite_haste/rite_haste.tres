@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("4_5un1r")
 id = 61
+tags = Array[int]([8])
 cost = 0.0
 required_capacity = 0.0
 element = 4

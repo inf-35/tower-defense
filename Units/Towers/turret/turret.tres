@@ -16,6 +16,7 @@ metadata/_custom_type_script = "uid://do6qrosup8u56"
 [resource]
 script = ExtResource("1_x6lxw")
 id = 2
+tags = Array[int]([5])
 cost = 7.0
 upgrades_into = Dictionary[int, float]({
 34: 10.0,
@@ -28,3 +29,4 @@ preview = ExtResource("1_12t77")
 inspector_actions = Array[ExtResource("2_1xnkv")]([ExtResource("4_l0cjb"), SubResource("Resource_1xnkv"), ExtResource("3_p42es")])
 tower_scene = ExtResource("2_bxren")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

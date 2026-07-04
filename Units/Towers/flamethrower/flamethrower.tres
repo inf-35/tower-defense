@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("2_mh00c")
 id = 20
+tags = Array[int]([2])
 cost = 15.0
 element = 2
 tower_name = "Flamethrower"
@@ -15,3 +16,4 @@ tower_description = "Spits flame in a wide cone"
 icon = ExtResource("1_7km1u")
 tower_scene = ExtResource("3_na035")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

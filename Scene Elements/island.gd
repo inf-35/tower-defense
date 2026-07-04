@@ -54,6 +54,7 @@ const RUIN_ATTEMPTS_PER_SITE: int = 20
 
 func _enter_tree() -> void:
 	Run.begin_run(self)
+	
 
 func _ready() -> void:
 	Run.phases.in_game = true
@@ -292,6 +293,9 @@ func update_shore_boundary() -> void: #used for expansion
 
 func is_lake_cell(cell: Vector2i) -> bool:
 	return lake_cells.has(cell)
+
+func is_path_tile(cell: Vector2i) -> bool: ##returns whether any currently committed enemy route lies over this tile
+	return is_instance_valid(Run.references.path_renderer) and Run.references.path_renderer.is_path_cell(cell)
 
 func update_lake_preview() -> void:
 	if not is_instance_valid(lake_preview_renderer):

@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("2_cqlpt")
 id = 18
+tags = Array[int]([4])
 cost = 12.0
 element = 5
 tower_name = "Mage"
@@ -18,3 +19,4 @@ icon = ExtResource("1_4g74q")
 preview = ExtResource("1_4g74q")
 tower_scene = ExtResource("3_2trff")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

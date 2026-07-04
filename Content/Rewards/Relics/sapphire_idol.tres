@@ -1,19 +1,18 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=5 format=3 uid="uid://c3n5w1b8n1u5v"]
 
-[ext_resource type="Script" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_rule"]
-[ext_resource type="Resource" path="res://Content/Relics/sapphire_idol/sapphire_idol.tres" id="2_relic"]
-[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="3_reward"]
-[ext_resource type="Script" path="res://Content/RewardBiasRule/has_tower.gd" id="4_bias"]
+[ext_resource type="Resource" uid="uid://cydfumv526gqn" path="res://Content/Relics/sapphire_idol/sapphire_idol.tres" id="1_relic"]
+[ext_resource type="Script" path="res://Content/reward_tag_rule.gd" id="2_rule"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_reward"]
 
-[sub_resource type="Resource" id="Resource_bias"]
-script = ExtResource("4_bias")
-tower_types = Array[int]([3, 24])
+[sub_resource type="Resource" id="Resource_rule"]
+script = ExtResource("2_rule")
+tags = Array[int]([1])
 operation = 1
 
 [resource]
 script = ExtResource("3_reward")
-id_name = "sapphire_idol"
 description = "this is a relic reward description"
 type = 2
-relic_data = ExtResource("2_relic")
-bias_rules = Array[ExtResource("1_rule")]([SubResource("Resource_bias")])
+relic_data = ExtResource("1_relic")
+tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_rule")])
+

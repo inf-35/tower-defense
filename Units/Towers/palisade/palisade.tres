@@ -14,6 +14,7 @@ metadata/_custom_type_script = "uid://do6qrosup8u56"
 [resource]
 script = ExtResource("1_h5q3w")
 id = 6
+tags = Array[int]([6])
 cost = 1.5
 cost_scaling_override = 0.0
 required_capacity = 0.5
@@ -27,3 +28,4 @@ preview = ExtResource("4_mo865")
 inspector_actions = Array[ExtResource("2_mo865")]([SubResource("Resource_74q3n"), ExtResource("3_mo865")])
 tower_scene = ExtResource("2_8e64g")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

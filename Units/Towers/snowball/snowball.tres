@@ -10,9 +10,10 @@
 [resource]
 script = ExtResource("3_tm8p4")
 id = 24
+tags = Array[int]([1])
 element = 1
 tower_name = "Snowball"
-tower_description = "Fires a piercing snowball that damages and {FROST|label=Freezes} all enemies in a line. The projectile stops only at max range or when hitting a structure."
+tower_description = "Faces one direction and fires a piercing snowball that damages and {FROST|label=Freezes} all enemies in a line. The projectile stops only at max range or when hitting a structure."
 icon = ExtResource("1_5y808")
 preview = ExtResource("1_5y808")
 tower_scene = ExtResource("4_eo045")

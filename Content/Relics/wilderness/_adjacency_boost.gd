@@ -10,6 +10,7 @@ class_name AdjacencyBoostEffect
 
 class AdjacencyState extends RefCounted:
 	var active_modifiers: Dictionary[Tower, Modifier] = {}
+	var active_counts: Dictionary[Tower, int] = {}
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.ADJACENCY_UPDATED, GameEvent.EventType.TOWER_BUILT]
@@ -39,6 +40,7 @@ func _handle_detach(instance: EffectInstance) -> void:
 			tower.modifiers_component.remove_modifier(mod)
 
 	state.active_modifiers.clear()
+	state.active_counts.clear()
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	#if event.event_type == GameEvent.EventType.REPLACED:
@@ -53,32 +55,23 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	#so we don't need to manually scan neighbors of the target here
 	_evaluate_tower(instance, target_tower)
 
-func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void:
-	var state: AdjacencyState = instance.state as AdjacencyState
-	#check if this tower is a valid host
-	if not is_instance_valid(tower):
-		return
-
-	#if host_tower_type is set, ignore towers that don't match
-	if host_tower_type != Towers.Type.VOID and tower.type != host_tower_type:
+func _evaluate_tower(_instance: EffectInstance, tower: Tower) -> void:
+	var state: AdjacencyState = _instance.state as AdjacencyState
+	if not _is_valid_host(tower):
 		_remove_buff_from_tower(state, tower)
 		return
 
-	#count valid neighbors
 	var adjacent_stacks: int = 0
-	var neighbors: Dictionary[Vector2i, Tower] = tower.get_adjacent_towers()
+	for neighbor: Tower in tower.get_adjacent_towers().values():
+		if _matches_adjacent_tower(neighbor, tower):
+			adjacent_stacks += 1
 
-	for neighbor: Tower in neighbors.values():
-		if is_instance_valid(neighbor):
-			#check neighbor type condition
-			if adjacent_tower_type == Towers.Type.VOID or neighbor.type == adjacent_tower_type:
-				adjacent_stacks += 1
-
-	#print(tower, " evaluated at ", adjacent_stacks)
-	#apply or update modifier
+	var previous_stacks: int = state.active_counts.get(tower, 0)
+	state.active_counts[tower] = adjacent_stacks
 	if adjacent_stacks > 0:
 		_apply_buff_to_tower(state, tower, adjacent_stacks)
-		UI.floating_text_manager.show_icon(icon, tower.global_position)
+		if previous_stacks == 0 or adjacent_stacks > previous_stacks:
+			trigger_target_bonus_feedback(tower)
 	else:
 		_remove_buff_from_tower(state, tower)
 
@@ -87,31 +80,46 @@ func _apply_buff_to_tower(state: AdjacencyState, tower: Tower, stacks: int) -> v
 		return
 
 	if state.active_modifiers.has(tower):
-		#update existing modifier
 		var mod: Modifier = state.active_modifiers[tower]
-
-		#calculate new values
-		var new_mult: float = modifier_prototype.multiplicative * stacks
-		var new_add: float = modifier_prototype.additive * stacks
-
-		if not is_equal_approx(mod.multiplicative, new_mult) or not is_equal_approx(mod.additive, new_add):
-			mod.multiplicative = new_mult
-			mod.additive = new_add
+		var old_mult: float = mod.multiplicative
+		var old_add: float = mod.additive
+		modifier_prototype.apply_single_source_stacks(mod, stacks)
+		if not is_equal_approx(mod.multiplicative, old_mult) or not is_equal_approx(mod.additive, old_add):
 			tower.modifiers_component.change_modifier(mod)
-			#print("edited modifier, strength: ", mod.multiplicative)
 	else:
-		#create new modifier
 		var new_mod: Modifier = modifier_prototype.generate_modifier()
-		new_mod.multiplicative = 1.0 + (new_mod.multiplicative - 1.0) * stacks
-		new_mod.additive *= stacks
-
+		modifier_prototype.apply_single_source_stacks(new_mod, stacks)
 		tower.modifiers_component.add_modifier(new_mod)
 		state.active_modifiers[tower] = new_mod
-		#print("applied new modifier, strength: ", new_mod.multiplicative)
 
 func _remove_buff_from_tower(state: AdjacencyState, tower: Tower) -> void:
+	state.active_counts.erase(tower)
 	if state.active_modifiers.has(tower):
 		var mod: Modifier = state.active_modifiers[tower]
 		if is_instance_valid(tower.modifiers_component):
 			tower.modifiers_component.remove_modifier(mod)
 		state.active_modifiers.erase(tower)
+
+func _is_valid_host(tower: Tower) -> bool:
+	if not is_instance_valid(tower):
+		return false
+	if tower.hostile or tower.is_queued_for_deletion():
+		return false
+	if tower.current_state != Tower.State.ACTIVE:
+		return false
+	if host_tower_type == Towers.Type.VOID:
+		return true
+	return tower.type == host_tower_type
+
+func _matches_adjacent_tower(candidate: Tower, host_tower: Tower) -> bool:
+	if not is_instance_valid(candidate):
+		return false
+	if candidate == host_tower:
+		return false
+	if candidate.hostile or candidate.is_queued_for_deletion():
+		return false
+	if candidate.current_state != Tower.State.ACTIVE:
+		return false
+	if adjacent_tower_type == Towers.Type.VOID:
+		return true
+	return candidate.type == adjacent_tower_type

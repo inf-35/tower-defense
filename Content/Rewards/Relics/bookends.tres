@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://dmhtkxujaf7gw"]
+
+[ext_resource type="Resource" uid="uid://d3ls1ij8xhf" path="res://Content/Relics/bookends/bookends.tres" id="1_relic"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_reward"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="3_to2u6"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="4_38i3p"]
+
+[resource]
+script = ExtResource("2_reward")
+id_name = "bookends"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_relic")
+base_rarity = 0

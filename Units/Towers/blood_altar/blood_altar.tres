@@ -11,6 +11,7 @@
 script = ExtResource("2_d0xwe")
 target_type_name = "BLOOD_ALTAR"
 id = 65
+tags = Array[int]([8])
 cost = 8.0
 element = 5
 tower_name = "Blood Altar"

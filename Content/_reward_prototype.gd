@@ -12,17 +12,21 @@ class_name RewardPrototype #see Reward
 @export var rite_type: Towers.Type = Towers.Type.VOID
 @export var flux_amount: int = 0
 
-@export var base_weight: float = 100.0
-@export var bias_rules: Array[RewardBiasRule] = []
+@export var base_rarity: Reward.Rarity = Reward.Rarity.UNCOMMON
+@export var weight_scale: float = 1.0
+@export var tag_rules: Array[RewardTagRule] = []
+@export var tower_rules: Array[RewardTowerRule] = []
 
-#converts this editor-friendly resource into the runtime reward object
+##converts this editor-friendly resource into the runtime reward object
 func generate_reward() -> Reward:
 	var reward := Reward.new()
 	reward.type = type
 	reward.title = title
 	reward.description = description
-	reward.base_weight = base_weight
-	reward.bias_rules = bias_rules
+	reward.base_rarity = base_rarity
+	reward.weight_scale = weight_scale
+	reward.tag_rules = tag_rules
+	reward.tower_rules = tower_rules
 
 	match type:
 		Reward.Type.UNLOCK_TOWER:

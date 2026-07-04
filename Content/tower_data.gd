@@ -32,6 +32,7 @@ func submit_tower_type() -> void:
 @export var is_rite: bool = false ##is this tower type a rite?
 @export var is_environmental: bool = false ##is this tower type environmental? i.e. a forest
 @export var upgrades_into: Dictionary[Towers.Type, float] = {} ##list of possible upgrades, where key is Type and value is cost (in gold)
+@export var tags: Array[Towers.Tag] = [] ##predefined reward-synergy tags used by reward weighting
 
 @export var allowed_terrain: Array[Terrain.Base] = [] #if empty, allows all constructable terrains
 #navigation

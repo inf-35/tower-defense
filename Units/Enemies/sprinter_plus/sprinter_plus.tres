@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/bandit.png" id="1"]
+[ext_resource type="Script" path="res://Content/unit_data..gd" id="2"]
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3"]
+[ext_resource type="PackedScene" path="res://Units/Enemies/sprinter_plus/sprinter_plus.tscn" id="4"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="5"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="6"]
+
+[resource]
+script = ExtResource("2")
+title = "Sprinter+"
+icon = ExtResource("1")
+description = "Hardened raiders that accelerate even faster as time passes."
+stat_displays = Array[ExtResource("3")]([ExtResource("5"), ExtResource("6")])
+unit_scene = ExtResource("4")
+flux_value = 0.7
+strength_value = 1.3

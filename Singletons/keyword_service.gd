@@ -95,7 +95,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"BURN": {
 		"title": "Burn",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Burning units take 0.5 damage per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}. Burning units take 0.8 damage per second per stack",
 		"icon": preload("res://Assets/burn_icon.png")
 	},
 	"BLEED": {
@@ -113,7 +113,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"POISON": {
 		"title": "Poison",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 6% remaining HP as damage per second per stack",
+		"description": "{STATUS_EFFECT_LABEL}: Poisoned units take 8% remaining HP as damage per second per stack, capped at 2 damage per second per stack",
 		"icon": preload("res://Assets/poison_icon.png"),
 	},
 	"STUN": {

@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_5kivb"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_ww8l2"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_hq7m0"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_vdoi0"]
 [ext_resource type="Texture2D" uid="uid://cfufr2y0oau2c" path="res://Assets/dynamite_icon.png" id="5_5kivb"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="6_fhrps"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="6_ww8l2"]
@@ -21,8 +22,6 @@ aoe_particles_enabled = true
 aoe_particle_color = Color(1, 0.85490197, 0.47058824, 0.4)
 aoe_particles_per_cell = 5.0
 aoe_particle_lifetime = 0.32
-aoe_particle_scale_min = 0.45
-aoe_particle_scale_max = 0.9
 aoe_particle_spin_speed_min = -50.0
 aoe_particle_spin_speed_max = 50.0
 aoe_particle_drift_speed_min = 10.0

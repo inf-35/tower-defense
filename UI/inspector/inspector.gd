@@ -277,7 +277,7 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 					is_disabled = true
 				btn.pressed.connect(UI.excavate_rite_requested.emit.bind(tower))
 			else:
-				var sell_value: float = snappedf(Towers.get_tower_refund_value(tower.type), Towers.TOWER_COST_INCREMENT)
+				var sell_value: float = snappedf(Towers.get_tower_refund_value(tower.type) * Tower.REFUND_PROPORTION, Towers.TOWER_COST_INCREMENT)
 				btn.text += " (%.2f)" % sell_value
 				btn.pressed.connect(UI.sell_tower_requested.emit.bind(tower))
 

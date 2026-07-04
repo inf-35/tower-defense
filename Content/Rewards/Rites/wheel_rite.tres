@@ -1,6 +1,5 @@
 [gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3 uid="uid://ctmte2cj2u1th"]
 
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_e5u53"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_8jbpc"]
 
 [resource]
@@ -10,3 +9,4 @@ description = "this is a relic reward description"
 type = 3
 rite_type = 51
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
+

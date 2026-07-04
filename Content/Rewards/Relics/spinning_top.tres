@@ -9,3 +9,4 @@ id_name = "spinning_top"
 description = "relic reward"
 type = 2
 relic_data = ExtResource("1_ou5kd")
+

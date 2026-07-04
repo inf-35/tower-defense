@@ -562,9 +562,9 @@ func deal_hit(hit: HitData, delivery_data : DeliveryData = null) -> void:
 	else:
 		CombatManager.resolve_hit(hit, delivery_data)
 
-#this is a new virtual function that deals with actual death (connects to the died signal)
+#this is a virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
-	Run.player.flux += hit_report_data.flux_value * 0.4 #reward player with flux
+	Run.player.flux += hit_report_data.flux_value * 0.25 #reward player with flux
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 
 	behavior.detach() #disable behavior
@@ -589,7 +589,7 @@ func get_stat(attr: Attributes.id) -> Variant: #generic get stat function
 			return movement_component.get_stat(modifiers_component, movement_component.movement_data, attr)
 
 	if attack_component != null:
-		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN:
+		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN or attr == Attributes.id.ATTACK_RATE:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
 
 	return null

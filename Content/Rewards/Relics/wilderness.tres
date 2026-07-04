@@ -1,22 +1,14 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cswn1yoa4e8w8"]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://dlf2j3m7jlwm4"]
 
-[ext_resource type="Resource" uid="uid://ddu0kih5o36wt" path="res://Content/Relics/wilderness/wilderness.tres" id="1_f7wol"]
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_wusxj"]
-[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_lfxhg"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_wusxj"]
-
-[sub_resource type="Resource" id="Resource_uxr01"]
-script = ExtResource("2_lfxhg")
-tower_types = Array[int]([14, 15])
-operation = 1
-metadata/_custom_type_script = "uid://7k2jlkybgih"
+[ext_resource type="Resource" uid="uid://ddu0kih5o36wt" path="res://Content/Relics/wilderness/wilderness.tres" id="1_relic"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_rule"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_reward"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="4_lfxhg"]
 
 [resource]
-script = ExtResource("2_wusxj")
+script = ExtResource("3_reward")
 id_name = "wilderness"
 description = "this is a relic reward description"
 type = 2
-relic_data = ExtResource("1_f7wol")
-base_weight = 200.0
-bias_rules = Array[ExtResource("1_wusxj")]([SubResource("Resource_uxr01")])
-metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
+relic_data = ExtResource("1_relic")
+base_rarity = 0

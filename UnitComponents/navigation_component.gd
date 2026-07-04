@@ -35,6 +35,9 @@ var _current_deviation: Vector2 = Vector2.ZERO
 #--- configuration ---
 const TARGET_DEVIATION_FROM_WAYPOINT: float = Island.CELL_SIZE * 0.5
 const TARGET_DEVIATION_SQUARED = TARGET_DEVIATION_FROM_WAYPOINT ** 2
+const NAVIGATION_UPDATE_INTERVAL: float = 5.0 / 60.0 ##matches the old 5-frame cadence at 60 fps while staying stable across frame rates and game speeds
+
+var _navigation_update_accumulator: float = 0.0
 
 func inject_components(movement: MovementComponent) -> void:
 	movement_component = movement
@@ -42,8 +45,7 @@ func inject_components(movement: MovementComponent) -> void:
 func _ready() -> void:
 	#listen for global path updates (e.g. maze changed)
 	Run.references.island.navigation_grid_updated.connect(update_path)
-	_STAGGER_CYCLE = 5
-	_stagger += randi_range(0, _STAGGER_CYCLE)
+	_navigation_update_accumulator = randf() * NAVIGATION_UPDATE_INTERVAL
 
 func _process(delta: float) -> void:
 	if not Run.is_run_ready():
@@ -57,10 +59,11 @@ func _process(delta: float) -> void:
 	if _deviation_timer <= 0.0:
 		_update_deviation()
 
-	#2. stagger logic
-	_stagger += 1
-	if _stagger % _STAGGER_CYCLE != 0:
+	#2. time-based cadence
+	_navigation_update_accumulator += Clock.game_delta
+	if _navigation_update_accumulator < NAVIGATION_UPDATE_INTERVAL:
 		return
+	_navigation_update_accumulator = fmod(_navigation_update_accumulator, NAVIGATION_UPDATE_INTERVAL)
 
 	var route_goal_changed: bool = _sync_route_goal()
 	if route_goal_changed:

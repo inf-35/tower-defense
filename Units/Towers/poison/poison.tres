@@ -22,6 +22,7 @@ upgrades_into = Dictionary[int, float]({
 42: 12.0,
 43: 12.0
 })
+tags = Array[int]([0, 3])
 tower_name = "Poison"
 tower_description = "Releases a noxious mist, inflicting nearby enemies with mild yet long-lasting {POISON}."
 icon = ExtResource("1_bbdyr")

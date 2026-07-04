@@ -2,6 +2,8 @@ extends UnitComponent
 class_name ModifiersComponent
 
 signal stat_changed(attribute: Attributes.id)
+const MIN_EFFECTIVE_COOLDOWN: float = 0.001
+const MIN_EFFECTIVE_ATTACK_RATE: float = 0.001
 #base stats
 var base_stats: Dictionary[Attributes.id, float] = {}
 #internal storage of modifiers
@@ -44,23 +46,28 @@ func _on_global_modifiers_changed() -> void:
 	for attribute: Attributes.id in base_stats:
 		stat_changed.emit(attribute)
 
+func _invalidate_stat(attribute: Attributes.id) -> void: ##invalidates one stat and any derived stat that depends on it
+	_effective_cache.erase(attribute)
+	stat_changed.emit(attribute)
+	if attribute != Attributes.id.ATTACK_RATE:
+		return
+	_effective_cache.erase(Attributes.id.COOLDOWN)
+	stat_changed.emit(Attributes.id.COOLDOWN)
+
 #add a permanent buff/debuff (for level-ups, skill choices, etc.)
 func add_permanent_modifier(mod: Modifier) -> void:
 	_permanent_modifiers.append(mod)
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute)
+	_invalidate_stat(mod.attribute)
 
 #remove a permanent buff/debuff (for respecs, etc.)
 func remove_permanent_modifier(mod: Modifier) -> void:
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute)
 	_permanent_modifiers.erase(mod)
+	_invalidate_stat(mod.attribute)
 
 #add a buff/debuff
 func add_modifier(mod: Modifier) -> void:
 	_modifiers.append(mod)
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute)
+	_invalidate_stat(mod.attribute)
 
 	if mod.source_id == null:
 		push_warning("modifier ", self, " has no source id!")
@@ -72,14 +79,12 @@ func add_modifier(mod: Modifier) -> void:
 
 #change modifier notification NOTE: mainly used for external modifier modification, simply notifies that there is a change
 func change_modifier(mod: Modifier) -> void:
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute)
+	_invalidate_stat(mod.attribute)
 
 #remove a buff/debuff
 func remove_modifier(mod: Modifier) -> void:
 	_modifiers.erase(mod)
-	_effective_cache.erase(mod.attribute)
-	stat_changed.emit(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
+	_invalidate_stat(mod.attribute) #this causes the UI to pull_stat; so you must finish everything (cache invalidation) before this
 
 func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us to not repeat stat_changed calls
 	_modifiers.erase(mod)
@@ -269,6 +274,11 @@ func pull_stat(attr: Attributes.id) -> Variant:
 	if _effective_cache.has(attr):
 		return _effective_cache[attr] #return cache
 
+	if attr == Attributes.id.COOLDOWN:
+		return _pull_cooldown_stat()
+	if attr == Attributes.id.ATTACK_RATE:
+		return _pull_attack_rate_stat()
+
 	if not has_stat(attr):
 		return null #unregistered stat!
 
@@ -328,6 +338,52 @@ func pull_stat(attr: Attributes.id) -> Variant:
 		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
 
 	return final_value
+
+func _pull_cooldown_stat() -> Variant: ##resolves cooldown in cooldown-space first, then applies flat attacks-per-second bonuses in rate-space
+	if not has_stat(Attributes.id.COOLDOWN):
+		return null
+
+	var global_modifiers: Array[Modifier] = Run.player.get_modifiers_for_unit(self.unit)
+	var cooldown_value: float = base_stats[Attributes.id.COOLDOWN]
+	cooldown_value = _apply_modifier_stage(cooldown_value, Attributes.id.COOLDOWN, _permanent_modifiers)
+	cooldown_value = _apply_modifier_stage(cooldown_value, Attributes.id.COOLDOWN, _modifiers)
+	cooldown_value = _apply_modifier_stage(cooldown_value, Attributes.id.COOLDOWN, global_modifiers)
+	cooldown_value = maxf(cooldown_value, MIN_EFFECTIVE_COOLDOWN)
+
+	var attack_rate_bonus: float = 0.0
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _permanent_modifiers)
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _modifiers)
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, global_modifiers)
+
+	var resolved_attack_rate: float = maxf((1.0 / cooldown_value) + attack_rate_bonus, MIN_EFFECTIVE_ATTACK_RATE)
+	var final_value: float = 1.0 / resolved_attack_rate
+	_effective_cache[Attributes.id.COOLDOWN] = final_value
+	return final_value
+
+func _pull_attack_rate_stat() -> Variant: ##returns the resolved flat attacks-per-second bonus for debugging and future facade access
+	var global_modifiers: Array[Modifier] = Run.player.get_modifiers_for_unit(self.unit)
+	var attack_rate_bonus: float = 0.0
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _permanent_modifiers)
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _modifiers)
+	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, global_modifiers)
+	_effective_cache[Attributes.id.ATTACK_RATE] = attack_rate_bonus
+	return attack_rate_bonus
+
+func _apply_modifier_stage(base_value: float, attr: Attributes.id, modifiers: Array[Modifier]) -> float: ##applies one modifier layer using the repo's standard base*mult+add convention
+	var sum_add: float = 0.0
+	var product_mult: float = 1.0
+	var override = null
+
+	for modifier: Modifier in modifiers:
+		if modifier.attribute != attr:
+			continue
+
+		sum_add += modifier.additive
+		product_mult *= modifier.multiplicative
+		if modifier.override != null:
+			override = modifier.override
+
+	return base_value * product_mult + sum_add if override == null else override
 
 func pull_dynamic_stat(key: StringName) -> Variant:
 	return pull_stat(get_dynamic_id(key))

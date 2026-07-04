@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Texture2D" path="res://Assets/troll.png" id="1"]
+[ext_resource type="Script" path="res://Content/unit_data..gd" id="2"]
+[ext_resource type="PackedScene" path="res://Units/Enemies/troll_plus/troll_plus.tscn" id="3"]
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="4"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="5"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="6"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/damage.tres" id="7"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/hitrate.tres" id="8"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/range.tres" id="9"]
+
+[resource]
+script = ExtResource("2")
+title = "Troll+"
+icon = ExtResource("1")
+description = "Massive elites that pathfind directly to your keep, smashing towers in their path."
+stat_displays = Array[ExtResource("4")]([ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")])
+important = true
+unit_scene = ExtResource("3")
+flux_value = 1.0
+strength_value = 3.2

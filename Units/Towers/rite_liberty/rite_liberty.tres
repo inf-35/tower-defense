@@ -13,12 +13,9 @@ cost = 0.0
 required_capacity = 0.0
 element = 4
 is_rite = true
-upgrades_into = Dictionary[int, float]({
-26: 1.0
-})
 tower_name = "Liberty Rite"
 rite_short_name = "liberty"
-tower_description = "{RITE_LABEL}. All adjacent towers gain 25% {UNIT_HITRATE} per empty adjacent tile."
+tower_description = "{RITE_LABEL}. All adjacent towers gain 40% {UNIT_HITRATE} per empty adjacent tile."
 icon = ExtResource("1_ob68q")
 preview = ExtResource("1_ob68q")
 inspector_actions = Array[ExtResource("2_qlphn")]([ExtResource("3_3pncg")])

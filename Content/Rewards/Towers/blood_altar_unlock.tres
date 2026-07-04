@@ -7,4 +7,4 @@ script = ExtResource("1_p7y7y")
 id_name = "blood_altar"
 description = "relic tower unlock"
 tower_type = 65
-base_weight = 200.0
+base_rarity = 1

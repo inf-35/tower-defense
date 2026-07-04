@@ -103,22 +103,82 @@ func get_rewards_by_type(type_filter: Reward.Type) -> Array[Reward]:
 func get_reroll_cost() -> float:
 	return pow(2, rerolls_this_phase) + 2.0
 
-func _calculate_reward_weight(reward: Reward) -> float:
+func _calculate_reward_weight(
+	reward: Reward,
+	owned_tags: Dictionary[Towers.Tag, bool],
+	owned_tower_types: Dictionary[Towers.Type, bool]
+) -> float:
 	if _player_already_has_reward(reward):
 		return 0.0
 
-	var final_weight: float = reward.base_weight
-	if reward.type == Reward.Type.UNLOCK_TOWER:
-		final_weight = maxf(final_weight, 200.0)
+	var final_weight: float = reward.get_base_weight()
 
-	for rule: RewardBiasRule in reward.bias_rules:
-		final_weight *= rule.get_multiplier()
+	for rule: RewardTagRule in reward.tag_rules:
+		final_weight *= rule.get_multiplier(owned_tags)
+
+	for rule: RewardTowerRule in reward.tower_rules:
+		final_weight *= rule.get_multiplier(owned_tower_types)
 
 		#optimization: if weight hits 0, stop calculating
 		if final_weight <= 0.0:
 			return 0.0
 
 	return final_weight
+
+##builds the current reward-synergy tag set from unlocked towers plus rites in inventory or already placed on the island
+func _get_owned_reward_tags() -> Dictionary[Towers.Tag, bool]:
+	var owned_tags: Dictionary[Towers.Tag, bool] = {}
+
+	for tower_type: Towers.Type in Run.player.unlocked_towers:
+		if not Run.player.unlocked_towers[tower_type]:
+			continue
+		if Towers.is_tower_rite(tower_type):
+			continue
+		_add_tower_type_tags(tower_type, owned_tags)
+
+	for rite_type: Towers.Type in Run.player.rite_inventory:
+		if Run.player.get_rite_count(rite_type) <= 0:
+			continue
+		_add_tower_type_tags(rite_type, owned_tags)
+
+	for tower: Tower in Run.references.island.tower_grid.values():
+		if not is_instance_valid(tower):
+			continue
+		if not Towers.is_tower_rite(tower.type):
+			continue
+		_add_tower_type_tags(tower.type, owned_tags)
+
+	return owned_tags
+
+##builds the current reward-synergy tower-type set from unlocked towers plus rites in inventory or already placed on the island
+func _get_owned_reward_tower_types() -> Dictionary[Towers.Type, bool]:
+	var owned_tower_types: Dictionary[Towers.Type, bool] = {}
+
+	for tower_type: Towers.Type in Run.player.unlocked_towers:
+		if not Run.player.unlocked_towers[tower_type]:
+			continue
+		if Towers.is_tower_rite(tower_type):
+			continue
+		owned_tower_types[tower_type] = true
+
+	for rite_type: Towers.Type in Run.player.rite_inventory:
+		if Run.player.get_rite_count(rite_type) <= 0:
+			continue
+		owned_tower_types[rite_type] = true
+
+	for tower: Tower in Run.references.island.tower_grid.values():
+		if not is_instance_valid(tower):
+			continue
+		if not Towers.is_tower_rite(tower.type):
+			continue
+		owned_tower_types[tower.type] = true
+
+	return owned_tower_types
+
+##adds all authored reward-synergy tags from one tower type into a shared membership set
+func _add_tower_type_tags(tower_type: Towers.Type, owned_tags: Dictionary[Towers.Tag, bool]) -> void:
+	for tag: Towers.Tag in Towers.get_tower_tags(tower_type):
+		owned_tags[tag] = true
 
 func _player_already_has_reward(reward: Reward) -> bool:
 	match reward.type:
@@ -240,6 +300,8 @@ func _roll_rewards(candidate_rewards: Array[Reward], choice_count: int) -> Array
 	var candidates: Array[Reward] = []
 	var weights: Array[float] = []
 	var total_weight: float = 0.0
+	var owned_tags: Dictionary[Towers.Tag, bool] = _get_owned_reward_tags()
+	var owned_tower_types: Dictionary[Towers.Type, bool] = _get_owned_reward_tower_types()
 
 	for reward: Reward in candidate_rewards:
 		if not is_instance_valid(reward):
@@ -247,7 +309,7 @@ func _roll_rewards(candidate_rewards: Array[Reward], choice_count: int) -> Array
 		if _player_already_has_reward(reward):
 			continue
 
-		var weight: float = _calculate_reward_weight(reward)
+		var weight: float = _calculate_reward_weight(reward, owned_tags, owned_tower_types)
 		if weight <= 0.0:
 			continue
 

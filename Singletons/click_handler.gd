@@ -336,7 +336,7 @@ func _update_preview_visuals() -> void:
 	if current_state != State.PREVIEWING:
 		return
 
-	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -10.0, preview_tower_position)
+	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -16.0, preview_tower_position)
 	preview_tower_prototype.tower_position = preview_tower_position
 	preview_tower_prototype.facing = preview_tower_facing
 	preview_tower_prototype.size = Tower.get_rotated_size(Towers.get_tower_size(preview_tower_prototype.type), preview_tower_prototype.facing)

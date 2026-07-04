@@ -85,6 +85,18 @@ enum Element {
 	NEUTRAL,
 }
 
+enum Tag {
+	POISONS,
+	FROST,
+	FLAME,
+	NATURE,
+	CURSES,
+	TURRET,
+	WALL,
+	CANNON,
+	SELF_DAMAGE,
+}
+
 var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
@@ -198,6 +210,11 @@ func get_tower_allowed_terrains(tower_type: Type) -> Array[Terrain.Base]:
 
 func get_tower_name(tower_type: Type) -> String:
 	return tower_stats[tower_type].tower_name
+
+func get_tower_tags(tower_type: Type) -> Array[Tag]:
+	if not tower_stats.has(tower_type):
+		return []
+	return tower_stats[tower_type].tags
 
 func get_rite_short_name(tower_type: Type) -> String:
 	if not tower_stats.has(tower_type):

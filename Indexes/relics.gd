@@ -30,5 +30,13 @@ static var ALCHEMISTS_STONE: RelicData = load("res://Content/Relics/alchemists_s
 static var WEREGILD: RelicData = load("res://Content/Relics/weregild/weregild.tres")
 static var EPIDEMIC: RelicData = load("res://Content/Relics/epidemic/epidemic.tres")
 static var RUPTURED_HEART: RelicData = load("res://Content/Relics/ruptured_heart/ruptured_heart.tres")
+static var BLACK_LILY: RelicData = load("res://Content/Relics/black_lily/black_lily.tres")
+static var SCOUTING_GOGGLES: RelicData = load("res://Content/Relics/scouting_goggles/scouting_goggles.tres")
+static var PALANTIR: RelicData = load("res://Content/Relics/palantir/palantir.tres")
+static var KINGSGUARD: RelicData = load("res://Content/Relics/kingsguard/kingsguard.tres")
+static var BOOKENDS: RelicData = load("res://Content/Relics/bookends/bookends.tres")
+static var ERGOT: RelicData = load("res://Content/Relics/ergot/ergot.tres")
+static var HEARTH: RelicData = load("res://Content/Relics/hearth/hearth.tres")
+static var BASTION: RelicData = load("res://Content/Relics/bastion/bastion.tres")
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {} ##relics indexed by type, loaded by reward_service

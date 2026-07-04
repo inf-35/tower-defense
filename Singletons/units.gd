@@ -9,6 +9,7 @@ enum Type {
 	WARRIOR,
 	HEALER,
 	SPRINTER,
+	SPRINTER_PLUS,
 	PROTECTOR,
 	FLESHBLOB,
 	FLESHLET,
@@ -17,7 +18,11 @@ enum Type {
 	SUMMONER,
 	ZOMBIE,
 	GIANT,
-	HULK
+	GIANT_PLUS,
+	HULK,
+	HULK_PLUS,
+	TROLL_PLUS,
+	WARRIOR_PLUS
 }
 
 var unit_stats: Dictionary[Type, UnitData] = {}

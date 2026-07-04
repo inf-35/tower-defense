@@ -1,22 +1,19 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://p4o1hdeutp1j"]
 
-[ext_resource type="Resource" uid="uid://cdgwf65nwokpo" path="res://Content/Relics/common_cold/common_cold.tres" id="1_01twd"]
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_cxsu7"]
-[ext_resource type="Script" uid="uid://7k2jlkybgih" path="res://Content/RewardBiasRule/has_tower.gd" id="2_4xnxi"]
-[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_aoevb"]
+[ext_resource type="Resource" uid="uid://cdgwf65nwokpo" path="res://Content/Relics/common_cold/common_cold.tres" id="1_relic"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_rule"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="3_reward"]
 
-[sub_resource type="Resource" id="Resource_rkgwf"]
-script = ExtResource("2_4xnxi")
-tower_types = Array[int]([14, 21])
+[sub_resource type="Resource" id="Resource_rule"]
+script = ExtResource("2_rule")
+tags = Array[int]([0])
 operation = 1
-metadata/_custom_type_script = "uid://7k2jlkybgih"
 
 [resource]
-script = ExtResource("2_aoevb")
+script = ExtResource("3_reward")
 id_name = "common_cold"
 description = "this is a relic reward description"
 type = 2
-relic_data = ExtResource("1_01twd")
-base_weight = 150.0
-bias_rules = Array[ExtResource("1_cxsu7")]([SubResource("Resource_rkgwf")])
-metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
+relic_data = ExtResource("1_relic")
+weight_scale = 1.5
+tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_rule")])

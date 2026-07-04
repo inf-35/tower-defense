@@ -37,7 +37,6 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="FarmBehavior" type="Node" parent="." unique_id=966735356]
 script = ExtResource("4_7c8ug")
-income_per_wave = 1.5
 metadata/_custom_type_script = "uid://djqe37wfw77og"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1023761601]

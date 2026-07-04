@@ -10,7 +10,7 @@ signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island f
 
 @export var turret: Node2D ##this is the part of the turret that turns to face and shoot
 #global configuration
-const REFUND_PROPORTION: float = 1.0 ##proportion of tower value refunded upon sale
+const REFUND_PROPORTION: float = 0.5 ##proportion of tower value refunded upon sale
 
 enum Facing {
 	UP,

@@ -10,3 +10,4 @@ description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_y0ud3")
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
+

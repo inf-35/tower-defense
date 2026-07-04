@@ -11,6 +11,7 @@
 [resource]
 script = ExtResource("6_cbc14")
 id = 41
+tags = Array[int]([1])
 cost = 16.0
 element = 1
 is_upgrade = true
@@ -18,3 +19,4 @@ tower_name = "Frost Tower (diffuse)"
 tower_description = "Inflicts mild frost to nearby enemies. (slight increased range)"
 tower_scene = ExtResource("7_nkeyn")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

@@ -53,8 +53,7 @@ func _trigger_explosion(instance: EffectInstance, dying_unit: Unit, hit_report: 
 	delivery_data.use_source_position_override = true
 	delivery_data.source_position = dying_unit.global_position
 	delivery_data.intercept_position = dying_unit.global_position
-	
-	await Clock.await_game_time(0.2)
+
 	CombatManager.resolve_hit(hit_data, delivery_data)
 
 func _get_status_stacks(unit: Unit, status: Attributes.Status) -> float:

@@ -44,6 +44,7 @@ class PathRender:
 
 var _path_cache: Array[PathRender] = []
 var _path_cache_by_key: Dictionary = {}
+var _path_cell_set: Dictionary[Vector2i, bool] = {}
 var _preview_path_cache: Array[PathRender] = []
 var _preview_blockers: Dictionary = {}
 var _preview_blocker_hash: int = 0
@@ -117,6 +118,7 @@ func _mark_paths_dirty(_unused = null) -> void:
 func _rebuild_committed_paths() -> void:
 	_path_cache.clear()
 	_path_cache_by_key.clear()
+	_path_cell_set.clear()
 
 	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
 	var route_variants: Array[Dictionary] = _get_current_wave_variants()
@@ -129,6 +131,12 @@ func _store_committed_path(path_render: PathRender) -> void:
 	_path_cache_by_key[_make_path_key(path_render.start_cell, path_render.is_phasing, path_render.route_mode)] = path_render
 	if path_render.is_valid:
 		_path_cache.append(path_render)
+		_path_cell_set[path_render.start_cell] = true
+		for cell: Vector2i in path_render.path_cells:
+			_path_cell_set[cell] = true
+
+func is_path_cell(cell: Vector2i) -> bool: ##returns whether any currently committed enemy route occupies this tile
+	return _path_cell_set.has(cell)
 
 func _rebuild_preview_paths() -> void:
 	_preview_path_cache.clear()

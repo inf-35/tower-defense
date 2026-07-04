@@ -1,6 +1,5 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://di6yhce7kn360"]
 
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_hy1xk"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
 
 [resource]
@@ -10,4 +9,6 @@ title = "Gold Cache"
 description = "Gain 15 {GOLD} immediately."
 type = 0
 flux_amount = 15.0
-base_weight = 200.0
+base_rarity = 0
+
+

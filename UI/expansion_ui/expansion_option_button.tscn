@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="2_a2c30"]
 
 [node name="ExpansionOptionButton" type="Button" node_paths=PackedStringArray("text_node")]
-custom_minimum_size = Vector2(0, 80)
+custom_minimum_size = Vector2(0, 120)
 offset_right = 200.0
 offset_bottom = 50.0
 script = ExtResource("1_86bau")
@@ -26,6 +26,7 @@ layout_mode = 2
 mouse_filter = 1
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
+horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("2_a2c30")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"

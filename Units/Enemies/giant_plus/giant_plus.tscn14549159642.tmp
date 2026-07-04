@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://pwucrd3pfeqo"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5"]
+[ext_resource type="Resource" path="res://Units/Enemies/giant_plus/giant_plus_hp.tres" id="6"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="7"]
+[ext_resource type="Texture2D" uid="uid://b2jsoxey31ctv" path="res://Assets/orc.png" id="8"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="11"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="13"]
+
+[sub_resource type="Resource" id="1"]
+script = ExtResource("4")
+max_speed = 12.0
+acceleration = 200.0
+turn_speed = 1000.0
+
+[sub_resource type="RectangleShape2D" id="2"]
+size = Vector2(60.000015, 82.500015)
+
+[sub_resource type="Resource" id="3"]
+script = ExtResource("12")
+
+[node name="GiantPlus" type="Node2D" unique_id=2012555980 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1")
+hostile = true
+attack_only_when_blocked = true
+behavior = NodePath("DefaultBehavior")
+graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+
+[node name="NavigationComponent" type="Node" parent="." unique_id=1472306226]
+script = ExtResource("2")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1459300046]
+script = ExtResource("3")
+face_towards_movement = false
+movement_data = SubResource("1")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=975003913]
+script = ExtResource("5")
+health_data = ExtResource("6")
+
+[node name="ContactShadow" type="Node2D" parent="." unique_id=941568683]
+z_index = 10
+z_as_relative = false
+position = Vector2(-0.2, 1.4)
+script = ExtResource("7")
+shadow_size = Vector2(8, 6)
+color = Color(0.1764706, 0.19215687, 0.2784314, 0.34117648)
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1639457706]
+modulate = Color(0.92, 0.66, 0.66, 1)
+position = Vector2(-0.41875023, -1.7940341)
+scale = Vector2(0.13882574, 0.13882574)
+texture = ExtResource("8")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=846911688]
+visible = false
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("9")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=572958877]
+position = Vector2(0, -29.999996)
+scale = Vector2(0.9999995, 0.9999995)
+shape = SubResource("2")
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1448214534]
+script = ExtResource("10")
+
+[node name="DefaultBehavior" type="Node" parent="." unique_id=2110733612]
+script = ExtResource("11")
+
+[node name="AttackComponent" type="Node" parent="." unique_id=1847389404]
+script = ExtResource("12")
+attack_data = SubResource("3")
+
+[node name="RangeComponent" type="Node" parent="." unique_id=1932266925]
+script = ExtResource("13")

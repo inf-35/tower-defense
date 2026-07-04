@@ -16,6 +16,7 @@
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_fcc2b")
 status = 1
+bonus_stacks = 2.0
 projectile_tint = Color(1, 0.3882353, 0.20392157, 1)
 metadata/_custom_type_script = "uid://c0tqsk2lv2qho"
 

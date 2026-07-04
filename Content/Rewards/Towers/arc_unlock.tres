@@ -7,4 +7,4 @@ script = ExtResource("1_reward")
 id_name = "arc"
 description = "relic tower unlock"
 tower_type = 16
-base_weight = 200.0
+base_rarity = 1

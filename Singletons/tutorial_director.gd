@@ -111,16 +111,20 @@ func pick_basic_tutorial_rite_type() -> Towers.Type:
 func can_purchase_trader_reward(reward: Reward) -> bool:
 	if _onboarding_stage == OnboardingStage.INACTIVE:
 		return true
-	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
-		return false
-	if not Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING] and _onboarding_stage not in [OnboardingStage.SHOP_POISONS, OnboardingStage.RESTOCK_EPIDEMIC]:
-		return false
+	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
+		return true
+	if _onboarding_stage not in [OnboardingStage.SHOP_POISONS, OnboardingStage.RESTOCK_EPIDEMIC]:
+		return true
 	match _onboarding_stage:
 		OnboardingStage.SHOP_POISONS:
+			if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
+				return false
 			if not _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.SHOP_POISONS], POISONS_SHOP_BUY_STEP_INDEX):
 				return false
 			return _matches_forced_reward(reward, _forced_poisons_reward)
 		OnboardingStage.RESTOCK_EPIDEMIC:
+			if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
+				return false
 			if not _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RESTOCK_EPIDEMIC], EPIDEMIC_SHOP_BUY_STEP_INDEX):
 				return false
 			return _matches_forced_reward(reward, _forced_ruptured_heart_reward)
@@ -136,7 +140,7 @@ func can_open_trader() -> bool:
 			return Run.phases.current_phase == Run.phases.GamePhase.BUILDING and Run.phases.current_wave_number == 2
 		OnboardingStage.RESTOCK_EPIDEMIC:
 			return Run.phases.current_phase == Run.phases.GamePhase.BUILDING and Run.phases.current_wave_number >= 3
-	return false
+	return true
 
 func can_close_trader() -> bool:
 	return true
@@ -144,11 +148,11 @@ func can_close_trader() -> bool:
 func can_force_restock() -> bool:
 	if _onboarding_stage == OnboardingStage.INACTIVE:
 		return true
-	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
-		return false
-	if _onboarding_stage == OnboardingStage.COMPLETE:
+	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING] or _onboarding_stage == OnboardingStage.COMPLETE:
 		return true
 	if _onboarding_stage != OnboardingStage.RESTOCK_EPIDEMIC:
+		return true
+	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
 		return false
 	return _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RESTOCK_EPIDEMIC], EPIDEMIC_SHOP_RESTOCK_STEP_INDEX)
 

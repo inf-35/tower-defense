@@ -116,11 +116,13 @@ func _apply_modifiers(tower: Tower) -> void:
 	var modifiers: Array[Modifier] = []
 	if attack_rate_modifier:
 		var attack_modifier: Modifier = attack_rate_modifier.generate_modifier()
+		attack_modifier.source_id = unit.unit_id
 		tower.modifiers_component.add_modifier(attack_modifier)
 		modifiers.append(attack_modifier)
 
 	if max_health_modifier:
 		var health_modifier: Modifier = max_health_modifier.generate_modifier()
+		health_modifier.source_id = unit.unit_id
 		tower.modifiers_component.add_modifier(health_modifier)
 		modifiers.append(health_modifier)
 

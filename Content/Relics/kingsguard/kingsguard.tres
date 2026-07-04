@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://b08tjlwpyvqus"]
+
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_modifier"]
+[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_relic"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_h202b"]
+[ext_resource type="Texture2D" uid="uid://bi0v4sh3btwn5" path="res://Assets/stumbling_blocks_icon.png" id="4_icon"]
+
+[sub_resource type="Resource" id="Resource_cooldown"]
+script = ExtResource("1_modifier")
+attribute = 8
+multiplicative = 0.714
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("2_effect")
+condition_kind = 1
+reference_tower_types = Array[int]([1])
+max_range = 2
+modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_cooldown")])
+icon = ExtResource("4_icon")
+
+[resource]
+script = ExtResource("3_relic")
+type = 42
+global_effect = SubResource("Resource_effect")
+title = "Kingsguard"
+description = "Towers within 2 tiles of {T_PLAYER_CORE|label=the Keep} gain +40% {UNIT_HITRATE}."
+icon = ExtResource("4_icon")

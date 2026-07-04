@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=3 format=3]
+
+[ext_resource type="Resource" path="res://Content/Relics/bastion/bastion.tres" id="1_relic"]
+[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="2_reward"]
+
+[resource]
+script = ExtResource("2_reward")
+id_name = "bastion"
+description = "this is a relic reward description"
+type = 2
+relic_data = ExtResource("1_relic")
+base_rarity = 0

@@ -20,6 +20,7 @@ enum id { #trackable value
 	DAMAGE_TAKEN, ##damage_taken (as a proportion from 0.0 to 1.0) (health component)
 	FLAT_DAMAGE_TAKEN, ##flat damage additionally taken per hit
 	REGEN_REMAINDER_PERCENT, ##regen taken as a percentage of remainder health
+	ATTACK_RATE, ##flat attacks-per-second bonus used when resolving cooldown
 }
 
 enum Status { #diegetic statuses
@@ -61,10 +62,10 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -0.5, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.5 hp every second
+		id.REGENERATION, -0.8, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-0.8 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_REMAINDER_PERCENT, -0.06, 0.0, true, Color(0, 1, 0, 0.5) #-6% remaining hp per second
+		id.REGEN_REMAINDER_PERCENT, -0.08, 0.0, true, Color(0, 1, 0, 0.5) #-6% remaining hp per second (capped at 2/s/stack)
 	),
 	Status.HEAT: StatusEffectData.new(
 		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST

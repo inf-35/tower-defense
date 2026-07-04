@@ -5,7 +5,27 @@
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_x20j3"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_2dvje"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_700oj"]
+[ext_resource type="PackedScene" uid="uid://ojlmrgya1m80" path="res://Content/CommonVisuals/radial_pulse.tscn" id="5_impact"]
 [ext_resource type="Texture2D" uid="uid://bptr3d8i0mrgf" path="res://Assets/plantball.png" id="5_w3vm4"]
+
+[sub_resource type="Gradient" id="Gradient_cloud"]
+colors = PackedColorArray(0.09803922, 0.47843137, 0.1764706, 0.42, 0.47843137, 0.78039217, 0.30980393, 0)
+
+[sub_resource type="Resource" id="Resource_impact"]
+script = ExtResource("4_700oj")
+scene = ExtResource("5_impact")
+color_gradient = SubResource("Gradient_cloud")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.1882353, 0.48235294, 0.1764706, 0.4)
+aoe_particles_per_cell = 4.5
+aoe_particle_lifetime = 0.45
+aoe_particle_scale_min = 0.42
+aoe_particle_scale_max = 0.88
+aoe_particle_spin_speed_min = -55.0
+aoe_particle_spin_speed_max = 55.0
+aoe_particle_drift_speed_min = 5.0
+aoe_particle_drift_speed_max = 14.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_700oj")
@@ -20,8 +40,9 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 script = ExtResource("2_0vqd8")
 delivery_method = 1
 cooldown = 2.0
-radius = 4.0
-damage = 0.8
+radius = 5.0
+damage = 1.2
 vfx_on_spawn = SubResource("Resource_e3651")
+vfx_on_impact = SubResource("Resource_impact")
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

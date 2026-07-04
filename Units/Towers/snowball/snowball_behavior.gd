@@ -1,36 +1,32 @@
 extends Behavior
 class_name SnowballBehavior
 
-const CARDINAL_DIRS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
 #cached objects
 var _query: PhysicsShapeQueryParameters2D
 
-func _init() -> void: ##prepares a reusable broad-phase query object for the four lane scans
+func _init() -> void: ##prepares a reusable broad-phase query object for the forward lane scan
 	_query = PhysicsShapeQueryParameters2D.new()
 	_query.collide_with_areas = true
 	_query.collide_with_bodies = false
 
-func update(delta: float) -> void: ##scores the four lanes and launches a projectile down the strongest one
+func update(delta: float) -> void: ##fires one untargeted snowball straight forward when that lane has enemies
 	_cooldown += delta
 
 	if not _is_attack_possible():
 		return
 
-	#find best direction
-	#we scan all 4 directions and pick the one with the most enemies
+	var tower: Tower = unit as Tower
+	if not is_instance_valid(tower):
+		return
+
 	var range_val: float = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.RANGE) as float
 	range_val += Island.CELL_SIZE * 0.5 #this is meant to be tile-based, so the half-tile gets us from the origin to the edges of our tile
-	var best_dir: Vector2 = Vector2.ZERO
-	var max_score: float = 0.0
-	for dir: Vector2 in CARDINAL_DIRS:
-		var score: float = _scan_lane(dir, range_val)
-		if score > max_score:
-			max_score = score
-			best_dir = dir
+	var forward_dir: Vector2 = Vector2(tower.get_forward_direction())
+	if forward_dir == Vector2.ZERO:
+		return
 
-	#fire if valid
-	if best_dir != Vector2.ZERO:
-		_fire_snowball(best_dir, range_val)
+	if _scan_lane(forward_dir, range_val) > 0.0:
+		_fire_snowball(forward_dir, range_val)
 
 func _scan_lane(dir: Vector2, max_dist: float) -> float: ##estimates lane value by counting hittable enemies inside a narrow rectangular sweep
 	var my_pos: Vector2 = unit.global_position
@@ -81,7 +77,7 @@ func _fire_snowball(dir: Vector2, range_val: float) -> void: ##builds one untarg
 	if is_instance_valid(animation_player):
 		animation_player.play("attack")
 
-func draw_visuals(canvas: RangeIndicator) -> void: ##draws the four lane previews and marks blocking impact tiles
+func draw_visuals(canvas: RangeIndicator) -> void: ##draws the current forward firing lane and marks the first blocking impact tile
 	super.draw_visuals(canvas)
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower): return
@@ -95,22 +91,18 @@ func draw_visuals(canvas: RangeIndicator) -> void: ##draws the four lane preview
 	var half_size: Vector2 = Vector2(cell_size, cell_size) / 2.0
 	var island: Island = Run.references.island
 
-	var dirs: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var direction: Vector2i = tower.get_forward_direction()
+	for i: int in range(1, range_tiles + 1):
+		var check_cell: Vector2i = start_cell + (direction * i)
+		var obstacle: Tower = island.get_tower_on_tile(check_cell)
+		if is_instance_valid(obstacle) and (obstacle.blocking or obstacle.type == Towers.Type.PLAYER_CORE):
+			_draw_cell_highlight(canvas, check_cell, half_size, cell_size, true)
+			break
 
-	for d: Vector2i in dirs:
-		for i: int in range(1, range_tiles + 1):
-			var check_cell: Vector2i = start_cell + (d * i)
-			#1. check if occupied by a blocking tower
-			var obstacle: Tower = island.get_tower_on_tile(check_cell)
-			if is_instance_valid(obstacle):
-				if obstacle.blocking or obstacle.type == Towers.Type.PLAYER_CORE:
-					_draw_cell_highlight(canvas, check_cell, half_size, cell_size, true)
-					break
+		if not island.terrain_base_grid.has(check_cell):
+			break
 
-			if not island.terrain_base_grid.has(check_cell):
-				break
-
-			_draw_cell_highlight(canvas, check_cell, half_size, cell_size, false)
+		_draw_cell_highlight(canvas, check_cell, half_size, cell_size, false)
 
 func _draw_cell_highlight(canvas: RangeIndicator, cell: Vector2i, half: Vector2, size: float, is_blocked: bool) -> void:
 	var pos = Island.cell_to_position(cell)

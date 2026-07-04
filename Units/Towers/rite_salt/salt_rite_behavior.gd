@@ -74,12 +74,10 @@ func _on_topology_updated(report: TowerTopologyService.Report) -> void:
 	_sync_affected_towers(current_modifiers)
 
 func _get_modifier_for_offset(offset: Vector2i) -> ModifierDataPrototype:
-	var side: int = Tower.get_side_from_offset((unit as Tower).size, offset)
-	var forward: Tower.Facing = (unit as Tower).facing
-	if side == forward or side == _get_backward_facing(forward):
+	if offset.x == 0:
 		return damage_modifier
 
-	if side != 10:
+	if offset.y == 0:
 		return attack_rate_modifier
 
 	return null
@@ -113,6 +111,7 @@ func _apply_modifier(tower: Tower, modifier_prototype: ModifierDataPrototype) ->
 		return
 
 	var modifier: Modifier = modifier_prototype.generate_modifier()
+	modifier.source_id = unit.unit_id
 	tower.modifiers_component.add_modifier(modifier)
 	_affected_towers[tower] = modifier
 
@@ -155,11 +154,7 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 		return
 
 	for offset: Vector2i in report.cells:
-		var side: int = Tower.get_side_from_offset(tower.size, offset)
 		var color: Color = canvas.positive_highlight_color
-		if side != tower.facing and side != _get_backward_facing(tower.facing):
+		if offset.x != 0:
 			color = canvas.negative_highlight_color
 		canvas.preview_cell(report.cells[offset], color)
-
-func _get_backward_facing(facing: Tower.Facing) -> Tower.Facing:
-	return ((facing + 2) % 4) as Tower.Facing

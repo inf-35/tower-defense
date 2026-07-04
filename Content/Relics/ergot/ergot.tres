@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://ck4nexf6bayuo"]
+
+[ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="1_status"]
+[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_8tt7c"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_relic"]
+[ext_resource type="Texture2D" uid="uid://bi0v4sh3btwn5" path="res://Assets/stumbling_blocks_icon.png" id="4_icon"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="5_gshe3"]
+
+[sub_resource type="Resource" id="Resource_status"]
+script = ExtResource("1_status")
+status = 2
+bonus_stacks = 2.0
+bonus_time = 1.0
+projectile_tint = Color(0.54648, 0.81, 0.3159, 1)
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("2_effect")
+reference_tower_types = Array[int]([53])
+min_count = 2
+granted_effect = SubResource("Resource_status")
+icon = ExtResource("4_icon")
+
+[resource]
+script = ExtResource("3_relic")
+type = 44
+global_effect = SubResource("Resource_effect")
+title = "Ergot"
+description = "Towers adjacent to 2 or more {T_FARM|label=Farms} inflict 2 stacks of {POISON}, lasting 1 second."
+icon = ExtResource("4_icon")

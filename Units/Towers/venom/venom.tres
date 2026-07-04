@@ -10,8 +10,8 @@
 
 [resource]
 script = ExtResource("3_vx6c2")
-target_type_name = "VENOM"
 id = 21
+tags = Array[int]([0, 3])
 cost = 12.0
 element = 3
 tower_name = "Venom"
@@ -20,3 +20,4 @@ icon = ExtResource("1_26xvn")
 preview = ExtResource("2_limp5")
 tower_scene = ExtResource("4_tqxgy")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

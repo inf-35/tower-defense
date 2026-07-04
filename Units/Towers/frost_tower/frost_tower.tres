@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("1_6qowr")
 id = 3
+tags = Array[int]([1])
 element = 1
 tower_name = "Frost"
 tower_description = "Inflicts mild frost to nearby enemies."
@@ -17,3 +18,4 @@ icon = ExtResource("1_85ooh")
 preview = ExtResource("1_85ooh")
 tower_scene = ExtResource("2_6qowr")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
+

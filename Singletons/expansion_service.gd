@@ -12,7 +12,7 @@ const FRONTIER_EVENING_BIAS: float = 0.75
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
 const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.0025
-const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.8
+const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.75
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
 class TerrainGenRule extends Resource:

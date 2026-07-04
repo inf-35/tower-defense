@@ -33,7 +33,7 @@ func detach() -> void:
 	_is_attached = false
 	_all_connected_prisms.clear()
 	_clear_prism_lasers()
-	if is_instance_valid(island):
+	if is_instance_valid(island) and Run.is_run_ready():
 		island.island_changed.emit()
 
 func update(_delta: float) -> void:

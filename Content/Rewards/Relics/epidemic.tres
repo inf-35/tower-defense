@@ -1,8 +1,15 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cyvifd18amlet"]
 
-[ext_resource type="Script" uid="uid://c65fs1wlf3w1c" path="res://Content/RewardBiasRule/_reward_bias_rule.gd" id="1_0ugbs"]
 [ext_resource type="Resource" uid="uid://b7d3xa6vfpdq1" path="res://Content/Relics/epidemic/epidemic.tres" id="1_3afnp"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_67xfx"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="3_5lj40"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="4_muoe2"]
+
+[sub_resource type="Resource" id="Resource_drphp"]
+script = ExtResource("3_5lj40")
+tags = Array[int]([0])
+operation = 1
+metadata/_custom_type_script = "uid://p5rqqytmyp6u"
 
 [resource]
 script = ExtResource("2_67xfx")
@@ -10,3 +17,4 @@ id_name = "epidemic"
 description = "relic reward"
 type = 2
 relic_data = ExtResource("1_3afnp")
+tag_rules = Array[ExtResource("3_5lj40")]([SubResource("Resource_drphp")])

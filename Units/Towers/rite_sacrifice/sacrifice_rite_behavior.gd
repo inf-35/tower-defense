@@ -87,6 +87,7 @@ func _on_target_hit(event: GameEvent, victim: Tower) -> void:
 	var chosen: Tower = valid_targets.pick_random()
 	var mod: Modifier = buff_modifier.generate_modifier()
 	mod.cooldown = -1.0 #managed manually via wave ends
+	mod.source_id = unit.unit_id
 	chosen.modifiers_component.add_modifier(mod)
 	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 

@@ -64,6 +64,7 @@ func _ready() -> void:
 	#_stagger = randi_range(0, _STAGGER_CYCLE)
 
 const _TICK_INTERVAL: float = 0.25
+const MAX_POISON_DAMAGE_PER_SECOND: float = 2.0
 
 func _process(_d : float) -> void:
 	if unit.abstractive:
@@ -82,7 +83,12 @@ func _tick(delta: float) -> void:
 		return
 
 	var benchmark = health
-	health += regeneration * delta + regen_percent * max_health * delta + regen_remainder_percent * max_health * delta
+	var regen_remainder_delta: float = regen_remainder_percent * max_health * delta
+	var uncapped_poison_delta: float = _get_uncapped_poison_delta(delta)
+	if uncapped_poison_delta < 0.0:
+		regen_remainder_delta = regen_remainder_delta - uncapped_poison_delta + _cap_poison_delta(uncapped_poison_delta, delta, _get_poison_stack_count())
+
+	health += regeneration * delta + regen_percent * max_health * delta + regen_remainder_delta
 	var difference = benchmark - health
 	_record_status_damage(difference, delta)
 	if difference > 0.1:
@@ -92,6 +98,23 @@ func _tick(delta: float) -> void:
 		unit.died.emit(HitReportData.blank_hit_report)
 
 	_accumulated_delta = 0.0
+
+func _get_uncapped_poison_delta(delta: float) -> float:
+	if not is_instance_valid(_modifiers_component):
+		return 0.0
+	if not _modifiers_component.has_status(Attributes.Status.POISON):
+		return 0.0
+
+	var poison_stacks: float = _get_poison_stack_count()
+	return Attributes.status_effects[Attributes.Status.POISON].additive_per_stack * poison_stacks * max_health * delta
+
+func _get_poison_stack_count() -> float:
+	if not is_instance_valid(_modifiers_component):
+		return 0.0
+	return _modifiers_component.get_status_count(Attributes.Status.POISON)
+
+func _cap_poison_delta(poison_delta: float, delta: float, poison_stacks: float) -> float:
+	return -minf(-poison_delta, MAX_POISON_DAMAGE_PER_SECOND * poison_stacks * delta)
 
 ##allocates net tick damage across any active status effects that directly drive regen-based attrition
 func _record_status_damage(net_damage: float, delta: float) -> void:
@@ -118,6 +141,8 @@ func _record_status_damage(net_damage: float, delta: float) -> void:
 				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
 			Attributes.id.REGEN_REMAINDER_PERCENT:
 				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
+				if status.type == Attributes.Status.POISON:
+					contribution = -_cap_poison_delta(-contribution, delta, status.stack)
 
 		if contribution <= 0.0:
 			continue

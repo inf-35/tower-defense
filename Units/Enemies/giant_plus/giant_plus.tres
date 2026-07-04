@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://Content/unit_data..gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/hulk.png" id="2"]
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="4"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="5"]
+[ext_resource type="PackedScene" path="res://Units/Enemies/giant_plus/giant_plus.tscn" id="6"]
+
+[resource]
+script = ExtResource("1")
+title = "Giant+"
+icon = ExtResource("2")
+description = "Very tanky elite infantry."
+stat_displays = Array[ExtResource("3")]([ExtResource("4"), ExtResource("5")])
+important = true
+unit_scene = ExtResource("6")
+flux_value = 0.6
+strength_value = 2.2

@@ -22,3 +22,12 @@ func generate_modifier() -> Modifier:
 		modifier.override = override
 	modifier.cooldown = cooldown
 	return modifier
+
+func apply_single_source_stacks(modifier: Modifier, count: int) -> void: ##folds repeated contributions from one source into one modifier so local stacks add linearly while separate sources still compound
+	modifier.additive = additive * count
+	if modifier.attribute == Attributes.id.COOLDOWN and not is_equal_approx(multiplicative, 1.0) and is_zero_approx(additive):
+		var single_rate_bonus: float = (1.0 / multiplicative) - 1.0
+		modifier.multiplicative = 1.0 / (1.0 + single_rate_bonus * count)
+		return
+
+	modifier.multiplicative = 1.0 + (multiplicative - 1.0) * count

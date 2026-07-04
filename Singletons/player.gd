@@ -155,16 +155,17 @@ func begin_new_game() -> void:
 		Towers.Type.PALISADE: true,
 		Towers.Type.FARM: true,
 		Towers.Type.GENERATOR: true,
+		#Towers.Type.SNOWBALL: true,
 	}
 	
-	#var reward := Reward.new()
+	var reward := Reward.new()
 	#reward.type = Reward.Type.ADD_RITE
 	#reward.rite_type = Towers.Type.RITE_POISONS
 	#RewardService.apply_reward(reward)
 	##reward.rite_type = Towers.Type.RITE_FROST
 	##RewardService.apply_reward(reward)
 	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.AMBUSH
+	#reward.relic = Relics.BOOKENDS
 	#RewardService.apply_reward(reward)
 	##reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
 	##RewardService.apply_reward(reward)
