@@ -42,6 +42,9 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var hit_data: HitData = event.data as HitData
 	var state: HasteState = instance.state as HasteState
+	if not is_instance_valid(hit_data) or not hit_data.primary:
+		return
+
 	if not HitData.consume_attack_id(hit_data, state.seen_attack_ids):
 		return
 

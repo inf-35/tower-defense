@@ -58,6 +58,9 @@ func _handle_tower_attack(instance: EffectInstance, event: GameEvent) -> void:
 
 	var state: SpinningTopState = instance.state as SpinningTopState
 	var hit_data: HitData = event.data as HitData
+	if not is_instance_valid(hit_data) or not hit_data.primary:
+		return
+
 	if not HitData.consume_attack_id(hit_data, state.seen_attack_ids):
 		return
 

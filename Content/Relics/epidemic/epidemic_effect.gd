@@ -81,8 +81,9 @@ func _fire_projectile(instance: EffectInstance, origin_unit: Unit, target: Unit,
 	delivery_data.intercept_position = target.global_position
 	
 	await Clock.await_game_time(0.15)
-	if target:
-		CombatManager.resolve_hit(hit_data, delivery_data)
+	if not is_instance_valid(instance) or not instance.enabled or not is_instance_valid(target):
+		return
+	CombatManager.resolve_hit(hit_data, delivery_data)
 
 func _get_status_stacks(unit: Unit, status: Attributes.Status) -> float:
 	if not is_instance_valid(unit) or not is_instance_valid(unit.modifiers_component):

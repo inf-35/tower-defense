@@ -26,7 +26,10 @@ func create_instance() -> EffectInstance:
 	return instance
 
 func _handle_attach(_i: EffectInstance) -> void: pass
-func _handle_detach(_i: EffectInstance) -> void: pass
+func _handle_detach(instance: EffectInstance) -> void:
+	var state: EarlyBirdState = instance.state as EarlyBirdState
+	_clear_buffs(state)
+	state.triggered_this_wave = false
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var state: EarlyBirdState = instance.state as EarlyBirdState

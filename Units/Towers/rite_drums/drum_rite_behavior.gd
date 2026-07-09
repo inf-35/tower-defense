@@ -66,6 +66,9 @@ func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
 		return
 
 	var hit_data: HitData = event.data as HitData
+	if not is_instance_valid(hit_data) or not hit_data.primary:
+		return
+
 	if not HitData.consume_attack_id(hit_data, _seen_attack_ids):
 		return
 

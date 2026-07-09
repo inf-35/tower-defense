@@ -117,8 +117,7 @@ func _load_current_settings() -> void:
 	music_slider.value = pow(db_to_linear(AudioServer.get_bus_volume_db(_bus_music)), -AUDIO_POWER)
 
 	#fullscreen
-	var mode = DisplayServer.window_get_mode()
-	fullscreen_toggle.button_pressed = (mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+	fullscreen_toggle.button_pressed = WindowSettings.is_fullscreen_enabled()
 	show_all_health_bars_toggle.button_pressed = Pause.show_all_health_bars
 
 func _on_volume_changed(value: float, bus_index: int) -> void:
@@ -130,12 +129,8 @@ func _on_volume_changed(value: float, bus_index: int) -> void:
 	AudioServer.set_bus_mute(bus_index, value < 0.01)
 
 func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
-	if is_fullscreen:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		#optional: center window
-		#displayserver.window_set_position(...)
+	WindowSettings.set_fullscreen_enabled(is_fullscreen)
+	SaveLoad.save_profile()
 
 func _on_show_all_health_bars_toggled(is_enabled: bool) -> void: ##applies the hp-bar visibility preference immediately and persists it to the profile store
 	Pause.show_all_health_bars = is_enabled

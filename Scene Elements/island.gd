@@ -527,6 +527,14 @@ func get_towers_by_type(type: Towers.Type) -> Array[Tower]:
 	typesafe.assign(_towers_by_type.get(type, []))
 	return typesafe
 
+func get_all_towers() -> Array[Tower]: ##returns the current tower cache without depending on scene-tree group scans during teardown-sensitive paths
+	var towers: Array[Tower] = []
+	for towers_of_type: Array in _towers_by_type.values():
+		for tower: Tower in towers_of_type:
+			if is_instance_valid(tower):
+				towers.append(tower)
+	return towers
+
 func get_raid_targets() -> Array[Tower]: ##returns all live non-ruined settlement-style towers that raiders should visit before heading to the keep
 	var raid_targets: Array[Tower] = []
 	for tower_type: Towers.Type in [Towers.Type.GENERATOR, Towers.Type.HAMLET]:

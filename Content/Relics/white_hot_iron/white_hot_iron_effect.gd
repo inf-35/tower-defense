@@ -25,7 +25,9 @@ func create_instance() -> EffectInstance:
 	return instance
 
 func _handle_attach(_i: EffectInstance) -> void: pass
-func _handle_detach(_i: EffectInstance) -> void: pass
+func _handle_detach(instance: EffectInstance) -> void:
+	var state: WhiteHotIronState = instance.state as WhiteHotIronState
+	state.cooldown.clear()
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:

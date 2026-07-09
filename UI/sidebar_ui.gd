@@ -2,16 +2,14 @@ extends Control
 class_name SidebarUI
 
 @export var towers_bar: VBoxContainer
-@export var start_wave_button: Button
 @export var trade_button: Button
 @export var trade_button_label: InteractiveRichTextLabel
 
-const START_WAVE_BUTTON_TEXT: String = "Start Wave (Space)"
-
 var tower_option_prototype: PackedScene = preload("res://UI/tower_option.tscn")
-var _tutorial_start_wave_locked: bool = false
 var _trade_button_has_unseen_stock: bool = false
 var _trade_button_wiggle_tween: Tween
+var _tower_options_by_type: Dictionary[Towers.Type, TowerOption] = {}
+var _selected_tower_type: Towers.Type = Towers.Type.VOID
 
 func _ready() -> void:
 	#initial population and updates are handled by connecting to the signal.
@@ -21,24 +19,11 @@ func _ready() -> void:
 		await Run.references_ready
 
 	UI.update_tower_types.connect(_on_player_tower_types_update)
+	UI.tower_option_selected.connect(_on_tower_option_selected)
 	UI.update_tower_counts.connect(func():
 		_on_player_tower_types_update(Run.player.unlocked_towers, Run.player.rite_inventory)
 	)
-
-	UI.show_building_ui.connect(func():
-		start_wave_button.text = START_WAVE_BUTTON_TEXT
-		_update_start_wave_button_state()
-	)
-	UI.hide_building_ui.connect(func():
-		start_wave_button.text = "Wave in Progress" #more descriptive
-		start_wave_button.disabled = true
-	)
-
-	start_wave_button.pressed.connect(_emit_start_wave)
-	UI.tutorial_manager.start_wave_lock_changed.connect(func(locked: bool):
-		_tutorial_start_wave_locked = locked
-		_update_start_wave_button_state()
-	)
+	ClickHandler.tower_was_deselected.connect(_clear_selected_tower_option)
 
 	trade_button.pressed.connect(func():
 		Run.player.trader_service.open_menu()
@@ -54,37 +39,15 @@ func _ready() -> void:
 	else:
 		_clear_towers_bar() #ensure it's empty if no towerss initially
 
-	UI.tutorial_manager.register_element(TutorialStep.Reference.START_WAVE_BUTTON, start_wave_button)
 	_update_trade_button_pivot()
 	if Run.has_active_run() and is_instance_valid(Run.player):
 		_update_trade_button_notification(Run.player.trader_service.has_unseen_stock())
 	else:
 		_update_trade_button_notification(false)
 
-func _input(event: InputEvent) -> void: ##allows starting the build phase from the keyboard without relying on button focus
-	if not event.is_action_pressed("start_wave"):
-		return
-	if not _can_start_wave():
-		return
-	get_viewport().set_input_as_handled()
-	_emit_start_wave()
-
-
-func _update_start_wave_button_state() -> void: ##only the build-phase label should become interactable
-	if start_wave_button.text != START_WAVE_BUTTON_TEXT:
-		return
-	start_wave_button.disabled = _tutorial_start_wave_locked
-
-
-func _can_start_wave() -> bool: ##matches the button's live availability so keyboard and mouse behave the same way
-	return start_wave_button.text == START_WAVE_BUTTON_TEXT and not start_wave_button.disabled
-
-
-func _emit_start_wave() -> void: ##shares the same start-wave action between button clicks and the space-bar shortcut
-	if not _can_start_wave():
-		return
-	UI.building_phase_ended.emit()
-
+	var tower_sidebar: Control = towers_bar.get_parent().get_parent().get_parent() as Control
+	UI.tutorial_manager.register_element(TutorialContent.Element.TOWER_BAR, tower_sidebar if is_instance_valid(tower_sidebar) else self)
+	UI.tutorial_manager.register_element(TutorialContent.Element.TRADE_BUTTON, trade_button)
 
 func _update_trade_button_pivot() -> void: ##keeps the wiggle centered on the button rather than the top-left corner
 	trade_button.pivot_offset = trade_button.size * 0.5
@@ -114,6 +77,7 @@ func _set_trade_button_wiggle_active(is_active: bool) -> void: ##starts or stops
 
 
 func _clear_towers_bar() -> void:
+	_tower_options_by_type.clear()
 	for child in towers_bar.get_children():
 		towers_bar.remove_child(child) #correct way to remove
 		child.queue_free() #then free it
@@ -134,13 +98,23 @@ func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type
 
 		tower_option.pressed.connect(_on_tower_button_pressed.bind(unlocked_tower_type))
 		towers_bar.add_child(tower_option)
+		_tower_options_by_type[unlocked_tower_type] = tower_option
 
-		if unlocked_tower_type == Towers.Type.PALISADE:
-			UI.tutorial_manager.register_element(TutorialStep.Reference.PALISADE_BUTTON, tower_option)
-		elif unlocked_tower_type == Towers.Type.TURRET:
-			UI.tutorial_manager.register_element(TutorialStep.Reference.TURRET_BUTTON, tower_option)
+		_sync_selected_tower_option()
 
 func _on_tower_button_pressed(type_id: Towers.Type) -> void:
 	UI.tower_option_selected.emit(type_id)
 	UI.tower_selected.emit(Towers.get_tower_prototype(type_id)) #update click handler
 	UI.update_inspector_bar.emit(Towers.get_tower_prototype(type_id)) #update inspector bar to fit whatever we're selecting
+
+func _on_tower_option_selected(tower_type: Towers.Type) -> void: ##keeps one sidebar card highlighted while its build preview is the active interaction mode
+	_selected_tower_type = tower_type
+	_sync_selected_tower_option()
+
+func _clear_selected_tower_option() -> void: ##clears the persistent card highlight when the click handler exits preview/selection flow
+	_selected_tower_type = Towers.Type.VOID
+	_sync_selected_tower_option()
+
+func _sync_selected_tower_option() -> void: ##re-applies card selection after rebuilds so counts and unlock refreshes do not drop the current highlight
+	for tower_type: Towers.Type in _tower_options_by_type:
+		_tower_options_by_type[tower_type].set_selected(tower_type == _selected_tower_type)

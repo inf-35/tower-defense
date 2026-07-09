@@ -27,7 +27,7 @@ size = Vector2(120.00007, 122.81258)
 [sub_resource type="Resource" id="3"]
 script = ExtResource("13")
 range = 12.0
-damage = 4.0
+damage = 8.0
 breaking = true
 
 [node name="TrollPlus" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]

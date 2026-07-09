@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="UnitData" format=3]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://yiirkjof8pwu"]
 
-[ext_resource type="Script" path="res://Content/unit_data..gd" id="1"]
-[ext_resource type="Texture2D" path="res://Assets/hulk.png" id="2"]
-[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="4"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="5"]
-[ext_resource type="PackedScene" path="res://Units/Enemies/giant_plus/giant_plus.tscn" id="6"]
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cstg513r7j5a2" path="res://Assets/hulk.png" id="2"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="4"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="5"]
+[ext_resource type="PackedScene" uid="uid://pwucrd3pfeqo" path="res://Units/Enemies/giant_plus/giant_plus.tscn" id="6"]
 
 [resource]
 script = ExtResource("1")

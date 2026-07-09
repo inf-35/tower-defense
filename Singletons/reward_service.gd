@@ -125,8 +125,7 @@ func _calculate_reward_weight(
 
 	return final_weight
 
-##builds the current reward-synergy tag set from unlocked towers plus rites in inventory or already placed on the island
-func _get_owned_reward_tags() -> Dictionary[Towers.Tag, bool]:
+func _get_owned_reward_tags() -> Dictionary[Towers.Tag, bool]: ##builds the current reward-synergy tag set from unlocked towers plus rites in inventory or already placed on the island
 	var owned_tags: Dictionary[Towers.Tag, bool] = {}
 
 	for tower_type: Towers.Type in Run.player.unlocked_towers:
@@ -150,8 +149,7 @@ func _get_owned_reward_tags() -> Dictionary[Towers.Tag, bool]:
 
 	return owned_tags
 
-##builds the current reward-synergy tower-type set from unlocked towers plus rites in inventory or already placed on the island
-func _get_owned_reward_tower_types() -> Dictionary[Towers.Type, bool]:
+func _get_owned_reward_tower_types() -> Dictionary[Towers.Type, bool]: ##builds the current reward-synergy tower-type set from unlocked towers plus rites in inventory or already placed on the island
 	var owned_tower_types: Dictionary[Towers.Type, bool] = {}
 
 	for tower_type: Towers.Type in Run.player.unlocked_towers:
@@ -175,8 +173,7 @@ func _get_owned_reward_tower_types() -> Dictionary[Towers.Type, bool]:
 
 	return owned_tower_types
 
-##adds all authored reward-synergy tags from one tower type into a shared membership set
-func _add_tower_type_tags(tower_type: Towers.Type, owned_tags: Dictionary[Towers.Tag, bool]) -> void:
+func _add_tower_type_tags(tower_type: Towers.Type, owned_tags: Dictionary[Towers.Tag, bool]) -> void: ##adds all authored reward-synergy tags from one tower type into a shared membership set
 	for tag: Towers.Tag in Towers.get_tower_tags(tower_type):
 		owned_tags[tag] = true
 
@@ -194,6 +191,27 @@ func _player_has_relic_type(relic_type: RelicData.Type) -> bool:
 		if is_instance_valid(relic) and relic.type == relic_type:
 			return true
 	return false
+
+func get_reward_block_reason(reward: Reward) -> String: ##returns the current reason a reward cannot be taken while still allowing it to remain visible in reward/shop ui
+	if not is_instance_valid(reward):
+		return "Unavailable."
+
+	match reward.type:
+		Reward.Type.UNLOCK_TOWER:
+			if reward.tower_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.tower_type):
+				return "Already unlocked."
+		Reward.Type.ADD_RELIC:
+			if not is_instance_valid(reward.relic):
+				return "Unavailable."
+			if _player_has_relic_type(reward.relic.type):
+				return "Already owned."
+			if not Run.player.has_free_relic_slot():
+				return "No free relic slots."
+
+	return ""
+
+func can_claim_reward(reward: Reward) -> bool: ##shared frontend/backend gate for whether a reward can currently be claimed
+	return get_reward_block_reason(reward).is_empty()
 
 func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
 	var roll: float = randf_range(0.0, total_weight)
@@ -215,7 +233,8 @@ func select_reward(choice_id: int) -> void: #concludes reward phase
 		return
 
 	var chosen_reward: Reward = _current_reward_options_by_id[choice_id]
-	apply_reward(chosen_reward)
+	if not apply_reward(chosen_reward):
+		return
 
 	_current_reward_options_by_id.clear()
 	is_choosing_reward = false
@@ -228,25 +247,36 @@ func select_reward(choice_id: int) -> void: #concludes reward phase
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
 
-func apply_reward(reward: Reward) -> void:
+func apply_reward(reward: Reward) -> bool:
+	if not can_claim_reward(reward):
+		return false
+
 	match reward.type:
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount
 			Run.player.flux += amount
+			return true
 
 		Reward.Type.UNLOCK_TOWER:
 			var tower_type: Towers.Type = reward.tower_type
 			if tower_type != Towers.Type.VOID and not Run.player.is_tower_unlocked(tower_type):
 				Run.player.unlock_tower(tower_type)
+				return true
+			return false
 
 		Reward.Type.ADD_RELIC:
 			var relic: RelicData = reward.relic
 			if relic and not _player_has_relic_type(relic.type):
 				Run.player.add_relic(relic)
+				return true
+			return false
 
 		Reward.Type.ADD_RITE:
 			var rite_type: Towers.Type = reward.rite_type
 			Run.player.add_rite(rite_type, 1)
+			return true
+
+	return false
 
 func _present_rewards_from_config(config: RewardChoiceConfig, owns_choice_signal: bool) -> bool:
 	if not is_instance_valid(config):

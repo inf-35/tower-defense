@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="HealthData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="HealthData" format=3 uid="uid://dnww05mxi0vmv"]
 
-[ext_resource type="Script" path="res://Content/health_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-max_health = 120.0
-flat_damage_taken = -1.5
+max_health = 150.0
+flat_damage_taken = -3.5

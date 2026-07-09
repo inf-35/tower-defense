@@ -39,6 +39,8 @@ shader = ExtResource("22_b47fn")
 shader_parameter/color = Color(0, 0, 0, 0.1764706)
 shader_parameter/spotlight_center = Vector2(0.5, 0.5)
 shader_parameter/spotlight_size = Vector2(0.1, 0.1)
+shader_parameter/spotlight_center_2 = Vector2(0.5, 0.5)
+shader_parameter/spotlight_size_2 = Vector2(0, 0)
 shader_parameter/is_active = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_damage_vignette"]
@@ -48,8 +50,6 @@ shader_parameter/intensity = 0.0
 shader_parameter/inner_radius = 0.52
 shader_parameter/feather = 0.2
 shader_parameter/center = Vector2(0.5, 0.5)
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_33vnq"]
 
 [node name="UI" type="CanvasLayer" unique_id=605534676]
 process_mode = 3
@@ -134,27 +134,65 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="tutorial_panel" type="PanelContainer" parent="Margin/ui_space/tutorial_anchors" unique_id=1280998084 node_paths=PackedStringArray("label")]
+[node name="tutorial_panel" type="PanelContainer" parent="Margin/ui_space/tutorial_anchors" unique_id=1280998084 node_paths=PackedStringArray("header_label", "checklist_container", "paragraph_label", "footer_label")]
 layout_mode = 0
 offset_left = 210.0
 offset_top = 227.0
 offset_right = 251.0
 offset_bottom = 377.0
 script = ExtResource("5_npsim")
-label = NodePath("MarginContainer/tutorial_instruction_label")
+header_label = NodePath("MarginContainer/VBoxContainer/header_label")
+checklist_container = NodePath("MarginContainer/VBoxContainer/checklist")
+paragraph_label = NodePath("MarginContainer/VBoxContainer/paragraph_label")
+footer_label = NodePath("MarginContainer/VBoxContainer/footer_label")
 
 [node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel" unique_id=1118652707]
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
-[node name="tutorial_instruction_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer" unique_id=872103735]
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer" unique_id=1200001001]
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+
+[node name="header_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001002]
+visible = false
 clip_contents = false
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
-text = "[b]Tutorial[/b]
-Press akgggggggggggggggggggggggg"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="checklist" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001003]
+visible = false
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+
+[node name="paragraph_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=872103735]
+clip_contents = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="footer_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001004]
+visible = false
+clip_contents = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
 fit_content = true
 scroll_active = false
 horizontal_alignment = 1
@@ -191,13 +229,14 @@ mouse_filter = 2
 
 [node name="start_wave_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=445037132]
 layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 483.0
-offset_top = 384.0
-offset_right = 768.0
-offset_bottom = 605.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -790.0
+offset_top = 165.0
+offset_right = -290.0
+offset_bottom = 395.0
+grow_horizontal = 0
 grow_vertical = 2
 mouse_filter = 2
 
@@ -423,10 +462,10 @@ anchors_preset = 4
 anchor_top = 0.5
 anchor_right = 0.0
 anchor_bottom = 0.5
-offset_left = 1.0
-offset_top = -600.0
+offset_left = 7.0
+offset_top = -538.0
 offset_right = 477.0
-offset_bottom = 600.0
+offset_bottom = 662.0
 grow_vertical = 2
 size_flags_horizontal = 0
 
@@ -440,11 +479,10 @@ offset_bottom = 302.0
 mouse_filter = 2
 
 [node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats" unique_id=233400822]
-clip_contents = true
 layout_mode = 0
 offset_left = 61.0
 offset_top = 129.0
-offset_right = 616.0
+offset_right = 922.0
 offset_bottom = 231.0
 size_flags_vertical = 3
 mouse_filter = 2
@@ -476,10 +514,10 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -250.0
-offset_right = 0.0
-offset_bottom = 250.0
+offset_left = -318.0
+offset_top = -187.0
+offset_right = -4.0
+offset_bottom = 321.0
 grow_horizontal = 0
 grow_vertical = 2
 
@@ -567,23 +605,52 @@ custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls" unique_id=1604513753 node_paths=PackedStringArray("pause_button", "base_button", "fast_forward_button")]
+[node name="BattleButtonPanel" type="Control" parent="Margin/ui_space/TimeControls" unique_id=1726003001]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -39.0
-offset_right = -183.0
-offset_bottom = -18.0
+offset_left = -373.0
+offset_top = -43.0
+offset_right = -64.0
+offset_bottom = 114.0
 grow_horizontal = 0
 grow_vertical = 2
-scale = Vector2(2, 2)
+
+[node name="BattleButton" type="Button" parent="Margin/ui_space/TimeControls/BattleButtonPanel" unique_id=1609551988]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -8.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Battle (Space)"
+autowrap_mode = 2
+script = ExtResource("11_gdbfk")
+metadata/_custom_type_script = "uid://dmty142sb38lp"
+
+[node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls" unique_id=1604513753 node_paths=PackedStringArray("battle_button", "pause_button", "base_button", "fast_forward_button")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -332.0
+offset_top = -25.0
+offset_right = -221.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 2
+scale = Vector2(1.5, 1.5)
 theme_type_variation = &"hbox_10"
 alignment = 2
 script = ExtResource("9_doea8")
+battle_button = NodePath("../BattleButtonPanel/BattleButton")
 pause_button = NodePath("AnimatableUI/PauseButton")
 base_button = NodePath("AnimatableUI2/PlayButton")
 fast_forward_button = NodePath("AnimatableUI3/FastForwardButton")
@@ -686,35 +753,48 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -99.0
-offset_top = 188.0
-offset_right = -19.0
-offset_bottom = 472.0
+offset_left = -336.0
+offset_top = 238.0
+offset_right = -66.0
+offset_bottom = 432.0
 grow_horizontal = 0
 mouse_filter = 2
 theme_type_variation = &"simple_panel"
-theme_override_styles/panel = SubResource("StyleBoxEmpty_33vnq")
 
 [node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel" unique_id=1650848154]
 layout_mode = 2
-theme_type_variation = &"MarginSuperminor"
+theme_type_variation = &"MarginMinor"
 
-[node name="IncomingEnemyBar" type="VBoxContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer" unique_id=1786013886]
+[node name="IncomingEnemyBar" type="VBoxContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer" unique_id=429844098 node_paths=PackedStringArray("roster_label")]
 layout_mode = 2
-theme_type_variation = &"vbox_5"
 script = ExtResource("11_nnaea")
-icon_size = Vector2(50, 50)
+roster_label = NodePath("Roster")
+
+[node name="Roster" type="RichTextLabel" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer/IncomingEnemyBar" unique_id=1396115686]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+theme_type_variation = &"rt_s15"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="Inspector" parent="Margin/ui_space" unique_id=2009911858 instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 size_flags_vertical = 8
 
-[node name="PanelMotionController" type="Node" parent="Margin/ui_space" unique_id=1534411001 node_paths=PackedStringArray("sidebar_panel", "stats_panel", "damage_tracker_panel", "time_controls_panel", "inspector_panel")]
+[node name="PanelMotionController" type="Node" parent="Margin/ui_space" unique_id=1534411001 node_paths=PackedStringArray("sidebar_panel", "stats_panel", "damage_tracker_panel", "time_controls_panel", "battle_button_panel", "time_control_buttons_panel", "inspector_panel")]
 script = ExtResource("25_panel_motion")
 sidebar_panel = NodePath("../building_bar")
 stats_panel = NodePath("../Stats")
 damage_tracker_panel = NodePath("../DamageTrackerPanel")
 time_controls_panel = NodePath("../TimeControls")
+battle_button_panel = NodePath("../TimeControls/BattleButtonPanel")
+time_control_buttons_panel = NodePath("../TimeControls/TimeControlButtons")
 inspector_panel = NodePath("../Inspector")
 
 [node name="RewardPickupAnimator" type="Control" parent="Margin/ui_space" unique_id=2114500012 node_paths=PackedStringArray("relic_target", "tower_target")]
@@ -728,6 +808,7 @@ mouse_filter = 2
 script = ExtResource("12_reward_pickup")
 relic_target = NodePath("../Stats/RelicDisplay")
 tower_target = NodePath("../building_bar/HBoxContainer/Panel")
+metadata/_edit_lock_ = true
 
 [node name="Expansion" type="Panel" parent="." unique_id=1600268793 node_paths=PackedStringArray("_vbox")]
 visible = false

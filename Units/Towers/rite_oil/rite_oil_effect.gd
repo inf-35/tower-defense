@@ -19,6 +19,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var hit_data = event.data as HitData
 	if not hit_data: return
+	if hit_data.negate: return
 
 	var triggered: bool = false
 	for status in hit_data.status_effects:

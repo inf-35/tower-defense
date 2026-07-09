@@ -3,7 +3,10 @@ class_name ShopOptionCard
 
 @export var price_text: InteractiveRichTextLabel
 
-const UNAFFORDABLE_ALPHA: float = 0.72
+const UNAFFORDABLE_ALPHA: float = 0.5
+const UNAFFORDABLE_BRIGHTNESS: float = 0.8
+
+var _has_gold: bool = true
 
 func setup(reward: Reward, index: int) -> void: ##binds one shop reward and keeps its affordability display synced to the player's current gold
 	_reward_data = reward
@@ -14,15 +17,21 @@ func setup(reward: Reward, index: int) -> void: ##binds one shop reward and keep
 
 	_refresh_affordability(Run.player.flux)
 
-func _refresh_affordability(_flux: float) -> void: ##tints the price and fades the whole card whenever the player cannot currently buy the reward
+func _refresh_affordability(_flux: float) -> void: ##tints the price and dims the whole card whenever the player cannot currently buy the reward
 	if not is_instance_valid(_reward_data):
 		return
 
-	var has_gold: bool = Run.player.flux >= _reward_data.price
+	_has_gold = Run.player.flux >= _reward_data.price
 	var bad_color_hex: String = KeywordService.get_color_hex("bad")
-	var price_text_value: String = "%.2f {GOLD%s}" % [_reward_data.price, "|color=%s" % bad_color_hex if not has_gold else ""]
-	if not has_gold:
+	var price_text_value: String = "%.2f {GOLD%s}" % [_reward_data.price, "|color=%s" % bad_color_hex if not _has_gold else ""]
+	if not _has_gold:
 		price_text_value = KeywordService.wrap_text(price_text_value, "bad")
 
 	price_text.set_parsed_text(price_text_value)
-	modulate.a = 1.0 if has_gold else UNAFFORDABLE_ALPHA
+	_update_card_disabled_state()
+
+func _update_card_disabled_state() -> void:
+	if _has_gold and _reward_available:
+		modulate = Color.WHITE
+		return
+	modulate = Color(UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_ALPHA)

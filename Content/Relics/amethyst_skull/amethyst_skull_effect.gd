@@ -95,4 +95,6 @@ func _attack(instance: EffectInstance, hit_report: HitReportData, killed_unit: U
 	delivery_data.intercept_position = target.global_position
 
 	await Clock.await_game_time(delay)
+	if not is_instance_valid(instance) or not instance.enabled or not is_instance_valid(target):
+		return
 	CombatManager.resolve_hit(hit_data, delivery_data)

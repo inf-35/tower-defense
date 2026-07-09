@@ -20,8 +20,14 @@ signal unhovered()
 @export var tower_meta: InteractiveRichTextLabel
 @export var description: InteractiveRichTextLabel
 
+const DISABLED_ALPHA: float = 0.5
+const DISABLED_BRIGHTNESS: float = 0.8
+
 var _reward_data: Reward
 var _display_index: int = 0
+var _base_description_text: String = ""
+var _reward_available: bool = true
+var _reward_block_reason: String = ""
 
 func _ready() -> void:
 	#ensure the container itself can catch mouse events
@@ -30,6 +36,7 @@ func _ready() -> void:
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_on_gui_input)
+	UI.update_relics.connect(_refresh_reward_availability)
 
 #public setup function
 func setup(reward: Reward, index: int) -> void:
@@ -97,7 +104,10 @@ func _apply_visuals(reward: Reward) -> void:
 		tower_meta.set_parsed_text("")
 
 	if description:
+		_base_description_text = desc_text
 		description.set_parsed_text(desc_text)
+
+	_refresh_reward_availability()
 
 func _get_tower_meta_text(tower_type: Towers.Type) -> String:
 	var size: Vector2i = Towers.get_tower_size(tower_type)
@@ -127,11 +137,34 @@ func play_pickup_animation() -> void: ##launches the shared hud pickup animation
 		return
 	UI.reward_pickup_animator.play_reward_pickup(_reward_data, icon.texture, get_pickup_origin())
 
+func _refresh_reward_availability() -> void: ##re-evaluates whether this reward is currently claimable and refreshes the card's disabled state
+	if not is_instance_valid(_reward_data):
+		return
+
+	_reward_block_reason = RewardService.get_reward_block_reason(_reward_data)
+	_reward_available = _reward_block_reason.is_empty()
+
+	if is_instance_valid(description):
+		var parsed_text: String = _base_description_text
+		if not _reward_available:
+			parsed_text += "\n" + KeywordService.wrap_text(_reward_block_reason, "bad")
+		description.set_parsed_text(parsed_text)
+
+	_update_card_disabled_state()
+
+func _update_card_disabled_state() -> void: ##applies the shared disabled presentation for reward cards; subclasses can extend this with extra gating such as affordability
+	if _reward_available:
+		modulate = Color.WHITE
+		return
+	modulate = Color(DISABLED_BRIGHTNESS, DISABLED_BRIGHTNESS, DISABLED_BRIGHTNESS, DISABLED_ALPHA)
+
 #--- input handling ---
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if not _reward_available:
+				return
 			Audio.play_sound(ID.Sounds.BUTTON_CLICK_SOUND, -1.0)
 			selected.emit()
 
@@ -139,14 +172,14 @@ func _on_gui_input(event: InputEvent) -> void:
 func _on_mouse_entered() -> void:
 	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -5.0)
 	hovered.emit()
-	if is_instance_valid(_icon_target) and _icon_target.has_method("_on_mouse_entered"):
-		_icon_target._on_mouse_entered()
-	if is_instance_valid(_panel_target) and _panel_target.has_method("_on_mouse_entered"):
-		_panel_target._on_mouse_entered()
+	if is_instance_valid(_icon_target):
+		_icon_target.set_hover_active(true)
+	if is_instance_valid(_panel_target):
+		_panel_target.set_hover_active(true)
 
 func _on_mouse_exited() -> void:
 	unhovered.emit()
-	if is_instance_valid(_icon_target) and _icon_target.has_method("_on_mouse_exited"):
-		_icon_target._on_mouse_exited()
-	if is_instance_valid(_panel_target) and _panel_target.has_method("_on_mouse_exited"):
-		_panel_target._on_mouse_exited()
+	if is_instance_valid(_icon_target):
+		_icon_target.set_hover_active(false)
+	if is_instance_valid(_panel_target):
+		_panel_target.set_hover_active(false)

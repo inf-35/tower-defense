@@ -13,7 +13,7 @@ multiplicative = 0.8
 
 [sub_resource type="Resource" id="Resource_effect"]
 script = ExtResource("2_effect")
-condition_kind = 4
+condition_kind = 5
 scale_with_count = true
 modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_cooldown")])
 icon = ExtResource("1_dw81v")
@@ -22,6 +22,6 @@ icon = ExtResource("1_dw81v")
 script = ExtResource("3_relic")
 type = 39
 global_effect = SubResource("Resource_effect")
-title = "Black Lily"
+title = "Night Lily"
 description = "Towers gain +25% {UNIT_HITRATE} for each rite currently affecting them."
 icon = ExtResource("1_dw81v")

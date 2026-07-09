@@ -1,66 +1,33 @@
 extends Node
 class_name TutorialDirector
 
-signal rite_placed_validly(tower: Tower)
-
 class TutorialRequest extends RefCounted:
 	var sequence_id: StringName = StringName()
 	var steps: Array[TutorialStep] = []
 	var world_target: Tower
 	var completion_flag: int = -1
 
-enum OnboardingStage {
-	INACTIVE,
-	INTRO,
-	WAIT_FOR_PAUSE,
-	SHOP_POISONS,
-	RITE_SELECT_PLACE,
-	RITE_REPOSITION,
-	WAIT_FOR_EXPANSION,
-	RESTOCK_EPIDEMIC,
-	COMPLETE,
-}
-
-const ONBOARDING_SEQUENCE_IDS: Dictionary = {
-	OnboardingStage.INTRO: &"onboarding_intro",
-	OnboardingStage.SHOP_POISONS: &"onboarding_shop_poisons",
-	OnboardingStage.RITE_SELECT_PLACE: &"onboarding_rite_select_place",
-	OnboardingStage.RITE_REPOSITION: &"onboarding_rite_reposition",
-	OnboardingStage.RESTOCK_EPIDEMIC: &"onboarding_restock_epidemic",
-}
-
-const FOLLOWUP_DELAY: float = 1.0
-const POISONS_SHOP_BUY_STEP_INDEX: int = 1
-const EPIDEMIC_SHOP_RESTOCK_STEP_INDEX: int = 1
-const EPIDEMIC_SHOP_BUY_STEP_INDEX: int = 2
-const POISONS_REWARD_PROTOTYPE: RewardPrototype = preload("res://Content/Rewards/Rites/poisons_rite.tres")
-const RUPTURED_HEART_REWARD_PROTOTYPE: RewardPrototype = preload("res://Content/Rewards/Relics/ruptured_heart.tres")
+const INTRO_AUTO_ADVANCE_DELAY: float = 0.8
 const RUINS_TUTORIAL: TutorialStep = preload("res://UI/tutorial/ruins.tres")
 const DESTROYED_TOWER_TUTORIAL: TutorialStep = preload("res://UI/tutorial/destroyed_tower.tres")
 const TROLL_WARNING_TUTORIAL: TutorialStep = preload("res://UI/tutorial/troll_warning.tres")
-const BASIC_TUTORIAL_RITE_TYPES: Array[Towers.Type] = [
-	Towers.Type.RITE_BLOOD,
-	Towers.Type.RITE_CURSES,
-	Towers.Type.RITE_POISONS,
-	Towers.Type.RITE_FROST,
-	Towers.Type.RITE_FLAME,
-]
+const RITE_TUTORIAL: TutorialStep = preload("res://UI/tutorial/rite.tres")
+const SHOP_SEQUENCE_ID: StringName = &"shop_intro"
 
-var _onboarding_stage: OnboardingStage = OnboardingStage.INACTIVE
 var _pending_requests: Array[TutorialRequest] = []
-var _suspended_requests: Array[TutorialRequest] = []
 var _active_request: TutorialRequest
-var _tutorial_rite_tower: Tower
-var _forced_poisons_reward: Reward
-var _forced_ruptured_heart_reward: Reward
-var _force_basic_expansion_rites: bool = false
-var _runtime_connected: bool = false
+var _intro_chapters: Array[TutorialContent.Chapter] = []
+var _completed_intro_facts: Dictionary[int, bool] = {}
+var _intro_active: bool = false
+var _active_chapter_index: int = -1
+var _advance_generation: int = 0
+var _restored_intro_state: Dictionary = {}
 
-func refresh_runtime_connections() -> void: ##binds the presenter and run-scoped event sources once the player services for this run exist
-	if _runtime_connected:
-		return
+func refresh_runtime_connections() -> void: ##binds the presenter and run-scoped event sources once the current run exists so the intro consumes real gameplay facts instead of polling
 	if not is_instance_valid(UI.tutorial_manager):
 		return
+	if not UI.tutorial_manager.fact_observed.is_connected(_on_fact_observed):
+		UI.tutorial_manager.fact_observed.connect(_on_fact_observed)
 	if not UI.tutorial_manager.sequence_finished.is_connected(_on_sequence_finished):
 		UI.tutorial_manager.sequence_finished.connect(_on_sequence_finished)
 	if not Run.phases.wave_cycle_started.is_connected(_on_wave_cycle_started):
@@ -71,342 +38,333 @@ func refresh_runtime_connections() -> void: ##binds the presenter and run-scoped
 		Run.phases.combat_started.connect(_on_combat_started)
 	if not Run.player.tower_placed.is_connected(_on_tower_placed):
 		Run.player.tower_placed.connect(_on_tower_placed)
-	if is_instance_valid(Run.player.trader_service):
-		if not Run.player.trader_service.item_purchased.is_connected(_on_trader_item_purchased):
-			Run.player.trader_service.item_purchased.connect(_on_trader_item_purchased)
-		if not Run.player.trader_service.stock_restocked.is_connected(_on_trader_stock_restocked):
-			Run.player.trader_service.stock_restocked.connect(_on_trader_stock_restocked)
-	if is_instance_valid(Run.references.island):
-		if not Run.references.island.tower_created.is_connected(_on_tower_created):
-			Run.references.island.tower_created.connect(_on_tower_created)
-		if not Run.references.island.expansion_service.expansion_process_complete.is_connected(_on_expansion_process_complete):
-			Run.references.island.expansion_service.expansion_process_complete.connect(_on_expansion_process_complete)
-	_runtime_connected = true
+	if not UI.tower_option_selected.is_connected(_on_tower_option_selected):
+		UI.tower_option_selected.connect(_on_tower_option_selected)
+	if is_instance_valid(Run.references.camera):
+		var camera: Camera = Run.references.camera
+		if not camera.tutorial_pan_observed.is_connected(_on_camera_panned):
+			camera.tutorial_pan_observed.connect(_on_camera_panned)
+		if not camera.tutorial_zoom_observed.is_connected(_on_camera_zoomed):
+			camera.tutorial_zoom_observed.connect(_on_camera_zoomed)
+	if is_instance_valid(Run.references.island) and not Run.references.island.tower_created.is_connected(_on_tower_created):
+		Run.references.island.tower_created.connect(_on_tower_created)
 
-func begin_new_game() -> void: ##starts the scripted onboarding if the profile has not fully completed it yet
+func begin_new_game() -> void: ##starts the wave-1 onboarding immediately for fresh profiles and leaves later tutorial requests queued behind it
 	_pending_requests.clear()
-	_suspended_requests.clear()
 	_active_request = null
-	_tutorial_rite_tower = null
-	_forced_poisons_reward = null
-	_forced_ruptured_heart_reward = null
-	_force_basic_expansion_rites = false
+	_completed_intro_facts.clear()
+	_intro_active = false
+	_active_chapter_index = -1
+	_advance_generation = 0
+	_build_intro_chapters()
 	refresh_runtime_connections()
+	if is_instance_valid(UI.tutorial_manager):
+		UI.tutorial_manager.clear_intro()
+		UI.tutorial_manager.set_start_wave_locked(false)
 	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
-		_onboarding_stage = OnboardingStage.COMPLETE
 		return
+	begin_intro_if_needed()
 
-	_onboarding_stage = OnboardingStage.INTRO
-	_force_basic_expansion_rites = true
-	_shift_first_expansion()
-	Run.phases.wave_schedule_updated.emit()
-	_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.INTRO], _build_intro_steps()), false)
+func begin_intro_if_needed() -> void:
+	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
+		return
+	if _intro_active:
+		return
+	if not _restored_intro_state.is_empty():
+		var restored_facts: Dictionary = _restored_intro_state.get("facts", {})
+		_completed_intro_facts = restored_facts.duplicate()
+		_active_chapter_index = clampi(int(_restored_intro_state.get("chapter_index", 0)), 0, maxi(_intro_chapters.size() - 1, 0))
+		_restored_intro_state.clear()
+	else:
+		_completed_intro_facts.clear()
+		_active_chapter_index = 0
+	_intro_active = true
+	var intro_hover_targets: Dictionary[int, int] = {}
+	for chapter: TutorialContent.Chapter in _intro_chapters:
+		for fact: int in chapter.hover_targets:
+			intro_hover_targets[fact] = chapter.hover_targets[fact]
+	UI.tutorial_manager.set_intro_hover_targets(intro_hover_targets)
+	_show_active_chapter()
+
+func is_intro_active() -> bool:
+	return _intro_active
+
+func is_start_wave_locked() -> bool:
+	if not _intro_active:
+		return false
+	if _active_chapter_index < 0 or _active_chapter_index >= _intro_chapters.size():
+		return false
+	return _intro_chapters[_active_chapter_index].start_wave_locked
+
+func notify_fact(fact: int) -> void: ##records sticky onboarding facts once and advances chapters only when the active chapter's requirements have all been met
+	if not _intro_active:
+		return
+	var fact_id: int = int(fact)
+	if _completed_intro_facts.get(fact_id, false):
+		return
+	_completed_intro_facts[fact_id] = true
+	UI.tutorial_manager.set_intro_fact_completed(fact)
+	if _is_active_chapter_complete():
+		_schedule_chapter_advance()
+
+func queue_contextual_tutorial(sequence_id: StringName, steps: Array[TutorialStep], world_target: Tower = null, completion_flag: int = -1) -> void:
+	if completion_flag >= 0 and Run.player.completed_tutorials[completion_flag]:
+		return
+	if _has_sequence_id(sequence_id):
+		return
+	var request := TutorialRequest.new()
+	request.sequence_id = sequence_id
+	request.steps = steps
+	request.world_target = world_target
+	request.completion_flag = completion_flag
+	_pending_requests.append(request)
+	if not _intro_active and _active_request == null:
+		_start_next_pending_request()
+
+func request_destroyed_tower_tutorial(tower: Tower) -> void:
+	if not is_instance_valid(tower):
+		return
+	queue_contextual_tutorial(_make_flag_sequence_id(Player.TutorialFlag.TOWER_DESTROYED), [DESTROYED_TOWER_TUTORIAL], tower, Player.TutorialFlag.TOWER_DESTROYED)
 
 func should_force_basic_tutorial_rites() -> bool:
-	return _force_basic_expansion_rites
+	return false
 
 func pick_basic_tutorial_rite_type() -> Towers.Type:
-	return BASIC_TUTORIAL_RITE_TYPES.pick_random()
+	return Towers.Type.RITE_POISONS
 
-func can_purchase_trader_reward(reward: Reward) -> bool:
-	if _onboarding_stage == OnboardingStage.INACTIVE:
-		return true
-	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
-		return true
-	if _onboarding_stage not in [OnboardingStage.SHOP_POISONS, OnboardingStage.RESTOCK_EPIDEMIC]:
-		return true
-	match _onboarding_stage:
-		OnboardingStage.SHOP_POISONS:
-			if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
-				return false
-			if not _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.SHOP_POISONS], POISONS_SHOP_BUY_STEP_INDEX):
-				return false
-			return _matches_forced_reward(reward, _forced_poisons_reward)
-		OnboardingStage.RESTOCK_EPIDEMIC:
-			if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
-				return false
-			if not _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RESTOCK_EPIDEMIC], EPIDEMIC_SHOP_BUY_STEP_INDEX):
-				return false
-			return _matches_forced_reward(reward, _forced_ruptured_heart_reward)
+func can_purchase_trader_reward(_reward: Reward) -> bool:
 	return true
 
 func can_open_trader() -> bool:
-	if _onboarding_stage == OnboardingStage.INACTIVE:
-		return true
-	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
-		return true
-	match _onboarding_stage:
-		OnboardingStage.SHOP_POISONS:
-			return Run.phases.current_phase == Run.phases.GamePhase.BUILDING and Run.phases.current_wave_number == 2
-		OnboardingStage.RESTOCK_EPIDEMIC:
-			return Run.phases.current_phase == Run.phases.GamePhase.BUILDING and Run.phases.current_wave_number >= 3
 	return true
 
 func can_close_trader() -> bool:
 	return true
 
 func can_force_restock() -> bool:
-	if _onboarding_stage == OnboardingStage.INACTIVE:
-		return true
-	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING] or _onboarding_stage == OnboardingStage.COMPLETE:
-		return true
-	if _onboarding_stage != OnboardingStage.RESTOCK_EPIDEMIC:
-		return true
-	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
-		return false
-	return _is_sequence_step_active(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RESTOCK_EPIDEMIC], EPIDEMIC_SHOP_RESTOCK_STEP_INDEX)
-
-func request_destroyed_tower_tutorial(tower: Tower) -> void:
-	if not is_instance_valid(tower):
-		return
-	_queue_flag_tutorial(Player.TutorialFlag.TOWER_DESTROYED, [DESTROYED_TOWER_TUTORIAL], tower)
+	return true
 
 func get_save_data() -> Dictionary:
 	return {
-		"onboarding_stage": int(_onboarding_stage),
+		"intro_active": _intro_active,
+		"active_chapter_index": _active_chapter_index,
+		"completed_facts": _completed_intro_facts.keys(),
 	}
 
-func load_save_data(data: Dictionary) -> void: ##restores only coarse onboarding progress and restarts the relevant scripted step on demand
-	_onboarding_stage = int(data.get("onboarding_stage", OnboardingStage.INACTIVE))
-	if _onboarding_stage == OnboardingStage.RITE_REPOSITION:
-		_onboarding_stage = OnboardingStage.RITE_SELECT_PLACE
-	_force_basic_expansion_rites = _onboarding_stage not in [OnboardingStage.INACTIVE, OnboardingStage.COMPLETE, OnboardingStage.RESTOCK_EPIDEMIC]
+func load_save_data(data: Dictionary) -> void: ##restores only the loose onboarding chapter state; queued contextual hints are intentionally regenerated from runtime events instead of being serialized
+	var saved_fact_ids: Array = data.get("completed_facts", [])
+	var saved_facts: Dictionary[int, bool] = {}
+	for fact_id: Variant in saved_fact_ids:
+		saved_facts[int(fact_id)] = true
+	_restored_intro_state = {
+		"intro_active": bool(data.get("intro_active", false)),
+		"chapter_index": int(data.get("active_chapter_index", 0)),
+		"facts": saved_facts,
+	}
 	refresh_runtime_connections()
 	_restore_after_load.call_deferred()
 
 func _restore_after_load() -> void:
 	if Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
-		_onboarding_stage = OnboardingStage.COMPLETE
+		_maybe_queue_shop_intro()
 		return
-	match _onboarding_stage:
-		OnboardingStage.INTRO:
-			_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.INTRO], _build_intro_steps()), false)
-		OnboardingStage.SHOP_POISONS:
-			if Run.phases.current_phase == Run.phases.GamePhase.BUILDING:
-				_start_poisons_shop_sequence()
-		OnboardingStage.RITE_SELECT_PLACE:
-			_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RITE_SELECT_PLACE], _build_rite_select_place_steps()), false)
-		OnboardingStage.RESTOCK_EPIDEMIC:
-			if Run.phases.current_phase == Run.phases.GamePhase.BUILDING:
-				_start_epidemic_shop_sequence()
-
-func _on_wave_cycle_started(wave_number: int) -> void:
-	var planned_enemies: Array[Array] = WaveEnemies.get_enemies_for_wave(wave_number)
-	for enemy_stack: Array in planned_enemies:
-		if enemy_stack[0] == Units.Type.TROLL:
-			_queue_flag_tutorial(Player.TutorialFlag.TROLL, [TROLL_WARNING_TUTORIAL])
-			return
-
-func _on_building_phase_started(wave_number: int) -> void:
-	match _onboarding_stage:
-		OnboardingStage.SHOP_POISONS:
-			if wave_number == 2:
-				_start_poisons_shop_sequence()
-		OnboardingStage.RESTOCK_EPIDEMIC:
-			if wave_number >= 3:
-				_start_epidemic_shop_sequence()
-
-func _on_combat_started(wave_number: int) -> void:
-	if _onboarding_stage != OnboardingStage.WAIT_FOR_PAUSE or wave_number != 1:
+	if bool(_restored_intro_state.get("intro_active", false)):
+		begin_intro_if_needed()
 		return
-	_start_pause_sequence.call_deferred(wave_number)
+	_maybe_queue_shop_intro()
 
-func _start_pause_sequence(wave_number: int) -> void:
-	await get_tree().create_timer(FOLLOWUP_DELAY, false).timeout
-	if wave_number != Run.phases.current_wave_number:
-		return
-	if Run.phases.current_phase != Run.phases.GamePhase.COMBAT_WAVE:
-		return
-	var step := _load_step("res://UI/tutorial/pause_controls.tres", Clock.speed_changed)
-	_queue_request(_make_request(&"onboarding_pause", [step]), true)
+func _build_intro_chapters() -> void:
+	_intro_chapters.clear()
 
-func _on_tower_created(tower: Tower) -> void:
-	if not is_instance_valid(tower):
-		return
-	if tower.type == Towers.Type.RUINS:
-		_queue_flag_tutorial(Player.TutorialFlag.RUINS, [RUINS_TUTORIAL])
+	var camera_controls := TutorialContent.Chapter.new()
+	camera_controls.id = &"camera_controls"
+	camera_controls.anchor = TutorialContent.Anchor.CENTRAL
+	camera_controls.checklist_items = [
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.CAMERA_PANNED, "Move the camera with WASD or drag with RMB."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.CAMERA_ZOOMED, "Zoom in and out with scroll."),
+	]
+	_intro_chapters.append(camera_controls)
 
-func _on_tower_placed(tower_type: Towers.Type, tower: Tower) -> void:
-	if tower_type != Towers.Type.RITE_POISONS:
-		return
-	match _onboarding_stage:
-		OnboardingStage.RITE_SELECT_PLACE:
-			_tutorial_rite_tower = tower
-			if _is_valid_onboarding_rite_placement(tower):
-				rite_placed_validly.emit(tower)
+	var towers := TutorialContent.Chapter.new()
+	towers.id = &"towers"
+	towers.anchor = TutorialContent.Anchor.TOWER_BAR
+	towers.highlight_elements = [TutorialContent.Element.TOWER_BAR]
+	towers.checklist_items = [
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_BAR_SELECTED, "Select a tower from the tower bar to inspect it."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_PLACED, "Place a tower down."),
+	]
+	towers.paragraph_text = "You can place towers to control the paths of enemies."
+	_intro_chapters.append(towers)
 
-func _on_expansion_process_complete() -> void:
-	if _onboarding_stage != OnboardingStage.WAIT_FOR_EXPANSION:
-		return
-	_force_basic_expansion_rites = false
-	_onboarding_stage = OnboardingStage.RESTOCK_EPIDEMIC
+	var information := TutorialContent.Chapter.new()
+	information.id = &"information"
+	information.anchor = TutorialContent.Anchor.PLAYER_STATS
+	information.highlight_elements = [
+		TutorialContent.Element.PLAYER_STATS,
+		TutorialContent.Element.WAVE_TIMELINE,
+	]
+	information.checklist_items = [
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.PLAYER_STATS_HOVERED, "Hover on the icons in the player stats."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.WAVE_TIMELINE_HOVERED, "Hover on the icons in the wave timeline to see future events"),
+	]
+	information.paragraph_text = "You can hover on {KEYWORD_TUTORIAL}/icons (i.e. {BLEED}, {BURN}, {GOLD}) within tooltips (including these ones!)"
+	information.hover_targets = {
+		TutorialContent.Fact.PLAYER_STATS_HOVERED: TutorialContent.Element.PLAYER_STATS,
+		TutorialContent.Fact.WAVE_TIMELINE_HOVERED: TutorialContent.Element.WAVE_TIMELINE,
+	}
+	_intro_chapters.append(information)
 
-func _on_trader_item_purchased(reward: Reward, _slot_index: int) -> void:
-	if reward == _forced_poisons_reward:
-		_forced_poisons_reward = null
-	elif reward == _forced_ruptured_heart_reward:
-		_forced_ruptured_heart_reward = null
+	var start_wave := TutorialContent.Chapter.new()
+	start_wave.id = &"start_wave"
+	start_wave.anchor = TutorialContent.Anchor.START_WAVE
+	start_wave.paragraph_text = "Start the wave when you're ready. Towers can still be built mid-battle."
+	start_wave.highlight_element = TutorialContent.Element.START_WAVE_BUTTON
+	start_wave.start_wave_locked = false
+	start_wave.auto_advance = false
+	_intro_chapters.append(start_wave)
 
-func _on_trader_stock_restocked(is_manual: bool) -> void: 
-	if not is_manual:
+func _show_active_chapter() -> void:
+	if _active_chapter_index >= _intro_chapters.size():
+		_complete_intro()
 		return
-	if _onboarding_stage == OnboardingStage.RESTOCK_EPIDEMIC and is_instance_valid(_forced_ruptured_heart_reward):
-		_ensure_flux(_forced_ruptured_heart_reward.price)
+	var chapter: TutorialContent.Chapter = _intro_chapters[_active_chapter_index]
+	UI.tutorial_manager.set_start_wave_locked(chapter.start_wave_locked)
+	UI.tutorial_manager.present_intro_chapter(chapter, _completed_intro_facts)
+	if _is_active_chapter_complete():
+		_schedule_chapter_advance()
+
+func _is_active_chapter_complete() -> bool:
+	if _active_chapter_index < 0 or _active_chapter_index >= _intro_chapters.size():
+		return false
+	var chapter: TutorialContent.Chapter = _intro_chapters[_active_chapter_index]
+	for fact: int in chapter.get_required_facts():
+		if not _completed_intro_facts.get(int(fact), false):
+			return false
+	return true
+
+func _schedule_chapter_advance() -> void:
+	var chapter: TutorialContent.Chapter = _intro_chapters[_active_chapter_index]
+	if not chapter.auto_advance:
+		return
+	_advance_generation += 1
+	var generation: int = _advance_generation
+	_advance_intro_after_delay.call_deferred(generation)
+
+func _advance_intro_after_delay(generation: int) -> void:
+	await get_tree().create_timer(INTRO_AUTO_ADVANCE_DELAY, false).timeout
+	if generation != _advance_generation:
+		return
+	if not _intro_active:
+		return
+	if not _is_active_chapter_complete():
+		return
+	_active_chapter_index += 1
+	_show_active_chapter()
+
+func _complete_intro() -> void:
+	_intro_active = false
+	_active_chapter_index = -1
+	UI.tutorial_manager.set_start_wave_locked(false)
+	UI.tutorial_manager.clear_intro()
+	Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING] = true
+	_start_next_pending_request()
+
+func _start_next_pending_request() -> void:
+	if _intro_active or _active_request != null or _pending_requests.is_empty():
+		return
+	_active_request = _pending_requests.pop_front()
+	if is_instance_valid(_active_request.world_target):
+		UI.tutorial_manager.start_world_sequence(_active_request.steps, _active_request.sequence_id, _active_request.world_target)
+		return
+	UI.tutorial_manager.start_sequence(_active_request.steps, _active_request.sequence_id)
 
 func _on_sequence_finished(sequence_id: StringName) -> void:
 	if is_instance_valid(_active_request) and _active_request.sequence_id == sequence_id and _active_request.completion_flag >= 0:
 		Run.player.completed_tutorials[_active_request.completion_flag] = true
 	_active_request = null
+	_start_next_pending_request()
 
-	match sequence_id:
-		&"onboarding_intro":
-			_onboarding_stage = OnboardingStage.WAIT_FOR_PAUSE
-		&"onboarding_pause":
-			_onboarding_stage = OnboardingStage.SHOP_POISONS
-		&"onboarding_shop_poisons":
-			_onboarding_stage = OnboardingStage.RITE_SELECT_PLACE
-			_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RITE_SELECT_PLACE], _build_rite_select_place_steps()), false)
-		&"onboarding_rite_select_place":
-			if is_instance_valid(_tutorial_rite_tower):
-				_onboarding_stage = OnboardingStage.RITE_REPOSITION
-				_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RITE_REPOSITION], [_build_rite_reposition_info_step()], _tutorial_rite_tower), false)
-		&"onboarding_rite_reposition":
-			_onboarding_stage = OnboardingStage.WAIT_FOR_EXPANSION
-		&"onboarding_restock_epidemic":
-			_complete_onboarding()
+func _on_fact_observed(fact: int) -> void:
+	notify_fact(fact)
 
-	_resume_next_request()
+func _on_camera_panned() -> void:
+	notify_fact(TutorialContent.Fact.CAMERA_PANNED)
 
-func _complete_onboarding() -> void:
-	_onboarding_stage = OnboardingStage.COMPLETE
-	_force_basic_expansion_rites = false
-	Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING] = true
+func _on_camera_zoomed() -> void:
+	notify_fact(TutorialContent.Fact.CAMERA_ZOOMED)
 
-func _queue_flag_tutorial(flag: Player.TutorialFlag, steps: Array[TutorialStep], tower: Tower = null) -> void:
-	if Run.player.completed_tutorials[flag]:
+func _on_tower_option_selected(_tower_type: Towers.Type) -> void:
+	notify_fact(TutorialContent.Fact.TOWER_BAR_SELECTED)
+
+func _on_tower_placed(_tower_type: Towers.Type, tower: Tower) -> void:
+	if not is_instance_valid(tower) or tower.hostile or tower.environmental or tower.abstractive:
 		return
-	if _has_sequence_id(_make_flag_sequence_id(flag)):
+	notify_fact(TutorialContent.Fact.TOWER_PLACED)
+
+func _on_combat_started(_wave_number: int) -> void:
+	notify_fact(TutorialContent.Fact.WAVE_STARTED)
+	if not _intro_active:
 		return
-	var request := _make_request(_make_flag_sequence_id(flag), steps, tower, flag)
-	_queue_request(request, true)
-
-func _queue_request(request: TutorialRequest, interrupt_current: bool) -> void:
-	if not is_instance_valid(UI.tutorial_manager):
+	if _active_chapter_index < 0 or _active_chapter_index >= _intro_chapters.size():
 		return
-	if interrupt_current and UI.tutorial_manager.has_active_sequence():
-		var suspended_state := UI.tutorial_manager.take_active_sequence_state()
-		if is_instance_valid(suspended_state):
-			var resumed_request := _make_request(suspended_state.sequence_id, suspended_state.steps, suspended_state.world_target, _get_completion_flag_for_sequence(suspended_state.sequence_id))
-			_suspended_requests.append(resumed_request)
-		_active_request = null
-	if UI.tutorial_manager.has_active_sequence():
-		if interrupt_current:
-			_pending_requests.push_front(request)
-		else:
-			_pending_requests.append(request)
+	if _intro_chapters[_active_chapter_index].id != &"start_wave":
 		return
-	_start_request(request)
+	_complete_intro()
 
-func _resume_next_request() -> void:
-	if not _pending_requests.is_empty():
-		var next_request = _pending_requests.pop_front()
-		_start_request(next_request)
+func _on_wave_cycle_started(wave_number: int) -> void:
+	var planned_enemies: Array[Array] = WaveEnemies.get_enemies_for_wave(wave_number)
+	for enemy_stack: Array in planned_enemies:
+		if enemy_stack[0] == Units.Type.TROLL:
+			queue_contextual_tutorial(_make_flag_sequence_id(Player.TutorialFlag.TROLL), [TROLL_WARNING_TUTORIAL], null, Player.TutorialFlag.TROLL)
+			return
+
+func _on_building_phase_started(_wave_number: int) -> void:
+	_maybe_queue_shop_intro()
+
+func _on_tower_created(tower: Tower) -> void:
+	if not is_instance_valid(tower):
 		return
-	if _suspended_requests.is_empty():
+	if Towers.is_tower_rite(tower.type):
+		queue_contextual_tutorial(_make_flag_sequence_id(Player.TutorialFlag.RITE), [RITE_TUTORIAL], tower, Player.TutorialFlag.RITE)
 		return
-	_start_request(_suspended_requests.pop_back())
-
-func _start_request(request: TutorialRequest) -> void:
-	_active_request = request
-	if is_instance_valid(request.world_target):
-		UI.tutorial_manager.start_world_sequence(request.steps, request.sequence_id, request.world_target)
+	if tower.type != Towers.Type.RUINS:
 		return
-	UI.tutorial_manager.start_sequence(request.steps, request.sequence_id)
+	queue_contextual_tutorial(_make_flag_sequence_id(Player.TutorialFlag.RUINS), [RUINS_TUTORIAL], null, Player.TutorialFlag.RUINS)
 
-func _start_poisons_shop_sequence() -> void:
-	if _player_has_poisons_rite_available():
-		_start_poisons_placement_sequence()
+func _maybe_queue_shop_intro() -> void: ##queues the day-2 trader explanation once the wave-1 intro is out of the way and the player reaches their second building day
+	if Run.player.completed_tutorials[Player.TutorialFlag.SHOP]:
 		return
-	_forced_poisons_reward = POISONS_REWARD_PROTOTYPE.generate_reward()
-	Run.player.trader_service.set_tutorial_stock([_forced_poisons_reward], true)
-	_ensure_flux(_forced_poisons_reward.price)
-	_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.SHOP_POISONS], _build_poisons_shop_steps()), false)
+	if not Run.player.completed_tutorials[Player.TutorialFlag.ONBOARDING]:
+		return
+	if Run.phases.current_phase != Run.phases.GamePhase.BUILDING:
+		return
+	if Run.phases.current_wave_number != 2:
+		return
+	queue_contextual_tutorial(SHOP_SEQUENCE_ID, _build_shop_intro_steps(), null, Player.TutorialFlag.SHOP)
 
-func _start_poisons_placement_sequence() -> void: ##skips the forced trader purchase when the player already owns the onboarding rite and moves directly to the placement lesson
-	_forced_poisons_reward = null
-	_onboarding_stage = OnboardingStage.RITE_SELECT_PLACE
-	_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RITE_SELECT_PLACE], _build_rite_select_place_steps()), false)
+func _build_shop_intro_steps() -> Array[TutorialStep]: ##opens with a real trader-open requirement, then explains the panel once it is visible on screen
+	var trader_is_open: bool = Run.player.trader_service.is_menu_open()
 
-func _start_epidemic_shop_sequence() -> void:
-	_forced_ruptured_heart_reward = RUPTURED_HEART_REWARD_PROTOTYPE.generate_reward()
-	Run.player.trader_service.set_tutorial_next_manual_restock_stock([_forced_ruptured_heart_reward])
-	_ensure_flux(Run.player.trader_service.get_restock_cost() + _forced_ruptured_heart_reward.price)
-	_queue_request(_make_request(ONBOARDING_SEQUENCE_IDS[OnboardingStage.RESTOCK_EPIDEMIC], _build_epidemic_shop_steps()), false)
-
-func _build_intro_steps() -> Array[TutorialStep]:
-	var select_step := _load_step("res://UI/tutorial/select_tower.tres", UI.tower_selected)
-	var turret_step := _load_step("res://UI/tutorial/place_turret.tres", Run.player.tower_placed, [Towers.Type.TURRET])
-	var palisade_step := _load_step("res://UI/tutorial/place_palisade.tres", Run.player.tower_placed, [Towers.Type.PALISADE])
-	var farm_step := _load_step("res://UI/tutorial/place_farm.tres", Run.player.tower_placed, [Towers.Type.FARM])
-	var start_wave_step := _load_step("res://UI/tutorial/start_wave.tres", UI.building_phase_ended)
-	return [
-		load("res://UI/tutorial/pan_camera.tres"),
-		load("res://UI/tutorial/zoom_camera.tres"),
-		select_step,
-		turret_step,
-		palisade_step,
-		farm_step,
-		load("res://UI/tutorial/gold_population_explanation.tres"),
-		load("res://UI/tutorial/hover_player_stats.tres"),
-		load("res://UI/tutorial/hover_wave_timeline.tres"),
-		start_wave_step,
-	]
-
-func _build_poisons_shop_steps() -> Array[TutorialStep]:
-	return [
-		_load_step("res://UI/tutorial/trade.tres", UI.trader_open),
-		_load_step("res://UI/tutorial/buy_poisons_rite.tres", Run.player.trader_service.item_purchased, [_forced_poisons_reward]),
-	]
-
-func _build_rite_select_place_steps() -> Array[TutorialStep]:
-	return [
-		_load_step("res://UI/tutorial/rite_select_inventory.tres", UI.tower_option_selected, [Towers.Type.RITE_POISONS]),
-		_load_step("res://UI/tutorial/rite_place_initial.tres", rite_placed_validly),
-	]
-
-func _build_rite_reposition_info_step() -> TutorialStep: ##shows the reposition explainer after the first successful adjacent placement instead of forcing a second placement cycle
-	var step := _load_step("res://UI/tutorial/rite_reposition.tres")
-	step.trigger_type = TutorialStep.TriggerType.BEGIN_TRIGGERED
-	step.require_confirmation = true
-	step.success_text = "%s\n[Q to continue.]" % step.instruction_text
-	return step
-
-func _build_epidemic_shop_steps() -> Array[TutorialStep]:
-	var open_step := _load_step("res://UI/tutorial/trade.tres", UI.trader_open)
-	open_step.instruction_text = "[Open] the trade menu."
+	var open_step := TutorialStep.new()
+	open_step.instruction_text = "Open the trade menu."
+	open_step.panel_anchor = TutorialStep.Anchor.TOWER_BAR_ANCHOR
+	open_step.highlight_target = TutorialStep.Reference.TRADE_BUTTON
+	open_step.trigger_type = TutorialStep.TriggerType.BEGIN_TRIGGERED if trader_is_open else TutorialStep.TriggerType.WAIT_FOR_SIGNAL
+	open_step.trigger_signal = UI.trader_open
 	open_step.require_confirmation = false
-	return [
-		open_step,
-		_load_step("res://UI/tutorial/restock_trade.tres", Run.player.trader_service.stock_restocked, [true]),
-		_load_step("res://UI/tutorial/buy_epidemic.tres", Run.player.trader_service.item_purchased, [_forced_ruptured_heart_reward]),
-	]
+	open_step.override_start_wave_lock = true
+	open_step.start_wave_locked = true
 
-func _load_step(path: String, trigger_signal: Signal = Signal(), desired_parameters: Array = []) -> TutorialStep:
-	var step: TutorialStep = (load(path) as TutorialStep).duplicate(true)
-	step.trigger_signal = trigger_signal
-	step.desired_parameters = desired_parameters
-	return step
+	var info_step := TutorialStep.new()
+	info_step.instruction_text = "Buy run upgrades here. It automatically restocks after 2 days, though you may restock it manually.\n[Q to continue.]"
+	info_step.panel_anchor = TutorialStep.Anchor.CENTRAL_ANCHOR
+	info_step.highlight_target = TutorialStep.Reference.TRADE_MENU
+	info_step.trigger_type = TutorialStep.TriggerType.BEGIN_TRIGGERED
+	info_step.require_confirmation = true
+	info_step.override_start_wave_lock = true
+	info_step.start_wave_locked = true
 
-func _make_request(sequence_id: StringName, steps: Array[TutorialStep], world_target: Tower = null, completion_flag: int = -1) -> TutorialRequest:
-	var request := TutorialRequest.new()
-	request.sequence_id = sequence_id
-	request.steps = steps
-	request.world_target = world_target
-	request.completion_flag = completion_flag
-	return request
-
-func _make_flag_sequence_id(flag: Player.TutorialFlag) -> StringName:
-	return StringName("flag_%d" % flag)
+	return [open_step, info_step]
 
 func _has_sequence_id(sequence_id: StringName) -> bool:
 	if is_instance_valid(_active_request) and _active_request.sequence_id == sequence_id:
@@ -414,64 +372,7 @@ func _has_sequence_id(sequence_id: StringName) -> bool:
 	for request: TutorialRequest in _pending_requests:
 		if request.sequence_id == sequence_id:
 			return true
-	for request: TutorialRequest in _suspended_requests:
-		if request.sequence_id == sequence_id:
-			return true
 	return false
 
-func _get_completion_flag_for_sequence(sequence_id: StringName) -> int:
-	var sequence_text: String = String(sequence_id)
-	if not sequence_text.begins_with("flag_"):
-		return -1
-	return int(sequence_text.trim_prefix("flag_"))
-
-func _ensure_flux(required_flux: float) -> void:
-	if Run.player.flux < required_flux:
-		Run.player.flux = required_flux
-
-func _player_has_poisons_rite_available() -> bool:
-	return Run.player.get_rite_count(Towers.Type.RITE_POISONS) > 0
-
-func _is_sequence_step_active(sequence_id: StringName, minimum_step_index: int) -> bool: ##keeps scripted shop actions locked until the matching onboarding step is the one currently being shown
-	if not is_instance_valid(UI.tutorial_manager):
-		return false
-	if UI.tutorial_manager.get_active_sequence_id() != sequence_id:
-		return false
-	return UI.tutorial_manager.get_current_step_index() >= minimum_step_index
-
-func _matches_forced_reward(candidate: Reward, forced_reward: Reward) -> bool:
-	if not is_instance_valid(candidate) or not is_instance_valid(forced_reward):
-		return false
-	if candidate.type != forced_reward.type:
-		return false
-	match candidate.type:
-		Reward.Type.ADD_RITE:
-			return candidate.rite_type == forced_reward.rite_type
-		Reward.Type.ADD_RELIC:
-			return is_instance_valid(candidate.relic) and is_instance_valid(forced_reward.relic) and candidate.relic.type == forced_reward.relic.type
-		_:
-			return candidate == forced_reward
-
-func _shift_first_expansion() -> void: ##keeps onboarding's first expansion at wave 3; with the normal 3-wave cadence this is a no-op but preserves older saves/configs gracefully
-	var wave_two: Phases.Wave = Run.phases.wave_plan.get(2)
-	var wave_three: Phases.Wave = Run.phases.wave_plan.get(3)
-	if wave_two == null or wave_three == null:
-		return
-	wave_two.day_events.erase(Phases.DayEvent.EXPANSION)
-	if wave_two.day_events.is_empty():
-		wave_two.day_events.append(Phases.DayEvent.NONE)
-	if not wave_three.day_events.has(Phases.DayEvent.EXPANSION):
-		if wave_three.day_events.size() == 1 and wave_three.day_events[0] == Phases.DayEvent.NONE:
-			wave_three.day_events.clear()
-		wave_three.day_events.append(Phases.DayEvent.EXPANSION)
-
-func _is_valid_onboarding_rite_placement(rite_tower: Tower) -> bool:
-	for adjacent_tower: Tower in rite_tower.get_adjacent_towers().values():
-		if not is_instance_valid(adjacent_tower):
-			continue
-		if adjacent_tower.hostile or adjacent_tower.environmental:
-			continue
-		if adjacent_tower.type in [Towers.Type.PLAYER_CORE, Towers.Type.FARM, Towers.Type.PALISADE, Towers.Type.PALISADE_UPGRADE_1]:
-			continue
-		return true
-	return false
+func _make_flag_sequence_id(flag: Player.TutorialFlag) -> StringName:
+	return StringName("flag_%d" % flag)

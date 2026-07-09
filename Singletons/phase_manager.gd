@@ -18,8 +18,8 @@ enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
 var current_wave_number: int = 0:
 	set(ncwm):
 		current_wave_number = ncwm
-		var base_scaling: float = 1.0 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 1.1
-		var scaling: float = 0.02 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.04
+		var base_scaling: float = 0.8 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 1.0
+		var scaling: float = 0.015 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.025
 		var goal: float = base_scaling + (max(current_wave_number - 3, 0) * scaling)
 		Run.current_game_scaling = max(Run.current_game_scaling - 0.1, goal)
 
@@ -187,6 +187,7 @@ func _start_choice_phase(type: ChoiceType) -> void:
 
 	match type:
 		ChoiceType.EXPANSION:
+			Run.references.island.expansion_service.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			Run.references.island.expansion_service.start_expansion_phase()
 		ChoiceType.REWARD_TOWER:
 			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER])
@@ -199,8 +200,6 @@ func _on_player_made_choice(choice_id: int) -> void:
 	_report("player chose option id: " + str(choice_id))
 
 	match current_choice_type:
-		ChoiceType.EXPANSION:
-			Run.references.island.expansion_service.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 		ChoiceType.REWARD_TOWER, ChoiceType.REWARD_RELIC:
 			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			RewardService.select_reward(choice_id)

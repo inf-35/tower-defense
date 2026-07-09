@@ -22,5 +22,5 @@ script = ExtResource("3_relic")
 type = 46
 global_effect = SubResource("Resource_effect")
 title = "Bastion"
-description = "{T_PALISADE|label=Walls} adjacent to 2 or more walls gain +100% {UNIT_HP}."
+description = "Towers adjacent to 2 or more {T_PALISADE|label=Walls} gain +100% {UNIT_HP}."
 icon = ExtResource("1_juk7m")

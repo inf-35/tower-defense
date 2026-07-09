@@ -25,10 +25,8 @@ func create_instance() -> EffectInstance:
 
 func _handle_attach(instance: EffectInstance) -> void:
 	#first evaluate all towers
-	var all_towers: Array = Run.references.island.get_tree().get_nodes_in_group(Run.references.TOWER_GROUP)
-	for tower: Node in all_towers:
-		if tower is Tower:
-			_evaluate_tower(instance, tower)
+	for tower: Tower in Run.references.island.get_all_towers():
+		_evaluate_tower(instance, tower)
 
 func _handle_detach(instance: EffectInstance) -> void:
 	#when the relic is lost, strip all modifiers we applied.

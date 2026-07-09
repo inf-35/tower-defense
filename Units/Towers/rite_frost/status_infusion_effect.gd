@@ -28,6 +28,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var hit_data: HitData = event.data as HitData
 	if not hit_data:
 		return
+	if hit_data.negate:
+		return
 
 	var status_vector: Vector2 = hit_data.status_effects.get(status, Vector2.ZERO)
 

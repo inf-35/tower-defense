@@ -1,20 +1,22 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene format=3 uid="uid://cvsqkb21snqay"]
 
-[ext_resource type="Script" path="res://UnitComponents/unit.gd" id="1"]
-[ext_resource type="Script" path="res://UnitComponents/navigation_component.gd" id="2"]
-[ext_resource type="Script" path="res://UnitComponents/movement_component.gd" id="3"]
-[ext_resource type="Script" path="res://Content/movement_data.gd" id="4"]
-[ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="5"]
-[ext_resource type="Resource" path="res://Units/Enemies/warrior_plus/warrior_plus_hp.tres" id="6"]
-[ext_resource type="Shader" path="res://Shaders/unit_effects.gdshader" id="7"]
-[ext_resource type="Texture2D" path="res://Assets/warrior.png" id="8"]
-[ext_resource type="Script" path="res://UnitComponents/hitbox.gd" id="9"]
-[ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="10"]
-[ext_resource type="Script" path="res://Content/Behaviors/_default_behavior.gd" id="11"]
-[ext_resource type="Script" path="res://UnitComponents/range_component.gd" id="12"]
-[ext_resource type="Script" path="res://UnitComponents/attack_component.gd" id="13"]
-[ext_resource type="Script" path="res://Content/attack_data.gd" id="14"]
-[ext_resource type="Script" path="res://UnitComponents/contact_shadow.gd" id="15"]
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5"]
+[ext_resource type="Resource" uid="uid://khoqrrjr1m12" path="res://Units/Enemies/warrior_plus/warrior_plus_hp.tres" id="6"]
+[ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="7"]
+[ext_resource type="Texture2D" uid="uid://p30x2gd2skej" path="res://Assets/warrior.png" id="8"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="11"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="13"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="14"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="14_bh2i8"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="15"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="16_s1wgm"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("4")
@@ -34,9 +36,9 @@ size = Vector2(70, 85)
 script = ExtResource("14")
 range = 8.0
 cooldown = 0.75
-damage = 4.0
+damage = 6.0
 
-[node name="WarriorPlus" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="WarriorPlus" type="Node2D" unique_id=734259489 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1")
 hostile = true
@@ -51,50 +53,50 @@ navigation_component = NodePath("NavigationComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=28700136]
 script = ExtResource("2")
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1613066009]
 script = ExtResource("3")
 face_towards_movement = false
 movement_data = SubResource("1")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=141370990]
 script = ExtResource("5")
 health_data = ExtResource("6")
 
-[node name="Graphics" type="Sprite2D" parent="."]
-material = SubResource("2")
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1946843787]
 modulate = Color(0.92, 0.66, 0.66, 1)
+material = SubResource("2")
 scale = Vector2(0.12972224, 0.12972224)
 texture = ExtResource("8")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=391845664]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
 script = ExtResource("9")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1107296790]
 position = Vector2(0, -2.4999983)
 scale = Vector2(0.9999998, 0.9999998)
 shape = SubResource("3")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1693420108]
 script = ExtResource("10")
 
-[node name="DefaultBehavior" type="Node" parent="."]
+[node name="DefaultBehavior" type="Node" parent="." unique_id=932563282]
 script = ExtResource("11")
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1405995915]
 script = ExtResource("12")
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=952463715]
 script = ExtResource("13")
 attack_data = SubResource("4")
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=1303964716]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 2.5)

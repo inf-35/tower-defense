@@ -25,6 +25,24 @@ func _start_attack_sequence(target: Unit) -> void: ##consumes one attack context
 	if not is_instance_valid(attack_context):
 		return
 
+	var signal_hit: HitData = attack_component.attack_data.generate_generic_hit_data()
+	signal_hit.source = unit
+	signal_hit.target = null
+	signal_hit.target_affiliation = true
+	signal_hit.damage = attack_component.damage
+	signal_hit.radius = attack_component.radius
+	signal_hit.attack_id = attack_id
+	signal_hit.negate = true
+	signal_hit.primary = true
+	if not attack_component.apply_attack_context(signal_hit, attack_context):
+		return
+
+	var signal_event := GameEvent.new()
+	signal_event.event_type = GameEvent.EventType.PRE_HIT_DEALT
+	signal_event.data = signal_hit
+	signal_event.unit = unit
+	unit.on_event.emit(signal_event)
+
 	var damaged_structure_positions: Array[Vector2] = _damage_adjacent_structures(attack_id, attack_context)
 	if damaged_structure_positions.is_empty():
 		attack_component.refresh_cooldown()
@@ -94,6 +112,7 @@ func _create_structure_hit(target: Tower, attack_id: int, attack_context: Attack
 	hit_data.damage = structure_damage
 	hit_data.breaking = true
 	hit_data.attack_id = attack_id
+	hit_data.primary = false
 	hit_data.velocity = (target.global_position - unit.global_position).normalized()
 	if not attack_component.apply_attack_context(hit_data, attack_context):
 		return null
@@ -111,6 +130,7 @@ func _fire_projectile(target: Unit, source_position: Vector2, attack_id: int, at
 	hit_data.target = target
 	hit_data.target_affiliation = target.hostile
 	hit_data.attack_id = attack_id
+	hit_data.primary = false
 	if not attack_component.apply_attack_context(hit_data, attack_context):
 		return
 

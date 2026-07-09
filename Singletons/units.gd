@@ -95,12 +95,12 @@ func create_unit(unit_type: Type) -> Unit:
 			if not is_instance_valid(_unit.modifiers_component):
 				return
 			if _unit.health_component:
-				var mod_hp = Modifier.new(Attributes.id.MAX_HEALTH, 0.75, 0.0, -1.0)
+				var mod_hp = Modifier.new(Attributes.id.MAX_HEALTH, 0.65, 0.0, -1.0)
 				_unit.modifiers_component.add_permanent_modifier(mod_hp)
 				#force health to update to the new, lowered maximum
 				_unit.health_component.health = _unit.health_component.health
 			if _unit.movement_component:
-				var mod_spd = Modifier.new(Attributes.id.MAX_SPEED, 0.70, 0.0, -1.0)
+				var mod_spd = Modifier.new(Attributes.id.MAX_SPEED, 0.65, 0.0, -1.0)
 				_unit.modifiers_component.add_permanent_modifier(mod_spd)
 			if _unit.attack_component:
 				var mod_cd = Modifier.new(Attributes.id.COOLDOWN, 1.25, 0.0, -1.0)

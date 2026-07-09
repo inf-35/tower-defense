@@ -116,8 +116,7 @@ func _get_poison_stack_count() -> float:
 func _cap_poison_delta(poison_delta: float, delta: float, poison_stacks: float) -> float:
 	return -minf(-poison_delta, MAX_POISON_DAMAGE_PER_SECOND * poison_stacks * delta)
 
-##allocates net tick damage across any active status effects that directly drive regen-based attrition
-func _record_status_damage(net_damage: float, delta: float) -> void:
+func _record_status_damage(net_damage: float, delta: float) -> void: ##allocates net tick damage across any active status effects that directly drive regen-based attrition
 	if net_damage <= 0.0:
 		return
 	if not is_instance_valid(_modifiers_component):

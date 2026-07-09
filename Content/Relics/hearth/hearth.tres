@@ -15,7 +15,7 @@ projectile_tint = Color(1, 0.3882353, 0.20392157, 1)
 
 [sub_resource type="Resource" id="Resource_effect"]
 script = ExtResource("2_effect")
-condition_kind = 1
+condition_kind = 2
 reference_tower_types = Array[int]([5, 52])
 max_range = 2
 granted_effect = SubResource("Resource_status")

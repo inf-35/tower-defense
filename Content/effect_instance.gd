@@ -31,7 +31,7 @@ func _init() -> void:
 
 func detach() -> void:
 	enabled = false
-	if is_instance_valid(host):
+	if global or is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 
 func attach_to(_host: Unit) -> void:

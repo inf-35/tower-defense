@@ -38,5 +38,7 @@ static var BOOKENDS: RelicData = load("res://Content/Relics/bookends/bookends.tr
 static var ERGOT: RelicData = load("res://Content/Relics/ergot/ergot.tres")
 static var HEARTH: RelicData = load("res://Content/Relics/hearth/hearth.tres")
 static var BASTION: RelicData = load("res://Content/Relics/bastion/bastion.tres")
+static var EDELWEISS: RelicData = load("res://Content/Relics/edelweiss/edelweiss.tres")
+static var SPRINKLERHEAD: RelicData = load("res://Content/Relics/sprinklerhead/sprinklerhead.tres")
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {} ##relics indexed by type, loaded by reward_service

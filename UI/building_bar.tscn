@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_tkmsn"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_rich"]
 
-[node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "start_wave_button", "trade_button", "trade_button_label")]
+[node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "trade_button", "trade_button_label")]
 clip_contents = true
 custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
@@ -19,7 +19,6 @@ offset_bottom = -48.0
 theme = ExtResource("1_uep1a")
 script = ExtResource("1_08diq")
 towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
-start_wave_button = NodePath("HBoxContainer/start_wave")
 trade_button = NodePath("HBoxContainer/trade")
 trade_button_label = NodePath("HBoxContainer/trade/label")
 
@@ -50,7 +49,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_type_variation = &"rt_s20_descriptive"
+theme_type_variation = &"rt_s20"
 bbcode_enabled = true
 text = "Trade (T)"
 scroll_active = false
@@ -81,12 +80,3 @@ theme_override_constants/separation = 12
 [node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" unique_id=132609132 instance=ExtResource("3_uep1a")]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
-
-[node name="start_wave" type="Button" parent="HBoxContainer" unique_id=1108735127]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
-text = "Start Wave (Space)"
-autowrap_mode = 2
-script = ExtResource("4_tkmsn")

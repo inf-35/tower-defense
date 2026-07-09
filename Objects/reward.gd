@@ -35,8 +35,7 @@ enum Rarity {
 @export var title: String = "dappled things" #used for terrain expansion previews and such
 @export_multiline var description: String = "Reward description"
 
-##resolves the authored rarity enum into the final base reward weight before tag adjustments
-func get_base_weight() -> float:
+func get_base_weight() -> float: ##resolves the authored rarity enum into the final base reward weight before tag adjustments
 	return get_rarity_weight(base_rarity) * weight_scale
 
 ##maps the shared authored rarity levels into concrete reward-pool weights

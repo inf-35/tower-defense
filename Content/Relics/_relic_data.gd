@@ -60,6 +60,8 @@ enum Type {
 	ERGOT,
 	HEARTH,
 	BASTION,
+	EDELWEISS,
+	SPRINKLERHEAD,
 }
 
 @export var type: Type
@@ -67,7 +69,6 @@ enum Type {
 #each relic contains a modifier prototype that defines its stat changes
 @export var modifier_prototypes: Array[GlobalModifierPrototype] ##modifiers that are applied to all satisfying towers (see specific_tower_type)
 @export var global_effect: EffectPrototype
-@export var active_effect_scene: PackedScene ##for active global effects, scene is instantiated as child of the player->global modifier singleton
 #--- presentation data for ui ---
 @export var title: String
 @export_multiline var description: String
@@ -77,12 +78,12 @@ func get_save_data() -> Dictionary:
 	var save_data: Dictionary = {}
 	save_data["type"] = type
 	save_data["resource_path"] = resource_path
-	#modifier prototypes and TODO: active effect scene are stateless and can be recreated from type
 	if global_effect:
-		var effect_instance: EffectInstance = Run.player.global_event_service.get_effect_instance_by_prototype(global_effect)
-		var effect_data: Dictionary = effect_instance.effect_prototype.get_save_data(effect_instance)
+		var effect_instance: EffectInstance = Run.player.get_relic_effect_instance(self)
+		if is_instance_valid(effect_instance):
+			var effect_data: Dictionary = effect_instance.effect_prototype.get_save_data(effect_instance)
 
-		save_data["global_effect"] = effect_data
+			save_data["global_effect"] = effect_data
 	return save_data
 
 func load_save_data(save_data: Dictionary) -> void:

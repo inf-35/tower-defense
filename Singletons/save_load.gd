@@ -86,10 +86,9 @@ func save_profile() -> void:
 	print("SaveLoad: Saving profile...")
 
 	var profile_dict: Dictionary = {
-		"settings": {
-			"show_all_health_bars": Pause.show_all_health_bars,
-		}
+		"settings": WindowSettings.get_profile_data()
 	}
+	profile_dict["settings"]["show_all_health_bars"] = Pause.show_all_health_bars
 	if is_instance_valid(Run.player):
 		profile_dict["player"] = Run.player.get_profile()
 	var json_string = JSON.stringify(profile_dict)
@@ -104,11 +103,13 @@ func load_profile() -> bool:
 	print("SaveLoad: Starting Load profile Process...")
 	if not FileAccess.file_exists(PROFILE_PATH):
 		print("SaveLoad: No save file found.")
+		WindowSettings.apply_startup_settings()
 		return false
 
 	#read file
 	var file = FileAccess.open(PROFILE_PATH, FileAccess.READ)
 	if not file:
+		WindowSettings.apply_startup_settings()
 		push_error("SaveLoad: Failed to open profile file.")
 		return false
 
@@ -118,6 +119,7 @@ func load_profile() -> bool:
 	var json = JSON.new()
 	var error: Error = json.parse(json_string)
 	if error != OK:
+		WindowSettings.apply_startup_settings()
 		push_error("SaveLoad: JSON Parse Error: " + json.get_error_message())
 		return false
 
@@ -126,6 +128,9 @@ func load_profile() -> bool:
 	if save_dict.has("settings"):
 		var settings_data: Dictionary = save_dict["settings"]
 		Pause.show_all_health_bars = bool(settings_data.get("show_all_health_bars", false))
+		WindowSettings.apply_startup_settings(settings_data)
+	else:
+		WindowSettings.apply_startup_settings()
 
 	if save_dict.has("player") and is_instance_valid(Run.player):
 		Run.player.load_profile(save_dict["player"])

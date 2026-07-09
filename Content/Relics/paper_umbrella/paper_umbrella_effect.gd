@@ -28,16 +28,14 @@ func create_instance() -> EffectInstance:
 func _handle_attach(instance: EffectInstance) -> void:
 	var state: UmbrellaState = instance.state as UmbrellaState
 	#initial scan
-	var all_towers: Array = Run.references.get_tree().get_nodes_in_group(Run.references.TOWER_GROUP)
-	for t in all_towers:
-		if t is Tower:
-			state.tower_cooldowns[t] = 0.0
-			_apply_shield_visual(t, true)
+	for t: Tower in Run.references.island.get_all_towers():
+		state.tower_cooldowns[t] = 0.0
+		_apply_shield_visual(t, true)
 
-			t.tree_exiting.connect(func():
-				state.tower_cooldowns.erase(t),
-				CONNECT_ONE_SHOT
-			)
+		t.tree_exiting.connect(func():
+			state.tower_cooldowns.erase(t),
+			CONNECT_ONE_SHOT
+		)
 
 func _handle_detach(instance: EffectInstance) -> void:
 	var state: UmbrellaState = instance.state as UmbrellaState

@@ -16,6 +16,7 @@ func _set_restock_affordability(restock_cost: float) -> void: ##keeps the trader
 
 func _ready() -> void: ##binds the trader panel to the live stock, restock, and close flows
 	visible = false
+	UI.tutorial_manager.register_element(TutorialContent.Element.TRADE_MENU, self)
 
 	UI.trader_open.connect(func():
 		visible = true

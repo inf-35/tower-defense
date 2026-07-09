@@ -41,6 +41,8 @@ func _subscribe() -> void:
 	_back_subscription_id = topo.subscribe(self, unit as Tower, _make_query(false), _on_back_updated, true)
 
 func _unsubscribe() -> void:
+	if not Run.is_run_ready():
+		return
 	var topo = Run.references.island.topology_service if is_instance_valid(Run.references.island) else null
 	if not topo: return
 

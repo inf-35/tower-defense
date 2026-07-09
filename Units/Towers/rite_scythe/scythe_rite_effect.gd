@@ -19,6 +19,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT: return
 	var hit_data = event.data as HitData
 	if not hit_data: return
+	if hit_data.negate: return
 
 	var target = hit_data.target
 	if not is_instance_valid(target) or not is_instance_valid(target.health_component):

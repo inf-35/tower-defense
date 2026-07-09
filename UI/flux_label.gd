@@ -12,7 +12,7 @@ func _ready() -> void:
 	UI.update_capacity.connect(_update_capacity)
 	UI.update_health.connect(_update_health)
 
-	UI.tutorial_manager.register_element(TutorialStep.Reference.PLAYER_STATS, self)
+	UI.tutorial_manager.register_element(TutorialContent.Element.PLAYER_STATS, self)
 
 	if Run.has_active_run() and is_instance_valid(Run.player):
 		_update_capacity(Run.player.used_capacity, Run.player.tower_capacity)

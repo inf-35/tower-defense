@@ -28,6 +28,8 @@ enum Reference { ##reference ids to control nodes
 	WAVE_TIMELINE,
 	TUTORIAL_TEXT,
 	PLAYER_STATS,
+	TRADE_BUTTON,
+	TRADE_MENU,
 }
 
 @export_multiline var instruction_text: String

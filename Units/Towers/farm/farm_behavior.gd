@@ -1,7 +1,7 @@
 extends Behavior
 class_name FarmBehavior
 
-@export var income_per_wave: float = 1.0
+@export var income_per_wave: float = 1.5
 @export var adjacent_bonus: float = 0 ##extra income per adjacent tower
 
 static func _static_init() -> void:

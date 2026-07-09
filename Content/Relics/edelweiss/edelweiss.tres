@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dnbrtc7yes5bg"]
+
+[ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="1_status"]
+[ext_resource type="Texture2D" uid="uid://dkdm6jxsmr4ho" path="res://Assets/edelweiss.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_vrnrr"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="4_relic"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="5_nrxp1"]
+
+[sub_resource type="Resource" id="Resource_status"]
+script = ExtResource("1_status")
+bonus_time = 1.0
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("3_effect")
+condition_kind = 6
+host_terrain_types = Array[int]([2])
+granted_effect = SubResource("Resource_status")
+icon = ExtResource("2_icon")
+
+[resource]
+script = ExtResource("4_relic")
+type = 47
+global_effect = SubResource("Resource_effect")
+title = "Edelweiss"
+description = "Attacks of towers on highland tiles inflict 1 stack of {FROST}, lasting 1 second."
+icon = ExtResource("2_icon")

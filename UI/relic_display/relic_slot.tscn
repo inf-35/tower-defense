@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://p35n4uwo5s1h"]
+
+[ext_resource type="Script" uid="uid://egglq5hicqrn" path="res://UI/relic_display/relic_slot.gd" id="1_slot_script"]
+[ext_resource type="Texture2D" uid="uid://64m2hwj4ionq" path="res://Assets/relic_slot.png" id="2_slot_texture"]
+
+[node name="RelicSlot" type="Control" unique_id=580362284 node_paths=PackedStringArray("frame", "icon")]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_slot_script")
+frame = NodePath("Frame")
+icon = NodePath("Icon")
+
+[node name="Frame" type="TextureRect" parent="." unique_id=5014766]
+self_modulate = Color(1, 1, 1, 0.49803922)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_slot_texture")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1389059003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+expand_mode = 1
+stretch_mode = 5

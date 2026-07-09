@@ -117,8 +117,8 @@ func generate_initial_island_block(island: Island, block_size: int) -> Dictionar
 	return _generate_block(island, block_size, initial_params)
 
 func start_expansion_phase() -> void: #entry point called by phases
-	generate_and_present_choices(Run.references.island, 22, 4)
 	expansions_this_phase = 0
+	generate_and_present_choices(Run.references.island, 22, 4)
 	if expansions_this_phase < minimum_expansions:
 		UI.hide_expansion_exit.emit()
 
@@ -179,6 +179,10 @@ func select_expansion(island: Island, choice_id: int) -> void:
 	expansions_this_phase += 1
 	if expansions_this_phase > 1:
 		Run.current_game_scaling += 0.4
+
+	if expansions_this_phase >= maximum_expansions:
+		_on_exit()
+		return
 
 	generate_and_present_choices(Run.references.island, 12, 4)
 	if expansions_this_phase >= minimum_expansions:
@@ -245,6 +249,7 @@ func _on_exit() -> void:
 	expansion_process_complete.emit()
 	UI.hide_expansion_choices.emit()
 	UI.hide_expansion_confirmation.emit()
+	UI.hide_expansion_exit.emit()
 
 func _apply_difficulty_to_generation_params(params: GenerationParameters) -> void: ##applies run-difficulty tuning to authored generation params without hardcoding individual call sites
 	for rule: TerrainGenRule in params.terrain_gen_rules:
@@ -262,6 +267,7 @@ func _clear_expansion_state(island: Island) -> void: ##resets the expansion prev
 	_current_state = State.IDLE
 	_choices_by_id.clear()
 	_hovered_choice_id = -1
+	_pending_choice_id = -1
 	island.update_previews({}) #clear all previews from the island
 
 #procedural generation logic

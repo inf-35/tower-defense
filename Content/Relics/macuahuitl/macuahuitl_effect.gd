@@ -8,6 +8,7 @@ class_name MacuahuitlEffect
 
 class CounterState extends RefCounted:
 	var attack_count: int = 0
+	var seen_attack_ids: Dictionary[int, bool] = {}
 
 func _init() -> void:
 	#pre_hit_dealt allows modifying the hit before it flies
@@ -21,7 +22,10 @@ func create_instance() -> EffectInstance:
 	return instance
 
 func _handle_attach(_i: EffectInstance) -> void: pass
-func _handle_detach(_i: EffectInstance) -> void: pass
+func _handle_detach(instance: EffectInstance) -> void:
+	var state: CounterState = instance.state as CounterState
+	state.attack_count = 0
+	state.seen_attack_ids.clear()
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
@@ -38,12 +42,19 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if Towers.get_tower_element(source.type) != required_element:
 		return
 
+	var hit_data: HitData = event.data as HitData
+	if not is_instance_valid(hit_data) or not hit_data.primary:
+		return
+
 	var state: CounterState = instance.state as CounterState
+	if not HitData.consume_attack_id(hit_data, state.seen_attack_ids):
+		return
+
 	state.attack_count += 1
 
 	if state.attack_count >= trigger_count:
 		state.attack_count = 0
-		_apply_bonus(event.data as HitData)
+		_apply_bonus(hit_data)
 
 func _apply_bonus(hit_data: HitData) -> void:
 	if not hit_data: return

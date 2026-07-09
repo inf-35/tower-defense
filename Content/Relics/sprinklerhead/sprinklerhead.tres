@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://7npi0y0m4klw"]
+
+[ext_resource type="Texture2D" uid="uid://bbbqlm7smdr5k" path="res://Assets/sprinkerhead.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_modifier"]
+[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="3_effect"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_01wei"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="4_relic"]
+
+[sub_resource type="Resource" id="Resource_income_bonus"]
+script = ExtResource("2_modifier")
+key = &"farm_income_per_wave"
+additive = 1.0
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("3_effect")
+condition_kind = 1
+host_tower_types = Array[int]([53])
+reference_terrain_types = Array[int]([3])
+scale_with_count = true
+modifier_prototypes = Array[ExtResource("2_modifier")]([SubResource("Resource_income_bonus")])
+icon = ExtResource("1_icon")
+
+[resource]
+script = ExtResource("4_relic")
+type = 48
+global_effect = SubResource("Resource_effect")
+title = "Sprinklerhead"
+description = "{T_FARM|label=Farms} earn 1 more {GOLD} for each adjacent water tile."
+icon = ExtResource("1_icon")

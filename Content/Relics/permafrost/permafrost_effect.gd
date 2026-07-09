@@ -35,6 +35,8 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	var hit_data := event.data as HitData #modify hit data
 	if not hit_data:
 		return
+	if hit_data.negate:
+		return
 
 	var current_data: Vector2 = hit_data.status_effects[extra_status] if hit_data.status_effects.has(extra_status) else Vector2(0.0, 1.0)
 	#x = stacks, y = duration (if no existing effect exists, default to 1 second as duration)

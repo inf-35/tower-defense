@@ -2,6 +2,9 @@
 extends Camera2D
 class_name Camera
 
+signal tutorial_pan_observed()
+signal tutorial_zoom_observed()
+
 #configuration
 const RETURN_FROM_OVERRIDE_TIME: float = 0.5 #how long it takes for the camera to snap back to position from override
 
@@ -48,11 +51,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	#handle zoom here instead of polling input in _process(), so scrollable ui
 	#controls can consume mouse wheel events before the camera ever sees them.
 	if event.is_action_pressed("zoom_in"):
+		tutorial_zoom_observed.emit()
 		zoom *= 0.9
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("zoom_out"):
+		tutorial_zoom_observed.emit()
 		zoom /= 0.9
 		get_viewport().set_input_as_handled()
 		return
@@ -68,6 +73,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _is_drag_panning and event is InputEventMouseMotion:
 		_target_position -= event.relative / zoom
 		position = _target_position
+		tutorial_pan_observed.emit()
 		get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
@@ -79,7 +85,10 @@ func _process(delta: float) -> void:
 	if _is_soft_snapping:
 		return
 
-	_target_position += get_viewport_rect().size / zoom * Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down") * delta * 0.8
+	var pan_input: Vector2 = Input.get_vector("pan_left", "pan_right", "pan_up", "pan_down")
+	if pan_input != Vector2.ZERO:
+		tutorial_pan_observed.emit()
+	_target_position += get_viewport_rect().size / zoom * pan_input * delta * 0.8
 	position = lerp(position, _target_position, 12.0 * delta)
 #--- public api for the override system ---
 

@@ -67,8 +67,7 @@ func open_menu() -> void:
 		return
 	_open_menu()
 
-##opens the trader and clears the unseen-restock marker once the player has viewed it
-func _open_menu() -> void:
+func _open_menu() -> void: ##opens the trader and clears the unseen-restock marker once the player has viewed it
 	_menu_open = true
 	_has_unseen_stock = false
 	UI.trader_open.emit()
@@ -82,9 +81,11 @@ func close_menu() -> void:
 func get_stock() -> Array[Reward]:
 	return _current_stock
 
-##returns whether the current trader stock has appeared since the player last opened the menu
-func has_unseen_stock() -> bool:
+func has_unseen_stock() -> bool: ##returns whether the current trader stock has appeared since the player last opened the menu
 	return _has_unseen_stock
+
+func is_menu_open() -> bool:
+	return _menu_open
 
 func get_restock_cost() -> float:
 	return snappedf(pow(_manual_restocks, 1.5) * 3.0 + 4.0, 0.1)
@@ -103,8 +104,14 @@ func purchase_item(slot_index: int) -> bool:
 	if Run.player.flux < item.price:
 		return false
 
+	if not RewardService.can_claim_reward(item):
+		return false
+
 	Run.player.flux -= item.price
-	RewardService.apply_reward(item)
+	if not RewardService.apply_reward(item):
+		Run.player.flux += item.price
+		return false
+
 	item_purchased.emit(item, slot_index)
 
 	_current_stock[slot_index] = null
@@ -147,8 +154,7 @@ func _on_wave_ended(_wave: int) -> void:
 		_generate_stock(true)
 		stock_restocked.emit(false)
 
-##rebuilds trader stock and optionally marks the new restock as unseen by the player
-func _generate_stock(mark_unseen: bool) -> void:
+func _generate_stock(mark_unseen: bool) -> void: ##rebuilds trader stock and optionally marks the new restock as unseen by the player
 	var pool: Array[Reward] = RewardService.get_rewards(
 		SLOT_COUNT,
 		[

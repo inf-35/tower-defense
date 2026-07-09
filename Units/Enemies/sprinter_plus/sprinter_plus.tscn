@@ -1,37 +1,36 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene format=3 uid="uid://ch0nc1sh1yxyl"]
 
-[ext_resource type="Script" path="res://UnitComponents/unit.gd" id="1"]
-[ext_resource type="Script" path="res://UnitComponents/navigation_component.gd" id="2"]
-[ext_resource type="Script" path="res://Units/Enemies/sprinter/accelerating_behavior.gd" id="3"]
-[ext_resource type="Script" path="res://UnitComponents/movement_component.gd" id="4"]
-[ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="5"]
-[ext_resource type="Script" path="res://Content/movement_data.gd" id="6"]
-[ext_resource type="Shader" path="res://Shaders/unit_effects.gdshader" id="7"]
-[ext_resource type="Resource" path="res://Units/Enemies/sprinter_plus/sprinter_plus_hp.tres" id="8"]
-[ext_resource type="Script" path="res://UnitComponents/hitbox.gd" id="9"]
-[ext_resource type="Script" path="res://UnitComponents/contact_shadow.gd" id="10"]
-[ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="11"]
-[ext_resource type="Texture2D" path="res://Assets/bandit.png" id="12"]
-[ext_resource type="Script" path="res://UnitComponents/range_component.gd" id="13"]
-[ext_resource type="Script" path="res://UnitComponents/attack_component.gd" id="14"]
-[ext_resource type="Resource" path="res://Units/Enemies/drifter/drifter_attack.tres" id="15"]
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://hhphtfxndfib" path="res://Units/Enemies/sprinter/accelerating_behavior.gd" id="3"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="6"]
+[ext_resource type="Shader" uid="uid://eholfpjoi6ha" path="res://Shaders/unit_effects.gdshader" id="7"]
+[ext_resource type="Resource" uid="uid://cbqmsao7j7vwy" path="res://Units/Enemies/sprinter_plus/sprinter_plus_hp.tres" id="8"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="10"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11"]
+[ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="12"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="13"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="14"]
+[ext_resource type="Resource" path="res://Units/Enemies/sprinter_plus/sprinter_plus_attack.tres" id="15"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("6")
-max_speed = 16.0
+max_speed = 18.0
 acceleration = 200.0
 turn_speed = 100.0
 
 [sub_resource type="ShaderMaterial" id="2"]
 shader = ExtResource("7")
-shader_parameter/flash_intensity = 0.0
-shader_parameter/transparency = 1.0
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
+shader_parameter/overlay_intensity = 0.0
 
 [sub_resource type="RectangleShape2D" id="3"]
 size = Vector2(70, 70.00002)
 
-[node name="SprinterPlus" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="SprinterPlus" type="Node2D" unique_id=1057562320 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1")
 hostile = true
@@ -46,55 +45,55 @@ navigation_component = NodePath("NavigationComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 
-[node name="AcceleratingBehavior" type="Node" parent="."]
+[node name="AcceleratingBehavior" type="Node" parent="." unique_id=2123889792]
 script = ExtResource("3")
-speed_increase_percent = 0.25
+speed_increase_percent = 0.3
 interval = 0.3
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=1288699964]
 script = ExtResource("2")
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1531733665]
 script = ExtResource("4")
 face_towards_movement = false
 movement_data = SubResource("1")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1467981965]
 script = ExtResource("5")
 health_data = ExtResource("8")
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=1124729474]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 1)
 script = ExtResource("10")
-shadow_size = Vector2(5.4, 3.0)
+shadow_size = Vector2(5.4, 3)
 
-[node name="Graphics" type="Sprite2D" parent="."]
-material = SubResource("2")
+[node name="Graphics" type="Sprite2D" parent="." unique_id=730464372]
 modulate = Color(0.92, 0.66, 0.66, 1)
+material = SubResource("2")
 position = Vector2(0, -2)
 scale = Vector2(0.12972224, 0.12972224)
 texture = ExtResource("12")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=780356458]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
 script = ExtResource("9")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=809687657]
 position = Vector2(0, -20)
 scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("3")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=924726609]
 script = ExtResource("11")
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=515827000]
 script = ExtResource("13")
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=398108517]
 script = ExtResource("14")
 attack_data = ExtResource("15")

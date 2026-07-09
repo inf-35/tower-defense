@@ -37,6 +37,24 @@ func _pulse_network() -> void: ##reuses one attack context across every emitted 
 		return
 	unit.play_action_squash_stretch()
 
+	var signal_hit: HitData = attack_component.attack_data.generate_generic_hit_data()
+	signal_hit.source = unit
+	signal_hit.target = null
+	signal_hit.target_affiliation = true
+	signal_hit.damage = dmg
+	signal_hit.radius = radius
+	signal_hit.attack_id = attack_id
+	signal_hit.negate = true
+	signal_hit.primary = true
+	if not attack_component.apply_attack_context(signal_hit, attack_context):
+		return
+
+	var signal_event := GameEvent.new()
+	signal_event.event_type = GameEvent.EventType.PRE_HIT_DEALT
+	signal_event.data = signal_hit
+	signal_event.unit = unit
+	unit.on_event.emit(signal_event)
+
 	#command connected palisades to attack
 	for palisade: Tower in _connected_palisades:
 		if not is_instance_valid(palisade): continue
@@ -48,6 +66,7 @@ func _pulse_network() -> void: ##reuses one attack context across every emitted 
 		hit_data.damage = dmg
 		hit_data.radius = radius
 		hit_data.attack_id = attack_id
+		hit_data.primary = false
 		if not attack_component.apply_attack_context(hit_data, attack_context):
 			continue
 

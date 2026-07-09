@@ -7,13 +7,16 @@ class_name TowerOption
 @export var tower_label: InteractiveRichTextLabel
 @export var tower_meta: InteractiveRichTextLabel
 
-const UNAFFORDABLE_ALPHA: float = 0.7
+const UNAFFORDABLE_ALPHA: float = 0.5
+const UNAFFORDABLE_BRIGHTNESS: float = 0.8
 const HOVER_Z_INDEX: int = 5
-const WARM_CARD_TINT: Color = Color(1.0, 0.9913333, 0.96, 1.0)
+const DEFAULT_CARD_TINT: Color = Color(0.96, 0.936, 0.874, 1.0)
 const RITE_CARD_TINT: Color = Color(0.93, 0.97, 1.0, 1.0)
+const SELECTED_CARD_TINT: Color = Color(1.0, 0.893, 0.54, 1.0)*1.05
 
 var _hovered_upon: bool = false
 var _tower_type: Towers.Type = Towers.Type.VOID
+var _is_selected: bool = false
 
 func _ready() -> void: ##subscribes to hover and economy updates so the option can restyle itself without bespoke sidebar plumbing
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -28,7 +31,15 @@ func display_tower_type(tower_type : Towers.Type) -> void: ##binds one authored 
 	_refresh_card_tint()
 	_refresh_state()
 
-func _refresh_state() -> void: ##rebuilds the label so unavailable resource costs share the central bad color and the whole card fades when blocked
+func set_selected(is_selected: bool) -> void: ##pins the active build option into a persistent highlighted card state without bypassing hover motion
+	if _is_selected == is_selected:
+		return
+	_is_selected = is_selected
+	if is_instance_valid(card_motion):
+		card_motion.set_emphasized(_is_selected)
+	_refresh_card_tint()
+
+func _refresh_state() -> void: ##rebuilds the label so unavailable resource costs share the central bad color and blocked cards read clearly at a glance
 	if _tower_type == Towers.Type.VOID:
 		return
 
@@ -51,17 +62,17 @@ func _refresh_state() -> void: ##rebuilds the label so unavailable resource cost
 
 	tower_label.set_parsed_text(title_text)
 	tower_meta.set_parsed_text("%s    %s" % [gold_text, capacity_text])
-	modulate.a = 1.0 if has_gold and has_capacity else UNAFFORDABLE_ALPHA
+	if has_gold and has_capacity:
+		modulate = Color.WHITE
+	else:
+		modulate = Color(UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_BRIGHTNESS, UNAFFORDABLE_ALPHA)
 
 func _on_hover(hover : bool) -> void: ##forwards root button hover into the shared card motion wrapper and lifts the hovered card above its neighbors
 	z_index = HOVER_Z_INDEX if hover else 0
 	if not is_instance_valid(card_motion):
 		return
 
-	if hover and card_motion.has_method(&"_on_mouse_entered"):
-		card_motion._on_mouse_entered()
-	elif not hover and card_motion.has_method(&"_on_mouse_exited"):
-		card_motion._on_mouse_exited()
+	card_motion.set_hover_active(hover)
 
 func _refresh_card_tint() -> void: ##duplicates the shared local stylebox so each option can bias its card skin by tower family without affecting other card users
 	if not is_instance_valid(card_panel):
@@ -72,5 +83,8 @@ func _refresh_card_tint() -> void: ##duplicates the shared local stylebox so eac
 		return
 
 	var card_style: StyleBoxTexture = (panel_style as StyleBoxTexture).duplicate()
-	card_style.modulate_color = RITE_CARD_TINT if Towers.is_tower_rite(_tower_type) else WARM_CARD_TINT
+	if _is_selected:
+		card_style.modulate_color = SELECTED_CARD_TINT
+	else:
+		card_style.modulate_color = RITE_CARD_TINT if Towers.is_tower_rite(_tower_type) else DEFAULT_CARD_TINT
 	card_panel.add_theme_stylebox_override(&"panel", card_style)

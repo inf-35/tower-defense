@@ -20,6 +20,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var hit_data = event.data as HitData
 	if not hit_data: return
+	if hit_data.negate: return
 
 	#check chance (scaled by stacks? 5% * stacks)
 	if randf() > (chance * instance.stacks): return

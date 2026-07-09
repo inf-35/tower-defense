@@ -8,14 +8,20 @@ signal hp_changed(new_health: float)
 signal capacity_changed(used: float, total: float)
 signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
 signal relics_changed()
+signal relic_slots_changed()
 signal tower_placed(tower_type: Towers.Type, tower: Tower) ##fires only after a tower placement request succeeds and the runtime tower exists
 signal rite_excavated(tower: Tower) ##fires after a rite is successfully returned to inventory through excavation
 
 signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
 #and relevant towers
 
+const DEBUG_REMOVE_RELIC_ACTION: StringName = &"debug_remove_relic"
+
 const DEBUG_CAPACITY: bool = false
 const RITE_EXCAVATION_COST: float = 3.0
+const BASE_RELIC_SLOTS: int = 4
+const RELIC_SLOT_FIRST_COST: float = 8.0
+const RELIC_SLOT_COST_SCALE: float = 1.8
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
@@ -28,7 +34,6 @@ var hp: float:
 	set(value):
 		hp = value
 		hp_changed.emit(hp)
-		push_warning("hp changed!")
 		if hp < 0.0 or is_zero_approx(hp):
 			if not Run.phases.is_game_over:
 				Run.phases.start_game_over(false)
@@ -53,8 +58,11 @@ var _tower_limits: Dictionary[Towers.Type, int] = {} ##stores placement limits o
 var rite_inventory: Dictionary[Towers.Type, int] = {}
 
 var active_relics: Array[RelicData]
-
-var _active_effects_container: Node
+var _active_relic_effects: Dictionary[RelicData, EffectInstance] = {}
+var relic_slot_capacity: int = BASE_RELIC_SLOTS:
+	set(value):
+		relic_slot_capacity = maxi(value, BASE_RELIC_SLOTS)
+		relic_slots_changed.emit()
 
 #tutorial
 enum TutorialFlag {
@@ -65,6 +73,7 @@ enum TutorialFlag {
 	RUINS,
 	RITE,
 	ONBOARDING,
+	SHOP,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
@@ -75,6 +84,7 @@ var completed_tutorials: Dictionary[TutorialFlag, bool] = {
 	TutorialFlag.RUINS: false,
 	TutorialFlag.RITE: false,
 	TutorialFlag.ONBOARDING: false,
+	TutorialFlag.SHOP: false,
 }
 
 #various services (which are children of this node)
@@ -83,9 +93,6 @@ var global_event_service: GlobalEventService
 var trader_service: TraderService
 
 func _ready() -> void:
-	if not OS.has_feature("web"): #web builds are automatically resized
-		get_window().size = DisplayServer.screen_get_size() * 0.6
-		get_window().move_to_center()
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -98,11 +105,26 @@ func _ready() -> void:
 	hp_changed.connect(UI.update_health.emit)
 	unlocked_towers_changed.connect(UI.update_tower_types.emit)
 	relics_changed.connect(UI.update_relics.emit)
+	relic_slots_changed.connect(UI.update_relics.emit)
 	#Run.phases.wave_ended.connect(func(_wave):
 		#Run.player.flux += 6
 	#)
 
+func _input(event: InputEvent) -> void:
+	if not event.is_action_pressed(DEBUG_REMOVE_RELIC_ACTION):
+		return
+	if event is InputEventKey and event.echo:
+		return
+	if active_relics.is_empty():
+		return
+
+	get_viewport().set_input_as_handled()
+	remove_relic(active_relics[0])
+
 func start() -> void:
+	for relic: RelicData in active_relics.duplicate():
+		remove_relic(relic)
+
 	for unit: Unit in get_tree().get_nodes_in_group(Run.references.TOWER_GROUP):
 		unit.queue_free()
 
@@ -113,11 +135,12 @@ func start() -> void:
 	_tower_limits.clear()
 	unlocked_towers.clear()
 	active_relics.clear()
+	_active_relic_effects.clear()
+	relic_slot_capacity = BASE_RELIC_SLOTS
 
 	tower_capacity = 0.0
 	used_capacity = 0.0
 
-	if _active_effects_container: _active_effects_container.free()
 	if global_event_service: global_event_service.free()
 	if ruin_service: ruin_service.free()
 
@@ -125,11 +148,6 @@ func start() -> void:
 	global_event_service = GlobalEventService.new()
 	add_child(global_event_service)
 	global_event_service.initialise_event_bus(on_event)
-
-	#setup global effects container
-	_active_effects_container = Node.new()
-	_active_effects_container.name = "ActiveGlobalEffects"
-	add_child(_active_effects_container)
 
 	#create and setup services
 	ruin_service = RuinService.new()
@@ -158,21 +176,21 @@ func begin_new_game() -> void:
 		#Towers.Type.SNOWBALL: true,
 	}
 	
-	var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_POISONS
-	#RewardService.apply_reward(reward)
-	##reward.rite_type = Towers.Type.RITE_FROST
+	#var reward := Reward.new()
+	##reward.type = Reward.Type.ADD_RITE
+	##reward.rite_type = Towers.Type.RITE_POISONS
 	##RewardService.apply_reward(reward)
-	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.BOOKENDS
-	#RewardService.apply_reward(reward)
-	##reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
-	##RewardService.apply_reward(reward)
-	##reward.relic = Relics.ALCHEMISTS_STONE
-	##RewardService.apply_reward(reward)
-	###reward.relic = Relics.SPINNING_TOP
+	###reward.rite_type = Towers.Type.RITE_FROST
 	###RewardService.apply_reward(reward)
+	#reward.type = Reward.Type.ADD_RELIC
+	#reward.relic = Relics.EDELWEISS
+	#RewardService.apply_reward(reward)
+	###reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
+	###RewardService.apply_reward(reward)
+	###reward.relic = Relics.ALCHEMISTS_STONE
+	###RewardService.apply_reward(reward)
+	#reward.relic = Relics.SPRINKLERHEAD
+	#RewardService.apply_reward(reward)
 	#reward.relic = Relics.EPIDEMIC
 	#RewardService.apply_reward(reward)
 	##reward.relic = Relics.RUPTURED_HEART
@@ -255,22 +273,85 @@ func get_rite_count(type: Towers.Type) -> int: ##number of rites left
 func add_relic(relic: RelicData) -> void:
 	if not is_instance_valid(relic):
 		return
+	if _has_relic_resource(relic):
+		return
+	if not can_add_relic(relic):
+		return
+
 	active_relics.append(relic)
 
 	if relic.global_effect:
-		global_event_service.register_effect(relic.global_effect)
-
-	if relic.active_effect_scene:
-		#instantiate the logic node for the active relic
-		var effect_node: Node = relic.active_effect_scene.instantiate()
-		#add it to our container so it becomes part of the scene tree
-		_active_effects_container.add_child(effect_node)
-		print("Added relic global effect: ", effect_node)
-		#initialize it with its own data
-		effect_node.initialise()
+		_active_relic_effects[relic] = global_event_service.register_effect(relic.global_effect)
 
 	#announce that the global state has changed
 	relics_changed.emit()
+
+func remove_relic(relic: RelicData) -> bool:
+	if not is_instance_valid(relic):
+		return false
+
+	var matched_relic: RelicData = _find_active_relic_resource(relic)
+	if not is_instance_valid(matched_relic):
+		return false
+
+	if _active_relic_effects.has(matched_relic):
+		global_event_service.deregister_effect(_active_relic_effects[matched_relic])
+		_active_relic_effects.erase(matched_relic)
+
+	active_relics.erase(matched_relic)
+	relics_changed.emit()
+	return true
+
+func remove_relic_by_type(relic_type: RelicData.Type) -> bool:
+	for relic: RelicData in active_relics:
+		if is_instance_valid(relic) and relic.type == relic_type:
+			return remove_relic(relic)
+	return false
+
+func has_free_relic_slot() -> bool: ##returns whether the player currently has at least one unoccupied relic slot
+	return active_relics.size() < relic_slot_capacity
+
+func can_add_relic(relic: RelicData) -> bool: ##checks both duplicate ownership and capacity before allowing one more relic
+	if not is_instance_valid(relic):
+		return false
+	if _has_relic_resource(relic):
+		return false
+	return has_free_relic_slot()
+
+func get_next_relic_slot_cost() -> float: ##derives the next slot purchase cost from current capacity so persistence falls out automatically
+	var purchase_index: int = maxi(relic_slot_capacity - BASE_RELIC_SLOTS, 0)
+	var cost: float = RELIC_SLOT_FIRST_COST
+	for _index: int in range(purchase_index):
+		cost = ceil(cost * RELIC_SLOT_COST_SCALE)
+	return cost
+
+func try_purchase_relic_slot() -> bool: ##attempts to buy one more relic slot directly from the player's gold pool
+	var cost: float = get_next_relic_slot_cost()
+	if flux < cost:
+		return false
+	flux -= cost
+	relic_slot_capacity += 1
+	relics_changed.emit()
+	return true
+
+func get_relic_effect_instance(relic: RelicData) -> EffectInstance:
+	var matched_relic: RelicData = _find_active_relic_resource(relic)
+	if not is_instance_valid(matched_relic):
+		return null
+	return _active_relic_effects.get(matched_relic, null) as EffectInstance
+
+func _has_relic_resource(relic: RelicData) -> bool:
+	return is_instance_valid(_find_active_relic_resource(relic))
+
+func _find_active_relic_resource(relic: RelicData) -> RelicData:
+	if not is_instance_valid(relic):
+		return null
+	for active_relic: RelicData in active_relics:
+		if active_relic == relic:
+			return active_relic
+		if is_instance_valid(active_relic) and active_relic.type == relic.type:
+			return active_relic
+	return null
 
 #this is the core query function used by modifierscomponent
 func get_modifiers_for_unit(unit: Unit) -> Array[Modifier]:
@@ -359,6 +440,7 @@ func get_save_data() -> Dictionary:
 		"hp": hp,
 		"unlocked_towers": unlocked_towers,
 		"rite_inventory": rite_inventory,
+		"relic_slot_capacity": relic_slot_capacity,
 	}
 
 	var relics_data: Array[Dictionary] = []
@@ -372,6 +454,7 @@ func get_save_data() -> Dictionary:
 func load_save_data(save_data: Dictionary) -> void:
 	flux = float(save_data.gold)
 	hp = int(save_data.hp)
+	relic_slot_capacity = int(save_data.get("relic_slot_capacity", BASE_RELIC_SLOTS))
 
 	for unlocked_tower_type in save_data.unlocked_towers:
 		unlocked_towers[int(unlocked_tower_type)] = bool(save_data.unlocked_towers[unlocked_tower_type])
@@ -393,24 +476,10 @@ func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
 	var relic: RelicData = load(active_relic.resource_path) as RelicData
 	if not is_instance_valid(relic):
 		return
-	active_relics.append(relic)
-
-	if relic.global_effect:
-		var effect_instance := global_event_service.register_effect(relic.global_effect)
-		effect_instance.effect_prototype.load_save_data(effect_instance, active_relic)
-
-	if relic.active_effect_scene: #WARNING: this doesnt actually work
-		#instantiate the logic node for the active relic
-		var effect_node: Node = relic.active_effect_scene.instantiate()
-		#add it to our container so it becomes part of the scene tree
-		_active_effects_container.add_child(effect_node)
-		print("Added relic global effect: ", effect_node)
-		#initialize it with its own data
-		effect_node.initialise()
-
-
-	#announce that the global state has changed
-	relics_changed.emit()
+	add_relic(relic)
+	var effect_instance: EffectInstance = get_relic_effect_instance(relic)
+	if is_instance_valid(effect_instance) and active_relic.has("global_effect"):
+		effect_instance.effect_prototype.load_save_data(effect_instance, active_relic.global_effect)
 
 func get_profile() -> Dictionary:
 	var profile_data: Dictionary = {

@@ -1,7 +1,7 @@
-extends VBoxContainer
+extends Control
 class_name IncomingEnemyBar
 
-@export var icon_size: Vector2 = Vector2(42, 42)
+@export var roster_label: InteractiveRichTextLabel
 
 var _current_wave: int = 1
 
@@ -18,9 +18,6 @@ func _on_wave_changed(wave: int) -> void:
 	_refresh()
 
 func _refresh() -> void:
-	for child: Node in get_children():
-		child.queue_free()
-
 	if not Run.is_run_ready() or Units.unit_stats.is_empty():
 		_set_display_visible(false)
 		if not Run.references_ready.is_connected(_refresh):
@@ -29,8 +26,9 @@ func _refresh() -> void:
 
 	var entries: Array[Dictionary] = _get_sorted_wave_entries(_current_wave)
 	_set_display_visible(not entries.is_empty())
-	for entry: Dictionary in entries:
-		_create_icon(entry)
+	if entries.is_empty():
+		return
+	roster_label.set_parsed_text(_build_roster_text(entries))
 
 func _get_sorted_wave_entries(wave: int) -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
@@ -73,37 +71,12 @@ func _set_display_visible(displayed: bool) -> void:
 	if is_instance_valid(panel):
 		panel.visible = displayed
 
-func _create_icon(entry: Dictionary) -> void:
-	var type: Units.Type = entry.type
-	var icon := TextureRect.new()
-	icon.texture = Units.get_unit_icon(type)
-	icon.custom_minimum_size = icon_size
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.mouse_filter = Control.MOUSE_FILTER_STOP
-	icon.mouse_entered.connect(_on_icon_hovered.bind(icon, entry))
-	icon.mouse_exited.connect(_on_icon_unhovered.bind(icon))
-	add_child(icon)
-
-func _on_icon_hovered(icon: Control, entry: Dictionary) -> void:
-	var type: Units.Type = entry.type
-	var tooltip_data := KeywordService.get_keyword_data("U_%s" % Units.Type.keys()[type])
-	tooltip_data = tooltip_data.duplicate(true)
-	tooltip_data["description"] = "%d incoming%s" % [
-		int(entry.count),
-		"\nNew enemy type." if bool(entry.unseen) else ""
-	]
-
-	var tooltip_instance: TooltipPanel = KeywordService.TOOLTIP_PANEL.instantiate()
-	add_child(tooltip_instance)
-	tooltip_instance.show_tooltip(tooltip_data)
-	icon.set_meta("active_tooltip", tooltip_instance)
-
-func _on_icon_unhovered(icon: Control) -> void:
-	if not icon.has_meta("active_tooltip"):
-		return
-
-	var tooltip_instance: TooltipPanel = icon.get_meta("active_tooltip")
-	if is_instance_valid(tooltip_instance):
-		tooltip_instance.on_link_mouse_exited()
-	icon.remove_meta("active_tooltip")
+func _build_roster_text(entries: Array[Dictionary]) -> String: ##formats the next-wave preview into one compact keyword-aware roster line
+	var chunks: Array[String] = []
+	for entry: Dictionary in entries:
+		var type: Units.Type = entry.type
+		var chunk: String = "{U_%s} x %d" % [Units.Type.keys()[type], int(entry.count)]
+		if bool(entry.unseen):
+			chunk = KeywordService.wrap_text(chunk, "action")
+		chunks.append(chunk)
+	return "This wave:\n" + ", ".join(chunks)

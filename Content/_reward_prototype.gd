@@ -17,8 +17,7 @@ class_name RewardPrototype #see Reward
 @export var tag_rules: Array[RewardTagRule] = []
 @export var tower_rules: Array[RewardTowerRule] = []
 
-##converts this editor-friendly resource into the runtime reward object
-func generate_reward() -> Reward:
+func generate_reward() -> Reward: ##converts this editor-friendly resource into the runtime reward object
 	var reward := Reward.new()
 	reward.type = type
 	reward.title = title

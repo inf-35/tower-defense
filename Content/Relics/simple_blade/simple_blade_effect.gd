@@ -38,7 +38,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 func _recalculate_all(instance: EffectInstance) -> void:
 	var state = instance.state as BladeState
-	var all_towers = Run.references.island.get_tree().get_nodes_in_group(Run.references.TOWER_GROUP)
+	var all_towers: Array[Tower] = Run.references.island.get_all_towers()
 	var tower_count: int = 0
 	for tower: Tower in all_towers:
 		if tower.hostile:

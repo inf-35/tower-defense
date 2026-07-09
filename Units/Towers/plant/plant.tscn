@@ -35,7 +35,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="PlantTowerBehavior" type="Node" parent="." unique_id=874438432]
 script = ExtResource("3_670td")
-additive_damage_per_forest = 0.6
+additive_damage_per_forest = 1.0
 metadata/_custom_type_script = "uid://bpjh5lj6vdqel"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1048465234]

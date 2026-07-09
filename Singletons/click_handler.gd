@@ -156,8 +156,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _enter_idle_state() -> void:
 	#deselect any tower and hide any preview.
+	var should_emit_deselected: bool = is_instance_valid(selected_entity) or current_state == State.PREVIEWING
 	if is_instance_valid(selected_entity):
 		selected_entity = null
+
+	if should_emit_deselected:
 		tower_was_deselected.emit()
 
 	#critical: ensure the ghost unit is destroyed when leaving a selection state

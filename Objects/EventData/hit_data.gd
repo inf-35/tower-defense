@@ -3,6 +3,7 @@ class_name HitData #stores information about a hit (runtime)
 
 var negate: bool = false ##if set true, this hit is not processed
 var attack_id: int = 0 ##positive when this hit belongs to a tower attack payload
+var primary: bool = true ##when false, this hit is a child/follow-up payload and should not count as the source unit's primary attack trigger
 
 var source: Unit ##dealer of hit
 var target: Unit ##receiver of hit

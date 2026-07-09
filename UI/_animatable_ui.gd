@@ -122,13 +122,21 @@ func _start_idle_animation() -> void:
 #--- hover logic ---
 
 func _on_mouse_entered() -> void:
-	if not hover_enabled or not content: return
-	_is_hovered = true
-	_refresh_scale()
+	if not hover_enabled or not content:
+		return
+	set_hover_active(true)
 
 func _on_mouse_exited() -> void:
-	if not hover_enabled or not content: return
-	_is_hovered = false
+	if not hover_enabled or not content:
+		return
+	set_hover_active(false)
+
+func set_hover_active(is_hovered: bool) -> void: ##lets parent controls drive the shared hover scale without relying on this wrapper's own mouse signals
+	if not content:
+		return
+	if _is_hovered == is_hovered:
+		return
+	_is_hovered = is_hovered
 	_refresh_scale()
 
 

@@ -23,9 +23,9 @@ func attach() -> void:
 		island.island_changed.connect(_recalculate_links)
 	island.island_changed.emit()
 
-func detach() -> void:
+func detach(notify_island: bool = true) -> void:
 	var island: Island = null
-	if is_instance_valid(Run.references.island):
+	if Run.is_run_ready() and is_instance_valid(Run.references.island):
 		island = Run.references.island
 		if island.island_changed.is_connected(_recalculate_links):
 			island.island_changed.disconnect(_recalculate_links)
@@ -33,7 +33,7 @@ func detach() -> void:
 	_is_attached = false
 	_all_connected_prisms.clear()
 	_clear_prism_lasers()
-	if is_instance_valid(island) and Run.is_run_ready():
+	if notify_island and is_instance_valid(island) and island.is_inside_tree():
 		island.island_changed.emit()
 
 func update(_delta: float) -> void:
@@ -209,7 +209,7 @@ func _is_valid_active_prism(tower: Tower) -> bool:
 	return is_instance_valid(tower) and not tower.is_queued_for_deletion() and not tower.abstractive and not tower.disabled
 
 func _exit_tree() -> void:
-	detach()
+	detach(false)
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var tower = unit as Tower

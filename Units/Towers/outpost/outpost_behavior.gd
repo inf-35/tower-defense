@@ -20,10 +20,8 @@ func start() -> void:
 		push_warning("CommandPost: Missing suppression_modifier!")
 
 	var tower: Tower = unit as Tower
-
 	tower.adjacency_updated.connect(_on_my_adjacency_updated)
 	_on_my_adjacency_updated(tower.get_adjacent_towers())
-
 	Run.references.island.island_changed.connect(_recalculate_target)
 	_recalculate_target()
 
@@ -35,30 +33,45 @@ func detach() -> void:
 	_last_trigger_hit = null
 
 func _on_my_adjacency_updated(adj_map: Dictionary) -> void:
+	var tower: Tower = unit as Tower
+	var back_direction: Vector2i = -tower.get_forward_direction()
 	var current_neighbors: Dictionary[Tower, bool] = {}
 
-	for n: Tower in adj_map.values():
-		if is_instance_valid(n) and n != unit and n != _target_tower:
-			current_neighbors[n] = true
-			if not _my_neighbors.has(n):
-				n.on_event.connect(_on_neighbor_event.bind(n))
+	for offset: Vector2i in adj_map:
+		var neighbor: Tower = adj_map[offset]
+		if not is_instance_valid(neighbor) or neighbor == unit or neighbor == _target_tower:
+			continue
+		if Tower.get_side_from_offset(tower.size, offset) != Tower.get_side_from_offset(tower.size, back_direction):
+			continue
+		current_neighbors[neighbor] = true
+		if not _my_neighbors.has(neighbor):
+			neighbor.on_event.connect(_on_neighbor_event.bind(neighbor))
 
 	var to_remove: Array[Tower] = []
-	for old_n: Tower in _my_neighbors:
-		if not current_neighbors.has(old_n):
-			if is_instance_valid(old_n) and old_n.on_event.is_connected(_on_neighbor_event):
-				old_n.on_event.disconnect(_on_neighbor_event)
-			to_remove.append(old_n)
+	for old_neighbor: Tower in _my_neighbors:
+		if current_neighbors.has(old_neighbor):
+			continue
+		var callback: Callable = _on_neighbor_event.bind(old_neighbor)
+		if is_instance_valid(old_neighbor) and old_neighbor.on_event.is_connected(callback):
+			old_neighbor.on_event.disconnect(callback)
+		to_remove.append(old_neighbor)
 
-	for n: Tower in to_remove:
-		_my_neighbors.erase(n)
+	for old_neighbor: Tower in to_remove:
+		_my_neighbors.erase(old_neighbor)
 
 	_my_neighbors = current_neighbors
 
 func _on_neighbor_event(event: GameEvent, _source: Tower) -> void:
-	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT: return
+	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
+		return
 
 	var hit_data: HitData = event.data as HitData
+	if not is_instance_valid(hit_data):
+		return
+
+	if not hit_data.primary:
+		return
+
 	if not HitData.consume_attack_id(hit_data, _seen_attack_ids):
 		return
 
@@ -124,20 +137,24 @@ func _start_command_limit() -> void:
 
 func _exit_tree() -> void:
 	_release_target()
-	for n: Tower in _my_neighbors:
-		if is_instance_valid(n) and n.on_event.is_connected(_on_neighbor_event):
-			n.on_event.disconnect(_on_neighbor_event)
+	for neighbor: Tower in _my_neighbors:
+		var callback: Callable = _on_neighbor_event.bind(neighbor)
+		if is_instance_valid(neighbor) and neighbor.on_event.is_connected(callback):
+			neighbor.on_event.disconnect(callback)
 	_my_neighbors.clear()
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower): return
 
-	var neighbors: Array[Vector2i] = tower.get_adjacent_cells()
-	for n: Vector2i in neighbors:
+	var back_direction: Vector2i = -tower.get_forward_direction()
+	for cell: Vector2i in tower.get_adjacent_cells():
+		var offset: Vector2i = cell - tower.tower_position
+		if Tower.get_side_from_offset(tower.size, offset) != Tower.get_side_from_offset(tower.size, back_direction):
+			continue
 		var fade_color: Color = canvas.input_color
 		fade_color.a *= 0.5
-		canvas.draw_cell(n, fade_color)
+		canvas.draw_cell(cell, fade_color)
 
 	var scan: Tower.ForwardScanResult = tower.scan_forward(20)
 	var target: Tower = scan.hit_tower

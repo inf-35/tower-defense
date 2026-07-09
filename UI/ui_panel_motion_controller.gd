@@ -5,21 +5,28 @@ class_name UIPanelMotionController
 @export var stats_panel: Control ##top-left player stats cluster
 @export var damage_tracker_panel: Control ##middle-right damage tracker cluster
 @export var time_controls_panel: Control ##top-right timeline and speed controls cluster
+@export var battle_button_panel: Control ##top-right build-phase battle button that should share the time-controls corner
+@export var time_control_buttons_panel: Control ##combat-only speed controls that swap with the battle button inside the time-controls panel
 @export var inspector_panel: Control ##bottom inspector cluster that should hide while nothing is selected
 @export var sidebar_margin: float = 48.0 ##extra travel for the sidebar so it fully clears the viewport edge
 @export var stats_margin: float = 48.0 ##extra travel for the stats panel so it fully clears the viewport edge
 @export var damage_tracker_margin: float = 48.0 ##extra travel for the damage tracker so it fully clears the viewport edge
 @export var time_controls_margin: float = 140.0 ##extra travel for time controls because its banner shape needs more clearance
+@export var battle_button_margin: float = 140.0 ##extra travel for the battle button so it follows the same corner language as the speed controls
+@export var time_control_buttons_margin: float = 240.0 ##extra travel for the speed controls because they swap in the same corner slot as the battle button
 @export var inspector_margin: float = 48.0 ##extra travel for the inspector so it fully clears the viewport edge
 
 var _sidebar_wrapper: PanelMotionWrapper
 var _stats_wrapper: PanelMotionWrapper
 var _damage_tracker_wrapper: PanelMotionWrapper
 var _time_controls_wrapper: PanelMotionWrapper
+var _battle_button_wrapper: PanelMotionWrapper
+var _time_control_buttons_wrapper: PanelMotionWrapper
 var _inspector_wrapper: PanelMotionWrapper
 
 var _expansion_active: bool = false
 var _inspector_has_target: bool = false
+var _building_phase_active: bool = true
 
 func _ready() -> void: ##wraps the existing large ui panels under stable anchors, then drives their motion from expansion and selection state
 	for i in 2: await get_tree().process_frame
@@ -28,11 +35,16 @@ func _ready() -> void: ##wraps the existing large ui panels under stable anchors
 	_stats_wrapper = _wrap_panel(stats_panel, Vector2(0.0, -(stats_panel.size.y + stats_margin)), &"stats")
 	_damage_tracker_wrapper = _wrap_panel(damage_tracker_panel, Vector2(damage_tracker_panel.size.x + damage_tracker_margin, 0.0), &"damage_tracker")
 	_time_controls_wrapper = _wrap_panel(time_controls_panel, Vector2(time_controls_panel.size.x + time_controls_margin, 0.0), &"time_controls")
+	_battle_button_wrapper = _wrap_panel(battle_button_panel, Vector2(battle_button_panel.size.x + battle_button_margin, 0.0), &"battle_button")
+	_time_control_buttons_wrapper = _wrap_panel(time_control_buttons_panel, Vector2(time_control_buttons_panel.size.x + time_control_buttons_margin, 0.0), &"time_control_buttons")
 	_inspector_wrapper = _wrap_panel(inspector_panel, Vector2(0.0, inspector_panel.size.y + inspector_margin), &"inspector")
+	_building_phase_active = Run.phases.current_phase != Run.phases.GamePhase.COMBAT_WAVE
 
 	UI.display_expansion_choices.connect(_on_expansion_started)
 	UI.hide_expansion_choices.connect(_on_expansion_ended)
 	UI.expansion_finished.connect(_on_expansion_ended)
+	UI.show_building_ui.connect(_on_building_started)
+	UI.hide_building_ui.connect(_on_building_ended)
 	UI.update_inspector_bar.connect(_on_inspector_target_changed)
 
 	_apply_panel_states(true)
@@ -109,6 +121,14 @@ func _on_expansion_ended() -> void:
 	_expansion_active = false
 	_apply_panel_states()
 
+func _on_building_started() -> void:
+	_building_phase_active = true
+	_apply_panel_states()
+
+func _on_building_ended() -> void:
+	_building_phase_active = false
+	_apply_panel_states()
+
 func _on_inspector_target_changed(unit: Unit) -> void:
 	_inspector_has_target = is_instance_valid(unit)
 	_apply_panel_states()
@@ -118,6 +138,8 @@ func _apply_panel_states(initial_snap: bool = false) -> void:
 	_set_panel_visible(_stats_wrapper, not _expansion_active, initial_snap)
 	_set_panel_visible(_damage_tracker_wrapper, not _expansion_active, initial_snap)
 	_set_panel_visible(_time_controls_wrapper, not _expansion_active, initial_snap)
+	_set_panel_visible(_battle_button_wrapper, not _expansion_active and _building_phase_active, initial_snap)
+	_set_panel_visible(_time_control_buttons_wrapper, not _expansion_active and not _building_phase_active, initial_snap)
 	_set_panel_visible(_inspector_wrapper, _inspector_has_target, initial_snap)
 
 func _set_panel_visible(wrapper: PanelMotionWrapper, shown: bool, initial_snap: bool) -> void:
