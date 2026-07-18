@@ -43,7 +43,6 @@ const LAKE_PREVIEW_MARGIN: int = 18
 const LAKE_SAFE_RADIUS: int = 5
 const LAKE_NOISE_FREQUENCY: float = 0.15
 const LAKE_NOISE_OCTAVES: int = 1
-const LAKE_THRESHOLD: float = 0.68
 const LAKE_WARP_FREQUENCY: float = 0.015
 const LAKE_WARP_STRENGTH: float = 0.0
 const LAKE_MIN_NEIGHBORS: int = 2
@@ -170,8 +169,10 @@ func _setup_lake_preview_renderer() -> void:
 	noise_tex.seamless = true
 	sketch_mat.set_shader_parameter("grid_data_texture", lake_preview_renderer._grid_texture)
 	sketch_mat.set_shader_parameter("noise_texture", noise_tex)
-	sketch_mat.set_shader_parameter("outline_color", Color(0.109, 0.239, 0.31, 0.192))
-	sketch_mat.set_shader_parameter("fill_color", Color(0.252, 0.551, 0.68, 0.024))
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	if profile != null:
+		sketch_mat.set_shader_parameter("outline_color", profile.lake_preview_outline_color)
+		sketch_mat.set_shader_parameter("fill_color", profile.lake_preview_fill_color)
 	lake_preview_renderer._terrain_rect.material = sketch_mat
 
 #--- public api / request handlers ---
@@ -284,7 +285,7 @@ func update_shore_boundary() -> void: #used for expansion
 	#simplified logic to find all land tiles adjacent to nothing
 	shore_boundary_tiles.clear()
 	for cell: Vector2i in terrain_base_grid:
-		if terrain_base_grid[cell] == Terrain.Base.WATER:
+		if Terrain.is_waterlike(terrain_base_grid[cell]):
 			continue
 		for dir: Vector2i in DIRS:
 			if not terrain_base_grid.has(cell + dir):
@@ -301,7 +302,12 @@ func update_lake_preview() -> void:
 	if not is_instance_valid(lake_preview_renderer):
 		return
 	lake_preview_renderer.clear_decorations()
-	lake_preview_renderer.reset_grid(get_nearby_lake_cells())
+	var preview_cells: Array[Vector2i] = get_nearby_lake_cells()
+	var terrain_by_cell: Dictionary[Vector2i, Terrain.Base] = {}
+	var lake_terrain: Terrain.Base = Terrain.get_open_water_base()
+	for cell: Vector2i in preview_cells:
+		terrain_by_cell[cell] = lake_terrain
+	lake_preview_renderer.reset_grid(preview_cells, terrain_by_cell)
 	for cell: Vector2i in get_visible_ruin_sites():
 		lake_preview_renderer.set_preview_feature(cell, Towers.Type.RUINS)
 
@@ -339,15 +345,18 @@ func get_visible_ruin_sites() -> Array[Vector2i]: ##returns the uncharted pregen
 
 func _generate_lake_cells() -> void:
 	lake_cells.clear()
-	var lake_noise := _make_lake_noise(lake_seed, LAKE_NOISE_FREQUENCY, LAKE_NOISE_OCTAVES)
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	var lake_noise_frequency_multiplier: float = profile.lake_noise_frequency_multiplier if profile != null else 1.0
+	var lake_noise := _make_lake_noise(lake_seed, LAKE_NOISE_FREQUENCY * lake_noise_frequency_multiplier, LAKE_NOISE_OCTAVES)
 	var warp_noise := _make_lake_noise(lake_seed + 1013, LAKE_WARP_FREQUENCY, 2)
+	var lake_threshold: float = profile.lake_threshold if profile != null else 0.68
 	for x in range(-LAKE_FIELD_RADIUS, LAKE_FIELD_RADIUS + 1):
 		for y in range(-LAKE_FIELD_RADIUS, LAKE_FIELD_RADIUS + 1):
 			var cell: Vector2i = Vector2i(x, y)
 			var distance: float = Vector2(cell).length()
 			if distance < LAKE_SAFE_RADIUS or distance > LAKE_FIELD_RADIUS:
 				continue
-			if _lake_score(cell, lake_noise, warp_noise) >= LAKE_THRESHOLD:
+			if _lake_score(cell, lake_noise, warp_noise) >= lake_threshold:
 				lake_cells[cell] = true
 	_prune_lake_speckles()
 
@@ -463,11 +472,11 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 			var choice: ExpansionChoice = _preview_choices[local_choice_id]
 			for cell: Vector2i in choice.block_data:
 				var cell_data: Terrain.CellData = choice.block_data[cell]
-				if cell_data.terrain == Terrain.Base.WATER:
+				if Terrain.is_waterlike(cell_data.terrain):
 					continue
-				preview_renderer.update_decoration(cell, cell_data.terrain)
-				if cell_data.feature != Towers.Type.VOID:
-					preview_renderer.set_preview_feature(cell, cell_data.feature)
+					preview_renderer.update_decoration(cell, cell_data.terrain)
+					if cell_data.feature != Towers.Type.VOID:
+						preview_renderer.set_preview_feature(cell, cell_data.feature)
 
 	elif _preview_choices.has(choice_id):
 		#show only the highlighted choice, with strong distinct style
@@ -480,7 +489,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 
 		for cell: Vector2i in active_choice.block_data:
 			var cell_data: Terrain.CellData = active_choice.block_data[cell]
-			if cell_data.terrain == Terrain.Base.WATER:
+			if Terrain.is_waterlike(cell_data.terrain):
 				continue
 			preview_renderer.update_decoration(cell, cell_data.terrain)
 			if cell_data.feature != Towers.Type.VOID:
@@ -489,7 +498,7 @@ func set_highlighted_choice(choice_id: int = -1) -> void:
 func _choice_land_cells(choice: ExpansionChoice) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for cell: Vector2i in choice.block_data:
-		if choice.block_data[cell].terrain != Terrain.Base.WATER:
+		if not Terrain.is_waterlike(choice.block_data[cell].terrain):
 			cells.append(cell)
 	return cells
 

@@ -9,6 +9,7 @@ var _health_component: HealthComponent
 var _parent_unit: Node2D
 
 var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon] = {}
+var _effect_icons: Dictionary[EffectInstance, UnitStatusIcon] = {}
 
 var _is_hovered: bool = false
 var _is_selected: bool = false
@@ -26,7 +27,9 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	_parent_unit = unit
 	_health_component = health_comp
 	_clear_status_icons()
+	_clear_effect_icons()
 	_status_icons = {}
+	_effect_icons = {}
 
 	if not _health_component.health_changed.is_connected(_on_health_changed):
 		_health_component.health_changed.connect(_on_health_changed)
@@ -46,6 +49,13 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 		if not unit.modifiers_component.status_changed.is_connected(_on_status_changed):
 			unit.modifiers_component.status_changed.connect(_on_status_changed)
 
+	if not unit.effect_display_changed.is_connected(_on_effect_display_changed):
+		unit.effect_display_changed.connect(_on_effect_display_changed)
+	if not unit.effect_display_removed.is_connected(_on_effect_display_removed):
+		unit.effect_display_removed.connect(_on_effect_display_removed)
+	if not Pause.attached_effect_icons_changed.is_connected(_on_attached_effect_icons_changed):
+		Pause.attached_effect_icons_changed.connect(_on_attached_effect_icons_changed)
+
 	if unit.has_meta(ID.UnitMeta.IS_IMPORTANT) and unit.get_meta(ID.UnitMeta.IS_IMPORTANT):
 		_is_important = true
 	if not UI.update_inspector_bar.is_connected(_on_global_selection_changed):
@@ -62,6 +72,16 @@ func _exit_tree() -> void:
 		var modifiers_component: ModifiersComponent = _parent_unit.modifiers_component
 		if modifiers_component.status_changed.is_connected(_on_status_changed):
 			modifiers_component.status_changed.disconnect(_on_status_changed)
+
+	if is_instance_valid(_parent_unit):
+		var parent_unit: Unit = _parent_unit as Unit
+		if parent_unit.effect_display_changed.is_connected(_on_effect_display_changed):
+			parent_unit.effect_display_changed.disconnect(_on_effect_display_changed)
+		if parent_unit.effect_display_removed.is_connected(_on_effect_display_removed):
+			parent_unit.effect_display_removed.disconnect(_on_effect_display_removed)
+
+	if Pause.attached_effect_icons_changed.is_connected(_on_attached_effect_icons_changed):
+		Pause.attached_effect_icons_changed.disconnect(_on_attached_effect_icons_changed)
 
 	if UI.update_inspector_bar.is_connected(_on_global_selection_changed):
 		UI.update_inspector_bar.disconnect(_on_global_selection_changed)
@@ -135,6 +155,70 @@ func _clear_status_icons() -> void:
 			icon.queue_free()
 	_status_icons.clear()
 
+func _on_effect_display_changed(effect_instance: EffectInstance, stacks: float, duration: float) -> void:
+	if DebugAssistant.disable_status_icons or not Pause.show_attached_effect_icons:
+		_remove_effect_icon(effect_instance)
+		return
+
+	if not is_instance_valid(effect_instance) or not effect_instance.should_show_status_icon():
+		_remove_effect_icon(effect_instance)
+		return
+
+	if stacks <= 0.0:
+		_remove_effect_icon(effect_instance)
+		return
+
+	var icon: UnitStatusIcon = _effect_icons.get(effect_instance, null)
+	if not is_instance_valid(icon):
+		_effect_icons.erase(effect_instance)
+		icon = _create_effect_icon(effect_instance)
+
+	if not is_instance_valid(icon):
+		return
+
+	icon.update_data(stacks, duration)
+	_reposition_icons()
+
+func _on_effect_display_removed(effect_instance: EffectInstance) -> void:
+	_remove_effect_icon(effect_instance)
+
+func _create_effect_icon(effect_instance: EffectInstance) -> UnitStatusIcon:
+	var icon: UnitStatusIcon = STATUS_ICON_SCENE.instantiate() as UnitStatusIcon
+	if not is_instance_valid(icon):
+		return null
+
+	_effect_icons[effect_instance] = icon
+	add_child(icon)
+	icon.setup_effect(effect_instance)
+	return icon
+
+func _remove_effect_icon(effect_instance: EffectInstance) -> void:
+	if not _effect_icons.has(effect_instance):
+		return
+
+	var icon_to_remove: UnitStatusIcon = _effect_icons[effect_instance]
+	_effect_icons.erase(effect_instance)
+	if is_instance_valid(icon_to_remove):
+		icon_to_remove.queue_free()
+		_reposition_icons()
+
+func _clear_effect_icons() -> void:
+	for icon: UnitStatusIcon in _effect_icons.values():
+		if is_instance_valid(icon):
+			icon.queue_free()
+	_effect_icons.clear()
+
+func _on_attached_effect_icons_changed(is_enabled: bool) -> void:
+	if not is_enabled:
+		_clear_effect_icons()
+		return
+
+	if not is_instance_valid(_parent_unit):
+		return
+
+	var parent_unit: Unit = _parent_unit as Unit
+	parent_unit.refresh_effect_displays()
+
 func on_mouse_entered() -> void:
 	_is_hovered = true
 	_evaluate_visibility()
@@ -190,7 +274,11 @@ static func _count_screen_units() -> int:
 	return unit_count
 
 func _reposition_icons() -> void:
-	var active_icons: Array[UnitStatusIcon] = _status_icons.values()
+	var active_icons: Array[UnitStatusIcon]
+	active_icons.assign(_status_icons.values())
+	var effect_icon_values: Array[UnitStatusIcon]
+	effect_icon_values.assign(_effect_icons.values())
+	active_icons.append_array(effect_icon_values)
 
 	var total_width: float = 0.0
 	for icon: Control in active_icons:

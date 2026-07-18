@@ -1,143 +1,124 @@
 class_name WaveEnemies
 
 const SCRIPTED_WAVES: Dictionary[int, Array] = {
-	#example: wave 1 is just 4 basics (tutorial)
 	1: [
-		[Units.Type.BASIC, 4],
+		[Units.Type.BASIC, 5],
 	],
 	2: [
-		[Units.Type.BASIC, 6],
+		[Units.Type.BASIC, 8],
 	],
 	3: [
-		[Units.Type.BASIC, 1],
-		[Units.Type.BUFF, 3],
+		[Units.Type.BUFF, 4],
+		[Units.Type.BASIC, 2],
 	],
 	4: [
-		[Units.Type.BASIC, 1],
-		[Units.Type.DRIFTER, 5],
+		[Units.Type.DRIFTER, 6],
+		[Units.Type.BASIC, 2],
 	],
-	5 : [
-		[Units.Type.BASIC, 4],
-		[Units.Type.BUFF, 2],
-		[Units.Type.DRIFTER, 4],
+	5: [
+		[Units.Type.FLESHBLOB, 2],
+		[Units.Type.BASIC, 8],
+	],
+	6: [
 		[Units.Type.HEALER, 1],
+		[Units.Type.BUFF, 6],
+		[Units.Type.BASIC, 8],
 	],
-	6 : [
-		[Units.Type.WARRIOR, 3],
+	7: [
+		[Units.Type.SPRINTER, 16],
+		[Units.Type.DRIFTER, 6],
 	],
-	7 : [
-		[Units.Type.BASIC, 1],
-		[Units.Type.BUFF, 2],
-		[Units.Type.DRIFTER, 3],
-		[Units.Type.WARRIOR, 2],
-		[Units.Type.HEALER, 1],
-	],
-	8 : [
-		[Units.Type.BASIC, 4],
-		[Units.Type.WARRIOR, 5],
-		[Units.Type.TROLL, 2],
-	],
-	9 : [
-		[Units.Type.BUFF, 2],
-		[Units.Type.DRIFTER, 4],
-		[Units.Type.WARRIOR, 3],
-		[Units.Type.TROLL, 2],
-		[Units.Type.HEALER, 1],
-	],
-	10 : [
-		[Units.Type.BUFF, 4],
-		[Units.Type.DRIFTER, 5],
-		[Units.Type.WARRIOR, 4],
-		[Units.Type.TROLL, 3],
-		[Units.Type.HEALER, 1],
-	],
-	11 : [
-		[Units.Type.WARRIOR, 10],
-		[Units.Type.HEALER, 2],
-	],
-	12 : [
-		[Units.Type.GIANT, 3],
-	],
-	13 : [
-		[Units.Type.GIANT, 2],
+	8: [
+		[Units.Type.TROLL, 1],
 		[Units.Type.WARRIOR, 8],
-		[Units.Type.HEALER, 1],
 	],
-	14 : [
-		[Units.Type.SPRINTER, 24],
+	9: [
+		[Units.Type.SPRINTER, 12],
+		[Units.Type.FLESHBLOB, 4],
 	],
-	15 : [
-		[Units.Type.DRIFTER, 3],
+	10: [
+		[Units.Type.CLERIC, 1],
+		[Units.Type.DRIFTER, 8],
 		[Units.Type.WARRIOR, 10],
-		[Units.Type.HEALER, 1],
-		[Units.Type.TROLL, 3],
-		[Units.Type.GIANT, 3],
-		[Units.Type.SPRINTER, 8],
 	],
-	16 : [
-		[Units.Type.WARRIOR, 15],
-		[Units.Type.WARRIOR_PLUS, 8],
-		[Units.Type.SPRINTER, 4],
+	11: [
+		[Units.Type.SUMMONER, 2],
+		[Units.Type.BASIC, 14],
+		[Units.Type.BUFF, 6],
 	],
-	17 : [
+	12: [
+		[Units.Type.GIANT, 1],
+		[Units.Type.HEALER, 2],
 		[Units.Type.WARRIOR, 12],
-		[Units.Type.WARRIOR_PLUS, 10],
+	],
+	13: [
+		[Units.Type.SUMMONER, 2],
+		[Units.Type.SPRINTER, 20],
+		[Units.Type.CLERIC, 1],
+	],
+	14: [
+		[Units.Type.FLESHBLOB, 6],
+		[Units.Type.SPRINTER, 22],
+	],
+	15: [
+		[Units.Type.TROLL, 2],
+		[Units.Type.WARRIOR, 18],
+		[Units.Type.HEALER, 2],
+	],
+	16: [
+		[Units.Type.HULK, 1],
+		[Units.Type.WARRIOR_PLUS, 14],
 		[Units.Type.SPRINTER, 10],
-		[Units.Type.HEALER, 3],
 	],
-	18 : [
-		[Units.Type.HULK, 4],
-		[Units.Type.WARRIOR, 5],
-		[Units.Type.WARRIOR_PLUS, 5],
-		[Units.Type.SPRINTER, 5],
+	17: [
+		[Units.Type.SPRINTER_PLUS, 20],
+		[Units.Type.WARRIOR, 12],
+		[Units.Type.CLERIC, 2],
 	],
-	19 : [
-		[Units.Type.HULK, 3],
-		[Units.Type.WARRIOR, 8],
-		[Units.Type.WARRIOR_PLUS, 8],
-		[Units.Type.GIANT, 4],
-		[Units.Type.TROLL, 4],
-		[Units.Type.HEALER, 2],
+	18: [
+		[Units.Type.SUMMONER, 4],
+		[Units.Type.FLESHBLOB, 6],
+		[Units.Type.HEALER_PLUS, 1],
 	],
-	20 : [
-		[Units.Type.GIANT_PLUS, 3],
+	19: [
 		[Units.Type.GIANT, 2],
-		[Units.Type.WARRIOR, 6],
-		[Units.Type.HEALER, 1],
-	],
-	21 : [
-		[Units.Type.HULK, 3],
-		[Units.Type.WARRIOR, 8],
-		[Units.Type.WARRIOR_PLUS, 8],
-		[Units.Type.GIANT_PLUS, 3],
-		[Units.Type.SPRINTER, 4],
-		[Units.Type.SPRINTER_PLUS, 6],
-		[Units.Type.TROLL, 4],
-		[Units.Type.HEALER, 2],
-	],
-	22 : [
-		[Units.Type.HULK_PLUS, 3],
-		[Units.Type.WARRIOR, 6],
+		[Units.Type.HULK, 1],
+		[Units.Type.TROLL, 2],
 		[Units.Type.WARRIOR_PLUS, 12],
-		[Units.Type.SPRINTER, 3],
-		[Units.Type.SPRINTER_PLUS, 8],
-		[Units.Type.TROLL, 4],
 	],
-	23 : [
-		[Units.Type.HULK_PLUS, 3],
-		[Units.Type.GIANT_PLUS, 3],
-		[Units.Type.WARRIOR_PLUS, 12],
-		[Units.Type.SPRINTER_PLUS, 8],
-		[Units.Type.TROLL, 4],
-		[Units.Type.HEALER, 4],
+	20: [
+		[Units.Type.WARRIOR_PLUS, 24],
+		[Units.Type.SPRINTER_PLUS, 24],
+		[Units.Type.HEALER_PLUS, 2],
+		[Units.Type.CLERIC, 2],
 	],
-	24 : [
-		[Units.Type.HULK_PLUS, 4],
-		[Units.Type.GIANT_PLUS, 4],
-		[Units.Type.WARRIOR_PLUS, 15],
-		[Units.Type.SPRINTER_PLUS, 15],
-		[Units.Type.TROLL, 4],
-		[Units.Type.HEALER, 5],
+	21: [
+		[Units.Type.TROLL_PLUS, 1],
+		[Units.Type.TROLL, 3],
+		[Units.Type.WARRIOR_PLUS, 20],
+		[Units.Type.SPRINTER_PLUS, 18],
+	],
+	22: [
+		[Units.Type.HULK_PLUS, 2],
+		[Units.Type.WARRIOR_PLUS, 30],
+		[Units.Type.HEALER_PLUS, 2],
+		[Units.Type.SUMMONER, 3],
+	],
+	23: [
+		[Units.Type.GIANT_PLUS, 2],
+		[Units.Type.FLESHBLOB, 8],
+		[Units.Type.SPRINTER_PLUS, 40],
+		[Units.Type.CLERIC, 3],
+	],
+	24: [
+		[Units.Type.HULK_PLUS, 2],
+		[Units.Type.GIANT_PLUS, 2],
+		[Units.Type.TROLL_PLUS, 2],
+		[Units.Type.SUMMONER, 4],
+		[Units.Type.HEALER_PLUS, 3],
+		[Units.Type.CLERIC, 3],
+		[Units.Type.WARRIOR_PLUS, 40],
+		[Units.Type.SPRINTER_PLUS, 24],
 	],
 }
 #--- unit catalog ---
@@ -152,17 +133,30 @@ enum WaveModifier {
 }
 
 const UNIT_DATA: Dictionary[Units.Type, Dictionary] = {
-	Units.Type.BASIC:   {"cost": 15, "tags": [&"GRUNT", &"MELEE"], "wave": 0},
-	Units.Type.BUFF:    {"cost": 20, "tags": [&"SUPPORT"], "wave": 2},
-	Units.Type.DRIFTER: {"cost": 30, "tags": [&"GRUNT", &"MELEE"], "wave": 4},
-	Units.Type.TROLL: {"cost": 60, "tags": [&"SUPPORT", &"SIEGE"], "wave": 6},
-	Units.Type.ARCHER: {"cost": 40, "tags": [&"SUPPORT"], "wave": 8},
+	Units.Type.BASIC: {"cost": 14, "tags": [&"GRUNT", &"MELEE", &"SWARM"], "wave": 0},
+	Units.Type.BUFF: {"cost": 22, "tags": [&"GRUNT", &"MELEE", &"BRUISER"], "wave": 3},
+	Units.Type.DRIFTER: {"cost": 24, "tags": [&"GRUNT", &"MELEE", &"FAST"], "wave": 4},
+	Units.Type.HEALER: {"cost": 46, "tags": [&"SUPPORT"], "wave": 6},
+	Units.Type.FLESHBLOB: {"cost": 60, "tags": [&"SPLITTER", &"SWARM"], "wave": 7},
+	Units.Type.TROLL: {"cost": 78, "tags": [&"SIEGE", &"STRUCTURE_PRESSURE"], "wave": 8},
+	Units.Type.SPRINTER: {"cost": 28, "tags": [&"FAST", &"SCALING"], "wave": 9},
+	Units.Type.WARRIOR: {"cost": 32, "tags": [&"ARMORED", &"MELEE"], "wave": 8},
+	Units.Type.CLERIC: {"cost": 58, "tags": [&"SUPPORT", &"CLEANSE"], "wave": 10},
+	Units.Type.GIANT: {"cost": 190, "tags": [&"ELITE", &"BRUISER"], "wave": 12},
+	Units.Type.SUMMONER: {"cost": 120, "tags": [&"SUPPORT", &"SUMMONER"], "wave": 11},
+	Units.Type.WARRIOR_PLUS: {"cost": 46, "tags": [&"ARMORED", &"MELEE"], "wave": 16},
+	Units.Type.SPRINTER_PLUS: {"cost": 42, "tags": [&"FAST", &"SCALING"], "wave": 17},
+	Units.Type.HEALER_PLUS: {"cost": 78, "tags": [&"SUPPORT"], "wave": 18},
+	Units.Type.HULK: {"cost": 220, "tags": [&"ELITE", &"ARMORED"], "wave": 16},
+	Units.Type.GIANT_PLUS: {"cost": 300, "tags": [&"ELITE", &"BRUISER"], "wave": 20},
+	Units.Type.TROLL_PLUS: {"cost": 145, "tags": [&"SIEGE", &"STRUCTURE_PRESSURE", &"ELITE"], "wave": 21},
+	Units.Type.HULK_PLUS: {"cost": 340, "tags": [&"ELITE", &"ARMORED"], "wave": 22},
 }
 
 #--- director configuration ---
-const BASE_BUDGET: float = 40.0
-const BUDGET_PER_WAVE: float = 24.0
-const QUADRATIC_BUDGET_SCALING: float = 1.8
+const BASE_BUDGET: float = 80.0
+const BUDGET_PER_WAVE: float = 51.0
+const QUADRATIC_BUDGET_SCALING: float = 3.6
 
 #the main public function, now a procedural generator
 static func get_enemies_for_wave(wave: int) -> Array[Array]:

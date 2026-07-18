@@ -1,8 +1,16 @@
 extends Node
 
 const menu_scene := preload("res://UI/settings_menu/settings_menu.tscn")
+signal attached_effect_icons_changed(is_enabled: bool)
+
 var _current_menu_instance: SettingsMenu
 var show_all_health_bars: bool = false
+var show_attached_effect_icons: bool = false:
+	set(is_enabled):
+		if show_attached_effect_icons == is_enabled:
+			return
+		show_attached_effect_icons = is_enabled
+		attached_effect_icons_changed.emit(show_attached_effect_icons)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS

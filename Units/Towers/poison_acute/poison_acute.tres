@@ -11,7 +11,7 @@
 script = ExtResource("6_xwdom")
 id = 42
 tags = Array[int]([0, 3])
-cost = 25.0
+cost = 15.0
 element = 3
 is_upgrade = true
 tower_name = "Poison (acute)"

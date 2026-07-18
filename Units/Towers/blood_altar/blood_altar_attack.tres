@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_jwymb"]
 script = ExtResource("3_jwymb")
 type = 5
-cooldown = 1.0
+cooldown = 0.666667
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_oxvma"]
@@ -39,6 +39,7 @@ rotation_mode = 1
 script = ExtResource("1_uqjfa")
 delivery_method = 1
 range = 25.0
+cooldown = 1.333333
 radius = 4.0
 damage = 0.6
 breaking = true

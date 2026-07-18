@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_1")
-instruction_text = "Buy the [Rite of Poisons] from the trader. It will let us modify a nearby tower."
+instruction_text = "Buy the [Rite of Plagues] from the trader. It will let us modify a nearby tower."
 panel_anchor = 0
 require_confirmation = false
 pause_clock = true

@@ -22,6 +22,7 @@ var event_handler: Callable = _handle_event
 var stack_update_handler: Callable = _handle_stack_update
 
 @export var icon: Texture2D ##icon that plays when this effectprototype is "triggered"
+@export var show_as_status_icon: bool = false ##whether attached instances can appear beside hp bars when the player enables effect icons
 #event handlers; these are injected into EffectInstance at runtime
 @abstract func _handle_attach(instance: EffectInstance) -> void
 @abstract func _handle_detach(instance: EffectInstance) -> void

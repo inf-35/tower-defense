@@ -25,5 +25,5 @@ script = ExtResource("4_relic")
 type = 48
 global_effect = SubResource("Resource_effect")
 title = "Sprinklerhead"
-description = "{T_FARM|label=Farms} earn 1 more {GOLD} for each adjacent water tile."
+description = "{T_FARM|label=Farms} earn 1 more {GOLD} for each adjacent water or ice tile."
 icon = ExtResource("1_icon")

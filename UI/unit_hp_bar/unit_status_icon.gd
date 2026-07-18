@@ -8,8 +8,21 @@ var _current_duration: float = 0.0
 var _max_seen_duration: float = 0.1 #prevent div by zero
 
 func setup(status: Attributes.Status) -> void:
+	setup_icon(Attributes.get_icon(status))
+
+func setup_effect(effect_instance: EffectInstance) -> void: ##initialises this icon from an opted-in attached effect prototype
+	if not is_instance_valid(effect_instance):
+		return
+	if not is_instance_valid(effect_instance.effect_prototype):
+		return
+
+	setup_icon(effect_instance.effect_prototype.icon)
+
+func setup_icon(icon_texture: Texture2D) -> void: ##applies the shared texture-progress presentation for statuses and displayed effects
 	add_to_group(DebugAssistant.GROUP_STATUS_ICONS)
-	var icon_texture: Texture2D = Attributes.get_icon(status)
+	if not is_instance_valid(icon_texture):
+		return
+
 	texture_under = icon_texture
 	texture_progress = icon_texture
 	step = 0.01

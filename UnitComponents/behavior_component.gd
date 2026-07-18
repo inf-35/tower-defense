@@ -86,9 +86,27 @@ func on_inspector_action(_action_key: StringName) -> void: ##optional hook for a
 
 func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 	var tower: Tower = unit as Tower
+	_draw_allowed_terrain_visuals(canvas, tower)
 	if not tower.get_stat(Attributes.id.RANGE):
 		return
 	canvas.preview_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
+
+func _draw_allowed_terrain_visuals(canvas: RangeIndicator, tower: Tower) -> void: ##highlights authored allowed-terrain cells for preview prototypes, even when those cells are already occupied
+	if not is_instance_valid(tower) or not tower.abstractive:
+		return
+
+	var allowed_terrains: Array[Terrain.Base] = Towers.get_tower_allowed_terrains(tower.type)
+	if allowed_terrains.is_empty():
+		return
+
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return
+
+	for cell: Vector2i in island.terrain_base_grid:
+		if not allowed_terrains.has(island.get_terrain_base(cell)):
+			continue
+		canvas.draw_cell(cell, canvas.highlight_color)
 
 func draw_visuals_adjacent_tiles(canvas: RangeIndicator) -> void:
 	var tower: Tower = unit as Tower
@@ -158,6 +176,30 @@ func _attempt_navigate_to_origin() -> bool:
 
 	navigation_component.goal = Vector2i.ZERO
 	return true
+
+func _get_valid_spawn_position_near(origin_position: Vector2, radius: float, max_attempts: int = 10) -> Vector2:
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return origin_position
+
+	for i: int in range(max_attempts):
+		var offset: Vector2 = Vector2.from_angle(randf() * TAU) * randf_range(0.0, radius)
+		var candidate: Vector2 = origin_position + offset
+		var cell: Vector2i = Island.position_to_cell(candidate)
+		if not Navigation.grid.has(cell):
+			continue
+		if _is_spawn_cell_blocked(island, cell):
+			continue
+		return candidate
+
+	return origin_position
+
+func _is_spawn_cell_blocked(island: Island, cell: Vector2i) -> bool:
+	if not island.tower_grid.has(cell):
+		return false
+
+	var tower: Tower = island.tower_grid[cell]
+	return is_instance_valid(tower) and tower.blocking
 
 func get_save_data() -> Dictionary:
 	return {}

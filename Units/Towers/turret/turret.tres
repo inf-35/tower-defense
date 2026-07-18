@@ -16,7 +16,7 @@ metadata/_custom_type_script = "uid://do6qrosup8u56"
 [resource]
 script = ExtResource("1_x6lxw")
 id = 2
-cost = 6.0
+cost = 3.5
 upgrades_into = Dictionary[int, float]({
 34: 10.0,
 35: 10.0

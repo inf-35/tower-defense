@@ -15,7 +15,7 @@ class PreviewVisualState:
 	var target_alpha: float = 0.0
 
 #--- configuration ---
-@export var highlight_color: Color = Color(0.94, 0.76, 0.28, 0.56)
+@export var highlight_color: Color = Color(0.96, 0.781, 0.288, 0.698)
 @export var input_color: Color = Color(0.0, 0.327, 0.963, 0.541)
 @export var positive_highlight_color: Color = Color(0.35, 1.0, 0.45, 0.48)
 @export var negative_highlight_color: Color = Color(1.0, 0.2, 0.2, 0.48)

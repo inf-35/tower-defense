@@ -20,7 +20,7 @@ signal unhovered()
 @export var tower_meta: InteractiveRichTextLabel
 @export var description: InteractiveRichTextLabel
 
-const DISABLED_ALPHA: float = 0.5
+const DISABLED_ALPHA: float = 0.65
 const DISABLED_BRIGHTNESS: float = 0.8
 
 var _reward_data: Reward

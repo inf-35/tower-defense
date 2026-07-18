@@ -11,6 +11,7 @@ func save_game() -> void:
 	var save_dict: Dictionary = {}
 
 	save_dict["run"] = Run.get_save_data()
+	save_dict["analytics"] = Analytics.get_save_data()
 
 	#player context
 	save_dict["player"] = Run.player.get_save_data()
@@ -68,9 +69,6 @@ func load_game() -> bool:
 	else:
 		push_error("SaveLoad: Missing 'phases' data.")
 
-	if save_dict.has("player"):
-		Run.player.load_save_data(save_dict["player"])
-
 	#restore island
 	if save_dict.has("island") and is_instance_valid(Run.references.island):
 		#triggers reconstruction (terrain -> towers)
@@ -78,6 +76,11 @@ func load_game() -> bool:
 	else:
 		push_error("SaveLoad: Missing 'island' data in save file or Island reference missing.")
 		return false
+
+	if save_dict.has("player"):
+		Run.player.load_save_data(save_dict["player"])
+	if save_dict.has("analytics"):
+		Analytics.load_save_data(save_dict["analytics"])
 
 	print("SaveLoad: Load Complete.")
 	return true
@@ -89,6 +92,7 @@ func save_profile() -> void:
 		"settings": WindowSettings.get_profile_data()
 	}
 	profile_dict["settings"]["show_all_health_bars"] = Pause.show_all_health_bars
+	profile_dict["settings"]["show_attached_effect_icons"] = Pause.show_attached_effect_icons
 	if is_instance_valid(Run.player):
 		profile_dict["player"] = Run.player.get_profile()
 	var json_string = JSON.stringify(profile_dict)
@@ -128,6 +132,7 @@ func load_profile() -> bool:
 	if save_dict.has("settings"):
 		var settings_data: Dictionary = save_dict["settings"]
 		Pause.show_all_health_bars = bool(settings_data.get("show_all_health_bars", false))
+		Pause.show_attached_effect_icons = bool(settings_data.get("show_attached_effect_icons", false))
 		WindowSettings.apply_startup_settings(settings_data)
 	else:
 		WindowSettings.apply_startup_settings()

@@ -22,13 +22,18 @@ enum Type {
 	HULK,
 	HULK_PLUS,
 	TROLL_PLUS,
-	WARRIOR_PLUS
+	WARRIOR_PLUS,
+	CLERIC,
+	HEALER_PLUS
 }
 
 var unit_stats: Dictionary[Type, UnitData] = {}
 var unit_prototypes: Dictionary[Type, Unit] = {}
 
 const VERBOSE: bool = false
+const GLOBAL_ENEMY_HP_MULTIPLIER: float = 1.25
+const GLOBAL_ENEMY_SPEED_MULTIPLIER: float = 1/1.25
+const GLOBAL_ENEMY_DAMAGE_MULTIPLIER: float = 1.0
 
 func start() -> void:
 	unit_stats.clear()
@@ -88,6 +93,23 @@ func create_unit(unit_type: Type) -> Unit:
 	_unit.enemy_type = unit_type
 	if unit_stats[unit_type].important:
 		_unit.set_meta(ID.UnitMeta.IS_IMPORTANT, true)
+
+	_unit.ready.connect(func():
+		if not is_instance_valid(_unit.modifiers_component):
+			return
+		if _unit.health_component:
+			var global_hp_mod := Modifier.new(Attributes.id.MAX_HEALTH, GLOBAL_ENEMY_HP_MULTIPLIER, 0.0, -1.0)
+			_unit.modifiers_component.add_permanent_modifier(global_hp_mod)
+			_unit.health_component.health = _unit.get_stat(Attributes.id.MAX_HEALTH)
+		if _unit.movement_component:
+			var global_speed_mod := Modifier.new(Attributes.id.MAX_SPEED, GLOBAL_ENEMY_SPEED_MULTIPLIER, 0.0, -1.0)
+			_unit.modifiers_component.add_permanent_modifier(global_speed_mod)
+		if _unit.attack_component:
+			var global_damage_mod := Modifier.new(Attributes.id.DAMAGE, GLOBAL_ENEMY_DAMAGE_MULTIPLIER, 0.0, -1.0)
+			_unit.modifiers_component.add_permanent_modifier(global_damage_mod)
+
+		CONNECT_ONE_SHOT
+	)
 
 	if Run.current_game_difficulty == Run.GameDifficulty.NORMAL:
 		#wait for the unit to enter the tree and call _ready()

@@ -6,12 +6,15 @@
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
 
-[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
 continue_button = NodePath("UI/MarginContainer/Control/VBoxContainer/continue")
 feedback_button = NodePath("UI/MarginContainer/Control/VBoxContainer/feedback")
+environment_panel = NodePath("UI/MarginContainer/Control/environment_panel")
+woods_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods")
+winter_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter")
 difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
 normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
 hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
@@ -80,6 +83,46 @@ theme_override_colors/font_hover_pressed_color = Color(0.14799999, 0.32559997, 0
 text = "Feedback"
 script = ExtResource("4_jix8l")
 
+[node name="environment_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0833
+offset_top = -221.0
+offset_right = 320.0833
+offset_bottom = 221.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/environment_panel"]
+layout_mode = 2
+theme_type_variation = &"MarginSuper"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/environment_panel/MarginContainer"]
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="Label" type="Label" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Choose an environment"
+horizontal_alignment = 1
+
+[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+text = "Woods"
+script = ExtResource("4_jix8l")
+
+[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+text = "Winter"
+script = ExtResource("4_jix8l")
+
 [node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]
 visible = false
 layout_mode = 1
@@ -131,6 +174,20 @@ offset_right = 673.5176
 offset_bottom = 466.0
 grow_horizontal = 2
 texture = ExtResource("4_glbon")
+
+[node name="AnalyticsNotice" type="Label" parent="UI/MarginContainer/Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 700.0
+offset_bottom = 760.0
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.21176471, 0.21176471, 0.21176471, 0.88)
+text = "This game records anonymous session and run analytics to help guide balance and development."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
 [node name="AudioListener2D" type="AudioListener2D" parent="."]
 current = true

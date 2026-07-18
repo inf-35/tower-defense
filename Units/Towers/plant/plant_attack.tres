@@ -39,7 +39,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_0vqd8")
 delivery_method = 1
-cooldown = 2.0
+cooldown = 2.5
 radius = 5.0
 damage = 1.2
 vfx_on_spawn = SubResource("Resource_e3651")

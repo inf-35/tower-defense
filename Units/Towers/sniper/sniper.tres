@@ -9,7 +9,7 @@
 script = ExtResource("2_k7tn8")
 id = 13
 size = Vector2i(2, 2)
-cost = 25.0
+cost = 15.0
 required_capacity = 2.0
 tower_name = "Sniper"
 tower_description = "Long-range, single-target high damage dealer"

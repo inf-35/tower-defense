@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=7 format=3]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_data"]
+[ext_resource type="Texture2D" uid="uid://cflil6vcjb1y8" path="res://Assets/healer.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3_display"]
+[ext_resource type="PackedScene" path="res://Units/Enemies/healer_plus/healer_plus.tscn" id="4_scene"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_hp"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6_speed"]
+
+[resource]
+script = ExtResource("1_data")
+title = "Healer+"
+icon = ExtResource("2_icon")
+description = "Fast veteran healer with high health and stronger support pulses."
+stat_displays = Array[ExtResource("3_display")]([ExtResource("5_hp"), ExtResource("6_speed")])
+important = true
+unit_scene = ExtResource("4_scene")
+flux_value = 1.0
+strength_value = 2.0
+metadata/_custom_type_script = "uid://bnpluy6agmetj"

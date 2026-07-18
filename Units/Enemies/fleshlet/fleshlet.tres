@@ -1,10 +1,19 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://evhxdaiutprk"]
+[gd_resource type="Resource" script_class="UnitData" load_steps=7 format=3 uid="uid://evhxdaiutprk"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_esoto"]
 [ext_resource type="PackedScene" uid="uid://wqqym3asl720" path="res://Units/Enemies/fleshlet/fleshlet.tscn" id="2_6ty6k"]
+[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="3_icon"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="4_stat"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_hp"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6_speed"]
 
 [resource]
 script = ExtResource("1_esoto")
+title = "Fleshlet"
+icon = ExtResource("3_icon")
+description = "Small split body spawned by {U_FLESHBLOB}s."
+stat_displays = Array[ExtResource("4_stat")]([ExtResource("5_hp"), ExtResource("6_speed")])
 unit_scene = ExtResource("2_6ty6k")
 flux_value = 0.0
+strength_value = 0.45
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

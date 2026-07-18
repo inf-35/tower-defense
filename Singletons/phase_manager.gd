@@ -18,8 +18,8 @@ enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
 var current_wave_number: int = 0:
 	set(ncwm):
 		current_wave_number = ncwm
-		var base_scaling: float = 0.8 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 1.0
-		var scaling: float = 0.015 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.025
+		var base_scaling: float = 0.75 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.8
+		var scaling: float = 0.02 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.035
 		var goal: float = base_scaling + (max(current_wave_number - 3, 0) * scaling)
 		Run.current_game_scaling = max(Run.current_game_scaling - 0.1, goal)
 
@@ -75,7 +75,7 @@ func start_game(progress_callback: Callable = Callable()) -> void:
 	Run.tutorials.refresh_runtime_connections()
 
 	Run.current_game_scaling = 1.0
-	Run.current_game_environment = Run.GameEnvironment.WOODS
+	Analytics.begin_run(SaveLoad.has_save_file())
 	await get_tree().process_frame
 	if SaveLoad.has_save_file():
 		_report_loading(progress_callback, "Loading save...", 0.7)

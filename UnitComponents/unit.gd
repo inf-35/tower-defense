@@ -5,6 +5,8 @@ class_name Unit
 signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready() ##fires when all components and the unit is ready
 signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto on_killed, which defines unit death behaviour. hit_report_data contains info of the hit that killed the enemy, if any
+signal effect_display_changed(effect_instance: EffectInstance, stacks: float, duration: float) ##emitted when an opted-in attached effect should refresh its hp-bar icon
+signal effect_display_removed(effect_instance: EffectInstance) ##emitted before an opted-in attached effect disappears from the unit
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
@@ -403,12 +405,16 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 		effect_instance.stacks += stacks
 		if effect_instance.stacks <= 0:
 			remove_effect(effect_prototype)
+		else:
+			effect_instance.notify_display_changed()
 
 		return null
 
 	if get_effect_instance_by_prototype(effect_prototype):
-		get_effect_instance_by_prototype(effect_prototype).stacks += stacks
-		return get_effect_instance_by_prototype(effect_prototype)
+		var existing_effect_instance: EffectInstance = get_effect_instance_by_prototype(effect_prototype)
+		existing_effect_instance.stacks += stacks
+		existing_effect_instance.notify_display_changed()
+		return existing_effect_instance
 
 	var effect_instance: EffectInstance = effect_prototype.create_instance()
 	var schedule := effect_instance.schedule
@@ -419,12 +425,15 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 	effect_instance.stacks = stacks
 	effect_instance.attach_to(self)
 	effect_prototypes.append(effect_prototype)
+	effect_instance.notify_display_changed()
 	return effect_instance
 
 func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effects, regardless of number
 	var effects_to_remove: Array[EffectInstance] = get_effect_instances_by_prototype(effect_prototype)
 
 	for effect in effects_to_remove:
+		if effect.should_show_status_icon():
+			effect_display_removed.emit(effect)
 		effect.detach() #trigger effect's detach handler
 		for event_hook in effect.event_hooks:
 			effects[effect.schedule][event_hook].erase(effect)
@@ -432,6 +441,12 @@ func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effe
 		effect.free()
 
 	effect_prototypes.erase(effect_prototype)
+
+func refresh_effect_displays() -> void: ##re-emits all active attached effect icons after settings changes
+	for schedule_dictionary: Dictionary in effects.values():
+		for instance_array: Array in schedule_dictionary.values():
+			for effect_instance: EffectInstance in instance_array:
+				effect_instance.notify_display_changed()
 
 #helper to find a specific running instance of a prototype on this unit
 func get_effect_instance_by_prototype(proto: EffectPrototype) -> EffectInstance:
@@ -519,7 +534,6 @@ func take_hit(hit: HitData) -> void:
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
 	hit_report.overkill = maxf(damage - benchmark, 0.0) if unit_dead else 0.0
-	hit_report.statuses_applied = hit.status_effects.duplicate(true)
 
 	if unit_dead and not is_zero_approx(delta_health):
 		hit_report.death_caused = true
@@ -539,7 +553,9 @@ func take_hit(hit: HitData) -> void:
 		var cooldown: float = hit.status_effects[status].y
 		if stack <= 0.0: #refuse to process insignificant status effects (will crash if not done otherwise)
 			continue
-		modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id if is_instance_valid(hit.source) else 0)
+		var did_apply_status: bool = modifiers_component.add_status(status, stack, cooldown, hit.source.unit_id if is_instance_valid(hit.source) else 0)
+		if did_apply_status:
+			hit_report.statuses_applied[status] = hit.status_effects[status]
 
 	var hit_report_evt := GameEvent.new()
 	hit_report_evt.event_type = GameEvent.EventType.HIT_DEALT

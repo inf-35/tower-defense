@@ -11,7 +11,7 @@
 [resource]
 script = ExtResource("2_42dav")
 id = 11
-cost = 15.0
+cost = 9.0
 tower_name = "Minigun"
 tower_description = "Rapid-shoo"
 tower_scene = ExtResource("3_vhwkn")

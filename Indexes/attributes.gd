@@ -30,7 +30,8 @@ enum Status { #diegetic statuses
 	HEAT,
 	CURSED,
 	BLEED,
-	STUN
+	STUN,
+	CLEANSE
 }
 
 class StatusEffectData:
@@ -78,6 +79,9 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 	),
 	Status.STUN: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.2, false, Color(1, 1, 0.5) #80% mvmt reduction
+	),
+	Status.CLEANSE: StatusEffectData.new(
+		id.NULL, 0.0, 1.0, false, Color(0.35, 0.65, 1.0, 0.35)
 	)
 }
 
@@ -87,7 +91,8 @@ const status_effect_icons: Dictionary[Status, Texture2D] = {
 	Status.CURSED: preload("res://Assets/cursed_icon.png"),
 	Status.BLEED: preload("res://Assets/bleed_icon.png"),
 	Status.POISON: preload("res://Assets/poison_icon.png"),
-	Status.STUN: preload("res://Assets/stun_icon.png")
+	Status.STUN: preload("res://Assets/stun_icon.png"),
+	Status.CLEANSE: preload("res://Assets/healer.png")
 }
 
 var reactions: Array[ReactionData] = [

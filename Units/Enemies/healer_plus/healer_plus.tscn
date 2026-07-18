@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://rlwxr7avkptf"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_nav"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_move"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_move_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
+[ext_resource type="Resource" path="res://Units/Enemies/healer_plus/healer_plus_hp.tres" id="6_hp"]
+[ext_resource type="Texture2D" uid="uid://cflil6vcjb1y8" path="res://Assets/healer.png" id="7_icon"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
+[ext_resource type="Script" uid="uid://dwx63ohv786ew" path="res://Units/Enemies/healer/healer_behavior.gd" id="11_behavior"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_range"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="13_attack"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="14_modifier_data"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="15_attack_data"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="16_status"]
+
+[sub_resource type="Resource" id="Resource_movement"]
+script = ExtResource("4_move_data")
+max_speed = 18.0
+acceleration = 200.0
+turn_speed = 1000.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(88, 110)
+
+[sub_resource type="Resource" id="Resource_attack"]
+script = ExtResource("15_attack_data")
+range = 10.0
+damage = 2.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"
+
+[node name="HealerPlus" type="Node2D" unique_id=2054946590 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_unit")
+hostile = true
+attack_only_when_blocked = true
+behavior = NodePath("HealerBehavior")
+graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://cv4ytdq1187pu"
+
+[node name="NavigationComponent" type="Node" parent="." unique_id=1355324477]
+script = ExtResource("2_nav")
+metadata/_custom_type_script = "uid://covwti10fyhl4"
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1770067819]
+script = ExtResource("3_move")
+face_towards_movement = false
+movement_data = SubResource("Resource_movement")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="." unique_id=818040459]
+script = ExtResource("5_health")
+health_data = ExtResource("6_hp")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="ContactShadow" type="Node2D" parent="." unique_id=361920253]
+z_index = 10
+z_as_relative = false
+position = Vector2(0, 0.75)
+scale = Vector2(0.105, 0.105)
+script = ExtResource("8_shadow")
+shadow_size = Vector2(56, 34)
+metadata/_custom_type_script = "uid://clft1opmwpvj0"
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1895710623]
+modulate = Color(0.92, 0.66, 0.66, 1)
+position = Vector2(1, -3)
+scale = Vector2(0.115, 0.115)
+texture = ExtResource("7_icon")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=681239405]
+visible = false
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("9_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=2130637067]
+position = Vector2(-5.7220404e-06, 0)
+scale = Vector2(0.9999992, 0.9999992)
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1360842504]
+script = ExtResource("10_modifiers")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="HealerBehavior" type="Node" parent="." unique_id=2051193537]
+script = ExtResource("11_behavior")
+heal_amount = 1.6
+heal_interval = 1.0
+heal_range = 22.0
+metadata/_custom_type_script = "uid://dwx63ohv786ew"
+
+[node name="RangeComponent" type="Node" parent="." unique_id=587421665]
+script = ExtResource("12_range")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="." unique_id=410643950]
+script = ExtResource("13_attack")
+attack_data = SubResource("Resource_attack")
+metadata/_custom_type_script = "uid://detgar3t50qgi"

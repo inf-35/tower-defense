@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="HealthData" format=3 uid="uid://kgcyyq08r41l"]
+
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="1_hp"]
+
+[resource]
+script = ExtResource("1_hp")
+max_health = 30.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"

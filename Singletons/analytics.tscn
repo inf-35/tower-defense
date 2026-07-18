@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bcue15y8x8spj"]
+
+[ext_resource type="Script" uid="uid://chbmxlpbi2te1" path="res://Singletons/analytics.gd" id="1_5nq2b"]
+
+[node name="Analytics" type="Node" unique_id=1187764445 node_paths=PackedStringArray("http_request", "retry_timer")]
+script = ExtResource("1_5nq2b")
+enabled = true
+endpoint_url = "https://script.google.com/macros/s/AKfycbwc4xQvGrLdmiz7cyHcfOL6GXZQK3Etxs63FMhnVn4Z2oiMZnoIHAZTKYpcpAp901IoDA/exec"
+shared_secret = "keepguard_analytics"
+request_timeout_seconds = 5.0
+game_name_override = "keepguard"
+verbose_logging = true
+http_request = NodePath("HTTPRequest")
+retry_timer = NodePath("RetryTimer")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=2066028324]
+
+[node name="RetryTimer" type="Timer" parent="." unique_id=888699566]
+wait_time = 5.0
+one_shot = true
+ignore_time_scale = true

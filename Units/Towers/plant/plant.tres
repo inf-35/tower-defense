@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("2_vwkbd")
 id = 15
+cost = 8.0
 element = 3
 upgrades_into = Dictionary[int, float]({
 27: 1.0

@@ -11,9 +11,9 @@
 script = ExtResource("2_d0xwe")
 target_type_name = "BLOOD_ALTAR"
 id = 65
-tags = Array[int]([8])
-cost = 8.0
+cost = 6.0
 element = 5
+tags = Array[int]([8])
 tower_name = "Blood Altar"
 tower_description = "Damages adjacent structures when it attacks. Each structure damaged releases one delayed projectile at the target."
 icon = ExtResource("1_vkp41")

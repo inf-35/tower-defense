@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name OilRiteEffect
 
-@export var duration_bonus: float = 3.0
+@export var duration_bonus: float = 2.0
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]

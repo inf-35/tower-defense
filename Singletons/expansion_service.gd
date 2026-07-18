@@ -5,14 +5,16 @@ signal expansion_process_complete
 
 #configuration
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
-const GENERATION_ATTEMPTS: int = 24
+const GENERATION_ATTEMPTS: int = 20
+const EXPANSION_SIZE: int = 18
 const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
 const FRONTIER_EVENING_BIAS: float = 0.75
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
-const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.0025
+const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.003
 const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.75
+
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
 class TerrainGenRule extends Resource:
@@ -27,6 +29,7 @@ class TerrainGenRule extends Resource:
 		probability = _prob
 		cluster_size_min = _c_min
 		cluster_size_max = _c_max
+
 
 class PlacementRule extends Resource:
 	@export var tower_type: Towers.Type ##tower type
@@ -184,7 +187,7 @@ func select_expansion(island: Island, choice_id: int) -> void:
 		_on_exit()
 		return
 
-	generate_and_present_choices(Run.references.island, 12, 4)
+	generate_and_present_choices(Run.references.island, EXPANSION_SIZE, 4)
 	if expansions_this_phase >= minimum_expansions:
 		UI.display_expansion_exit.emit()
 
@@ -286,8 +289,9 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	#first, fill everything with default earth
 	for coord: Vector2i in generated_coords:
 		block_data[coord] = Terrain.CellData.new(Terrain.Base.EARTH, Towers.Type.VOID)
+	var waterlike_terrain: Terrain.Base = Terrain.get_open_water_base()
 	for coord: Vector2i in generated_water:
-		block_data[coord] = Terrain.CellData.new(Terrain.Base.WATER, Towers.Type.VOID)
+		block_data[coord] = Terrain.CellData.new(waterlike_terrain, Towers.Type.VOID)
 
 	#now apply procedural terrain rules (ruins, highlands, gold veins, etc.)
 	#we shuffle coords to prevent "top-left" bias
@@ -345,12 +349,13 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 
 	#3. feature placement (towers / groves)
 	var available_cells: Array[Vector2i] = generated_coords.duplicate()
+	_reserve_forced_ruins(island, block_data, available_cells)
 
 	for rule: PlacementRule in params.placement_rules:
 		#"rule.count" here is interpreted as "number of instances" or "number of clusters" depending on logic
 		var candidate_cells: Array[Vector2i] = _get_candidate_cells(available_cells, island, rule.seed_placement)
 
-		var features_to_place: int = randi_range(rule.min_seeds, rule.max_seeds)
+		var features_to_place: int = _roll_environment_adjusted_feature_count(rule)
 		var placed_features: int = 0
 		while placed_features < features_to_place and not candidate_cells.is_empty():
 			var seed_cell: Vector2i = candidate_cells.pick_random()
@@ -374,18 +379,28 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 				if candidate_cells.has(target_cell): candidate_cells.erase(target_cell)
 			placed_features += 1
 
-	_place_forced_ruins(island, block_data)
-
 	return block_data
 
-func _place_forced_ruins(island: Island, block_data: Dictionary[Vector2i, Terrain.CellData]) -> void: ##forces pregenerated ruin sites into any generated block that reaches them
+func _roll_environment_adjusted_feature_count(rule: PlacementRule) -> int: ##keeps feature-count tweaks data-driven through the active environment profile instead of hardcoded per environment branches
+	var base_count: int = randi_range(rule.min_seeds, rule.max_seeds)
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	if profile == null:
+		return base_count
+	var scaled_count: float = float(base_count) * profile.get_placement_count_multiplier(rule.tower_type)
+	var whole_count: int = floori(scaled_count)
+	var fractional_bonus: float = scaled_count - float(whole_count)
+	if randf() < fractional_bonus:
+		whole_count += 1
+	return max(whole_count, 0)
+
+func _reserve_forced_ruins(island: Island, block_data: Dictionary[Vector2i, Terrain.CellData], available_cells: Array[Vector2i]) -> void: ##claims pregenerated ruin cells before normal feature placement so later rules cannot overwrite them
 	for cell: Vector2i in block_data:
 		if not island.has_ruin_site(cell):
 			continue
-
 		block_data[cell].terrain = Terrain.Base.EARTH
 		block_data[cell].feature = Towers.Type.RUINS
 		block_data[cell].initial_state = {&"_ruins_data": DEFAULT_RUINS_DATA}
+		available_cells.erase(cell)
 
 func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary: ##wrapper for _grow_expansion_from_start, quality control (number of tiles of each type, size)
 	var best_result: Dictionary = {"land": [], "water": []}
@@ -441,6 +456,8 @@ func _get_average_shore_radius(island: Island) -> float:
 
 func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: int) -> Dictionary: ##terrain canvas generator, determines land/water, and which tiles to visit
 	var water_cap := int(ceil(float(land_target) * WATER_EXTRA_RATIO))
+	var open_water_base: Terrain.Base = Terrain.get_open_water_base()
+	var open_water_is_navigable: bool = Terrain.is_navigable(open_water_base)
 	var to_visit: Array[Vector2i] = [start]
 	var visited: Dictionary[Vector2i, bool] = {}
 	var land: Array[Vector2i] = []
@@ -453,14 +470,17 @@ func _grow_expansion_from_start(island: Island, start: Vector2i, land_target: in
 		visited[cell] = true
 
 		if island.terrain_base_grid.has(cell):
-			if island.terrain_base_grid[cell] != Terrain.Base.WATER:
+			if Terrain.is_navigable(island.terrain_base_grid[cell]):
 				_queue_neighbors(cell, to_visit, visited, island.DIRS)
 			continue
 
 		if island.is_lake_cell(cell):
 			if water.size() < water_cap:
 				water.append(cell)
-				_queue_neighbors(cell, to_visit, visited, island.DIRS, true, island)
+				if open_water_is_navigable:
+					_queue_neighbors(cell, to_visit, visited, island.DIRS)
+				else:
+					_queue_neighbors(cell, to_visit, visited, island.DIRS, true, island)
 			continue
 
 		land.append(cell)
@@ -515,7 +535,7 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 
 		#validation check
 		if not block_data.has(current): continue
-		if block_data[current].terrain == Terrain.Base.WATER: continue
+		if Terrain.is_waterlike(block_data[current].terrain): continue
 		if check_feature_empty and block_data[current].feature != Towers.Type.VOID: continue
 
 		result.append(current)
@@ -526,7 +546,7 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 
 		for n: Vector2i in neighbors:
 			var next = current + n
-			if block_data.has(next) and block_data[next].terrain != Terrain.Base.WATER and not processed.has(next):
+			if block_data.has(next) and not Terrain.is_waterlike(block_data[next].terrain) and not processed.has(next):
 				processed[next] = true
 				open_list.append(next)
 

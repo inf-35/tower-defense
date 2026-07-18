@@ -72,8 +72,9 @@ metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_j01gd")
+self_modulate = Color(0.55, 0.78, 1, 0.78)
 position = Vector2(-5.9604645e-08, 1.7881393e-07)
-scale = Vector2(0.072569445, 0.07256945)
+scale = Vector2(0.08, 0.08)
 texture = ExtResource("8_b31uj")
 
 [node name="Hitbox" type="Area2D" parent="."]

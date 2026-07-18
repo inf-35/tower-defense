@@ -10,7 +10,7 @@
 [resource]
 script = ExtResource("4_1jlla")
 id = 38
-cost = 38.0
+cost = 22.5
 element = 2
 is_upgrade = true
 upgrades_into = Dictionary[int, float]({

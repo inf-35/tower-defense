@@ -95,10 +95,8 @@ func _perform_heal_pulse() -> bool:
 		did_heal_anyone = true
 		_spawn_heal_vfx(ally)
 
-	#3. visual feedback for the healer itself
-	if did_heal_anyone:
-		_play_animation(&"cast") #assuming an animation exists
-		_spawn_pulse_vfx()
+	_play_animation(&"cast") #assuming an animation exists
+	_spawn_pulse_vfx()
 
 	#return true to reset cooldown, even if we didn't heal anyone?
 	#usually yes, to maintain the rhythm, or false to heal immediately when someone gets hurt.

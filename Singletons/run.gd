@@ -17,6 +17,7 @@ const PHASES_SCRIPT := preload("res://Singletons/phase_manager.gd")
 const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
 const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
 const TUTORIAL_DIRECTOR_SCRIPT := preload("res://Singletons/tutorial_director.gd")
+const ENVIRONMENT_DATABASE: EnvironmentDatabase = preload("res://Indexes/default_environments.tres")
 
 var _run_root: Node
 var _run_owner: Island
@@ -24,6 +25,7 @@ var _run_generation: int = 0
 var _is_run_ready: bool = false
 
 var pending_game_difficulty: GameDifficulty = GameDifficulty.NORMAL
+var pending_game_environment: GameEnvironment = GameEnvironment.WOODS
 var current_game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 var current_game_scaling: float = 1.0
 var current_game_environment: GameEnvironment = GameEnvironment.WOODS
@@ -37,6 +39,7 @@ var damage_tracker: DamageTrackerService
 var tutorials: TutorialDirector
 
 signal references_ready ##emitted once the current run is fully booted and safe to use
+signal run_ending ##emitted before the current island-owned run state is cleared
 
 func has_active_run() -> bool:
 	return is_instance_valid(_run_root)
@@ -72,7 +75,7 @@ func begin_run(island: Island) -> void:
 
 	current_game_difficulty = pending_game_difficulty
 	current_game_scaling = 1.0
-	current_game_environment = GameEnvironment.WOODS
+	current_game_environment = pending_game_environment
 
 	island.tree_exited.connect(_on_run_owner_tree_exited.bind(_run_generation), CONNECT_ONE_SHOT)
 	_prime_run_references.call_deferred(island, _run_generation)
@@ -89,18 +92,28 @@ func finalize_run_setup() -> void:
 
 func end_run() -> void:
 	_is_run_ready = false
+	if has_active_run():
+		run_ending.emit()
 	_clear_run_handles()
 	
 	current_game_scaling = 1.0
-	current_game_environment = GameEnvironment.WOODS
+	current_game_environment = pending_game_environment
 
 func set_pending_game_difficulty(game_difficulty: GameDifficulty) -> void:
 	pending_game_difficulty = game_difficulty
 	current_game_difficulty = game_difficulty
 
+func set_pending_game_environment(game_environment: GameEnvironment) -> void:
+	pending_game_environment = game_environment
+	current_game_environment = game_environment
+
+func get_environment_profile(game_environment: GameEnvironment = current_game_environment) -> EnvironmentProfile: ##returns the authored environment profile so runtime systems share one source of truth
+	return ENVIRONMENT_DATABASE.environment_profiles.get(int(game_environment), null)
+
 func get_save_data() -> Dictionary:
 	return {
 		"pending_game_difficulty": int(pending_game_difficulty),
+		"pending_game_environment": int(pending_game_environment),
 		"current_game_difficulty": int(current_game_difficulty),
 		"current_game_scaling": current_game_scaling,
 		"current_game_environment": int(current_game_environment),
@@ -109,9 +122,10 @@ func get_save_data() -> Dictionary:
 
 func load_save_data(data: Dictionary) -> void:
 	pending_game_difficulty = int(data.get("pending_game_difficulty", GameDifficulty.NORMAL))
+	pending_game_environment = int(data.get("pending_game_environment", GameEnvironment.WOODS))
 	current_game_difficulty = int(data.get("current_game_difficulty", pending_game_difficulty))
 	current_game_scaling = float(data.get("current_game_scaling", 1.0))
-	current_game_environment = int(data.get("current_game_environment", GameEnvironment.WOODS))
+	current_game_environment = int(data.get("current_game_environment", pending_game_environment))
 	if data.has("tutorials") and is_instance_valid(tutorials):
 		tutorials.load_save_data(data["tutorials"])
 

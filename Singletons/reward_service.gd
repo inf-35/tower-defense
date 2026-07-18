@@ -2,6 +2,7 @@
 extends Node
 
 signal reward_process_complete
+signal reward_applied(reward: Reward)
 
 #--- configuration ---
 const REWARD_DIRECTORY: String = "res://Content/Rewards/"
@@ -37,8 +38,10 @@ func _load_all_rewards() -> void:
 
 	for reward in reward_pool:
 		if reward.type == Reward.Type.UNLOCK_TOWER:
-			reward.price = snappedf(randf_range(6.0, 10.0), 0.1)
-		else:
+			reward.price = snappedf(randf_range(5.0, 8.0), 0.1)
+		elif reward.type == Reward.Type.ADD_RITE:
+			reward.price = snappedf(randf_range(2.0, 5.0), 0.1)
+		elif reward.type == Reward.Type.ADD_RELIC:
 			reward.price = snappedf(randf_range(3.0, 7.0), 0.1)
 
 func _scan_directory_recursive(path: String) -> void: ##loads authored reward prototypes into the shared runtime pool
@@ -255,12 +258,14 @@ func apply_reward(reward: Reward) -> bool:
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount
 			Run.player.flux += amount
+			reward_applied.emit(reward)
 			return true
 
 		Reward.Type.UNLOCK_TOWER:
 			var tower_type: Towers.Type = reward.tower_type
 			if tower_type != Towers.Type.VOID and not Run.player.is_tower_unlocked(tower_type):
 				Run.player.unlock_tower(tower_type)
+				reward_applied.emit(reward)
 				return true
 			return false
 
@@ -268,12 +273,14 @@ func apply_reward(reward: Reward) -> bool:
 			var relic: RelicData = reward.relic
 			if relic and not _player_has_relic_type(relic.type):
 				Run.player.add_relic(relic)
+				reward_applied.emit(reward)
 				return true
 			return false
 
 		Reward.Type.ADD_RITE:
 			var rite_type: Towers.Type = reward.rite_type
 			Run.player.add_rite(rite_type, 1)
+			reward_applied.emit(reward)
 			return true
 
 	return false

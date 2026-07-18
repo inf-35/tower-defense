@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://y3fmjqd4dpgt"]
+[gd_scene format=3 uid="uid://y3fmjqd4dpgt"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_ein27"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_v8yu7"]
@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="9_qtlu4"]
 [ext_resource type="Texture2D" uid="uid://hgq763rjsuls" path="res://Assets/town_floor.png" id="11_hfdks"]
 
-[node name="Town" type="Node2D" node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Town" type="Node2D" unique_id=608355952 node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_ein27")
 type = 5
@@ -25,29 +25,29 @@ movement_component = NodePath("MovementComponent")
 intrinsic_effects = Array[ExtResource("3_c84km")]([ExtResource("4_v8yu7")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1699019436]
 script = ExtResource("3_p4o20")
 movement_data = ExtResource("4_0fd6n")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1703749976]
 script = ExtResource("5_sxhhn")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=128868787]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("9_e5w4x")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1164000687]
 script = ExtResource("8_c84km")
 height_multiplier = 0.5
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=1953576088]
 z_index = 50
 z_as_relative = false
 texture = ExtResource("11_hfdks")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1395736162]
 script = ExtResource("9_qtlu4")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

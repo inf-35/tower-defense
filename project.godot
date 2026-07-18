@@ -15,6 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="tower_defense"
+config/version="0.0.1"
 run/main_scene="uid://mhb8xv30283p"
 config/features=PackedStringArray("4.6", "Mobile")
 run/max_fps=240
@@ -51,6 +52,7 @@ Sun="*res://Singletons/sun.gd"
 WindowSettings="*res://Singletons/window_settings.gd"
 Pause="*res://Singletons/pause.gd"
 SaveLoad="*res://Singletons/save_load.gd"
+Analytics="*res://Singletons/analytics.tscn"
 
 [display]
 

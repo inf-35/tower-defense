@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CapacityGeneratorEffect" load_steps=2 format=3 uid="uid://cqoa0ljfot6ra"]
+[gd_resource type="Resource" script_class="CapacityGeneratorEffect" format=3 uid="uid://cqoa0ljfot6ra"]
 
 [ext_resource type="Script" uid="uid://bigp8gkrdqok7" path="res://Content/Effects/_capacity_generator.gd" id="1_on2je"]
 
 [resource]
 script = ExtResource("1_on2je")
-base_capacity = 10.0
+base_capacity = 12.0
 effect_type = 2
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

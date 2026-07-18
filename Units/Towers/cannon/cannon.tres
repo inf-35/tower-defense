@@ -12,7 +12,7 @@
 script = ExtResource("1_dhi2e")
 id = 4
 tags = Array[int]([7])
-cost = 12.0
+cost = 7.0
 required_capacity = 1.2
 tower_name = "Cannon"
 tower_description = "Slow, yet a powerful heavy-hitter."

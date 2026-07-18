@@ -11,7 +11,7 @@
 script = ExtResource("5_o6e7m")
 target_type_name = "OUTPOST"
 id = 60
-cost = 6.0
+cost = 3.5
 element = 5
 tower_name = "Outpost"
 tower_description = "Aims forward at one [highlight:target tower], which no longer attacks by itself. Whenever any other [input:tower behind the outpost] fires, the [highlight:target tower] is commanded to fire, up to 3 times per second."

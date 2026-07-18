@@ -17,9 +17,9 @@ is_rite = true
 upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
-tower_name = "Poisons Rite"
-rite_short_name = "poisons"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 2 stacks of {POISON}, lasting 2 seconds."
+tower_name = "Rite of Plagues"
+rite_short_name = "plagues"
+tower_description = "{RITE_LABEL}. Adjacent towers spread {POISON} from poisoned enemies to nearby unpoisoned enemies."
 icon = ExtResource("1_47pug")
 preview = ExtResource("1_47pug")
 inspector_actions = Array[ExtResource("2_0b6ek")]([ExtResource("3_b1ovi")])

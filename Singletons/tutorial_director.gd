@@ -193,7 +193,7 @@ func _build_intro_chapters() -> void:
 		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_BAR_SELECTED, "Select a tower from the tower bar to inspect it."),
 		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_PLACED, "Place a tower down."),
 	]
-	towers.paragraph_text = "You can place towers to control the paths of enemies."
+	towers.paragraph_text = "You can place towers to control the paths of enemies. Try to make the enemies' paths as long as possible."
 	_intro_chapters.append(towers)
 
 	var information := TutorialContent.Chapter.new()
@@ -204,8 +204,8 @@ func _build_intro_chapters() -> void:
 		TutorialContent.Element.WAVE_TIMELINE,
 	]
 	information.checklist_items = [
-		TutorialContent.ChecklistItem.new(TutorialContent.Fact.PLAYER_STATS_HOVERED, "Hover on the icons in the player stats."),
-		TutorialContent.ChecklistItem.new(TutorialContent.Fact.WAVE_TIMELINE_HOVERED, "Hover on the icons in the wave timeline to see future events"),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.PLAYER_STATS_HOVERED, "Hover on the icons in the player stats (top-left)"),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.WAVE_TIMELINE_HOVERED, "Hover on the icons in the wave timeline (top-right) to see future events"),
 	]
 	information.paragraph_text = "You can hover on {KEYWORD_TUTORIAL}/icons (i.e. {BLEED}, {BURN}, {GOLD}) within tooltips (including these ones!)"
 	information.hover_targets = {

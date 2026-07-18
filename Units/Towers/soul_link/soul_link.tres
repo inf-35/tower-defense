@@ -11,7 +11,7 @@
 script = ExtResource("2_84niy")
 target_type_name = "SOUL_LINK"
 id = 66
-cost = 6.0
+cost = 3.5
 required_capacity = 0.8
 element = 5
 tower_name = "Soul Link"

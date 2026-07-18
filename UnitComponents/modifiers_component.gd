@@ -92,8 +92,11 @@ func replace_modifier(mod: Modifier, replacement: Modifier) -> void: #allows us 
 	add_modifier(replacement) #this calls stat_changed
 
 #add a status effect with new precedence rules
-func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int = 0) -> void:
+func add_status(type: Attributes.Status, stack: float, cooldown: float, source_id: int = 0) -> bool:
 	#NOTE: 0 by default refers to the player core
+	if _is_status_blocked_by_cleanse(type):
+		return false
+
 	#if a status of this type already exists, refresh it
 	if _status_effects.has(type):
 		var existing_status: StatusEffect = _status_effects[type]
@@ -102,7 +105,7 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 		#apply the updated state
 		update_status(existing_status)
 		check_reactions_for_status(type)
-		return
+		return true
 
 	#if it's a new status, create and configure it
 	var status := StatusEffect.new(type, stack, cooldown, source_id)
@@ -121,6 +124,12 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 		#gametimers automatically start
 	update_status(status)
 	check_reactions_for_status(type)
+	return true
+
+func _is_status_blocked_by_cleanse(type: Attributes.Status) -> bool:
+	if type == Attributes.Status.CLEANSE:
+		return false
+	return _status_effects.has(Attributes.Status.CLEANSE)
 
 #update a status effect
 func update_status(status: StatusEffect) -> void:

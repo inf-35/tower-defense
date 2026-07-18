@@ -11,7 +11,7 @@
 script = ExtResource("2_cqlpt")
 id = 18
 tags = Array[int]([4])
-cost = 12.0
+cost = 7.0
 element = 5
 tower_name = "Mage"
 tower_description = "Mages energise adjacent contiguous {T_PALISADE|label=Walls}, inflicting {CURSED}"

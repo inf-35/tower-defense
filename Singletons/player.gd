@@ -18,7 +18,7 @@ signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, co
 const DEBUG_REMOVE_RELIC_ACTION: StringName = &"debug_remove_relic"
 
 const DEBUG_CAPACITY: bool = false
-const RITE_EXCAVATION_COST: float = 3.0
+const RITE_EXCAVATION_COST: float = 2.0
 const BASE_RELIC_SLOTS: int = 4
 const RELIC_SLOT_FIRST_COST: float = 8.0
 const RELIC_SLOT_COST_SCALE: float = 1.8

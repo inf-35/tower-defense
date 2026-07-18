@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1")
-max_health = 18.0
-flat_damage_taken = -1.4
+max_health = 22.0
+flat_damage_taken = -1.6

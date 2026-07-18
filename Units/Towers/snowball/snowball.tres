@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=7 format=3 uid="uid://cledbfomsigv"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cledbfomsigv"]
 
 [ext_resource type="Texture2D" uid="uid://r76io870gwkf" path="res://Assets/snowball_tower.png" id="1_5y808"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_cmlbd"]
@@ -10,8 +10,9 @@
 [resource]
 script = ExtResource("3_tm8p4")
 id = 24
-tags = Array[int]([1])
+cost = 8.0
 element = 1
+tags = Array[int]([1])
 tower_name = "Snowball"
 tower_description = "Faces one direction and fires a piercing snowball that damages and {FROST|label=Freezes} all enemies in a line. The projectile stops only at max range or when hitting a structure."
 icon = ExtResource("1_5y808")

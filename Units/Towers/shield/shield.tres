@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("2_kr28s")
 id = 12
+cost = 7.5
 element = 4
 tower_name = "Shield"
 tower_description = "Towers adjacent to shields take 75% less damage."

@@ -3,7 +3,7 @@ class_name ShopOptionCard
 
 @export var price_text: InteractiveRichTextLabel
 
-const UNAFFORDABLE_ALPHA: float = 0.5
+const UNAFFORDABLE_ALPHA: float = 0.65
 const UNAFFORDABLE_BRIGHTNESS: float = 0.8
 
 var _has_gold: bool = true

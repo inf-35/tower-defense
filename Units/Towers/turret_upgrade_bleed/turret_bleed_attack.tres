@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_i3c6p"]
 script = ExtResource("3_mr3g7")
 type = 5
-cooldown = 2.0
+cooldown = 1.333333
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_e3651"]
@@ -24,6 +24,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [resource]
 script = ExtResource("2_6chqq")
 delivery_method = 1
+cooldown = 1.333333
 radius = 5.0
 damage = 0.8
 status_effects = Array[ExtResource("3_mr3g7")]([SubResource("Resource_i3c6p")])

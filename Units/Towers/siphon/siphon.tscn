@@ -156,6 +156,7 @@ _data = {
 [sub_resource type="Resource" id="Resource_w60fo"]
 script = ExtResource("14_iqhky")
 range = 30.0
+cooldown = 1.333333
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [sub_resource type="Resource" id="Resource_rvgqw"]

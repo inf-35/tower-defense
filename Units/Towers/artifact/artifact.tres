@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("4_v48tl")
 id = 7
-cost = 1.5
+cost = 1.0
 required_capacity = 0.0
 element = 5
 tower_name = "Artifact"

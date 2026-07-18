@@ -4,8 +4,9 @@
 
 [resource]
 script = ExtResource("1_na8uw")
-id_name = "flame_rite"
-description = "this is a relic reward description"
+id_name = "plagues_rite"
+title = "Rite of Plagues"
+description = "rite reward"
 type = 3
 rite_type = 29
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

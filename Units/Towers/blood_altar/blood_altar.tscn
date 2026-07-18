@@ -33,7 +33,7 @@ attack_component = NodePath("AttackComponent")
 
 [node name="BloodAltarBehavior" type="Node" parent="." unique_id=455360217]
 script = ExtResource("7_eu6my")
-structure_damage = 1.5
+structure_damage = 2.0
 
 [node name="MovementComponent" type="Node" parent="." unique_id=720563198]
 script = ExtResource("8_isxa0")

@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_dk6pn"]
 script = ExtResource("3_dxh48")
 type = 4
-cooldown = 3.0
+cooldown = 1.333333
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_kr0na"]
@@ -29,6 +29,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 script = ExtResource("2_3gio5")
 delivery_method = 3
 range = 10.0
+cooldown = 2.0
 radius = 10.0
 damage = 0.25
 breaking = true

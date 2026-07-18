@@ -1,0 +1,70 @@
+[gd_resource type="Resource" script_class="EnvironmentDatabase" format=3 uid="uid://dc8lp3kpg3jn1"]
+
+[ext_resource type="Script" uid="uid://chadv8nia6sra" path="res://Objects/Indexes/environment_database.gd" id="1_environment_database"]
+[ext_resource type="Script" uid="uid://dfli5bbr26ss7" path="res://Content/environment_profile.gd" id="2_environment_profile"]
+[ext_resource type="Script" uid="uid://dk1gy0e6eorr2" path="res://Objects/Indexes/terrain_base_stat.gd" id="3_terrain_base_stat"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_modifier"]
+[ext_resource type="Texture2D" uid="uid://pb6220cxxuje" path="res://Assets/highland_placeholder.png" id="5_highland_icon"]
+[ext_resource type="Texture2D" uid="uid://dwha3anjlqofr" path="res://Assets/trees.png" id="6_woods_forest"]
+[ext_resource type="Texture2D" uid="uid://lycsyol0gttf" path="res://Assets/forest_shadow.png" id="7_woods_shadow"]
+[ext_resource type="Texture2D" uid="uid://b3vk8hysr1tik" path="res://Assets/pines.png" id="8_winter_forest"]
+[ext_resource type="Texture2D" uid="uid://8kcpw4bfiyvq" path="res://Assets/pine_shadows.png" id="9_winter_shadow"]
+
+[sub_resource type="Resource" id="Resource_woods_profile"]
+script = ExtResource("2_environment_profile")
+display_name = "Woods"
+forest_texture = ExtResource("6_woods_forest")
+forest_shadow_texture = ExtResource("7_woods_shadow")
+forest_shadow_position = Vector2(0, 33.33)
+forest_shadow_scale = Vector2(1.047, 1.032)
+
+[sub_resource type="Resource" id="Resource_winter_earth"]
+script = ExtResource("3_terrain_base_stat")
+color = Color(0.935, 0.94, 0.922, 1)
+wash_color = Color(0.95, 0.956, 0.94, 0.22)
+navigable = true
+constructable = true
+
+[sub_resource type="Resource" id="Resource_highland_modifier"]
+script = ExtResource("4_modifier")
+attribute = 7
+multiplicative = 1.5
+
+[sub_resource type="Resource" id="Resource_winter_highland"]
+script = ExtResource("3_terrain_base_stat")
+color = Color(0.7872, 0.80687994, 0.82, 1)
+wash_color = Color(0.8835, 0.91295004, 0.93, 0.627451)
+texture = ExtResource("5_highland_icon")
+navigable = true
+constructable = true
+modifiers = Array[ExtResource("4_modifier")]([SubResource("Resource_highland_modifier")])
+
+[sub_resource type="Resource" id="Resource_winter_profile"]
+script = ExtResource("2_environment_profile")
+display_name = "Winter"
+open_water_base = 4
+open_water_label = "Ice"
+lake_noise_frequency_multiplier = 1.15
+clear_color = Color(0.9098039, 0.8745098, 0.81960785, 1)
+ui_canvas_color = Color(0.91, 0.87511665, 0.819, 1)
+paper_background_color = Color(0.972, 0.972, 0.964, 1)
+lake_preview_outline_color = Color(0.398, 0.53, 0.64, 0.192)
+lake_preview_fill_color = Color(0.772, 0.861, 0.93, 0.03)
+terrain_base_overrides = Dictionary[int, ExtResource("3_terrain_base_stat")]({
+0: SubResource("Resource_winter_earth"),
+2: SubResource("Resource_winter_highland")
+})
+placement_count_multipliers = Dictionary[int, float]({
+19: 1.5
+})
+forest_texture = ExtResource("8_winter_forest")
+forest_shadow_texture = ExtResource("9_winter_shadow")
+forest_shadow_position = Vector2(0, 25)
+forest_shadow_scale = Vector2(1.047, 1.032)
+
+[resource]
+script = ExtResource("1_environment_database")
+environment_profiles = Dictionary[int, ExtResource("2_environment_profile")]({
+0: SubResource("Resource_woods_profile"),
+1: SubResource("Resource_winter_profile")
+})

@@ -212,8 +212,12 @@ func _count_adjacent_terrains(tower: Tower) -> int: ##counts adjacent cells whos
 
 	var count: int = 0
 	for cell: Vector2i in tower.get_adjacent_cells():
-		if reference_terrain_types.has(Run.references.island.get_terrain_base(cell)):
+		var terrain_base: Terrain.Base = Run.references.island.get_terrain_base(cell)
+		for reference_terrain: Terrain.Base in reference_terrain_types:
+			if not Terrain.matches_reference_terrain(terrain_base, reference_terrain):
+				continue
 			count += 1
+			break
 	return count
 
 func _count_adjacent_empty_cells(tower: Tower) -> int: ##matches liberty's notion of free adjacencies by counting in-bounds adjacent cells with no tower on them
@@ -292,7 +296,11 @@ func _count_affecting_rites(tower: Tower) -> int: ##counts distinct rite sources
 func _matches_host_terrain(tower: Tower) -> bool: ##keeps terrain-gated relics on the same count-based interface as the other conditional modes
 	if host_terrain_types.is_empty():
 		return false
-	return host_terrain_types.has(tower.get_terrain_base())
+	var host_terrain: Terrain.Base = tower.get_terrain_base()
+	for reference_terrain: Terrain.Base in host_terrain_types:
+		if Terrain.matches_reference_terrain(host_terrain, reference_terrain):
+			return true
+	return false
 
 func _collect_active_rite_source_ids() -> Dictionary[int, bool]: ##builds a live membership set so modifier source ids can be filtered down to currently active rite towers
 	var rite_source_ids: Dictionary[int, bool] = {}

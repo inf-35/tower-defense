@@ -12,7 +12,7 @@
 script = ExtResource("3_hsyy1")
 id = 22
 size = Vector2i(2, 2)
-cost = 20.0
+cost = 12.0
 required_capacity = 2.0
 tower_name = "Mortar"
 tower_description = "Slow yet far-reaching AOE damage-dealer, effective at crowd control."

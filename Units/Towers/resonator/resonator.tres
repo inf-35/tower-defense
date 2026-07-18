@@ -17,7 +17,7 @@ metadata/_custom_type_script = "uid://do6qrosup8u56"
 script = ExtResource("6_muh02")
 target_type_name = "RESONATOR"
 id = 64
-cost = 7.0
+cost = 4.0
 upgrades_into = Dictionary[int, float]({
 34: 10.0,
 35: 10.0

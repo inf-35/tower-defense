@@ -162,13 +162,19 @@ func _spawn_enemies_for_current_wave() -> void:
 func spawn_enemy(unit_type: Units.Type, position: Vector2) -> Unit:
 	var unit: Unit = Units.create_unit(unit_type)
 	unit.add_to_group(ENEMY_GROUP)
-	unit.died.connect(func(_hit_report_data): _on_enemy_died(unit), CONNECT_ONE_SHOT)
+	unit.ready.connect(_register_enemy_death_tracking.bind(unit), CONNECT_ONE_SHOT)
 	Run.references.island.add_child.call_deferred(unit)
 	unit.movement_component.set_deferred(&"position", position)
 
 	#increment the spawned counter only after the unit is created
 	_enemies_spawned += 1
 	return unit
+
+func _register_enemy_death_tracking(unit: Unit) -> void:
+	if not is_instance_valid(unit):
+		return
+
+	unit.died.connect(func(_hit_report_data: HitReportData): _on_enemy_died(unit), CONNECT_ONE_SHOT)
 
 func _on_wave_cycle_started(wave_number: int) -> void: ##seeds a stable roster for the newly prepared wave and rebuilds any per-breach previews against it
 	_cache_wave_enemy_plan(wave_number)
@@ -251,7 +257,8 @@ func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy as
 	for breach: Tower in active_breaches:
 		if not is_instance_valid(breach):
 			continue
-		var assigned_units: Array[Units.Type] = breach_streams.get(breach.unit_id, [])
+		var assigned_units: Array[Units.Type]
+		assigned_units.assign(breach_streams.get(breach.unit_id, []))
 		_breach_enemy_assignments[breach.unit_id] = WaveEnemies._consolidate_enemy_list(assigned_units)
 		UI.update_unit_state.emit(breach)
 

@@ -62,14 +62,11 @@ func _create_debug_view() -> void:
 	add_child(c)
 
 func _setup_configuration() -> void:
-	match Run.current_game_environment:
-		Run.GameEnvironment.WINTER:
-			RenderingServer.set_default_clear_color(Color(0.867, 0.871, 0.867))
-			color_rect.color = Color(0.87, 0.87, 0.87, 1.0)
-
-		Run.GameEnvironment.WOODS:
-			RenderingServer.set_default_clear_color(Color(0.992, 0.937, 0.847))
-			color_rect.color = Color(0.992, 0.937, 0.847)
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	if profile == null:
+		return
+	RenderingServer.set_default_clear_color(profile.clear_color)
+	color_rect.color = profile.ui_canvas_color
 
 func _setup_visuals() -> void:
 	#initialize with a small empty grid
@@ -93,7 +90,8 @@ func _setup_visuals() -> void:
 
 	if draw_background:
 		_bg_rect = ColorRect.new()
-		_bg_rect.color = Color(1.0, 0.976, 0.941, 1.0)
+		var profile: EnvironmentProfile = Run.get_environment_profile()
+		_bg_rect.color = profile.paper_background_color if profile != null else Color(1.0, 0.976, 0.941, 1.0)
 		_bg_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_bg_rect.size = Vector2(10000,10000)
 		_bg_rect.position = Vector2(-5000,-5000)

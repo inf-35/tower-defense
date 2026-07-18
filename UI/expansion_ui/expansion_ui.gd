@@ -140,7 +140,7 @@ func _should_show_feature_type(feature_type: Towers.Type) -> bool: ##filters exp
 func _count_land_tiles(choice: ExpansionChoice) -> int:
 	var count: int = 0
 	for cell: Vector2i in choice.block_data:
-		if choice.block_data[cell].terrain != Terrain.Base.WATER:
+		if not Terrain.is_waterlike(choice.block_data[cell].terrain):
 			count += 1
 	return count
 

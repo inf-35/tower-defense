@@ -318,12 +318,12 @@ func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
 			msg += "\n(Range Bonus)"
 		elif terrain == Terrain.Base.SETTLEMENT:
 			msg += "\n(Used to build villages)"
-		elif terrain == Terrain.Base.WATER:
-			msg += "\n(Blocks building and movement)"
+		elif Terrain.is_waterlike(terrain):
+			msg += "\n(Blocks building, enemies can traverse it)"
 		return msg
 
 	if _is_uncharted_lake_cell(island, cell):
-		return "Uncharted Water\n(Blocks building and movement once revealed)"
+		return "Uncharted %s\n(Blocks building, enemies can traverse it once revealed)" % Terrain.get_open_water_label()
 	if island.has_ruin_site(cell):
 		return "Uncharted {T_RUINS}\n(Search it for one reward once uncovered)"
 

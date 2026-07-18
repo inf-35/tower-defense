@@ -1,9 +1,19 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=3 format=3 uid="uid://cjymwipchiax2"]
+[gd_resource type="Resource" script_class="UnitData" load_steps=7 format=3 uid="uid://cjymwipchiax2"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_juj3o"]
+[ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="2_icon"]
 [ext_resource type="PackedScene" uid="uid://chmntoippcxd" path="res://Units/Enemies/phantom/phantom.tscn" id="2_phe1k"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3_stat"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="4_hp"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="5_speed"]
 
 [resource]
 script = ExtResource("1_juj3o")
+title = "Phantom"
+icon = ExtResource("2_icon")
+description = "Flickers forward along the path, punishing single chokepoints."
+stat_displays = Array[ExtResource("3_stat")]([ExtResource("4_hp"), ExtResource("5_speed")])
 unit_scene = ExtResource("2_phe1k")
+flux_value = 0.4
+strength_value = 1.25
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

@@ -17,7 +17,7 @@ metadata/_custom_type_script = "uid://do6qrosup8u56"
 script = ExtResource("6_dnlvm")
 target_type_name = "SIPHON"
 id = 63
-cost = 7.0
+cost = 4.0
 upgrades_into = Dictionary[int, float]({
 34: 10.0,
 35: 10.0

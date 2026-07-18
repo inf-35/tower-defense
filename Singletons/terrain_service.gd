@@ -74,7 +74,12 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 
 			#--- new: specific terrain check ---
 			if not allowed_terrains.is_empty():
-				if not allowed_terrains.has(terrain):
+				var is_allowed: bool = false
+				for allowed_terrain: Terrain.Base in allowed_terrains:
+					if Terrain.matches_reference_terrain(terrain, allowed_terrain):
+						is_allowed = true
+						break
+				if not is_allowed:
 					return false
 			#-----------------------------------
 
@@ -131,7 +136,12 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 			var terrain = island.terrain_base_grid[check_cell]
 
 			if not allowed_terrains.is_empty():
-				if not allowed_terrains.has(terrain):
+				var is_allowed: bool = false
+				for allowed_terrain: Terrain.Base in allowed_terrains:
+					if Terrain.matches_reference_terrain(terrain, allowed_terrain):
+						is_allowed = true
+						break
+				if not is_allowed:
 					#generate nice error message
 					var required_names = []
 					for t in allowed_terrains:

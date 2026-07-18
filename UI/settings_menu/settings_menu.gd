@@ -7,6 +7,7 @@ class_name SettingsMenu
 @export var music_slider: HSlider
 @export var fullscreen_toggle: CheckButton
 @export var show_all_health_bars_toggle: CheckButton ##toggles whether all damaged units should always show their health bars
+@export var show_attached_effect_icons_toggle: CheckButton ##toggles hp-bar icons for opted-in attached effects such as temporary rite markers
 @export var back_button: Button
 
 @export var resume_button: Button
@@ -54,6 +55,7 @@ func _ready() -> void:
 
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
 	show_all_health_bars_toggle.toggled.connect(_on_show_all_health_bars_toggled)
+	show_attached_effect_icons_toggle.toggled.connect(_on_show_attached_effect_icons_toggled)
 	back_button.pressed.connect(back)
 	resume_button.pressed.connect(func(): close_menu())
 	settings_button.pressed.connect(func(): enter_state(State.SETTINGS))
@@ -119,6 +121,7 @@ func _load_current_settings() -> void:
 	#fullscreen
 	fullscreen_toggle.button_pressed = WindowSettings.is_fullscreen_enabled()
 	show_all_health_bars_toggle.button_pressed = Pause.show_all_health_bars
+	show_attached_effect_icons_toggle.button_pressed = Pause.show_attached_effect_icons
 
 func _on_volume_changed(value: float, bus_index: int) -> void:
 	#convert linear slider (0-1) to decibels
@@ -134,6 +137,10 @@ func _on_fullscreen_toggled(is_fullscreen: bool) -> void:
 
 func _on_show_all_health_bars_toggled(is_enabled: bool) -> void: ##applies the hp-bar visibility preference immediately and persists it to the profile store
 	Pause.show_all_health_bars = is_enabled
+	SaveLoad.save_profile()
+
+func _on_show_attached_effect_icons_toggled(is_enabled: bool) -> void: ##applies the attached-effect icon preference immediately and persists it to the profile store
+	Pause.show_attached_effect_icons = is_enabled
 	SaveLoad.save_profile()
 
 func _on_save_and_quit() -> void:

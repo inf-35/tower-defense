@@ -9,6 +9,7 @@ var effect_type: Effects.Type ##id of this type of effect
 var schedule: EffectPrototype.Schedule
 var event_hooks: Array[GameEvent.EventType]
 var duration: float = -1.0 ##negative = permanent
+var timer: Clock.GameTimer
 
 var stacks: int = 0: ##how many stacks of this effect (mainly used for bookkeeping)
 	set(ns):
@@ -31,6 +32,8 @@ func _init() -> void:
 
 func detach() -> void:
 	enabled = false
+	if is_instance_valid(timer):
+		timer.is_active = false
 	if global or is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 
@@ -57,3 +60,43 @@ func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit i
 			return
 
 	effect_prototype.event_handler.call(self, event)
+
+func should_show_status_icon() -> bool: ##returns whether this runtime effect is eligible for hp-bar icon presentation
+	return is_instance_valid(effect_prototype) and effect_prototype.show_as_status_icon and is_instance_valid(effect_prototype.icon)
+
+func get_display_duration() -> float: ##returns remaining timed duration, or the authored permanent marker
+	if is_instance_valid(timer) and timer.is_active:
+		return maxf(timer.duration - timer.time_elapsed, 0.0)
+
+	return duration
+
+func refresh_duration(new_duration: float) -> void: ##starts or refreshes a game-time duration for temporary attached effects
+	duration = new_duration
+	if new_duration <= 0.0:
+		notify_display_changed()
+		return
+
+	if is_instance_valid(timer) and timer.is_active:
+		timer.time_elapsed = 0.0
+		timer.duration = new_duration
+	else:
+		timer = Clock.create_game_timer(new_duration)
+		timer.timeout.connect(_on_duration_timeout)
+
+	notify_display_changed()
+
+func notify_display_changed() -> void: ##asks the host unit to refresh this effect's hp-bar icon if it is displayable
+	if not should_show_status_icon():
+		return
+	if not is_instance_valid(host):
+		return
+
+	host.effect_display_changed.emit(self, float(stacks), get_display_duration())
+
+func _on_duration_timeout() -> void:
+	if not enabled:
+		return
+	if not is_instance_valid(host):
+		return
+
+	host.remove_effect(effect_prototype)
