@@ -61,6 +61,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 		hit.target_affiliation = tower.hostile #matches self affiliation
 		if not hit.derive_lineage_from(hit_data, instance):
 			continue
+		hit.attack_id = AttackComponent.get_next_attack_id()
+		hit.primary = false
 
 		#apply directly so it mitigates through standard defensive layers
 		tower.take_hit(hit)

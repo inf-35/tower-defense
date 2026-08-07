@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_ktdqc"]
 [ext_resource type="PackedScene" uid="uid://13cf44n6d3h8" path="res://Units/Enemies/summoner/summoner.tscn" id="2_ysn46"]
-[ext_resource type="Texture2D" uid="uid://ceb7ksik3lia2" path="res://Assets/mage_provisional.png" id="3_icon"]
+[ext_resource type="Texture2D" path="res://Assets/summoner.png" id="3_icon"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="4_stat"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_hp"]
 [ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6_speed"]

@@ -49,7 +49,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="OutpostBehavior" type="Node" parent="." unique_id=1213460094]
 script = ExtResource("4_ters3")
 suppression_modifier = SubResource("Resource_kbsww")
-max_commands_per_second = 10.0
+max_commands_per_second = 3.0
 command_beam_vfx = SubResource("Resource_command_beam_vfx")
 metadata/_custom_type_script = "uid://ujin37rk7ep2"
 

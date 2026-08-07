@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RewardPrototype" load_steps=5 format=3 uid="uid://c3k8ksfodhx2v"]
+[gd_resource type="Resource" script_class="RewardPrototype" load_steps=6 format=3 uid="uid://c3k8ksfodhx2v"]
 
 [ext_resource type="Resource" uid="uid://dxodj5es1nf4c" path="res://Content/Relics/sepsis/sepsis.tres" id="1_relic"]
 [ext_resource type="Script" path="res://Content/reward_tag_rule.gd" id="2_rule"]
@@ -9,6 +9,11 @@ script = ExtResource("2_rule")
 tags = Array[int]([0])
 operation = 1
 
+[sub_resource type="Resource" id="Resource_bleed_rule"]
+script = ExtResource("2_rule")
+tags = Array[int]([9])
+operation = 1
+
 [resource]
 script = ExtResource("3_reward")
 id_name = "sepsis"
@@ -17,5 +22,5 @@ type = 2
 relic_data = ExtResource("1_relic")
 base_rarity = 1
 weight_scale = 1.5
-tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_rule")])
+tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_rule"), SubResource("Resource_bleed_rule")])
 

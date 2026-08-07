@@ -410,9 +410,12 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 
 		return null
 
-	if get_effect_instance_by_prototype(effect_prototype):
-		var existing_effect_instance: EffectInstance = get_effect_instance_by_prototype(effect_prototype)
-		existing_effect_instance.stacks += stacks
+	if _is_statuslike_effect_blocked(effect_prototype):
+		return null
+
+	var existing_effect_instance: EffectInstance = get_effect_instance_by_prototype(effect_prototype)
+	if is_instance_valid(existing_effect_instance):
+		_refresh_existing_effect_stacks(existing_effect_instance, stacks)
 		existing_effect_instance.notify_display_changed()
 		return existing_effect_instance
 
@@ -428,17 +431,25 @@ func apply_effect(effect_prototype: EffectPrototype, stacks: int = 1) -> EffectI
 	effect_instance.notify_display_changed()
 	return effect_instance
 
+func _refresh_existing_effect_stacks(effect_instance: EffectInstance, incoming_stacks: int) -> void:
+	if is_instance_valid(effect_instance.effect_prototype) and effect_instance.effect_prototype.counts_as_status:
+		effect_instance.stacks = maxi(effect_instance.stacks, incoming_stacks)
+		return
+
+	effect_instance.stacks += incoming_stacks
+
 func remove_effect(effect_prototype: EffectPrototype) -> void: ##clears all effects, regardless of number
 	var effects_to_remove: Array[EffectInstance] = get_effect_instances_by_prototype(effect_prototype)
 
 	for effect in effects_to_remove:
 		if effect.should_show_status_icon():
 			effect_display_removed.emit(effect)
+		effect.mark_removing()
 		effect.detach() #trigger effect's detach handler
 		for event_hook in effect.event_hooks:
 			effects[effect.schedule][event_hook].erase(effect)
 
-		effect.free()
+		effect.call_deferred("free")
 
 	effect_prototypes.erase(effect_prototype)
 
@@ -447,6 +458,42 @@ func refresh_effect_displays() -> void: ##re-emits all active attached effect ic
 		for instance_array: Array in schedule_dictionary.values():
 			for effect_instance: EffectInstance in instance_array:
 				effect_instance.notify_display_changed()
+
+func get_statuslikes() -> Dictionary: ##returns active real statuses and attached effects that should be treated as statuses
+	var statuslikes: Dictionary = {
+		&"statuses": [],
+		&"effects": [],
+	}
+	if is_instance_valid(modifiers_component):
+		statuslikes[&"statuses"] = modifiers_component.get_active_statuses()
+	statuslikes[&"effects"] = _get_statuslike_effect_instances()
+	return statuslikes
+
+func _get_statuslike_effect_instances() -> Array[EffectInstance]:
+	var output: Array[EffectInstance] = []
+	for schedule_dictionary: Dictionary in effects.values():
+		for instance_array: Array in schedule_dictionary.values():
+			for effect_instance: EffectInstance in instance_array:
+				if not is_instance_valid(effect_instance):
+					continue
+				if output.has(effect_instance):
+					continue
+				if not effect_instance.counts_as_status():
+					continue
+
+				output.append(effect_instance)
+
+	return output
+
+func _is_statuslike_effect_blocked(effect_prototype: EffectPrototype) -> bool:
+	if not is_instance_valid(effect_prototype):
+		return false
+	if not effect_prototype.counts_as_status:
+		return false
+	if not is_instance_valid(modifiers_component):
+		return false
+
+	return modifiers_component.blocks_statuslike_effects()
 
 #helper to find a specific running instance of a prototype on this unit
 func get_effect_instance_by_prototype(proto: EffectPrototype) -> EffectInstance:
@@ -516,6 +563,7 @@ func take_hit(hit: HitData) -> void:
 	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
 
 	if hit.negate: #ignore negated hits
+		health_component.show_damage_number(0.0)
 		return
 
 	var damage: float = evt.data.damage
@@ -530,6 +578,7 @@ func take_hit(hit: HitData) -> void:
 	hit_report.recursion = hit.recursion #NOTE: a hit and its corresponding report are of the SAME recursion
 	hit_report.target = self
 	hit_report.attack_id = hit.attack_id
+	hit_report.primary = hit.primary
 	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = delta_health
@@ -584,7 +633,9 @@ func on_killed(hit_report_data: HitReportData) -> void:
 	Targeting.clear_damage(self) #clear any damage that might be locked on to us
 
 	behavior.detach() #disable behavior
-	for effect_prototype: EffectPrototype in effect_prototypes:
+	var active_effect_prototypes: Array[EffectPrototype]
+	active_effect_prototypes.assign(effect_prototypes)
+	for effect_prototype: EffectPrototype in active_effect_prototypes:
 		remove_effect(effect_prototype) #detach effects
 
 	if is_instance_valid(corpse_component):

@@ -18,14 +18,77 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_ft41b"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_c1n2m"]
 
-[node name="Plant" type="Node2D" unique_id=958980380 node_paths=PackedStringArray("turret", "behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[sub_resource type="Animation" id="Animation_plant_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1.0555556, 1.0555556)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 2.3841858e-07)]
+}
+
+[sub_resource type="Animation" id="Animation_plant_attack"]
+resource_name = "attack"
+length = 0.42
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.11, 0.24, 0.42),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1.0555556, 1.0555556), Vector2(0.74, 1.28), Vector2(1.24, 0.9), Vector2(1, 1.08), Vector2(1.0555556, 1.0555556)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.08, 0.18, 0.3, 0.42),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 2.3841858e-07), Vector2(0, 2.3841858e-07), Vector2(-14, 2.3841858e-07), Vector2(-6, 2.3841858e-07), Vector2(2, 2.3841858e-07), Vector2(0, 2.3841858e-07)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_plant"]
+_data = {
+&"RESET": SubResource("Animation_plant_reset"),
+&"attack": SubResource("Animation_plant_attack")
+}
+
+[node name="Plant" type="Node2D" unique_id=958980380 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_670td")
 type = 15
-turret = NodePath("Graphics/Turret")
+turret = NodePath("Graphics/TurretFrame")
 stat_displays = Array[ExtResource("2_k6lwd")]([ExtResource("3_40f40"), ExtResource("4_c1n2m"), ExtResource("4_rirfx"), ExtResource("5_c1n2m")])
 behavior = NodePath("PlantTowerBehavior")
 graphics = NodePath("Graphics")
+animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
@@ -35,7 +98,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="PlantTowerBehavior" type="Node" parent="." unique_id=874438432]
 script = ExtResource("3_670td")
-additive_damage_per_forest = 1.0
+additive_damage_per_forest = 0.5
 metadata/_custom_type_script = "uid://bpjh5lj6vdqel"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1048465234]
@@ -54,21 +117,23 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 [node name="AttackComponent" type="Node" parent="." unique_id=2063761597 node_paths=PackedStringArray("muzzle")]
 script = ExtResource("8_jh1kv")
 attack_data = ExtResource("9_8152j")
-muzzle = NodePath("../Graphics/Turret/Muzzle")
+muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=51508056]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_670td")
 
-[node name="Turret" type="Sprite2D" parent="Graphics" unique_id=552555545]
+[node name="TurretFrame" type="Node2D" parent="Graphics" unique_id=966071523]
 z_index = 1
+
+[node name="Turret" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=552555545]
 position = Vector2(0, 2.3841858e-07)
 scale = Vector2(1.0555556, 1.0555556)
 texture = ExtResource("11_k6lwd")
 offset = Vector2(28, 0)
 
-[node name="Muzzle" type="Marker2D" parent="Graphics/Turret" unique_id=1571442330]
+[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=1571442330]
 position = Vector2(51.0289, 0)
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1168679258]
@@ -78,3 +143,7 @@ metadata/_custom_type_script = "uid://cgkca68adlq8y"
 [node name="ModifiersComponent" type="Node" parent="." unique_id=28298067]
 script = ExtResource("12_ft41b")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=544159866]
+root_motion_local = true
+libraries/ = SubResource("AnimationLibrary_plant")

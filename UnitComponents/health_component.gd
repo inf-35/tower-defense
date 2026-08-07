@@ -54,7 +54,10 @@ func take_damage(damage: float, breaking: bool = false) -> void:
 	#health phase
 	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
 		health -= damage
-		UI.floating_text_manager.show_value(damage, unit.global_position)
+		show_damage_number(damage)
+
+func show_damage_number(damage: float) -> void: ##displays the standard damage marker without changing health
+	UI.floating_text_manager.show_value(damage, unit.global_position)
 
 func _ready() -> void:
 	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)

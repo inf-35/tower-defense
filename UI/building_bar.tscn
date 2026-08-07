@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_tkmsn"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_rich"]
 
-[node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "trade_button", "trade_button_label")]
+[node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "trade_button", "trade_button_label", "tower_slot_label")]
 clip_contents = true
 custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
@@ -21,6 +21,7 @@ script = ExtResource("1_08diq")
 towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
 trade_button = NodePath("HBoxContainer/trade")
 trade_button_label = NodePath("HBoxContainer/trade/label")
+tower_slot_label = NodePath("HBoxContainer/TowerSlotsPanel/MarginContainer/slot_label")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=230116015]
 layout_mode = 1
@@ -51,7 +52,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
-text = "Trade (T)"
+text = "Upgrades (T)"
 scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -80,3 +81,26 @@ theme_override_constants/separation = 12
 [node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" unique_id=132609132 instance=ExtResource("3_uep1a")]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
+
+[node name="TowerSlotsPanel" type="PanelContainer" parent="HBoxContainer" unique_id=1509594030]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_type_variation = &"simple_panel"
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/TowerSlotsPanel" unique_id=373565510]
+layout_mode = 2
+theme_type_variation = &"MarginSuperminor"
+
+[node name="slot_label" type="RichTextLabel" parent="HBoxContainer/TowerSlotsPanel/MarginContainer" unique_id=1980623880]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"rt_s20"
+bbcode_enabled = true
+text = "Towers: 0/8"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+script = ExtResource("5_rich")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"

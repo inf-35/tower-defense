@@ -88,9 +88,8 @@ func _rebuild_prism_network() -> void:
 				var path_clear: bool = true
 				var line: Array[Vector2i] = _get_line_between(pos_a, pos_b)
 				for cell: Vector2i in line:
-					#a cell is an obstruction if it has a tower that is marked as 'blocking'
-					#unless it is the player core, which should still be counted as solid despite being non-blocking
-					if island.tower_grid.has(cell) and (island.tower_grid[cell].blocking or island.tower_grid[cell].type == Towers.Type.PLAYER_CORE):
+					var blocking_tower: Tower = island.get_tower_on_tile(cell)
+					if is_instance_valid(blocking_tower) and blocking_tower.blocks_line_of_sight_at_cell(cell):
 						path_clear = false
 						break
 

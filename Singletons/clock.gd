@@ -16,7 +16,7 @@ enum GameSpeed {
 	FAST_FORWARD
 }
 
-const PAUSE_SPEED: float = 0.0
+const PAUSE_SPEED: float = 0.2
 const BASE_SPEED: float = 1.0
 const FAST_FORWARD_SPEED: float = 3.0
 

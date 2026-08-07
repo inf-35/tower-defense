@@ -9,7 +9,7 @@
 [resource]
 script = ExtResource("3_pdx2k")
 id = 29
-tags = Array[int]([0, 3])
+tags = Array[int]([0])
 cost = 0.0
 required_capacity = 0.0
 element = 6
@@ -17,9 +17,9 @@ is_rite = true
 upgrades_into = Dictionary[int, float]({
 26: 1.0
 })
-tower_name = "Rite of Plagues"
-rite_short_name = "plagues"
-tower_description = "{RITE_LABEL}. Adjacent towers spread {POISON} from poisoned enemies to nearby unpoisoned enemies."
+tower_name = "Rite of Poisons"
+rite_short_name = "poisons"
+tower_description = "{RITE_LABEL}. Adjacent towers inflict 1 stack of {POISON}, lasting 2 seconds."
 icon = ExtResource("1_47pug")
 preview = ExtResource("1_47pug")
 inspector_actions = Array[ExtResource("2_0b6ek")]([ExtResource("3_b1ovi")])

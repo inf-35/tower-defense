@@ -408,5 +408,17 @@ func get_status_count(status: Attributes.Status) -> float:
 		return 0.0
 	return _status_effects[status].stack
 
+func get_active_statuses() -> Array[StatusEffect]: ##returns active real status objects for systems that also need statuslike effects
+	var statuses: Array[StatusEffect] = []
+	for status_type: Attributes.Status in _status_effects:
+		var status: StatusEffect = _status_effects[status_type]
+		if status.stack > 0.0:
+			statuses.append(status)
+
+	return statuses
+
+func blocks_statuslike_effects() -> bool: ##returns whether attached statuslike effects should currently be rejected
+	return _status_effects.has(Attributes.Status.CLEANSE)
+
 func get_save_data() -> Dictionary:
 	return {} #TODO

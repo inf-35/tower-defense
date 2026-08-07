@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_eobk3"]
 [ext_resource type="Script" uid="uid://dkhofkopi0n6x" path="res://Units/Towers/rite_drums/drum_rite_behavior.gd" id="3_167qi"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_k6sim"]
+[ext_resource type="Script" uid="uid://gpf5f42hee63" path="res://Units/Towers/rite_drums/drum_rite_marker_effect.gd" id="4_marker"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_5ai0x"]
 [ext_resource type="Texture2D" uid="uid://bqlb1inewdn38" path="res://Assets/rite_drums_sigil.png" id="5_r4fv5"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_we72q"]
@@ -13,11 +14,14 @@
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_h6xm1"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_p7vby"]
 
+[sub_resource type="Resource" id="Resource_drums_marker"]
+resource_local_to_scene = true
+script = ExtResource("4_marker")
+icon = ExtResource("5_r4fv5")
+
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("8_fs5jb")
 max_health = 20.0
-regeneration = null
-regen_percent = null
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_p6ncc"]
@@ -100,8 +104,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="DrumRiteBehavior" type="Node" parent="." unique_id=939343812]
 script = ExtResource("3_167qi")
-icon = ExtResource("5_r4fv5")
-trigger_chance = 0.4
+rite_marker_effect = SubResource("Resource_drums_marker")
 metadata/_custom_type_script = "uid://dkhofkopi0n6x"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1257848227]

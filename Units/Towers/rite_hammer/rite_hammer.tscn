@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_jcjng"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="2_cg1o6"]
-[ext_resource type="Script" uid="uid://nuyx87xgxcsr" path="res://Units/Towers/rite_scythe/scythe_rite_effect.gd" id="3_eiiov"]
+[ext_resource type="Script" path="res://Units/Towers/rite_hammer/keep_distance_damage_effect.gd" id="3_eiiov"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_frj5s"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_wlphy"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_1h54n"]
@@ -14,10 +14,10 @@
 
 [sub_resource type="Resource" id="Resource_uv4w3"]
 script = ExtResource("3_eiiov")
-bonus_per_percent = 0.8
-invert_logic = true
+max_bonus_multiplier = 0.7
+falloff_per_tile = 0.07
+tile_world_size = 10.0
 schedule = 1
-metadata/_custom_type_script = "uid://nuyx87xgxcsr"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("7_p46l1")

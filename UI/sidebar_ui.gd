@@ -4,6 +4,7 @@ class_name SidebarUI
 @export var towers_bar: VBoxContainer
 @export var trade_button: Button
 @export var trade_button_label: InteractiveRichTextLabel
+@export var tower_slot_label: InteractiveRichTextLabel
 
 var tower_option_prototype: PackedScene = preload("res://UI/tower_option.tscn")
 var _trade_button_has_unseen_stock: bool = false
@@ -38,6 +39,7 @@ func _ready() -> void:
 		_on_player_tower_types_update(Run.player.unlocked_towers, Run.player.rite_inventory)
 	else:
 		_clear_towers_bar() #ensure it's empty if no towerss initially
+	_refresh_tower_slot_label()
 
 	_update_trade_button_pivot()
 	if Run.has_active_run() and is_instance_valid(Run.player):
@@ -53,7 +55,7 @@ func _update_trade_button_pivot() -> void: ##keeps the wiggle centered on the bu
 	trade_button.pivot_offset = trade_button.size * 0.5
 
 func _update_trade_button_notification(has_unseen_stock: bool) -> void: ##toggles the blue unseen-restock badge on the trade button
-	var label_text: String = "Trade (T)"
+	var label_text: String = "Upgrades (T)"
 	if has_unseen_stock:
 		label_text += "\n" + KeywordService.wrap_text("[restocked!]", "action")
 	trade_button_label.set_parsed_text(label_text)
@@ -85,8 +87,9 @@ func _clear_towers_bar() -> void:
 func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type, bool], _rite_inventory: Dictionary[Towers.Type, int]) -> void:
 	_clear_towers_bar()
 
-	var tower_types_by_id: Array[Towers.Type] = unlocked_tower_types.keys()
-	tower_types_by_id.sort()
+	var tower_types_by_id: Array[Towers.Type] = []
+	tower_types_by_id.assign(unlocked_tower_types.keys())
+	tower_types_by_id.sort_custom(_compare_tower_bar_types)
 
 	for unlocked_tower_type : Towers.Type in tower_types_by_id:
 		if not unlocked_tower_types[unlocked_tower_type]:
@@ -101,6 +104,29 @@ func _on_player_tower_types_update(unlocked_tower_types : Dictionary[Towers.Type
 		_tower_options_by_type[unlocked_tower_type] = tower_option
 
 		_sync_selected_tower_option()
+
+	_refresh_tower_slot_label()
+
+func _compare_tower_bar_types(a: Towers.Type, b: Towers.Type) -> bool: ##sorts rites before regular towers while keeping each family stable by enum order
+	var a_is_rite: bool = Towers.is_tower_rite(a)
+	var b_is_rite: bool = Towers.is_tower_rite(b)
+	if a_is_rite != b_is_rite:
+		return a_is_rite
+	return int(a) < int(b)
+
+func _refresh_tower_slot_label() -> void: ##updates the placeholder active-loadout counter beneath the tower bar
+	if not is_instance_valid(tower_slot_label):
+		return
+	if not Run.has_active_run() or not is_instance_valid(Run.player):
+		tower_slot_label.set_parsed_text("Towers: 0/8")
+		return
+
+	var current: int = Run.player.get_active_tower_type_count()
+	var maximum: int = Run.player.get_max_active_tower_types()
+	var label_text: String = "Towers: %d/%d" % [current, maximum]
+	if current > maximum:
+		label_text = KeywordService.wrap_text(label_text, "bad")
+	tower_slot_label.set_parsed_text(label_text)
 
 func _on_tower_button_pressed(type_id: Towers.Type) -> void:
 	UI.tower_option_selected.emit(type_id)

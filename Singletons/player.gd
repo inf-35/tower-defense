@@ -6,7 +6,7 @@ class_name Player
 signal flux_changed(new_flux: float)
 signal hp_changed(new_health: float)
 signal capacity_changed(used: float, total: float)
-signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool])
+signal unlocked_towers_changed(unlocked: Dictionary[Towers.Type, bool], rite_inventory: Dictionary[Towers.Type, int])
 signal relics_changed()
 signal relic_slots_changed()
 signal tower_placed(tower_type: Towers.Type, tower: Tower) ##fires only after a tower placement request succeeds and the runtime tower exists
@@ -22,6 +22,7 @@ const RITE_EXCAVATION_COST: float = 2.0
 const BASE_RELIC_SLOTS: int = 4
 const RELIC_SLOT_FIRST_COST: float = 8.0
 const RELIC_SLOT_COST_SCALE: float = 1.8
+const MAX_ACTIVE_TOWER_TYPES: int = 999
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
@@ -169,19 +170,26 @@ func start() -> void:
 func begin_new_game() -> void:
 	#initial state setup
 	self.unlocked_towers = {
-		Towers.Type.TURRET: true,
+		Towers.Type.CANNON:true,
 		Towers.Type.PALISADE: true,
+		Towers.Type.SPIKES: true,
 		Towers.Type.FARM: true,
-		Towers.Type.GENERATOR: true,
-		#Towers.Type.SNOWBALL: true,
+		Towers.Type.POISON: true,
+		Towers.Type.RESONATOR: true,
 	}
 	
-	#var reward := Reward.new()
-	##reward.type = Reward.Type.ADD_RITE
-	##reward.rite_type = Towers.Type.RITE_POISONS
-	##RewardService.apply_reward(reward)
-	###reward.rite_type = Towers.Type.RITE_FROST
-	###RewardService.apply_reward(reward)
+	var reward := Reward.new()
+	reward.type = Reward.Type.ADD_RITE
+	reward.rite_type = Towers.Type.RITE_IRON
+	RewardService.apply_reward(reward)
+	reward.rite_type = Towers.Type.RITE_PLAGUES
+	RewardService.apply_reward(reward)
+	reward.rite_type = Towers.Type.RITE_SULPHUR
+	RewardService.apply_reward(reward)
+	reward.rite_type = Towers.Type.RITE_LODESTONE
+	RewardService.apply_reward(reward)
+	reward.rite_type = Towers.Type.RITE_FROST
+	#RewardService.apply_reward(reward)
 	#reward.type = Reward.Type.ADD_RELIC
 	#reward.relic = Relics.EDELWEISS
 	#RewardService.apply_reward(reward)
@@ -240,9 +248,58 @@ func has_capacity(tower_type : Towers.Type) -> bool:
 	return Run.player.used_capacity + Towers.get_tower_capacity(tower_type) - 0.01 < Run.player.tower_capacity
 
 #tower unlock helper functions
-func unlock_tower(tower_type : Towers.Type, unlock : bool = true) -> void:
-	unlocked_towers[tower_type] = unlock
+func unlock_tower(tower_type : Towers.Type, unlock : bool = true) -> bool:
+	if unlock and not can_add_tower_type(tower_type):
+		return false
+
+	if unlock:
+		unlocked_towers[tower_type] = true
+	else:
+		unlocked_towers.erase(tower_type)
+		if Towers.is_tower_rite(tower_type):
+			rite_inventory.erase(tower_type)
 	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
+	return true
+
+func get_active_tower_type_count() -> int: ##counts currently placeable non-rite tower types, without caring about towers already on the map
+	var count: int = 0
+	for tower_type: Towers.Type in unlocked_towers:
+		if tower_type == Towers.Type.VOID or tower_type == Towers.Type.PLAYER_CORE:
+			continue
+		if Towers.is_tower_rite(tower_type):
+			continue
+		if not unlocked_towers[tower_type]:
+			continue
+		count += 1
+	return count
+
+func get_max_active_tower_types() -> int: ##returns the current active tower-loadout cap for ui and reward gates
+	return MAX_ACTIVE_TOWER_TYPES
+
+func has_free_tower_type_slot() -> bool: ##returns whether one more new non-rite tower type can enter the active placeable bar
+	return get_active_tower_type_count() < MAX_ACTIVE_TOWER_TYPES
+
+func can_add_tower_type(tower_type: Towers.Type) -> bool: ##allows duplicates and rites, but blocks new non-rite tower entries once the active loadout is full
+	if tower_type == Towers.Type.VOID or tower_type == Towers.Type.PLAYER_CORE:
+		return false
+	if Towers.is_tower_rite(tower_type):
+		return true
+	if unlocked_towers.get(tower_type, false):
+		return true
+	return has_free_tower_type_slot()
+
+func remove_tower_type(tower_type: Towers.Type) -> bool: ##removes a type from the active placeable bar without touching existing towers on the map
+	if tower_type == Towers.Type.VOID or tower_type == Towers.Type.PLAYER_CORE:
+		return false
+	if not unlocked_towers.has(tower_type):
+		return false
+
+	unlocked_towers.erase(tower_type)
+	if Towers.is_tower_rite(tower_type):
+		rite_inventory.erase(tower_type)
+
+	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
+	return true
 
 func is_tower_unlocked(tower_type : Towers.Type) -> bool:
 	return unlocked_towers.get(tower_type, false)
@@ -255,16 +312,20 @@ func add_to_tower_limit(type: Towers.Type, amount: int) -> void:
 func get_tower_limit(type: Towers.Type) -> int:
 	return _tower_limits.get(type, -1)
 
-func add_rite(type: Towers.Type, amount: int) -> void:
+func add_rite(type: Towers.Type, amount: int) -> bool:
 	var current: int = rite_inventory.get(type, 0)
-	rite_inventory[type] = maxi(current + amount, 0)
+	var next_count: int = maxi(current + amount, 0)
+	if current <= 0 and next_count > 0 and not can_add_tower_type(type):
+		return false
 
+	rite_inventory[type] = next_count
 	if rite_inventory[type] > 0:
 		unlocked_towers[type] = true
 	else:
 		unlocked_towers.erase(type)
 
 	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
+	return true
 
 func get_rite_count(type: Towers.Type) -> int: ##number of rites left
 	return rite_inventory.get(type, 0)
@@ -411,9 +472,13 @@ func _on_excavate_rite_requested(tower) -> void:
 		return
 	if flux < RITE_EXCAVATION_COST:
 		return
+	if not can_add_tower_type(tower.type):
+		return
 
 	self.flux -= RITE_EXCAVATION_COST
-	add_rite(tower.type, 1)
+	if not add_rite(tower.type, 1):
+		self.flux += RITE_EXCAVATION_COST
+		return
 	rite_excavated.emit(tower)
 	tower.excavate()
 

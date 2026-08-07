@@ -1,11 +1,12 @@
 extends EffectPrototype
 class_name BrittleEffect
 
-@export var minimum_trigger_damage: float = 3.0 ##hit must exceed this post-modifier damage before brittle is consumed
-@export var damage_multiplier: float = 2.0 ##damage multiplier applied to the qualifying hit
+@export var minimum_trigger_damage: float = 3.0 ##hit must exceed this post-modifier damage before brittle applies
+@export var damage_multiplier: float = 2.5 ##one-stack damage multiplier; extra stacks add the same bonus again
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
+	counts_as_status = true
 
 func create_instance() -> EffectInstance:
 	var instance := EffectInstance.new()
@@ -18,26 +19,21 @@ func _handle_attach(_instance: EffectInstance) -> void:
 func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
-func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##doubles the next sufficiently large hit, then removes itself
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##amplifies every sufficiently large hit while brittle remains active
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
 
 	var hit_data: HitData = event.data as HitData
 	if not hit_data or hit_data.negate:
 		return
-	if hit_data.damage <= minimum_trigger_damage:
+	if hit_data.damage < minimum_trigger_damage:
 		return
 
-	hit_data.damage *= damage_multiplier
-	_consume(instance)
-
-func _consume(instance: EffectInstance) -> void:
-	if not is_instance_valid(instance.host):
-		return
-
-	if instance.should_show_status_icon():
-		instance.host.effect_display_removed.emit(instance)
-
-	instance.enabled = false
+	hit_data.damage = hit_data.damage * get_damage_multiplier(instance)
 	trigger_source_tower_pulse(instance)
-	instance.host.remove_effect.call_deferred(instance.effect_prototype)
+
+func get_damage_multiplier(instance: EffectInstance) -> float: ##returns the linear multiplier contributed by current brittle stacks
+	return 1.0 + ((damage_multiplier - 1.0) * float(_get_effect_stacks(instance)))
+
+func _get_effect_stacks(instance: EffectInstance) -> int:
+	return maxi(instance.stacks, 1)

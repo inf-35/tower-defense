@@ -37,6 +37,7 @@ func _ready() -> void:
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_on_gui_input)
 	UI.update_relics.connect(_refresh_reward_availability)
+	UI.update_tower_types.connect(func(_unlocked: Dictionary[Towers.Type, bool], _rites: Dictionary[Towers.Type, int]): _refresh_reward_availability())
 
 #public setup function
 func setup(reward: Reward, index: int) -> void:

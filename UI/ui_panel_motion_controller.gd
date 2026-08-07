@@ -27,6 +27,8 @@ var _inspector_wrapper: PanelMotionWrapper
 var _expansion_active: bool = false
 var _inspector_has_target: bool = false
 var _building_phase_active: bool = true
+var _trade_menu_active: bool = false
+var _reward_menu_active: bool = false
 
 func _ready() -> void: ##wraps the existing large ui panels under stable anchors, then drives their motion from expansion and selection state
 	for i in 2: await get_tree().process_frame
@@ -46,6 +48,10 @@ func _ready() -> void: ##wraps the existing large ui panels under stable anchors
 	UI.show_building_ui.connect(_on_building_started)
 	UI.hide_building_ui.connect(_on_building_ended)
 	UI.update_inspector_bar.connect(_on_inspector_target_changed)
+	UI.trader_open.connect(_on_trade_menu_opened)
+	UI.trader_close.connect(_on_trade_menu_closed)
+	UI.display_reward_choices.connect(_on_reward_menu_opened)
+	UI.hide_reward_choices.connect(_on_reward_menu_closed)
 
 	_apply_panel_states(true)
 
@@ -133,6 +139,22 @@ func _on_inspector_target_changed(unit: Unit) -> void:
 	_inspector_has_target = is_instance_valid(unit)
 	_apply_panel_states()
 
+func _on_trade_menu_opened() -> void:
+	_trade_menu_active = true
+	_apply_panel_states()
+
+func _on_trade_menu_closed() -> void:
+	_trade_menu_active = false
+	_apply_panel_states()
+
+func _on_reward_menu_opened(_choices: Array[Reward]) -> void:
+	_reward_menu_active = true
+	_apply_panel_states()
+
+func _on_reward_menu_closed() -> void:
+	_reward_menu_active = false
+	_apply_panel_states()
+
 func _apply_panel_states(initial_snap: bool = false) -> void:
 	_set_panel_visible(_sidebar_wrapper, not _expansion_active, initial_snap)
 	_set_panel_visible(_stats_wrapper, not _expansion_active, initial_snap)
@@ -140,7 +162,7 @@ func _apply_panel_states(initial_snap: bool = false) -> void:
 	_set_panel_visible(_time_controls_wrapper, not _expansion_active, initial_snap)
 	_set_panel_visible(_battle_button_wrapper, not _expansion_active and _building_phase_active, initial_snap)
 	_set_panel_visible(_time_control_buttons_wrapper, not _expansion_active and not _building_phase_active, initial_snap)
-	_set_panel_visible(_inspector_wrapper, _inspector_has_target, initial_snap)
+	_set_panel_visible(_inspector_wrapper, _inspector_has_target and not _trade_menu_active and not _reward_menu_active, initial_snap)
 
 func _set_panel_visible(wrapper: PanelMotionWrapper, shown: bool, initial_snap: bool) -> void:
 	if not is_instance_valid(wrapper):

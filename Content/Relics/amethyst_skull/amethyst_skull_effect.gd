@@ -85,6 +85,9 @@ func _attack(instance: EffectInstance, hit_report: HitReportData, killed_unit: U
 	hit_data.target_affiliation = true #hostile
 	if not hit_data.derive_lineage_from(hit_report, instance):
 		return
+	hit_data.source = hit_report.get_source_unit(killer)
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	hit_data.primary = false
 
 	#configure delivery
 	var delivery_data := projectile_data.generate_generic_delivery_data()

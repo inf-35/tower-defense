@@ -314,20 +314,26 @@ func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
 	if island.terrain_base_grid.has(cell):
 		var terrain: Terrain.Base = island.get_terrain_base(cell)
 		var msg: String = Terrain.Base.keys()[terrain].capitalize()
+		if terrain == Terrain.get_open_water_base():
+			msg = Terrain.get_open_water_label()
 		if terrain == Terrain.Base.HIGHLAND:
 			msg += "\n(Range Bonus)"
 		elif terrain == Terrain.Base.SETTLEMENT:
 			msg += "\n(Used to build villages)"
-		elif Terrain.is_waterlike(terrain):
+		elif terrain == Terrain.Base.ICE:
 			msg += "\n(Blocks building, enemies can traverse it)"
+		elif terrain == Terrain.Base.WATER:
+			msg += "\n(Blocks building)"
 		return msg
 
 	if _is_uncharted_lake_cell(island, cell):
-		return "Uncharted %s\n(Blocks building, enemies can traverse it once revealed)" % Terrain.get_open_water_label()
+		if Terrain.get_open_water_base() == Terrain.Base.ICE:
+			return "Uncharted %s\n(Blocks building, enemies can traverse it once revealed)" % Terrain.get_open_water_label()
+		return "Uncharted %s\n(Blocks building once revealed)" % Terrain.get_open_water_label()
 	if island.has_ruin_site(cell):
 		return "Uncharted {T_RUINS}\n(Search it for one reward once uncovered)"
 
-	return "Uncharted"
+	return "Uncharted\n(Enemies cannot traverse it)"
 
 func _is_uncharted_lake_cell(island: Island, cell: Vector2i) -> bool:
 	return island.is_lake_cell(cell) and not island.terrain_base_grid.has(cell)

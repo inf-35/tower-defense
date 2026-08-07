@@ -2,10 +2,10 @@ extends EffectPrototype
 class_name RuinedGroundEffect
 
 @export var modifier_prototype: ModifierDataPrototype
+@export var damage_taken_modifier_prototype: ModifierDataPrototype
 
-#track which unit has which specific modifier instance so we can remove it later
 class RuinedGroundState extends RefCounted:
-	var slowed_units: Dictionary[Unit, Modifier] = {}
+	var affected_units: Dictionary[Unit, Array] = {}
 
 func _init() -> void:
 	#we listen for cell changes (movement) and death (cleanup)
@@ -24,12 +24,13 @@ func _handle_attach(_instance: EffectInstance) -> void:
 
 func _handle_detach(instance: EffectInstance) -> void:
 	var state: RuinedGroundState = instance.state as RuinedGroundState
+	var affected_units: Array[Unit] = []
+	affected_units.assign(state.affected_units.keys())
 
-	#clean up: remove effect from everyone if the relic is lost/sold
-	for unit: Unit in state.slowed_units:
-		if is_instance_valid(unit) and is_instance_valid(unit.modifiers_component):
-			var mod: Modifier = state.slowed_units[unit]
-			unit.modifiers_component.remove_modifier(mod)
+	for unit: Unit in affected_units:
+		_remove_modifiers(state, unit)
+
+	state.affected_units.clear()
 
 func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	var state: RuinedGroundState = instance.state as RuinedGroundState
@@ -37,8 +38,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	#cleanup handler
 	if event.event_type == GameEvent.EventType.DIED:
-		if state.slowed_units.has(unit):
-			state.slowed_units.erase(unit)
+		_remove_modifiers(state, unit)
 		return
 
 	#movement handler
@@ -52,21 +52,46 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 func _evaluate_unit_position(state: RuinedGroundState, unit: Unit, cell: Vector2i) -> void:
 	var is_on_ruin: bool = Run.player.ruin_service.is_cell_ruined(cell)
-	var is_currently_slowed: bool = state.slowed_units.has(unit)
+	var is_currently_affected: bool = state.affected_units.has(unit)
 
 	#entered ruins (apply)
-	if is_on_ruin and not is_currently_slowed:
-		if is_instance_valid(unit.modifiers_component):
-			var mod: Modifier = modifier_prototype.generate_modifier()
-			mod.cooldown = -1.0 #permanent until manually removed
-
-			unit.modifiers_component.add_modifier(mod)
-			state.slowed_units[unit] = mod
+	if is_on_ruin and not is_currently_affected:
+		_apply_modifiers(state, unit)
+		return
 
 	#left ruins (remove)
-	elif (not is_on_ruin) and is_currently_slowed:
-		if is_instance_valid(unit.modifiers_component):
-			var mod: Modifier = state.slowed_units[unit]
-			unit.modifiers_component.remove_modifier(mod)
+	if (not is_on_ruin) and is_currently_affected:
+		_remove_modifiers(state, unit)
 
-		state.slowed_units.erase(unit)
+func _apply_modifiers(state: RuinedGroundState, unit: Unit) -> void:
+	if not is_instance_valid(unit) or not is_instance_valid(unit.modifiers_component):
+		return
+
+	var modifiers: Array[Modifier] = []
+	_add_modifier_from_prototype(unit, modifiers, modifier_prototype)
+	_add_modifier_from_prototype(unit, modifiers, damage_taken_modifier_prototype)
+	if modifiers.is_empty():
+		return
+
+	state.affected_units[unit] = modifiers
+
+func _add_modifier_from_prototype(unit: Unit, modifiers: Array[Modifier], prototype: ModifierDataPrototype) -> void:
+	if not is_instance_valid(prototype):
+		return
+
+	var modifier: Modifier = prototype.generate_modifier()
+	modifier.cooldown = -1.0
+	unit.modifiers_component.add_modifier(modifier)
+	modifiers.append(modifier)
+
+func _remove_modifiers(state: RuinedGroundState, unit: Unit) -> void:
+	if not state.affected_units.has(unit):
+		return
+
+	if is_instance_valid(unit) and is_instance_valid(unit.modifiers_component):
+		var modifiers: Array = state.affected_units[unit]
+		for modifier: Modifier in modifiers:
+			if is_instance_valid(modifier):
+				unit.modifiers_component.remove_modifier(modifier)
+
+	state.affected_units.erase(unit)

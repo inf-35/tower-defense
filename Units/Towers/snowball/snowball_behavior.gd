@@ -95,7 +95,7 @@ func draw_visuals(canvas: RangeIndicator) -> void: ##draws the current forward f
 	for i: int in range(1, range_tiles + 1):
 		var check_cell: Vector2i = start_cell + (direction * i)
 		var obstacle: Tower = island.get_tower_on_tile(check_cell)
-		if is_instance_valid(obstacle) and (obstacle.blocking or obstacle.type == Towers.Type.PLAYER_CORE):
+		if is_instance_valid(obstacle) and obstacle.blocks_line_of_sight_at_cell(check_cell):
 			_draw_cell_highlight(canvas, check_cell, half_size, cell_size, true)
 			break
 

@@ -16,12 +16,79 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="11_hbpja"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_nh6s4"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="15_ij6wa"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="16_effect_base"]
+[ext_resource type="Script" uid="uid://rnuifqfi3uy4" path="res://Units/Towers/rite_hammer/health_ratio_damage_effect.gd" id="17_health_ratio"]
+
+[sub_resource type="Resource" id="Resource_cannon_health_ratio"]
+script = ExtResource("17_health_ratio")
+
+[sub_resource type="Animation" id="Animation_cannon_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cannon_attack"]
+resource_name = "attack"
+length = 0.5
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.13, 0.3, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.65, 1.25), Vector2(1.18, 0.86), Vector2(0.96, 1.03), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.09, 0.22, 0.38, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(-36, 0), Vector2(-8, 0), Vector2(2, 0), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cannon"]
+_data = {
+&"RESET": SubResource("Animation_cannon_reset"),
+&"attack": SubResource("Animation_cannon_attack")
+}
 
 [node name="Cannon" type="Node2D" unique_id=395828879 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_8ywdl")
 type = 4
-turret = NodePath("Graphics/Turret")
+turret = NodePath("Graphics/TurretFrame")
 stat_displays = Array[ExtResource("2_nx7ew")]([ExtResource("3_ij6wa"), ExtResource("4_ybq1v"), ExtResource("5_nx7ew")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
@@ -31,6 +98,7 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
+intrinsic_effects = Array[ExtResource("16_effect_base")]([SubResource("Resource_cannon_health_ratio")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="DefaultTowerBehavior" type="Node" parent="." unique_id=1468525524]
@@ -54,19 +122,21 @@ metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 [node name="AttackComponent" type="Node" parent="." unique_id=1109686772 node_paths=PackedStringArray("muzzle")]
 script = ExtResource("11_hbpja")
 attack_data = ExtResource("7_2qmy6")
-muzzle = NodePath("../Graphics/Turret/Muzzle")
+muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=791941999]
 scale = Vector2(0.07066667, 0.07066667)
 texture = ExtResource("9_8g1yo")
 
-[node name="Turret" type="Sprite2D" parent="Graphics" unique_id=911381062]
+[node name="TurretFrame" type="Node2D" parent="Graphics"]
 z_index = 1
+
+[node name="Turret" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=911381062]
 texture = ExtResource("10_0yqpy")
 offset = Vector2(0, -20)
 
-[node name="Muzzle" type="Marker2D" parent="Graphics/Turret" unique_id=855882592]
+[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=855882592]
 position = Vector2(56.60377, 0)
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1463965523]
@@ -78,3 +148,5 @@ script = ExtResource("14_nh6s4")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1202908761]
+root_motion_local = true
+libraries/ = SubResource("AnimationLibrary_cannon")

@@ -7,7 +7,10 @@ signal tutorial_zoom_observed()
 
 #configuration
 const RETURN_FROM_OVERRIDE_TIME: float = 0.5 #how long it takes for the camera to snap back to position from override
+const SCROLL_ZOOM_FACTOR: float = 0.9
 
+@export var minimum_player_zoom: float = 4.0 ##smallest zoom scalar reachable through manual scroll
+@export var maximum_player_zoom: float = 20.0 ##largest zoom scalar reachable through manual scroll
 @export var shake_decay: float = 5.5
 @export var shake_max_offset: Vector2 = Vector2(8.0, 8.0)
 @export var shake_noise_frequency: float = 30.0
@@ -52,17 +55,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	#controls can consume mouse wheel events before the camera ever sees them.
 	if event.is_action_pressed("zoom_in"):
 		tutorial_zoom_observed.emit()
-		zoom *= 0.9
+		_apply_player_zoom_multiplier(1.0 / SCROLL_ZOOM_FACTOR)
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("zoom_out"):
 		tutorial_zoom_observed.emit()
-		zoom /= 0.9
+		_apply_player_zoom_multiplier(SCROLL_ZOOM_FACTOR)
 		get_viewport().set_input_as_handled()
 		return
 
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 		if event.is_pressed() and ClickHandler.enabled and ClickHandler.current_state != ClickHandler.State.IDLE:
 			return
 
@@ -156,6 +159,17 @@ func add_shake(amount: float) -> void: ##adds camera trauma through the shared s
 func add_damage_shake(amount: float) -> void:
 	add_shake(amount)
 
+func _apply_player_zoom_multiplier(multiplier: float) -> void:
+	zoom = _clamp_player_zoom(zoom * multiplier)
+
+func _clamp_player_zoom(target_zoom: Vector2) -> Vector2:
+	var lower_bound: float = minf(minimum_player_zoom, maximum_player_zoom)
+	var upper_bound: float = maxf(minimum_player_zoom, maximum_player_zoom)
+	return Vector2(
+		clampf(target_zoom.x, lower_bound, upper_bound),
+		clampf(target_zoom.y, lower_bound, upper_bound)
+	)
+
 #allows an external system (like a ui button) to cancel the override
 func release_override() -> void:
 	if is_instance_valid(_active_tween):
@@ -209,7 +223,7 @@ func _should_cancel_soft_snap(event: InputEvent) -> bool:
 		return true
 	if event.is_action_pressed("pan_left") or event.is_action_pressed("pan_right") or event.is_action_pressed("pan_up") or event.is_action_pressed("pan_down"):
 		return true
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.is_pressed():
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and event.is_pressed():
 		return true
 	if event is InputEventMouseMotion and _is_drag_panning:
 		return true

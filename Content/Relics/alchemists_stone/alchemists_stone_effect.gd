@@ -30,24 +30,17 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	if not is_instance_valid(victim) or not victim.hostile:
 		return
 
-	if not is_instance_valid(victim.modifiers_component):
-		return
-
-	var unique_statuses: int = _count_unique_statuses(victim)
+	var statuslikes: Dictionary = victim.get_statuslikes()
+	var statuses: Array[StatusEffect]
+	statuses.assign(statuslikes.get(&"statuses", []))
+	var effects: Array[EffectInstance]
+	effects.assign(statuslikes.get(&"effects", []))
+	var unique_statuses: int = statuses.size() + effects.size()
 	var extra_statuses: int = maxi(unique_statuses - 1, 0)
 	if extra_statuses <= 0:
 		return
 
 	hit_data.damage *= 1.0 + (extra_statuses * damage_bonus_per_extra_status * _get_effect_stacks(instance))
-
-func _count_unique_statuses(victim: Unit) -> int:
-	var count: int = 0
-	for status: Attributes.Status in victim.modifiers_component._status_effects:
-		var status_effect: StatusEffect = victim.modifiers_component._status_effects[status]
-		if status_effect.stack > 0.0:
-			count += 1
-
-	return count
 
 func _get_effect_stacks(instance: EffectInstance) -> int:
 	return maxi(instance.stacks, 1)

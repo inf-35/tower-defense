@@ -29,5 +29,8 @@ func _handle_event(instance: EffectInstance, event : GameEvent) -> void:
 	reflect_hit.target = hit_data.source
 	if not reflect_hit.derive_lineage_from(hit_data, instance):
 		return
+	reflect_hit.source = instance.host
+	reflect_hit.attack_id = AttackComponent.get_next_attack_id()
+	reflect_hit.primary = false
 
 	reflect_hit.target.deal_hit(reflect_hit)

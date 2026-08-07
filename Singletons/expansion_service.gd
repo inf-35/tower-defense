@@ -9,7 +9,7 @@ const GENERATION_ATTEMPTS: int = 20
 const EXPANSION_SIZE: int = 18
 const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
-const FRONTIER_EVENING_BIAS: float = 0.75
+const FRONTIER_EVENING_BIAS: float = 1.125
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
 const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.003
@@ -163,7 +163,7 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 func _pick_random_rite_type() -> Towers.Type:
 	if is_instance_valid(Run.tutorials) and Run.tutorials.should_force_basic_tutorial_rites():
 		return Run.tutorials.pick_basic_tutorial_rite_type()
-	var rewards := RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
+	var rewards: Array[Reward] = RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
 	if rewards.is_empty():
 		return Towers.Type.VOID
 	return rewards[0].rite_type

@@ -98,9 +98,11 @@ func _spawn_sparks(instance: EffectInstance, stacks: int, duration: float, origi
 		var hit_data := spark_attack_data.generate_generic_hit_data()
 		if not hit_data.derive_lineage_from(original_hit_data, instance):
 			continue
-		hit_data.source = source
+		hit_data.source = original_hit_data.get_source_unit(source)
 		hit_data.target = target_unit
 		hit_data.target_affiliation = victim.hostile
+		hit_data.attack_id = AttackComponent.get_next_attack_id()
+		hit_data.primary = false
 		hit_data.status_effects[required_status] = Vector2(stacks, duration)
 
 		var delivery := spark_attack_data.generate_generic_delivery_data()

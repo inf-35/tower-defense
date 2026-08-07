@@ -7,12 +7,12 @@
 
 [sub_resource type="Resource" id="Resource_o5w7d"]
 script = ExtResource("1_xfaq6")
-sell_value_proportion = 1.0
+sell_value_proportion = 0.1
 
 [resource]
 script = ExtResource("2_k6h1x")
 type = 35
 global_effect = SubResource("Resource_o5w7d")
 title = "Weregild"
-description = "When a tower dies during combat, gain its sell value. Selling never triggers this."
+description = "Whenever an allied tower is hit, gain 10% of its sell value."
 icon = ExtResource("3_qmugo")

@@ -43,6 +43,8 @@ func _trigger_ambush_explosion(instance: EffectInstance, parent_data: BuildTower
 		return
 	hit_data.source = source_tower
 	hit_data.target_affiliation = not source_tower.hostile
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	hit_data.primary = false
 
 	#instant centered aoe
 	var delivery_data: DeliveryData = attack_data.generate_generic_delivery_data()

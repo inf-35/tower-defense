@@ -23,6 +23,7 @@ var stack_update_handler: Callable = _handle_stack_update
 
 @export var icon: Texture2D ##icon that plays when this effectprototype is "triggered"
 @export var show_as_status_icon: bool = false ##whether attached instances can appear beside hp bars when the player enables effect icons
+@export var counts_as_status: bool = false ##whether attached instances are included in statuslike queries such as cleanse, alchemy, and fist
 #event handlers; these are injected into EffectInstance at runtime
 @abstract func _handle_attach(instance: EffectInstance) -> void
 @abstract func _handle_detach(instance: EffectInstance) -> void
@@ -61,6 +62,16 @@ func trigger_target_bonus_feedback(tower: Tower, override_icon: Texture2D = null
 		Tween.EASE_OUT,
 		true
 	)
+
+func _set_targeting_preference(instance: EffectInstance, status: Attributes.Status, active: bool) -> void: ##keeps local status-targeting preferences aligned with effect lifetimes
+	var host_tower: Tower = instance.host as Tower
+	if not is_instance_valid(host_tower) or not is_instance_valid(host_tower.range_component):
+		return
+
+	if active:
+		host_tower.range_component.add_status_targeting_preference(status)
+	else:
+		host_tower.range_component.remove_status_targeting_preference(status)
 
 func _resolve_source_tower(instance: EffectInstance) -> Tower:
 	if is_instance_valid(instance.source) and instance.source is Tower:

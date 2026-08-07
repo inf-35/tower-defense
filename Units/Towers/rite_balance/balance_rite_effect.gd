@@ -64,12 +64,14 @@ func _fire_overkill_bolt(instance: EffectInstance, source_tower: Tower, parent_r
 		return
 
 	var hit_data: HitData = projectile_data.generate_generic_hit_data()
-	hit_data.source = source_tower
-	hit_data.target = target
-	hit_data.target_affiliation = target.hostile
-	hit_data.damage = damage
 	if not hit_data.derive_lineage_from(parent_report, instance):
 		return
+	hit_data.source = parent_report.get_source_unit(source_tower)
+	hit_data.target = target
+	hit_data.target_affiliation = target.hostile
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	hit_data.primary = false
+	hit_data.damage = damage
 
 	var delivery_data: DeliveryData = projectile_data.generate_generic_delivery_data()
 	delivery_data.target = target

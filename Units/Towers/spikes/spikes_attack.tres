@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://gfgaj7q6vj5m"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_attack_data"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_j3iyq"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="2_status_effect"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="3_vfx_info"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_3adj2"]
+
+[sub_resource type="Resource" id="Resource_bleed"]
+script = ExtResource("2_status_effect")
+type = 5
+stack = 2.0
+cooldown = 1.0
+metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
+
+[sub_resource type="Resource" id="Resource_spike_field"]
+script = ExtResource("3_vfx_info")
+radius = 2.0
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.75, 0.05, 0.08, 0.3)
+aoe_particles_per_cell = 8.0
+aoe_particle_lifetime = 0.22
+aoe_particle_scale_min = 0.25
+aoe_particle_scale_max = 0.5
+aoe_particle_spin_speed_min = -20.0
+aoe_particle_spin_speed_max = 20.0
+aoe_particle_drift_speed_min = 2.0
+aoe_particle_drift_speed_max = 7.0
+aoe_particle_drift_angle_noise_deg = 18.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
+[resource]
+script = ExtResource("1_attack_data")
+delivery_method = 3
+range = 6.0
+cooldown = 1.5
+damage = 0.5
+status_effects = Array[ExtResource("2_status_effect")]([SubResource("Resource_bleed")])
+vfx_on_spawn = SubResource("Resource_spike_field")
+cone_angle = 360.0
+metadata/_custom_type_script = "uid://bxee20ha7a0bv"

@@ -25,6 +25,7 @@ icon = ExtResource("2_8tt7c")
 script = ExtResource("3_relic")
 type = 44
 global_effect = SubResource("Resource_effect")
+reward_tags = Array[int]([0])
 title = "Ergot"
 description = "Towers adjacent to 2 or more {T_FARM|label=Farms} inflict 2 stacks of {POISON}, lasting 0.6 seconds."
 icon = ExtResource("2_8tt7c")

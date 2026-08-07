@@ -3,14 +3,16 @@ class_name CommandPostBehavior
 
 @export var suppression_modifier: ModifierDataPrototype
 @export var attacks_required: int = 1
-@export var max_commands_per_second: float = 3.0
+@export var max_commands_per_second: float = 3.0 ##maximum times this outpost can command its target each second
 @export var command_beam_vfx: VFXInfo ##authored pulse beam settings used when this outpost forces its linked tower to attack
+@export var passive_beam_strength: float = 0.33 ##scales the continuous beam so the passive link reads softly behind command pulses
 
 var _target_tower: Tower = null
 var _target_suppression_modifier: Modifier
+var _passive_beam_vfx: SwirlLineVFX = null
 var _my_neighbors: Dictionary[Tower, bool] = {}
 var _attack_counter: int = 0
-var _seen_attack_ids: Dictionary[int, bool] = {}
+var _seen_attack_ids: Dictionary[int, bool] = {} ##int: attack id, bool: true once this outpost has counted that source attack
 var _can_command: bool = true
 var _command_limit_token: int = 0
 var _last_trigger_hit: HitData
@@ -23,6 +25,7 @@ func start() -> void:
 	tower.adjacency_updated.connect(_on_my_adjacency_updated)
 	_on_my_adjacency_updated(tower.get_adjacent_towers())
 	Run.references.island.island_changed.connect(_recalculate_target)
+	set_process(true)
 	_recalculate_target()
 
 func detach() -> void:
@@ -31,6 +34,9 @@ func detach() -> void:
 	_can_command = true
 	_command_limit_token += 1
 	_last_trigger_hit = null
+
+func _process(_delta: float) -> void:
+	_refresh_passive_beam()
 
 func _on_my_adjacency_updated(adj_map: Dictionary) -> void:
 	var tower: Tower = unit as Tower
@@ -83,7 +89,9 @@ func _on_neighbor_event(event: GameEvent, _source: Tower) -> void:
 
 func _recalculate_target() -> void:
 	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower) or tower.abstractive or tower.disabled: return
+	if not is_instance_valid(tower) or tower.abstractive or tower.disabled:
+		_release_target()
+		return
 
 	var scan: Tower.ForwardScanResult = tower.scan_forward(49)
 	var found_tower: Tower = scan.hit_tower
@@ -103,12 +111,14 @@ func _bind_target(target: Tower) -> void:
 	target.modifiers_component.add_modifier(_target_suppression_modifier)
 	if is_instance_valid(unit.buff_component):
 		unit.buff_component.activate_new_link(target)
+	_refresh_passive_beam()
 
 func _release_target() -> void:
 	if is_instance_valid(_target_tower):
 		_target_tower.modifiers_component.remove_modifier(_target_suppression_modifier)
 	_target_tower = null
 	_last_trigger_hit = null
+	_clear_passive_beam()
 
 func _command_target_to_fire() -> void: ##forces the linked tower to fire and briefly pulses the support beam so the trigger reads in-world
 	if not is_instance_valid(_target_tower) or not is_instance_valid(_target_tower.attack_component): return
@@ -134,6 +144,34 @@ func _start_command_limit() -> void:
 	if token != _command_limit_token or not is_inside_tree():
 		return
 	_can_command = true
+
+func _refresh_passive_beam() -> void: ##keeps a faint continuous link visible while the outpost has a valid commanded target
+	if not _has_passive_beam_target():
+		_clear_passive_beam()
+		return
+
+	var source_tower: Tower = unit as Tower
+	var start_position: Vector2 = source_tower.global_position
+	var end_position: Vector2 = _target_tower.global_position
+
+	if not is_instance_valid(_passive_beam_vfx):
+		_passive_beam_vfx = VFXManager.create_swirl_beam_info(command_beam_vfx, start_position, end_position, passive_beam_strength)
+		return
+
+	_passive_beam_vfx.set_segment(start_position, end_position)
+
+func _has_passive_beam_target() -> bool:
+	var source_tower: Tower = unit as Tower
+	if not is_instance_valid(source_tower) or source_tower.disabled:
+		return false
+	if not is_instance_valid(_target_tower) or _target_tower.disabled:
+		return false
+	return is_instance_valid(command_beam_vfx) and passive_beam_strength > 0.0
+
+func _clear_passive_beam() -> void:
+	if is_instance_valid(_passive_beam_vfx):
+		_passive_beam_vfx.stop()
+	_passive_beam_vfx = null
 
 func _exit_tree() -> void:
 	_release_target()

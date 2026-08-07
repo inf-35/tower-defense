@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bx8eed1tke6jq"]
 
 [ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_data"]
-[ext_resource type="Texture2D" uid="uid://cflil6vcjb1y8" path="res://Assets/healer.png" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://d1k2jmcwtn332" path="res://Assets/cleric.png" id="2_icon"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3_display"]
-[ext_resource type="PackedScene" path="res://Units/Enemies/cleric/cleric.tscn" id="4_scene"]
+[ext_resource type="PackedScene" uid="uid://b4lf1ed2ub45v" path="res://Units/Enemies/cleric/cleric.tscn" id="4_scene"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_hp"]
 [ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6_speed"]
 
@@ -16,5 +16,5 @@ stat_displays = Array[ExtResource("3_display")]([ExtResource("5_hp"), ExtResourc
 important = true
 unit_scene = ExtResource("4_scene")
 flux_value = 0.8
-strength_value = 1.7
+strength_value = 2.5
 metadata/_custom_type_script = "uid://bnpluy6agmetj"

@@ -1,12 +1,19 @@
-extends ProgressBar
+extends Control
 class_name UnitHPBar
 
-var bar_size: Vector2 = Vector2(5, 1.2)
+const HEALTH_BAR_SCALE: Vector2 = Vector2(0.15, 0.15)
+const ROW_GAP: float = 0.25
+const COLUMN_GAP: float = 0.25
 const AUTO_IMPORTANT_UNIT_THRESHOLD: int = 30
 const VISIBILITY_REFRESH_INTERVAL_FRAMES: int = 10
+const VERTICAL_OFFSET: Vector2 = Vector2(0, -5)
+const STATUS_ICON_SCENE: PackedScene = preload("res://UI/unit_hp_bar/status_icon.tscn")
 
 var _health_component: HealthComponent
 var _parent_unit: Node2D
+@onready var _health_progress: TextureProgressBar = $TextureProgressBar as TextureProgressBar
+var _health_value: float = 0.0
+var _max_health_value: float = 1.0
 
 var _status_icons: Dictionary[Attributes.Status, UnitStatusIcon] = {}
 var _effect_icons: Dictionary[EffectInstance, UnitStatusIcon] = {}
@@ -18,9 +25,6 @@ var _visibility_refresh_frames: int = 0
 
 static var _cached_screen_unit_count_frame: int = -1
 static var _cached_screen_unit_count: int = 0
-
-const VERTICAL_OFFSET: Vector2 = Vector2(0,-5)
-const STATUS_ICON_SCENE: PackedScene = preload("res://UI/unit_hp_bar/status_icon.tscn")
 
 func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	add_to_group(DebugAssistant.GROUP_HP_BARS)
@@ -36,14 +40,12 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 	_on_health_changed(_health_component.health)
 	visible = false
 
-	var max_hp: float = unit.get_stat(Attributes.id.MAX_HEALTH)
-	var scale_factor: float = log(max_hp*0.5 + 1) * 0.5
-	bar_size.x *= scale_factor + 1
-	bar_size.y *= scale_factor * 0.25 + 1
-
-	size = bar_size
-	position = VERTICAL_OFFSET - bar_size * 0.5
-	step = 0.01
+	size = Vector2.ZERO
+	if is_instance_valid(_health_progress):
+		_health_progress.scale = HEALTH_BAR_SCALE
+		_health_progress.position = Vector2.ZERO
+		_health_progress.step = 0.01
+	_reposition_icons()
 
 	if unit.modifiers_component:
 		if not unit.modifiers_component.status_changed.is_connected(_on_status_changed):
@@ -55,6 +57,8 @@ func setup(unit: Unit, health_comp: HealthComponent) -> void:
 		unit.effect_display_removed.connect(_on_effect_display_removed)
 	if not Pause.attached_effect_icons_changed.is_connected(_on_attached_effect_icons_changed):
 		Pause.attached_effect_icons_changed.connect(_on_attached_effect_icons_changed)
+	if Pause.show_attached_effect_icons:
+		unit.refresh_effect_displays()
 
 	if unit.has_meta(ID.UnitMeta.IS_IMPORTANT) and unit.get_meta(ID.UnitMeta.IS_IMPORTANT):
 		_is_important = true
@@ -87,7 +91,7 @@ func _exit_tree() -> void:
 		UI.update_inspector_bar.disconnect(_on_global_selection_changed)
 
 func _evaluate_visibility() -> void:
-	var is_damaged: bool = value < max_value
+	var is_damaged: bool = _health_value < _max_health_value
 	var has_intent: bool = _is_hovered or _is_selected or ((_is_important or _is_conditionally_important()) and is_damaged)
 
 	visible = has_intent
@@ -101,12 +105,15 @@ func _process(_delta: float) -> void:
 		return
 
 	_visibility_refresh_frames = 0
-	if value < max_value:
+	if _health_value < _max_health_value:
 		_evaluate_visibility()
 
 func _on_health_changed(new_health: float) -> void:
-	value = new_health
-	max_value = _health_component.max_health
+	_health_value = new_health
+	_max_health_value = _health_component.max_health
+	if is_instance_valid(_health_progress):
+		_health_progress.max_value = _health_component.max_health
+		_health_progress.value = new_health
 	_evaluate_visibility()
 
 func _on_status_changed(status: Attributes.Status, stacks: float, duration: float) -> void:
@@ -280,14 +287,35 @@ func _reposition_icons() -> void:
 	effect_icon_values.assign(_effect_icons.values())
 	active_icons.append_array(effect_icon_values)
 
-	var total_width: float = 0.0
+	var health_size: Vector2 = _get_control_visual_size(_health_progress)
+	var icon_row_width: float = 0.0
+	var icon_row_height: float = 0.0
 	for icon: Control in active_icons:
-		var w: float = icon.size.x * icon.scale.x
-		total_width += w
+		var icon_size: Vector2 = _get_control_visual_size(icon)
+		icon_row_height = maxf(icon_row_height, icon_size.y)
+		if icon_row_width > 0.0:
+			icon_row_width += ROW_GAP
+		icon_row_width += icon_size.x
 
-	var accumulated_width: float = 0.0
+	var total_width: float = maxf(health_size.x, icon_row_width)
+	var total_height: float = health_size.y
+	if not active_icons.is_empty():
+		total_height += icon_row_height + COLUMN_GAP
+
+	position = VERTICAL_OFFSET - Vector2(total_width, total_height) * 0.5
+	if is_instance_valid(_health_progress):
+		var health_y: float = 0.0
+		if not active_icons.is_empty():
+			health_y = icon_row_height + COLUMN_GAP
+		_health_progress.position = Vector2((total_width - health_size.x) * 0.5, health_y)
+
+	var accumulated_width: float = (total_width - icon_row_width) * 0.5
 	for icon: Control in active_icons:
-		var w: float = icon.size.x * icon.scale.x
-		icon.position = VERTICAL_OFFSET
-		icon.position.x = 0.0 - total_width * 0.5 + w * 0.5 + accumulated_width
-		accumulated_width += w
+		var icon_size: Vector2 = _get_control_visual_size(icon)
+		icon.position = Vector2(accumulated_width, (icon_row_height - icon_size.y) * 0.5)
+		accumulated_width += icon_size.x + ROW_GAP
+
+func _get_control_visual_size(control: Control) -> Vector2:
+	if not is_instance_valid(control):
+		return Vector2.ZERO
+	return control.size * control.scale

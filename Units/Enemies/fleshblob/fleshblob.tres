@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c3kljuov5fl5a" path="res://Units/Enemies/fleshblob/fleshblob.tscn" id="2_wj0ta"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_021ty"]
 [ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="4_th4qc"]
-[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="5_icon"]
+[ext_resource type="Texture2D" path="res://Assets/fleshblob.png" id="5_icon"]
 
 [resource]
 script = ExtResource("1_62c0u")

@@ -5,7 +5,7 @@ signal attached_effect_icons_changed(is_enabled: bool)
 
 var _current_menu_instance: SettingsMenu
 var show_all_health_bars: bool = false
-var show_attached_effect_icons: bool = false:
+var show_attached_effect_icons: bool = true:
 	set(is_enabled):
 		if show_attached_effect_icons == is_enabled:
 			return

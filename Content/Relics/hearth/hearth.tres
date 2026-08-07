@@ -24,6 +24,7 @@ icon = ExtResource("2_m4pl3")
 [resource]
 script = ExtResource("3_relic")
 type = 45
+reward_tags = Array[int]([2])
 global_effect = SubResource("Resource_effect")
 title = "Hearth"
 description = "Towers within 2 tiles of {T_GENERATOR|label=Villages} or {T_HAMLET|label=Hamlets} inflict 2 stacks of {BURN}, lasting 2 seconds."

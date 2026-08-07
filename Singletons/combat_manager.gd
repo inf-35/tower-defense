@@ -1,6 +1,11 @@
 extends Node #CombatManager
 
 const _DEBUG: bool = false
+const _DEFAULT_AOE_FIELD_COLOR: Color = Color(0.58, 0.62, 0.6, 0.26)
+const _DEFAULT_AOE_FIELD_PARTICLES_PER_CELL: float = 3.5
+const _DEFAULT_AOE_FIELD_LIFETIME: float = 0.38
+
+static var _default_aoe_field_vfx_info: VFXInfo
 
 class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
@@ -229,6 +234,11 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				return false #ignore self
 
 			if stop_on_walls:
+				var tower: Tower = unit as Tower
+				var impact_cell: Vector2i = _get_tower_collision_cell(tower, impact_pos)
+				if not tower.blocks_line_of_sight_at_cell(impact_cell):
+					return false
+
 				_apply_impact_vfx(impact_pos)
 				_on_destruct(null) #wall hit = death
 				return true
@@ -247,6 +257,15 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				_on_destruct(unit) #out of pierce charges
 				return true
 		return false #hit something allied that is not a structure (ignore)
+
+	func _get_tower_collision_cell(tower: Tower, impact_pos: Vector2) -> Vector2i: ##resolves a broad tower hitbox impact back to the specific occupied cell that should decide blocking
+		var nudge_direction: Vector2 = projectile_velocity.normalized() if not projectile_velocity.is_zero_approx() else Vector2.ZERO
+		var nudged_position: Vector2 = impact_pos + nudge_direction * 0.5
+		var impact_cell: Vector2i = Island.position_to_cell(nudged_position)
+		if tower.get_occupied_cells().has(impact_cell):
+			return impact_cell
+
+		return Island.position_to_cell(impact_pos)
 
 	func _apply_hit_to_unit(unit: Unit, impact_pos: Vector2) -> void:
 		hit_data.velocity = projectile_velocity
@@ -413,10 +432,44 @@ static func _play_aoe_field_vfx_set(
 	aim_direction: Vector2 = Vector2.RIGHT,
 	include_base: bool = false
 ) -> void:
-	if include_base and is_instance_valid(hit_data.vfx_on_spawn):
-		VFXManager.play_aoe_field(hit_data.vfx_on_spawn, position, radius, cone_angle_deg, aim_direction)
-	elif is_instance_valid(hit_data.vfx_on_impact):
-		VFXManager.play_aoe_field(hit_data.vfx_on_impact, position, radius, cone_angle_deg, aim_direction)
+	if radius <= 0.0:
+		return
+
+	var aoe_info: VFXInfo = _get_aoe_field_vfx_info(hit_data, include_base)
+	if is_instance_valid(aoe_info):
+		VFXManager.play_aoe_field(aoe_info, position, radius, cone_angle_deg, aim_direction)
+
+static func _get_aoe_field_vfx_info(hit_data: HitData, include_base: bool) -> VFXInfo:
+	if include_base and _has_aoe_particles(hit_data.vfx_on_spawn):
+		return hit_data.vfx_on_spawn
+	if _has_aoe_particles(hit_data.vfx_on_impact):
+		return hit_data.vfx_on_impact
+	if _has_aoe_particles(hit_data.vfx_on_spawn):
+		return hit_data.vfx_on_spawn
+	return _get_default_aoe_field_vfx_info()
+
+static func _has_aoe_particles(info: VFXInfo) -> bool:
+	return is_instance_valid(info) and info.aoe_particles_enabled and is_instance_valid(info.aoe_particle_texture)
+
+static func _get_default_aoe_field_vfx_info() -> VFXInfo:
+	if is_instance_valid(_default_aoe_field_vfx_info):
+		return _default_aoe_field_vfx_info
+
+	var info := VFXInfo.new()
+	info.aoe_particles_enabled = true
+	info.aoe_particle_color = _DEFAULT_AOE_FIELD_COLOR
+	info.aoe_particles_per_cell = _DEFAULT_AOE_FIELD_PARTICLES_PER_CELL
+	info.aoe_particle_lifetime = _DEFAULT_AOE_FIELD_LIFETIME
+	info.aoe_particle_scale_min = 0.35
+	info.aoe_particle_scale_max = 0.78
+	info.aoe_particle_spin_speed_min = -35.0
+	info.aoe_particle_spin_speed_max = 35.0
+	info.aoe_particle_drift_speed_min = 3.0
+	info.aoe_particle_drift_speed_max = 10.0
+	info.aoe_particle_drift_angle_noise_deg = 35.0
+	info.graphical_layer = 950
+	_default_aoe_field_vfx_info = info
+	return _default_aoe_field_vfx_info
 
 var simulated_projectiles: Array[ProjectileSimulatedResolver] = [] #projectileresolvers will automatically add and remove themselves as necessary
 func _process(_delta: float) -> void: #simulate all alive projectiles

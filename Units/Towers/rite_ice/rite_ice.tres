@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="TowerData" format=3]
+
+[ext_resource type="Texture2D" uid="uid://coxdl3nr3cjjs" path="res://Assets/frost_rite.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_action_script"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_destroy"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_tower_data"]
+[ext_resource type="PackedScene" path="res://Units/Towers/rite_ice/rite_ice.tscn" id="5_scene"]
+
+[resource]
+script = ExtResource("4_tower_data")
+id = 72
+cost = 0.0
+required_capacity = 0.0
+element = 4
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tags = Array[int]([1])
+tower_name = "Rite of Ice"
+rite_short_name = "ice"
+tower_description = "{RITE_LABEL}. When adjacent towers hit {FROST|label=Frosted} enemies, they inflict 1 stack of {BRITTLE}, lasting 3 seconds."
+icon = ExtResource("1_icon")
+preview = ExtResource("1_icon")
+inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])
+tower_scene = ExtResource("5_scene")

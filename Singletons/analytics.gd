@@ -33,6 +33,7 @@ const RETRY_DELAY_SECONDS: float = 12.0
 var _pending_events: Array[Dictionary] = []
 var _request_in_flight: bool = false
 var _session_end_queued: bool = false
+var _event_sequence: int = 0 ##session-local suffix used to keep generated event ids unique within one boot
 
 var _session_id: String = ""
 var _session_started_ticks_msec: int = 0
@@ -202,7 +203,7 @@ func _finalize_current_run(result: String, reason: String) -> void: ##builds one
 		"collected_relic_counts": _copy_int_dictionary(_current_run.relic_counts),
 		"collected_rite_counts": _copy_int_dictionary(_current_run.rite_counts),
 	}
-	_enqueue_event(EVENT_RUN_SUMMARY, payload)
+	_enqueue_event(EVENT_RUN_SUMMARY, payload, true)
 
 	if send_session_snapshot_on_run_end:
 		_queue_session_snapshot("run_end", EVENT_SESSION_SNAPSHOT)
@@ -226,13 +227,14 @@ func _queue_session_end_once(reason: String) -> void:
 	_try_send_next()
 	_persist_queue()
 
-func _enqueue_event(event_type: String, payload: Dictionary) -> void:
+func _enqueue_event(event_type: String, payload: Dictionary, priority: bool = false) -> void: ##queues one outbound analytics envelope; priority events are sent before older low-value backlog
 	if not enabled:
 		return
 	if endpoint_url.strip_edges().is_empty():
 		return
 
 	var envelope: Dictionary = {
+		"event_id": _make_event_id(event_type),
 		"event_type": event_type,
 		"game_name": _get_game_name(),
 		"build_version": _get_build_version(),
@@ -243,7 +245,10 @@ func _enqueue_event(event_type: String, payload: Dictionary) -> void:
 	if shared_secret.strip_edges() != "":
 		envelope["secret"] = shared_secret
 
-	_pending_events.append(envelope)
+	if priority:
+		_pending_events.push_front(envelope)
+	else:
+		_pending_events.append(envelope)
 	_persist_queue()
 	_try_send_next()
 
@@ -404,9 +409,16 @@ func _load_queue() -> void:
 	if not (json.data is Array):
 		return
 
+	var queue_changed: bool = false
 	for event: Variant in json.data:
 		if event is Dictionary:
-			_pending_events.append(event)
+			var envelope: Dictionary = event
+			if _ensure_event_id(envelope):
+				queue_changed = true
+			_pending_events.append(envelope)
+
+	if queue_changed:
+		_persist_queue()
 	_log("loaded %s queued analytics events" % str(_pending_events.size()))
 
 func _persist_queue() -> void:
@@ -453,6 +465,19 @@ func _get_session_duration_seconds() -> int:
 
 func _make_ephemeral_id(prefix: String) -> String:
 	return "%s_%s_%s" % [prefix, str(_now_unix()), str(randi())]
+
+func _make_event_id(event_type: String, source_session_id: String = "") -> String: ##builds one retry-stable id before the envelope is persisted to the local queue
+	_event_sequence += 1
+	var session_id: String = source_session_id if source_session_id.strip_edges() != "" else _session_id
+	var normalized_event_type: String = event_type.strip_edges().to_lower().replace(" ", "_")
+	return "%s_%s_%s_%s" % [session_id, normalized_event_type, str(_now_unix()), str(_event_sequence)]
+
+func _ensure_event_id(envelope: Dictionary) -> bool: ##backfills old queued events so retries can be deduped once they reach the analytics endpoint
+	if str(envelope.get("event_id", "")).strip_edges() != "":
+		return false
+
+	envelope["event_id"] = _make_event_id(str(envelope.get("event_type", "event")), str(envelope.get("session_id", "")))
+	return true
 
 func _should_use_query_transport() -> bool:
 	return endpoint_url.find(GOOGLE_SCRIPT_ENDPOINT_HINT) != -1

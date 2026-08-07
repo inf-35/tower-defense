@@ -7,6 +7,7 @@ extends Node
 @export var environment_panel: Control ##shown first so new runs choose an environment before difficulty
 @export var woods_environment: Button ##starts the woods branch of new-run setup
 @export var winter_environment: Button ##starts the winter branch of new-run setup
+@export var deeps_environment: Button ##starts the deeps branch of new-run setup
 @export var difficulty_panel: Control ##shown after environment selection to finish new-run setup
 @export var normal_difficulty: Button ##starts a normal-difficulty run
 @export var hard_difficulty: Button ##starts a hard-difficulty run
@@ -25,6 +26,7 @@ func _ready() -> void: ##wires the title-screen buttons into the existing run bo
 	play_button.pressed.connect(_show_environment_panel)
 	woods_environment.pressed.connect(_select_woods_environment)
 	winter_environment.pressed.connect(_select_winter_environment)
+	deeps_environment.pressed.connect(_select_deeps_environment)
 	normal_difficulty.pressed.connect(_start_normal_game)
 	hard_difficulty.pressed.connect(_start_hard_game)
 
@@ -46,6 +48,9 @@ func _select_woods_environment() -> void:
 
 func _select_winter_environment() -> void:
 	_select_environment(Run.GameEnvironment.WINTER)
+
+func _select_deeps_environment() -> void:
+	_select_environment(Run.GameEnvironment.DEEPS)
 
 func _select_environment(game_environment: Run.GameEnvironment) -> void: ##stores the environment choice before difficulty is chosen
 	Run.set_pending_game_environment(game_environment)

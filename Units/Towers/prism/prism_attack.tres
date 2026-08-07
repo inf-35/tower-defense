@@ -9,7 +9,8 @@
 [sub_resource type="Resource" id="Resource_27ydr"]
 script = ExtResource("3_l1orb")
 type = 1
-cooldown = 1.333333
+stack = 2.0
+cooldown = 2.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_e3651"]
@@ -23,7 +24,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 script = ExtResource("2_27ydr")
 delivery_method = 1
 cooldown = 0.333333
-damage = 0.5
+damage = 0.1
 status_effects = Array[ExtResource("3_l1orb")]([SubResource("Resource_27ydr")])
 vfx_on_spawn = SubResource("Resource_e3651")
 projectile_speed = 80.0

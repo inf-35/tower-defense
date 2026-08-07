@@ -18,6 +18,7 @@ enum Anchor {
 	START_WAVE_ANCHOR,
 	TARGET_OFFSET,
 	TIME_CONTROLS_ANCHOR,
+	TRADE_ANCHOR,
 }
 
 enum Reference { ##reference ids to control nodes

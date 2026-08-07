@@ -299,17 +299,22 @@ func create_swirl_beam(
 	)
 	return beam
 
-func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position: Vector2) -> SwirlLineVFX: ##spawns a persistent swirl beam from one authored resource so linked supports stay data-driven
+func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position: Vector2, strength: float = 1.0) -> SwirlLineVFX: ##spawns a persistent swirl beam from one authored resource so linked supports stay data-driven
 	if not is_instance_valid(info):
 		return null
+	if strength <= 0.0:
+		return null
+
+	var beam_color: Color = info.swirl_color
+	beam_color.a *= strength
 
 	var beam: SwirlLineVFX = create_swirl_beam(
 		start_position,
 		end_position,
-		info.swirl_color,
+		beam_color,
 		info.swirl_width,
 		info.lifetime,
-		info.swirl_particles_per_tile,
+		info.swirl_particles_per_tile * strength,
 		info.swirl_scale_min,
 		info.swirl_scale_max,
 		info.swirl_drift_speed_min,

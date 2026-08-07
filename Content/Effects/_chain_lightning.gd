@@ -34,6 +34,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##only r
 	var hit_report: HitReportData = event.data as HitReportData
 	if not is_instance_valid(hit_report.target) or hit_report.attack_id <= 0:
 		return
+	if hit_report.has_lineage_producer(instance):
+		return
 
 	#cast host to tower to access attack components
 	var host_tower: Tower = instance.host as Tower
@@ -72,11 +74,12 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 			true,
 			last_hit_target.global_position,
 			true,
-			current_damage
+			current_damage,
+			initial_report.get_attack_id()
 		)
 		if not is_instance_valid(attack_context):
 			break
-		host.attack_component.attack_with_context(next_target, attack_context, Vector2.ZERO, false)
+		host.attack_component.attack_with_context(next_target, attack_context, Vector2.ZERO, false, false)
 		#update state for next loop iteration
 		already_hit.append(next_target)
 		last_hit_target = next_target

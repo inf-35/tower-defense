@@ -21,6 +21,9 @@ var _frozen_raider_waypoints: Dictionary[int, Array] = {}
 const CONCURRENT_ENEMY_SPAWNS: int = 10
 const WAVES_PER_EXPANSION_CHOICE: int = 3
 const DELAY_AFTER_BUILDING_PHASE_ENDS: float = 0.5
+const BREACH_DISTANCE_ASSIGNMENT_BIAS: float = 1.5 ##0 disables distance bias, higher values push more enemies toward breaches farther from the keep
+const MIN_BREACH_ASSIGNMENT_WEIGHT: float = 0.15
+const BREACH_ASSIGNMENT_CYCLE_RESOLUTION: int = 8
 
 #--- reconciliation system ---
 const ENEMY_GROUP: StringName = &"active_enemies"
@@ -131,29 +134,26 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 		_end_combat_wave()
 
 func _spawn_enemies_for_current_wave() -> void:
-	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	if spawn_points.is_empty():
-		push_warning("Waves: No active breaches found. Cannot spawn enemies.")
-		_end_combat_wave() #end the wave if we can't spawn anything
-		return
-
-	var enemies_to_spawn: Array = _enemies_planned
 	var enemy_stagger: float = 5.0 / _total_enemies_planned
-	var spawn_point_index: int = 0
+	var spawn_sequence_index: int = 0
 
-
-	for enemy_stack: Array in enemies_to_spawn:
+	for enemy_stack: Array in _enemies_planned:
 		var unit_type: Units.Type = enemy_stack[0]
-		var unit_stack_count: int = enemy_stack[1]
+		var unit_stack_count: int = int(enemy_stack[1])
 
-		for i: int in unit_stack_count:
+		for _stack_index: int in range(unit_stack_count):
 			#if a new wave has started while we were spawning, abort
 			if current_combat_wave_number == 0:
 				return
 
-			var spawn_cell: Vector2i = spawn_points[spawn_point_index]
-			spawn_point_index = (spawn_point_index + 1) % spawn_points.size()
-			spawn_enemy(unit_type, Island.cell_to_position(spawn_cell))
+			var breach: Tower = _get_breach_for_spawn_index(spawn_sequence_index)
+			if not is_instance_valid(breach):
+				push_warning("Waves: No active breaches found. Cannot spawn enemies.")
+				_end_combat_wave() #end the wave if we can't spawn anything
+				return
+
+			spawn_enemy(unit_type, Island.cell_to_position(breach.tower_position))
+			spawn_sequence_index += 1
 
 			await Clock.await_game_time(enemy_stagger * 0.6)
 
@@ -232,20 +232,23 @@ func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy as
 	if planned_stacks.is_empty():
 		return
 
+	var breach_cycle: Array[Tower] = _get_breach_spawn_cycle(active_breaches)
+	if breach_cycle.is_empty():
+		return
+
 	var breach_streams: Dictionary[int, Array] = {}
 	for breach: Tower in active_breaches:
 		if not is_instance_valid(breach):
 			continue
 		breach_streams[breach.unit_id] = []
 
-	var active_breach_count: int = active_breaches.size()
-	var breach_index: int = 0
+	var spawn_sequence_index: int = 0
 	for enemy_stack: Array in planned_stacks:
 		var unit_type: Units.Type = enemy_stack[0]
 		var unit_count: int = int(enemy_stack[1])
 		for _stack_index: int in range(unit_count):
-			var breach: Tower = active_breaches[breach_index % active_breach_count]
-			breach_index += 1
+			var breach: Tower = breach_cycle[spawn_sequence_index % breach_cycle.size()]
+			spawn_sequence_index += 1
 			if not is_instance_valid(breach):
 				continue
 
@@ -261,6 +264,56 @@ func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy as
 		assigned_units.assign(breach_streams.get(breach.unit_id, []))
 		_breach_enemy_assignments[breach.unit_id] = WaveEnemies._consolidate_enemy_list(assigned_units)
 		UI.update_unit_state.emit(breach)
+
+func _get_breach_for_spawn_index(spawn_index: int) -> Tower: ##chooses the live breach for one spawn using the same distance-weighted cycle as the preview
+	var active_breaches: Array[Tower] = SpawnPointService.get_active_breaches()
+	var breach_cycle: Array[Tower] = _get_breach_spawn_cycle(active_breaches)
+	if breach_cycle.is_empty():
+		return null
+	return breach_cycle[spawn_index % breach_cycle.size()]
+
+func _get_breach_spawn_cycle(active_breaches: Array[Tower]) -> Array[Tower]: ##builds a weighted rotation where farther breaches appear more often than breaches close to the keep
+	var breach_cycle: Array[Tower] = []
+	var max_distance: float = 0.0
+	for breach: Tower in active_breaches:
+		if not is_instance_valid(breach):
+			continue
+		max_distance = maxf(max_distance, _get_breach_keep_distance(breach))
+
+	var slot_counts: Dictionary[int, int] = {}
+	var max_slot_count: int = 0
+	for breach: Tower in active_breaches:
+		if not is_instance_valid(breach):
+			continue
+		var weight: float = _get_breach_assignment_weight(breach, max_distance)
+		var slot_count: int = maxi(1, int(round(weight * BREACH_ASSIGNMENT_CYCLE_RESOLUTION)))
+		slot_counts[breach.unit_id] = slot_count
+		max_slot_count = maxi(max_slot_count, slot_count)
+
+	for slot_layer: int in range(max_slot_count):
+		for breach: Tower in active_breaches:
+			if not is_instance_valid(breach):
+				continue
+			if int(slot_counts.get(breach.unit_id, 0)) <= slot_layer:
+				continue
+			breach_cycle.append(breach)
+
+	return breach_cycle
+
+func _get_breach_assignment_weight(breach: Tower, max_distance: float) -> float: ##returns a compact distance weight where close breaches are clamped to a small but nonzero share
+	if BREACH_DISTANCE_ASSIGNMENT_BIAS <= 0.0:
+		return 1.0
+	var normalized_distance: float = _get_breach_keep_distance(breach) / maxf(max_distance, 0.001)
+	var weighted_distance: float = pow(maxf(normalized_distance, 0.001), BREACH_DISTANCE_ASSIGNMENT_BIAS)
+	return maxf(weighted_distance, MIN_BREACH_ASSIGNMENT_WEIGHT)
+
+func _get_breach_keep_distance(breach: Tower) -> float: ##uses tile-space straight-line distance so assignment bias is cheap and stable
+	if not is_instance_valid(breach):
+		return 0.0
+	if is_instance_valid(Run.references.keep) and Run.references.keep is Tower:
+		var keep: Tower = Run.references.keep
+		return Vector2(breach.tower_position - keep.tower_position).length()
+	return Vector2(breach.tower_position).length()
 
 #the primary, high-frequency update method
 func _on_enemy_died(_died_unit: Unit) -> void:

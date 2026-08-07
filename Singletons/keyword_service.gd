@@ -98,6 +98,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "{STATUS_EFFECT_LABEL}. Burning units take 1 damage per second per stack",
 		"icon": preload("res://Assets/burn_icon.png")
 	},
+	"BRITTLE": {
+		"title": "Brittle",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}. Brittle units take +150% damage per stack on hits above 3 damage.",
+		"icon": preload("res://Assets/brittle_effect_icon.png")
+	},
 	"BLEED": {
 		"title": "Bleed",
 		"display": "",
@@ -156,12 +162,6 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"title": "Base Income",
 		"display": "",
 		"description": "Amount of base {GOLD} earned by this structure every wave.",
-		"icon": preload("res://Assets/gold_icon.png"),
-	},
-	"FARM_ADJACENT_BONUS": {
-		"title": "Adjacent Bonus",
-		"display": "",
-		"description": "Amount of extra {GOLD} earned by this structure for each adjacent structure every wave.",
 		"icon": preload("res://Assets/gold_icon.png"),
 	},
 }

@@ -17,17 +17,11 @@ dynamic_attribute = &"farm_income_per_wave"
 label = "{FARM_BASE_INCOME}"
 metadata/_custom_type_script = "uid://ytjls7y0k8wv"
 
-[sub_resource type="Resource" id="Resource_c0bwh"]
-script = ExtResource("2_7c8ug")
-dynamic_attribute = &"farm_adjacent_bonus"
-label = "{FARM_ADJACENT_BONUS}"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
-
 [node name="Farm" type="Node2D" unique_id=1786711533 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_5gwp7")
 type = 53
-stat_displays = Array[ExtResource("2_7c8ug")]([SubResource("Resource_7c8ug"), SubResource("Resource_c0bwh")])
+stat_displays = Array[ExtResource("2_7c8ug")]([SubResource("Resource_7c8ug")])
 behavior = NodePath("FarmBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")

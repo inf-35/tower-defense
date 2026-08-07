@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_1")
-instruction_text = "Buy the [Ruptured Heart] relic from the trader.\nIt goes well with the {T_RITE_POISONS|label=Rite of Plagues}."
+instruction_text = "Buy the [Ruptured Heart] relic from the trader.\nIt goes well with the {T_RITE_PLAGUES|label=Rite of Plagues}."
 panel_anchor = 0
 require_confirmation = false
 pause_clock = true

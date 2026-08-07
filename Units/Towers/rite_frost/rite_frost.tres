@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://dg7x84eajxqod"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dg7x84eajxqod"]
 
 [ext_resource type="Texture2D" uid="uid://coxdl3nr3cjjs" path="res://Assets/frost_rite.png" id="1_bv8ri"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_33pyk"]
@@ -9,7 +9,6 @@
 [resource]
 script = ExtResource("3_r7qki")
 id = 30
-tags = Array[int]([1])
 cost = 0.0
 required_capacity = 0.0
 element = 4
@@ -19,10 +18,9 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Frost Rite"
 rite_short_name = "frost"
-tower_description = "{RITE_LABEL}. Adjacent towers make frosted enemies brittle. The next hit above 3 {UNIT_DAMAGE} deals double damage."
+tower_description = "{RITE_LABEL}. Adjacent towers inflict 1 stack of {FROST}, lasting 2 seconds."
 icon = ExtResource("1_bv8ri")
 preview = ExtResource("1_bv8ri")
 inspector_actions = Array[ExtResource("2_33pyk")]([ExtResource("3_m2obg")])
 tower_scene = ExtResource("4_780o2")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

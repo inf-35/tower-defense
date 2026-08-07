@@ -28,6 +28,8 @@ func refresh_runtime_connections() -> void: ##binds the presenter and run-scoped
 		return
 	if not UI.tutorial_manager.fact_observed.is_connected(_on_fact_observed):
 		UI.tutorial_manager.fact_observed.connect(_on_fact_observed)
+	if not UI.tutorial_manager.intro_continue_requested.is_connected(_on_intro_continue_requested):
+		UI.tutorial_manager.intro_continue_requested.connect(_on_intro_continue_requested)
 	if not UI.tutorial_manager.sequence_finished.is_connected(_on_sequence_finished):
 		UI.tutorial_manager.sequence_finished.connect(_on_sequence_finished)
 	if not Run.phases.wave_cycle_started.is_connected(_on_wave_cycle_started):
@@ -130,7 +132,7 @@ func should_force_basic_tutorial_rites() -> bool:
 	return false
 
 func pick_basic_tutorial_rite_type() -> Towers.Type:
-	return Towers.Type.RITE_POISONS
+	return Towers.Type.RITE_PLAGUES
 
 func can_purchase_trader_reward(_reward: Reward) -> bool:
 	return true
@@ -180,7 +182,7 @@ func _build_intro_chapters() -> void:
 	camera_controls.id = &"camera_controls"
 	camera_controls.anchor = TutorialContent.Anchor.CENTRAL
 	camera_controls.checklist_items = [
-		TutorialContent.ChecklistItem.new(TutorialContent.Fact.CAMERA_PANNED, "Move the camera with WASD or drag with RMB."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.CAMERA_PANNED, "Move the camera with WASD or drag with MMB."),
 		TutorialContent.ChecklistItem.new(TutorialContent.Fact.CAMERA_ZOOMED, "Zoom in and out with scroll."),
 	]
 	_intro_chapters.append(camera_controls)
@@ -191,9 +193,12 @@ func _build_intro_chapters() -> void:
 	towers.highlight_elements = [TutorialContent.Element.TOWER_BAR]
 	towers.checklist_items = [
 		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_BAR_SELECTED, "Select a tower from the tower bar to inspect it."),
-		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TOWER_PLACED, "Place a tower down."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.TURRET_PLACED, "Place a {T_TURRET} down."),
+		TutorialContent.ChecklistItem.new(TutorialContent.Fact.FARM_PLACED, "Place down as many {T_FARM|label=Farms} as possible."),
 	]
-	towers.paragraph_text = "You can place towers to control the paths of enemies. Try to make the enemies' paths as long as possible."
+	towers.paragraph_text = "You can place towers to control the paths of enemies. Try to make them as long as possible."
+	towers.footer_text = "[Q to continue.]"
+	towers.auto_advance = false
 	_intro_chapters.append(towers)
 
 	var information := TutorialContent.Chapter.new()
@@ -287,6 +292,21 @@ func _on_sequence_finished(sequence_id: StringName) -> void:
 func _on_fact_observed(fact: int) -> void:
 	notify_fact(fact)
 
+func _on_intro_continue_requested() -> void:
+	if not _intro_active:
+		return
+	if _active_chapter_index < 0 or _active_chapter_index >= _intro_chapters.size():
+		return
+	var chapter: TutorialContent.Chapter = _intro_chapters[_active_chapter_index]
+	if chapter.auto_advance:
+		return
+	if chapter.checklist_items.is_empty():
+		return
+	if not _is_active_chapter_complete():
+		return
+	_active_chapter_index += 1
+	_show_active_chapter()
+
 func _on_camera_panned() -> void:
 	notify_fact(TutorialContent.Fact.CAMERA_PANNED)
 
@@ -299,7 +319,10 @@ func _on_tower_option_selected(_tower_type: Towers.Type) -> void:
 func _on_tower_placed(_tower_type: Towers.Type, tower: Tower) -> void:
 	if not is_instance_valid(tower) or tower.hostile or tower.environmental or tower.abstractive:
 		return
-	notify_fact(TutorialContent.Fact.TOWER_PLACED)
+	if _tower_type == Towers.Type.TURRET:
+		notify_fact(TutorialContent.Fact.TURRET_PLACED)
+	if _tower_type == Towers.Type.FARM:
+		notify_fact(TutorialContent.Fact.FARM_PLACED)
 
 func _on_combat_started(_wave_number: int) -> void:
 	notify_fact(TutorialContent.Fact.WAVE_STARTED)
@@ -347,7 +370,7 @@ func _build_shop_intro_steps() -> Array[TutorialStep]: ##opens with a real trade
 
 	var open_step := TutorialStep.new()
 	open_step.instruction_text = "Open the trade menu."
-	open_step.panel_anchor = TutorialStep.Anchor.TOWER_BAR_ANCHOR
+	open_step.panel_anchor = TutorialStep.Anchor.TRADE_ANCHOR
 	open_step.highlight_target = TutorialStep.Reference.TRADE_BUTTON
 	open_step.trigger_type = TutorialStep.TriggerType.BEGIN_TRIGGERED if trader_is_open else TutorialStep.TriggerType.WAIT_FOR_SIGNAL
 	open_step.trigger_signal = UI.trader_open

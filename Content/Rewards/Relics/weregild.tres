@@ -2,6 +2,12 @@
 
 [ext_resource type="Resource" uid="uid://bi0urs84h5hqm" path="res://Content/Relics/weregild/weregild.tres" id="1_6lroi"]
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_et4s5"]
+[ext_resource type="Script" path="res://Content/reward_tag_rule.gd" id="3_rule"]
+
+[sub_resource type="Resource" id="Resource_self_damage_rule"]
+script = ExtResource("3_rule")
+tags = Array[int]([8])
+value = 2.0
 
 [resource]
 script = ExtResource("2_et4s5")
@@ -9,4 +15,4 @@ id_name = "weregild"
 description = "relic reward"
 type = 2
 relic_data = ExtResource("1_6lroi")
-
+tag_rules = Array[ExtResource("3_rule")]([SubResource("Resource_self_damage_rule")])

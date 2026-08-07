@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c7chrtlkjrrxn"]
+[gd_scene format=3 uid="uid://c7chrtlkjrrxn"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_yhqet"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_r83sm"]
@@ -17,7 +17,7 @@
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_pw7yb"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_qyrm2"]
 
-[node name="Snowball" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Snowball" type="Node2D" unique_id=104738060 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_yhqet")
 type = 13
@@ -31,36 +31,36 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="SnowballBehavior" type="Node" parent="."]
+[node name="SnowballBehavior" type="Node" parent="." unique_id=1904653124]
 script = ExtResource("3_pw7yb")
 metadata/_custom_type_script = "uid://dpshtubwwoeys"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1568432293]
 script = ExtResource("4_3uwey")
 movement_data = ExtResource("5_c7yfw")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1809633610]
 script = ExtResource("6_7e6o7")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1678117476]
 script = ExtResource("7_5efsi")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=191361020]
 script = ExtResource("8_s4vh2")
 attack_data = ExtResource("9_18pqd")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1230712423]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_7iuwt")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1869631332]
 script = ExtResource("11_pw7yb")
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1214531484]
 script = ExtResource("12_qyrm2")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

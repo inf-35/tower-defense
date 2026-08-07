@@ -21,6 +21,7 @@ icon = ExtResource("2_icon")
 [resource]
 script = ExtResource("4_relic")
 type = 47
+reward_tags = Array[int]([1])
 global_effect = SubResource("Resource_effect")
 title = "Edelweiss"
 description = "Attacks of towers on highland tiles inflict 1 stack of {FROST}, lasting 1 second."

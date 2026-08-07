@@ -199,7 +199,7 @@ func _is_spawn_cell_blocked(island: Island, cell: Vector2i) -> bool:
 		return false
 
 	var tower: Tower = island.tower_grid[cell]
-	return is_instance_valid(tower) and tower.blocking
+	return is_instance_valid(tower) and tower.blocks_tile_at_cell(cell)
 
 func get_save_data() -> Dictionary:
 	return {}

@@ -35,8 +35,8 @@ size = Vector2(70, 85)
 [sub_resource type="Resource" id="4"]
 script = ExtResource("14")
 range = 8.0
-cooldown = 0.75
-damage = 6.0
+cooldown = 1.5
+damage = 3.0
 
 [node name="WarriorPlus" type="Node2D" unique_id=734259489 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100

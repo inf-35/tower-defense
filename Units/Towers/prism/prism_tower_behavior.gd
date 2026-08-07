@@ -48,9 +48,12 @@ func update(_delta: float) -> void:
 	if not is_instance_valid(attack_context):
 		return
 
+	attack_context.use_attack_id_override = true
+	attack_context.attack_id_override = AttackComponent.get_next_attack_id()
 	attack_component.current_cooldown = attack_component.cooldown * 2.0
-	for target: Unit in targets:
-		attack_component.attack_with_context(target, attack_context, Vector2.ZERO, false)
+	for i: int in range(targets.size()):
+		var target: Unit = targets[i]
+		attack_component.attack_with_context(target, attack_context, Vector2.ZERO, false, i == 0)
 
 func _is_ready_to_pulse() -> bool: ##keeps prism firing on its own half-cooldown cadence rather than delegating cadence to the beam nodes
 	return is_instance_valid(attack_component) and not unit.disabled and attack_component.current_cooldown <= 0.0
@@ -133,7 +136,8 @@ func _scan_direction(dir: Vector2i) -> Tower:
 			if _is_valid_active_prism(check_tower) and check_tower.type == tower.type:
 				return check_tower
 
-			return null
+			if check_tower.blocks_line_of_sight_at_cell(current_cell):
+				return null
 
 		current_cell += dir
 	return null
@@ -236,9 +240,10 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 
 			var check_tower = island.get_tower_on_tile(current_cell)
 			if is_instance_valid(check_tower) and check_tower != tower:
-				hit_tower = check_tower
-				impact_cell = current_cell
-				break
+				if check_tower.blocks_line_of_sight_at_cell(current_cell):
+					hit_tower = check_tower
+					impact_cell = current_cell
+					break
 
 			impact_cell = current_cell
 			current_cell += d

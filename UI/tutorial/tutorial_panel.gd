@@ -70,4 +70,14 @@ func _build_intro_text() -> String:
 		if not body_text.is_empty():
 			body_text += "\n\n"
 		body_text += "\n\n".join(lines)
+	if _is_active_chapter_complete() and not _active_chapter.footer_text.is_empty():
+		if not body_text.is_empty():
+			body_text += "\n\n"
+		body_text += KeywordService.parse_text_for_bbcode(_active_chapter.footer_text)
 	return body_text
+
+func _is_active_chapter_complete() -> bool:
+	for item: TutorialContent.ChecklistItem in _active_chapter.checklist_items:
+		if not _completed_facts.get(item.fact, false):
+			return false
+	return true

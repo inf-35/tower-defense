@@ -14,7 +14,7 @@
 [sub_resource type="Resource" id="Resource_cggor"]
 script = ExtResource("5_d5ols")
 texture = ExtResource("6_r2t0r")
-scale = 0.1
+scale = 0.15
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 

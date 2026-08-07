@@ -1,24 +1,22 @@
-[gd_scene load_steps=19 format=3 uid="uid://din6sbre3mwxa"]
+[gd_scene load_steps=20 format=3 uid="uid://din6sbre3mwxa"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_frvvu"]
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_5d8om"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="3_12xml"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_hp"]
 [ext_resource type="Script" uid="uid://cdxowv5igovgj" path="res://Units/Towers/rite_fist/fist_rite_effect.gd" id="4_kq60c"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_nlo5c"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_eueeg"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_d5rjs"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_fmkmc"]
-[ext_resource type="Texture2D" uid="uid://cked07u2aceg" path="res://Assets/wall.png" id="9_jvp2d"]
+[ext_resource type="Texture2D" path="res://Assets/rite_fist.png" id="9_jvp2d"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_kt7s2"]
-
-[sub_resource type="Resource" id="Resource_p6ncc"]
-script = ExtResource("2_5d8om")
-attribute = 0
-label = "HP"
-metadata/_custom_type_script = "uid://ytjls7y0k8wv"
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_shadow"]
 
 [sub_resource type="Resource" id="Resource_o60ju"]
 script = ExtResource("4_kq60c")
+icon = ExtResource("9_jvp2d")
+show_as_status_icon = true
 metadata/_custom_type_script = "uid://cdxowv5igovgj"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
@@ -97,7 +95,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_frvvu")
 type = 33
-stat_displays = Array[ExtResource("2_5d8om")]([SubResource("Resource_p6ncc")])
+stat_displays = Array[ExtResource("2_5d8om")]([ExtResource("3_hp")])
 behavior = NodePath("EffectDistributorBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -128,6 +126,11 @@ texture = SubResource("PlaceholderTexture2D_p6ncc")
 [node name="Graphics" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("9_jvp2d")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+script = ExtResource("11_shadow")
+height_multiplier = 0.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="."]
 script = ExtResource("10_kt7s2")

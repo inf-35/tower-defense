@@ -1,31 +1,30 @@
 extends Behavior
 class_name DrumRiteBehavior
 
-@export var trigger_chance: float = 0.20
+@export var attacks_required: int = 4 ##unique adjacent tower attacks needed before the drum commands follow-up attacks
+@export var rite_marker_effect: EffectPrototype ##hidden marker used by shared rite-affinity systems such as night lily
 
-#tracks currently connected towers to avoid double connections
-var _connected_neighbors: Dictionary[Tower, bool] = {}
+var _connected_neighbors: Dictionary[Tower, Callable] = {}
 var _seen_attack_ids: Dictionary[int, bool] = {}
+var _attack_counter: int = 0
 
 func start() -> void:
-	var tower = unit as Tower
-	#hook into grid updates to maintain connections
+	var tower: Tower = unit as Tower
 	tower.adjacency_updated.connect(_refresh_connections)
-
-	#initial setup
 	attach()
 
-func detach() -> void: #disconnect all
-	var to_remove = []
-	for tower in _connected_neighbors:
-		if is_instance_valid(tower):
-			if tower.on_event.is_connected(_on_neighbor_event):
-				tower.on_event.disconnect(_on_neighbor_event)
+func detach() -> void:
+	var to_remove: Array[Tower] = []
+	var connected_towers: Array[Tower] = []
+	connected_towers.assign(_connected_neighbors.keys())
+	for tower: Tower in connected_towers:
+		_disconnect_neighbor(tower)
 		to_remove.append(tower)
 
-	for t in to_remove:
-		_connected_neighbors.erase(t)
+	for tower: Tower in to_remove:
+		_connected_neighbors.erase(tower)
 
+	_attack_counter = 0
 	_seen_attack_ids.clear()
 
 func attach() -> void:
@@ -33,34 +32,34 @@ func attach() -> void:
 
 func _refresh_connections(adj_map: Dictionary[Vector2i, Tower]) -> void:
 	var current_set: Dictionary[Tower, bool] = {}
+	var adjacent_towers: Array[Tower] = []
+	adjacent_towers.assign(adj_map.values())
 
-	#connect new neighbors
-	for neighbor: Tower in adj_map.values():
-		if not is_instance_valid(neighbor): continue
+	for neighbor: Tower in adjacent_towers:
+		if not is_instance_valid(neighbor):
+			continue
 
 		current_set[neighbor] = true
 
 		if not _connected_neighbors.has(neighbor):
-			#subscribe specifically to this neighbor's bus
-			neighbor.on_event.connect(_on_neighbor_event.bind(neighbor))
-			_connected_neighbors[neighbor] = true
+			var event_handler: Callable = _on_neighbor_event.bind(neighbor)
+			neighbor.on_event.connect(event_handler)
+			_connected_neighbors[neighbor] = event_handler
+			_modify_marker_stack(neighbor, 1)
 			if is_instance_valid(unit.buff_component):
 				unit.buff_component.activate_new_link(neighbor)
 
-	#disconnect old neighbors
-	var to_remove = []
-	for old_t in _connected_neighbors:
+	var to_remove: Array[Tower] = []
+	var connected_towers: Array[Tower] = []
+	connected_towers.assign(_connected_neighbors.keys())
+	for old_t: Tower in connected_towers:
 		if not current_set.has(old_t):
-			#check validity before disconnecting (it might be freed already)
-			if is_instance_valid(old_t):
-				if old_t.on_event.is_connected(_on_neighbor_event):
-					old_t.on_event.disconnect(_on_neighbor_event)
+			_disconnect_neighbor(old_t)
 			to_remove.append(old_t)
 
-	for t in to_remove:
-		_connected_neighbors.erase(t)
+	for tower: Tower in to_remove:
+		_connected_neighbors.erase(tower)
 
-#this handler is only called when a direct neighbor fires
 func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
 	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
 		return
@@ -72,23 +71,45 @@ func _on_neighbor_event(event: GameEvent, source_neighbor: Tower) -> void:
 	if not HitData.consume_attack_id(hit_data, _seen_attack_ids):
 		return
 
-	#1. roll chance
-	if randf() > trigger_chance: return
+	_attack_counter += 1
+	if _attack_counter < maxi(attacks_required, 1):
+		return
 
-	#2. trigger others
-	#we iterate our known list (which we know are valid neighbors)
+	_attack_counter = 0
 	if _trigger_all_except(source_neighbor, hit_data):
 		unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
 func _trigger_all_except(exception: Tower, parent_data: EventData) -> bool: ##arms neighboring towers so their forced follow-up attack derives from the triggering attack rather than restarting a fresh branch
 	var triggered_any: bool = false
-	for t in _connected_neighbors:
-		if t == exception: continue
-		if is_instance_valid(t) and is_instance_valid(t.attack_component):
-			t.attack_component.queue_next_attack_context(parent_data, self)
-			t.attack_component.current_cooldown = 0.0
+	var connected_towers: Array[Tower] = []
+	connected_towers.assign(_connected_neighbors.keys())
+	for tower: Tower in connected_towers:
+		if tower == exception:
+			continue
+		if is_instance_valid(tower) and is_instance_valid(tower.attack_component):
+			tower.attack_component.queue_next_attack_context(parent_data, self)
+			tower.attack_component.current_cooldown = 0.0
 			triggered_any = true
 	return triggered_any
+
+func _disconnect_neighbor(tower: Tower) -> void:
+	if not is_instance_valid(tower):
+		return
+	if not _connected_neighbors.has(tower):
+		return
+
+	var event_handler: Callable = _connected_neighbors[tower]
+	if tower.on_event.is_connected(event_handler):
+		tower.on_event.disconnect(event_handler)
+	_modify_marker_stack(tower, -1)
+
+func _modify_marker_stack(target: Tower, amount: int) -> void:
+	if not is_instance_valid(target) or not is_instance_valid(rite_marker_effect):
+		return
+
+	var effect_instance: EffectInstance = target.apply_effect(rite_marker_effect, amount)
+	if is_instance_valid(effect_instance):
+		effect_instance.source = unit
 
 func draw_visuals(canvas: RangeIndicator) -> void:
 	draw_visuals_adjacent_tiles(canvas)

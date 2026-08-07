@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://df82mxtmsjgs1"]
+
+[ext_resource type="Texture2D" uid="uid://bhw12bw4eotj4" path="res://Assets/rite_iron.png" id="1_jj0o2"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_action_script"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_destroy"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_tower_data"]
+[ext_resource type="PackedScene" uid="uid://cicygotbujwoo" path="res://Units/Towers/rite_iron/rite_iron.tscn" id="5_scene"]
+
+[resource]
+script = ExtResource("4_tower_data")
+id = 75
+cost = 0.0
+required_capacity = 0.0
+element = 6
+is_rite = true
+upgrades_into = Dictionary[int, float]({
+26: 1.0
+})
+tower_name = "Rite of Iron"
+rite_short_name = "iron"
+tower_description = "{RITE_LABEL}. Affects [input:front tower] and [highlight:back tower] of this rite. When the [input:front tower] deals overkill {UNIT_DAMAGE}, that overkill is added to the [highlight:back tower]'s next attack."
+icon = ExtResource("1_jj0o2")
+preview = ExtResource("1_jj0o2")
+inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])
+tower_scene = ExtResource("5_scene")

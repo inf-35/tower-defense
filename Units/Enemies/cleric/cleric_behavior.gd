@@ -15,7 +15,29 @@ func _perform_heal_pulse() -> bool:
 	_allies_in_range = valid_allies
 
 	for ally: Unit in _allies_in_range:
-		_clear_statuses(ally)
+		var statuslikes: Dictionary = ally.get_statuslikes()
+		var statuses: Array[StatusEffect]
+		statuses.assign(statuslikes.get(&"statuses", []))
+		var effect_instances: Array[EffectInstance]
+		effect_instances.assign(statuslikes.get(&"effects", []))
+
+		for status: StatusEffect in statuses:
+			if not is_instance_valid(status):
+				continue
+			if status.stack <= 0.0:
+				continue
+
+			status.stack = 0.0
+			ally.modifiers_component.update_status(status)
+
+		for effect_instance: EffectInstance in effect_instances:
+			if not is_instance_valid(effect_instance):
+				continue
+			if not is_instance_valid(effect_instance.effect_prototype):
+				continue
+
+			ally.remove_effect(effect_instance.effect_prototype)
+
 		ally.modifiers_component.add_status(Attributes.Status.CLEANSE, 1.0, cleanse_duration, unit.unit_id)
 		did_apply_cleanse = true
 		_spawn_cleanse_vfx(ally)
@@ -25,26 +47,6 @@ func _perform_heal_pulse() -> bool:
 		_spawn_pulse_vfx()
 
 	return true
-
-func _clear_statuses(target: Unit) -> bool:
-	if not is_instance_valid(target.modifiers_component):
-		return false
-
-	var statuses: Array[StatusEffect] = []
-	statuses.assign(target.modifiers_component._status_effects.values())
-	var did_clear: bool = false
-
-	for status: StatusEffect in statuses:
-		if not is_instance_valid(status):
-			continue
-		if status.stack <= 0.0:
-			continue
-
-		status.stack = 0.0
-		target.modifiers_component.update_status(status)
-		did_clear = true
-
-	return did_clear
 
 func _spawn_cleanse_vfx(target: Unit) -> void:
 	if not is_instance_valid(target.graphics):

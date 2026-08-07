@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_tag_rule"]
+
+[sub_resource type="Resource" id="Resource_require_frost"]
+script = ExtResource("2_tag_rule")
+tags = Array[int]([1])
+operation = 1
+
+[resource]
+script = ExtResource("1_reward")
+id_name = "ice_rite"
+description = "rite reward"
+type = 3
+rite_type = 72
+tag_rules = Array[ExtResource("2_tag_rule")]([SubResource("Resource_require_frost")])

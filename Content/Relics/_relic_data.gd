@@ -69,6 +69,7 @@ enum Type {
 #each relic contains a modifier prototype that defines its stat changes
 @export var modifier_prototypes: Array[GlobalModifierPrototype] ##modifiers that are applied to all satisfying towers (see specific_tower_type)
 @export var global_effect: EffectPrototype
+@export var reward_tags: Array[Towers.Tag] = [] ##buildcraft tags this owned relic contributes to future reward qualification
 #--- presentation data for ui ---
 @export var title: String
 @export_multiline var description: String

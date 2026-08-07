@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://cc4c4um3tp57h"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cc4c4um3tp57h"]
 
 [ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="1_2p0vd"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_wao5w"]
@@ -9,7 +9,6 @@
 [resource]
 script = ExtResource("3_klcfn")
 id = 31
-tags = Array[int]([2])
 cost = 0.0
 required_capacity = 0.0
 element = 6
@@ -19,10 +18,9 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Flame Rite"
 rite_short_name = "flame"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks gain 2 stacks of {BURN}, lasting 2 seconds."
+tower_description = "{RITE_LABEL}. Adjacent towers inflict 1 stack of {BURN}, lasting 2 seconds."
 icon = ExtResource("1_2p0vd")
 preview = ExtResource("1_2p0vd")
 inspector_actions = Array[ExtResource("2_wao5w")]([ExtResource("3_c8csk")])
 tower_scene = ExtResource("4_sg5f4")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

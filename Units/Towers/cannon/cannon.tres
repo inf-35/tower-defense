@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://drslua0wfw62h"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://drslua0wfw62h"]
 
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_dhi2e"]
 [ext_resource type="Texture2D" uid="uid://d0g5jqpqajbyi" path="res://Assets/cannon_full.png" id="1_vcib8"]
@@ -11,13 +11,12 @@
 [resource]
 script = ExtResource("1_dhi2e")
 id = 4
-tags = Array[int]([7])
 cost = 7.0
-required_capacity = 1.2
+required_capacity = 1.5
+tags = Array[int]([7])
 tower_name = "Cannon"
-tower_description = "Slow, yet a powerful heavy-hitter."
+tower_description = "Slow heavy hitter. Deals more damage the more {UNIT_HP} enemies have, up to +100% {UNIT_DAMAGE} at full HP."
 icon = ExtResource("1_vcib8")
 preview = ExtResource("5_prod2")
 tower_scene = ExtResource("2_gll86")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

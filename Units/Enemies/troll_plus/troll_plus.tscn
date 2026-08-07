@@ -1,23 +1,25 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://6cobxus7bjs"]
 
-[ext_resource type="Script" path="res://UnitComponents/unit.gd" id="1"]
-[ext_resource type="Script" path="res://UnitComponents/navigation_component.gd" id="2"]
-[ext_resource type="Script" path="res://UnitComponents/movement_component.gd" id="3"]
-[ext_resource type="Script" path="res://Content/movement_data.gd" id="4"]
-[ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5"]
 [ext_resource type="Resource" path="res://Units/Enemies/troll_plus/troll_plus_hp.tres" id="6"]
-[ext_resource type="Texture2D" path="res://Assets/troll.png" id="7"]
-[ext_resource type="Script" path="res://UnitComponents/contact_shadow.gd" id="8"]
-[ext_resource type="Script" path="res://UnitComponents/hitbox.gd" id="9"]
-[ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="10"]
-[ext_resource type="Script" path="res://Content/Behaviors/_default_behavior.gd" id="11"]
-[ext_resource type="Script" path="res://UnitComponents/attack_component.gd" id="12"]
-[ext_resource type="Script" path="res://Content/attack_data.gd" id="13"]
-[ext_resource type="Script" path="res://UnitComponents/range_component.gd" id="14"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="7"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="11"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="13"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="13_s5wo4"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="14"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="15_lmkje"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("4")
-max_speed = 15.0
+max_speed = 20.0
 acceleration = 200.0
 turn_speed = 1000.0
 
@@ -27,10 +29,11 @@ size = Vector2(120.00007, 122.81258)
 [sub_resource type="Resource" id="3"]
 script = ExtResource("13")
 range = 12.0
-damage = 8.0
+cooldown = 0.4
+damage = 6.0
 breaking = true
 
-[node name="TrollPlus" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="TrollPlus" type="Node2D" unique_id=1503766852 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1")
 hostile = true
@@ -45,22 +48,22 @@ navigation_component = NodePath("NavigationComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=2047102613]
 script = ExtResource("2")
 ignore_walls = true
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1001457976]
 script = ExtResource("3")
 face_towards_movement = false
 movement_data = SubResource("1")
 jiggle_speed = 4.0
 jiggle_angle = 6.0
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1854641258]
 script = ExtResource("5")
 health_data = ExtResource("6")
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=803520420]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 1)
@@ -68,32 +71,32 @@ script = ExtResource("8")
 shadow_size = Vector2(9.6, 4.2)
 color = Color(0.1764706, 0.19215687, 0.2784314, 0.34117648)
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1653276022]
 modulate = Color(0.92, 0.66, 0.66, 1)
 position = Vector2(1, -4)
 scale = Vector2(0.1152, 0.1152)
 texture = ExtResource("7")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1768596882]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("9")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=460800840]
 position = Vector2(10, -30)
 scale = Vector2(0.99999917, 0.99999917)
 shape = SubResource("2")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=535553]
 script = ExtResource("10")
 
-[node name="DefaultBehavior" type="Node" parent="."]
+[node name="DefaultBehavior" type="Node" parent="." unique_id=750441173]
 script = ExtResource("11")
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=2027640368]
 script = ExtResource("12")
 attack_data = SubResource("3")
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=828456458]
 script = ExtResource("14")

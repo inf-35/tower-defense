@@ -55,7 +55,7 @@ shader_parameter/center = Vector2(0.5, 0.5)
 process_mode = 3
 script = ExtResource("1_8wg1j")
 
-[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("overlay_color_rect", "instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor", "time_controls_anchor")]
+[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("overlay_color_rect", "instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor", "time_controls_anchor", "trade_anchor")]
 layer = 3
 script = ExtResource("21_7qncy")
 overlay_color_rect = NodePath("ColorRect")
@@ -66,6 +66,7 @@ player_stats_anchor = NodePath("../Margin/ui_space/tutorial_anchors/stats_anchor
 timeline_anchor = NodePath("../Margin/ui_space/tutorial_anchors/timeline_anchor")
 start_wave_anchor = NodePath("../Margin/ui_space/tutorial_anchors/start_wave_anchor")
 time_controls_anchor = NodePath("../Margin/ui_space/tutorial_anchors/time_controls_anchor")
+trade_anchor = NodePath("../Margin/ui_space/tutorial_anchors/trade_anchor")
 metadata/_custom_type_script = "uid://ddlb750e0o03a"
 
 [node name="ColorRect" type="ColorRect" parent="TutorialManager" unique_id=177295535]
@@ -108,6 +109,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
+visible = false
+z_index = 0
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=878017124]
 anchors_preset = 15
@@ -217,14 +222,20 @@ mouse_filter = 2
 
 [node name="tower_bar_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1679238732]
 layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 470.0
-offset_top = -587.0
-offset_right = 874.0
-offset_bottom = -330.0
-grow_vertical = 2
+anchors_preset = 0
+offset_left = 14.0
+offset_top = 47.0
+offset_right = 878.0
+offset_bottom = 504.0
+mouse_filter = 2
+
+[node name="trade_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1027622576]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 523.0
+offset_top = 544.0
+offset_right = 895.0
+offset_bottom = 679.0
 mouse_filter = 2
 
 [node name="start_wave_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=445037132]
@@ -833,10 +844,7 @@ theme_type_variation = &"vbox_5"
 alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
-visible = false
-
-[node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button", "title_label")]
+[node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button", "skip_button", "title_label")]
 visible = false
 z_index = 1
 anchors_preset = 15
@@ -849,6 +857,7 @@ script = ExtResource("4_q3aj2")
 card_list = NodePath("CenterContainer/main_container/card_list")
 card_scene = ExtResource("5_m8qfw")
 reroll_button = NodePath("CenterContainer/main_container/reroll")
+skip_button = NodePath("CenterContainer/main_container/skip")
 title_label = NodePath("CenterContainer/main_container/title")
 
 [node name="CenterContainer" type="CenterContainer" parent="Reward" unique_id=94962506]
@@ -878,6 +887,12 @@ metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 [node name="card_list" type="VBoxContainer" parent="Reward/CenterContainer/main_container" unique_id=713995152]
 layout_mode = 2
 theme_type_variation = &"vbox_20"
+
+[node name="skip" type="Button" parent="Reward/CenterContainer/main_container" unique_id=1630843295]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Skip"
 
 [node name="reroll" type="Button" parent="Reward/CenterContainer/main_container" unique_id=120652893]
 custom_minimum_size = Vector2(300, 0)

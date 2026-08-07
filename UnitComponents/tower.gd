@@ -305,10 +305,11 @@ func scan_direction(direction: Vector2i, max_distance: int = 50) -> ForwardScanR
 		result.last_valid_cell = current_cell
 		var check_tower: Tower = island.get_tower_on_tile(current_cell)
 		if is_instance_valid(check_tower) and check_tower != self:
-			result.hit_tower = check_tower
-			result.impact_cell = current_cell
-			result.distance_tiles = distance_tiles
-			return result
+			if check_tower.blocks_line_of_sight_at_cell(current_cell):
+				result.hit_tower = check_tower
+				result.impact_cell = current_cell
+				result.distance_tiles = distance_tiles
+				return result
 
 		current_cell += direction
 		distance_tiles += 1
@@ -402,6 +403,18 @@ func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for
 	if behavior.has_method(&"get_navcost_for_cell"): #allows behaviors to override default behaviour
 		return behavior.get_navcost_for_cell(_cell)
 	return Towers.get_tower_navcost(self.type)
+
+func blocks_tile_at_cell(cell: Vector2i) -> bool: ##answers whether this specific occupied cell behaves as a solid blocker
+	if type == Towers.Type.PLAYER_CORE:
+		return true
+	if current_state != State.ACTIVE:
+		return false
+	if not blocking:
+		return false
+	return get_navcost_for_cell(cell) > Navigation.BASE_COST
+
+func blocks_line_of_sight_at_cell(cell: Vector2i) -> bool: ##keeps beam/lane scans aligned with movement-blocking cells
+	return blocks_tile_at_cell(cell)
 
 func check_placement_validity(island: Island, cell: Vector2i, input_facing: Facing) -> Dictionary:
 	if behavior.has_method(&"check_placement_validity"):

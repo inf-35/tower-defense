@@ -112,6 +112,7 @@ func _on_forward_tower_event(event: GameEvent) -> void:
 	if not is_instance_valid(transferred_hit):
 		return
 
+	unit.play_action_squash_stretch()
 	_back_tower.take_hit(transferred_hit)
 
 func _create_transferred_hit(incoming_hit: HitData) -> HitData:
@@ -121,6 +122,9 @@ func _create_transferred_hit(incoming_hit: HitData) -> HitData:
 	transferred_hit.target_affiliation = _back_tower.hostile
 	if not transferred_hit.derive_lineage_from(incoming_hit, self):
 		return null
+	transferred_hit.source = incoming_hit.get_source_unit()
+	transferred_hit.attack_id = AttackComponent.get_next_attack_id()
+	transferred_hit.primary = false
 	transferred_hit.velocity = (_back_tower.global_position - _forward_tower.global_position).normalized()
 	return transferred_hit
 

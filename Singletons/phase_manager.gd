@@ -18,8 +18,8 @@ enum ChoiceType { EXPANSION, REWARD_TOWER, REWARD_RELIC }
 var current_wave_number: int = 0:
 	set(ncwm):
 		current_wave_number = ncwm
-		var base_scaling: float = 0.75 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.8
-		var scaling: float = 0.02 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.035
+		var base_scaling: float = 0.7 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.8
+		var scaling: float = 0.008 if Run.current_game_difficulty == Run.GameDifficulty.NORMAL else 0.02
 		var goal: float = base_scaling + (max(current_wave_number - 3, 0) * scaling)
 		Run.current_game_scaling = max(Run.current_game_scaling - 0.1, goal)
 

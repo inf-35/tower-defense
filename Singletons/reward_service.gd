@@ -38,7 +38,7 @@ func _load_all_rewards() -> void:
 
 	for reward in reward_pool:
 		if reward.type == Reward.Type.UNLOCK_TOWER:
-			reward.price = snappedf(randf_range(5.0, 8.0), 0.1)
+			reward.price = snappedf(randf_range(6.0, 10.0), 0.1)
 		elif reward.type == Reward.Type.ADD_RITE:
 			reward.price = snappedf(randf_range(2.0, 5.0), 0.1)
 		elif reward.type == Reward.Type.ADD_RELIC:
@@ -146,9 +146,10 @@ func _get_owned_reward_tags() -> Dictionary[Towers.Tag, bool]: ##builds the curr
 	for tower: Tower in Run.references.island.tower_grid.values():
 		if not is_instance_valid(tower):
 			continue
-		if not Towers.is_tower_rite(tower.type):
-			continue
 		_add_tower_type_tags(tower.type, owned_tags)
+
+	for relic: RelicData in Run.player.active_relics:
+		_add_relic_tags(relic, owned_tags)
 
 	return owned_tags
 
@@ -170,14 +171,19 @@ func _get_owned_reward_tower_types() -> Dictionary[Towers.Type, bool]: ##builds 
 	for tower: Tower in Run.references.island.tower_grid.values():
 		if not is_instance_valid(tower):
 			continue
-		if not Towers.is_tower_rite(tower.type):
-			continue
 		owned_tower_types[tower.type] = true
 
 	return owned_tower_types
 
 func _add_tower_type_tags(tower_type: Towers.Type, owned_tags: Dictionary[Towers.Tag, bool]) -> void: ##adds all authored reward-synergy tags from one tower type into a shared membership set
 	for tag: Towers.Tag in Towers.get_tower_tags(tower_type):
+		owned_tags[tag] = true
+
+func _add_relic_tags(relic: RelicData, owned_tags: Dictionary[Towers.Tag, bool]) -> void: ##adds explicit provider tags from active relics into the shared reward qualification set
+	if not is_instance_valid(relic):
+		return
+
+	for tag: Towers.Tag in relic.reward_tags:
 		owned_tags[tag] = true
 
 func _player_already_has_reward(reward: Reward) -> bool:
@@ -203,6 +209,8 @@ func get_reward_block_reason(reward: Reward) -> String: ##returns the current re
 		Reward.Type.UNLOCK_TOWER:
 			if reward.tower_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.tower_type):
 				return "Already unlocked."
+			if reward.tower_type != Towers.Type.VOID and not Run.player.can_add_tower_type(reward.tower_type):
+				return "No tower slots."
 		Reward.Type.ADD_RELIC:
 			if not is_instance_valid(reward.relic):
 				return "Unavailable."
@@ -250,6 +258,21 @@ func select_reward(choice_id: int) -> void: #concludes reward phase
 	UI.hide_reward_choices.emit()
 	reward_process_complete.emit()
 
+func skip_current_choices() -> void: ##closes the active reward choice screen without applying a reward
+	if not is_choosing_reward:
+		return
+
+	_current_reward_options_by_id.clear()
+	is_choosing_reward = false
+	rerolls_this_phase = 0
+	current_choice_title = DEFAULT_CHOICE_TITLE
+	current_reroll_enabled = true
+	_current_choice_config = null
+	_disconnect_owned_choice_signal()
+
+	UI.hide_reward_choices.emit()
+	reward_process_complete.emit()
+
 func apply_reward(reward: Reward) -> bool:
 	if not can_claim_reward(reward):
 		return false
@@ -264,7 +287,8 @@ func apply_reward(reward: Reward) -> bool:
 		Reward.Type.UNLOCK_TOWER:
 			var tower_type: Towers.Type = reward.tower_type
 			if tower_type != Towers.Type.VOID and not Run.player.is_tower_unlocked(tower_type):
-				Run.player.unlock_tower(tower_type)
+				if not Run.player.unlock_tower(tower_type):
+					return false
 				reward_applied.emit(reward)
 				return true
 			return false
@@ -279,7 +303,8 @@ func apply_reward(reward: Reward) -> bool:
 
 		Reward.Type.ADD_RITE:
 			var rite_type: Towers.Type = reward.rite_type
-			Run.player.add_rite(rite_type, 1)
+			if not Run.player.add_rite(rite_type, 1):
+				return false
 			reward_applied.emit(reward)
 			return true
 

@@ -2,7 +2,7 @@ extends EventData
 class_name HitData #stores information about a hit (runtime)
 
 var negate: bool = false ##if set true, this hit is not processed
-var attack_id: int = 0 ##positive when this hit belongs to a tower attack payload
+var attack_id: int = 0 ##positive when this hit belongs to one proc-countable hit group
 var primary: bool = true ##when false, this hit is a child/follow-up payload and should not count as the source unit's primary attack trigger
 
 var source: Unit ##dealer of hit
@@ -30,7 +30,7 @@ var vfx_on_impact: VFXInfo
 var projectile_tints: Array[Color] = [] ##ordered tint palette cycled across the base projectile visual while it is in flight
 #see unit.gd, deal_hit and take_hit and AttackData
 
-static func consume_attack_id(hit_data: HitData, seen_attack_ids: Dictionary[int, bool]) -> bool:
+static func consume_attack_id(hit_data: HitData, seen_attack_ids: Dictionary[int, bool]) -> bool: ##returns true once per proc group in the supplied effect-local seen table
 	if not hit_data or hit_data.attack_id <= 0:
 		return false
 

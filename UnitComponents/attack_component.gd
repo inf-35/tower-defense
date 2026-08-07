@@ -5,6 +5,8 @@ class AttackLineageContext extends RefCounted:
 	var lineage: EventLineage = EventLineage.new()
 	var recursion: int = 0
 	var clear_attack_id: bool = false
+	var use_attack_id_override: bool = false
+	var attack_id_override: int = 0
 	var use_source_position_override: bool = false
 	var source_position: Vector2 = Vector2.ZERO
 	var use_damage_override: bool = false
@@ -122,8 +124,9 @@ func create_derived_attack_context(
 	use_source_position_override: bool = false,
 	source_position: Vector2 = Vector2.ZERO,
 	use_damage_override: bool = false,
-	damage_override: float = 0.0
-) -> AttackLineageContext: ##builds a one-off derived context for explicit follow-up attacks without consuming the queued root-followup slot
+	damage_override: float = 0.0,
+	attack_id_override: int = 0
+) -> AttackLineageContext: ##builds a one-off derived context for explicit follow-up attacks with optional proc-group inheritance
 	if not is_instance_valid(parent_data) or not is_instance_valid(producer):
 		return null
 
@@ -134,14 +137,16 @@ func create_derived_attack_context(
 	var attack_context := AttackLineageContext.new()
 	attack_context.lineage = template_data.lineage.duplicate()
 	attack_context.recursion = template_data.recursion
-	attack_context.clear_attack_id = true
+	attack_context.clear_attack_id = attack_id_override <= 0
+	attack_context.use_attack_id_override = attack_id_override > 0
+	attack_context.attack_id_override = attack_id_override
 	attack_context.use_source_position_override = use_source_position_override
 	attack_context.source_position = source_position
 	attack_context.use_damage_override = use_damage_override
 	attack_context.damage_override = damage_override
 	return attack_context
 
-func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContext) -> bool: ##copies a prepared lineage stamp onto a hit and clears root-only attack identity for derived attacks
+func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContext) -> bool: ##copies a prepared lineage stamp plus any authored damage or proc-group override onto a hit
 	if not is_instance_valid(hit_data) or not is_instance_valid(attack_context):
 		return false
 
@@ -150,7 +155,9 @@ func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContex
 	if attack_context.use_damage_override:
 		hit_data.damage = attack_context.damage_override
 
-	if attack_context.clear_attack_id:
+	if attack_context.use_attack_id_override:
+		hit_data.attack_id = attack_context.attack_id_override
+	elif attack_context.clear_attack_id:
 		hit_data.attack_id = 0
 
 	return true
@@ -162,13 +169,38 @@ func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO, spend_cool
 
 	_attack_with_context(target, attack_context, intercept_override, spend_cooldown)
 
-func attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true) -> void: ##fires one attack using an explicit lineage context, bypassing the queued root-followup slot
+func attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true, primary: bool = true) -> void: ##fires one attack using an explicit lineage context, bypassing the queued root-followup slot
 	if not is_instance_valid(attack_context):
 		return
 
-	_attack_with_context(target, attack_context, intercept_override, spend_cooldown)
+	_attack_with_context(target, attack_context, intercept_override, spend_cooldown, primary)
 
-func _attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true) -> void: ##shared execution path for both normal attacks and immediate explicit follow-up attacks
+func fire_sibling_attack(target: Unit, parent_hit_data: HitData, damage_multiplier: float) -> void: ##fires a non-primary sibling payload as its own proc group while preserving source and lineage
+	if attack_data == null or not is_instance_valid(target):
+		return
+	if not is_instance_valid(parent_hit_data):
+		return
+
+	var delivery_data: DeliveryData = generate_delivery_data()
+	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
+	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
+		delivery_data.intercept_position = predict_intercept_position(unit, target, delivery_data.projectile_speed)
+	else:
+		delivery_data.intercept_position = target.global_position
+	delivery_data.target = target
+
+	var hit_data: HitData = generate_hit_data(delivery_data)
+	hit_data.target = target
+	hit_data.target_affiliation = target.hostile
+	hit_data.attack_id = get_next_attack_id()
+	hit_data.primary = false
+	hit_data.copy_lineage_from(parent_hit_data)
+	hit_data.source = parent_hit_data.get_source_unit(unit)
+	hit_data.damage *= damage_multiplier
+
+	unit.deal_hit(hit_data, delivery_data)
+
+func _attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true, primary: bool = true) -> void: ##shared execution path for both normal attacks and immediate explicit follow-up attacks
 	if attack_data == null or not is_instance_valid(target):
 		return
 
@@ -194,7 +226,8 @@ func _attack_with_context(target: Unit, attack_context: AttackLineageContext, in
 	var hit_data: HitData = generate_hit_data(delivery_data)
 	hit_data.target = target
 	hit_data.target_affiliation = target.hostile
-	hit_data.attack_id = get_next_attack_id()
+	hit_data.attack_id = attack_context.attack_id_override if attack_context.use_attack_id_override else get_next_attack_id()
+	hit_data.primary = primary
 
 	if not apply_attack_context(hit_data, attack_context):
 		return

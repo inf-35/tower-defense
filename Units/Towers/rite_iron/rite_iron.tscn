@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://cicygotbujwoo"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://coso8kvpo748m" path="res://Units/Towers/rite_iron/iron_rite_behavior.gd" id="2_behavior"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_movement"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_movement_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_health"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="7_health_data"]
+[ext_resource type="Texture2D" uid="uid://bhw12bw4eotj4" path="res://Assets/rite_iron.png" id="7_vd4io"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_modifiers"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="9_shadow"]
+
+[sub_resource type="Resource" id="Resource_health"]
+script = ExtResource("7_health_data")
+max_health = 20.0
+
+[node name="Rite of Iron" type="Node2D" unique_id=2014012371 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+z_index = 100
+script = ExtResource("1_tower")
+type = 75
+behavior = NodePath("IronRiteBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+
+[node name="IronRiteBehavior" type="Node" parent="." unique_id=723027415]
+script = ExtResource("2_behavior")
+overkill_transfer_ratio = 1.0
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1290907607]
+script = ExtResource("4_movement")
+movement_data = ExtResource("5_movement_data")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1888572206]
+script = ExtResource("6_health")
+health_data = SubResource("Resource_health")
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1652171011]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("7_vd4io")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1062129157]
+script = ExtResource("9_shadow")
+height_multiplier = 0.5
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1842457803]
+script = ExtResource("8_modifiers")

@@ -37,7 +37,7 @@ enum Status { #diegetic statuses
 class StatusEffectData:
 	var attribute: id #what attribute is this status effect targeting
 	var additive_per_stack: float = 0.0
-	var multiplicative_per_stack: float = 0.0
+	var multiplicative_per_stack: float = 1.0
 	var can_stack: bool = true
 	var overlay_color: Color = Color.TRANSPARENT
 
@@ -63,19 +63,19 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -1, 0.0, true, Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
+		id.REGENERATION, -1, 1.0, true, Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_REMAINDER_PERCENT, -0.05, 0.0, true, Color(0, 1, 0, 0.5) #-5% remaining hp per second (capped at 2/s/stack)
+		id.REGEN_REMAINDER_PERCENT, -0.05, 1.0, true, Color(0, 1, 0, 0.5) #-5% remaining hp per second (capped at 2/s/stack)
 	),
 	Status.HEAT: StatusEffectData.new(
-		id.NULL, 0.0, 0.0  #this effect does nothing by itself, but reacts with FROST
+		id.NULL, 0.0, 1.0  #this effect does nothing by itself, but reacts with FROST
 	),
 	Status.CURSED: StatusEffectData.new(
 		id.DAMAGE_TAKEN, 0.0, 1.25, true, Color(0.446, 0.002, 0.768, 0.5)
 	),
 	Status.BLEED: StatusEffectData.new(
-		id.FLAT_DAMAGE_TAKEN, 0.5, 0.0, true, Color(1,0,0,0.5),
+		id.FLAT_DAMAGE_TAKEN, 0.5, 1.0, true, Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
 		id.MAX_SPEED, 0.0, 0.2, false, Color(1, 1, 0.5) #80% mvmt reduction

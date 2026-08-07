@@ -6,6 +6,7 @@ const SESSION_SHEET = "session_snapshots";
 const TOWER_SHEET = "run_towers";
 const RELIC_SHEET = "run_relics";
 const RITE_SHEET = "run_rites";
+const EVENT_ID_SHEET = "processed_event_ids";
 
 const RUN_HEADERS = [
   "received_at_iso",
@@ -30,6 +31,7 @@ const RUN_HEADERS = [
   "collected_relic_counts_json",
   "collected_rite_counts_json",
   "raw_payload_json",
+  "event_id",
 ];
 
 const SESSION_HEADERS = [
@@ -45,6 +47,7 @@ const SESSION_HEADERS = [
   "session_runs_completed",
   "active_run_id",
   "raw_payload_json",
+  "event_id",
 ];
 
 const COUNT_HEADERS = [
@@ -60,6 +63,14 @@ const COUNT_HEADERS = [
   "final_wave_number",
   "key",
   "count",
+  "event_id",
+];
+
+const EVENT_ID_HEADERS = [
+  "event_id",
+  "received_at_iso",
+  "event_type",
+  "session_id",
 ];
 
 function doGet(e) {
@@ -91,10 +102,30 @@ function _processEnvelope(envelope) {
     return _json({ ok: false, error: "unauthorized" });
   }
 
-  if (envelope.event_type === "run_summary") {
-    _appendRunRow(envelope);
-  } else if (envelope.event_type === "session_snapshot" || envelope.event_type === "session_summary") {
-    _appendSessionRow(envelope);
+  const eventId = _getEventId(envelope);
+  const lock = eventId ? LockService.getScriptLock() : null;
+  if (lock) {
+    lock.waitLock(5000);
+  }
+
+  try {
+    if (eventId && _hasProcessedEventId(eventId)) {
+      return _json({ ok: true, duplicate: true });
+    }
+
+    if (envelope.event_type === "run_summary") {
+      _appendRunRow(envelope);
+    } else if (envelope.event_type === "session_snapshot" || envelope.event_type === "session_summary") {
+      _appendSessionRow(envelope);
+    }
+
+    if (eventId) {
+      _appendProcessedEventId(envelope);
+    }
+  } finally {
+    if (lock) {
+      lock.releaseLock();
+    }
   }
 
   return _json({ ok: true });
@@ -127,6 +158,7 @@ function _appendRunRow(envelope) {
     JSON.stringify(payload.collected_relic_counts || {}),
     JSON.stringify(payload.collected_rite_counts || {}),
     JSON.stringify(payload),
+    envelope.event_id || "",
   ]);
 
   _appendCountRows(TOWER_SHEET, receivedAt, envelope, payload, payload.placed_tower_counts || {});
@@ -150,6 +182,7 @@ function _appendSessionRow(envelope) {
     Number(payload.session_runs_completed || 0),
     payload.active_run_id || "",
     JSON.stringify(payload),
+    envelope.event_id || "",
   ]);
 }
 
@@ -159,10 +192,25 @@ function _getSheet(name, headers) {
   if (!sheet) {
     sheet = spreadsheet.insertSheet(name);
   }
+  _ensureHeaders(sheet, headers);
+  return sheet;
+}
+
+function _ensureHeaders(sheet, headers) {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
+    return;
   }
-  return sheet;
+
+  const lastColumn = sheet.getLastColumn();
+  const currentHeaders = sheet.getRange(1, 1, 1, Math.max(lastColumn, 1)).getValues()[0];
+  const existingHeaders = new Set(currentHeaders.filter((header) => header));
+  const missingHeaders = headers.filter((header) => !existingHeaders.has(header));
+  if (missingHeaders.length === 0) {
+    return;
+  }
+
+  sheet.getRange(1, lastColumn + 1, 1, missingHeaders.length).setValues([missingHeaders]);
 }
 
 function _appendCountRows(sheetName, receivedAt, envelope, payload, counts) {
@@ -185,9 +233,35 @@ function _appendCountRows(sheetName, receivedAt, envelope, payload, counts) {
     Number(payload.final_wave_number || 0),
     key,
     Number(count || 0),
+    envelope.event_id || "",
   ]);
 
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, COUNT_HEADERS.length).setValues(rows);
+}
+
+function _getEventId(envelope) {
+  return String((envelope && envelope.event_id) || "").trim();
+}
+
+function _hasProcessedEventId(eventId) {
+  const sheet = _getSheet(EVENT_ID_SHEET, EVENT_ID_HEADERS);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return false;
+  }
+
+  const values = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  return values.some((row) => String(row[0]) === eventId);
+}
+
+function _appendProcessedEventId(envelope) {
+  const sheet = _getSheet(EVENT_ID_SHEET, EVENT_ID_HEADERS);
+  sheet.appendRow([
+    envelope.event_id || "",
+    new Date().toISOString(),
+    envelope.event_type || "",
+    envelope.session_id || "",
+  ]);
 }
 
 function _json(payload) {

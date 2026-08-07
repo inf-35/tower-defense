@@ -8,6 +8,7 @@ enum GameDifficulty {
 enum GameEnvironment {
 	WOODS,
 	WINTER,
+	DEEPS,
 }
 
 const REFERENCES_SCRIPT := preload("res://Singletons/references.gd")

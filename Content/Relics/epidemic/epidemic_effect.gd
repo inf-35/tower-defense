@@ -69,9 +69,11 @@ func _fire_projectile(instance: EffectInstance, origin_unit: Unit, target: Unit,
 	var hit_data: HitData = projectile_data.generate_generic_hit_data()
 	if not hit_data.derive_lineage_from(trigger_hit, instance):
 		return
-	hit_data.source = null
+	hit_data.source = trigger_hit.get_source_unit()
 	hit_data.target = target
 	hit_data.target_affiliation = origin_unit.hostile
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	hit_data.primary = false
 	hit_data.status_effects[poison_status] = Vector2(poison_stacks, poison_duration)
 
 	var delivery_data: DeliveryData = projectile_data.generate_generic_delivery_data()

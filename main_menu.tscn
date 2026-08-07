@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
 
-[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "deeps_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
@@ -15,6 +15,7 @@ feedback_button = NodePath("UI/MarginContainer/Control/VBoxContainer/feedback")
 environment_panel = NodePath("UI/MarginContainer/Control/environment_panel")
 woods_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods")
 winter_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter")
+deeps_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/deeps")
 difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
 normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
 hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
@@ -121,6 +122,12 @@ script = ExtResource("4_jix8l")
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "Winter"
+script = ExtResource("4_jix8l")
+
+[node name="deeps" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+text = "The Deeps"
 script = ExtResource("4_jix8l")
 
 [node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]

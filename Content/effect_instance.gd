@@ -26,20 +26,26 @@ const GLOBAL_RECURSION_LIMIT: int = 5 ##limit for effect recursion; see Unit eff
 var host: Unit ##to which unit does this effect apply onto
 var source: Unit ##to which unit does this effect come from (may be null)
 var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect
+var _is_removing: bool = false
 
 func _init() -> void:
 	pass
 
-func detach() -> void:
+func mark_removing() -> void: ##disables this instance before structural removal runs on the host
+	_is_removing = true
 	enabled = false
 	if is_instance_valid(timer):
 		timer.is_active = false
+
+func detach() -> void:
+	mark_removing()
 	if global or is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 
 func attach_to(_host: Unit) -> void:
 	detach()
 	host = _host
+	_is_removing = false
 	enabled = true
 
 	if is_instance_valid(host):
@@ -49,6 +55,7 @@ func attach_to(_host: Unit) -> void:
 			effect_prototype.attach_handler.call(self)
 
 func attach_global() -> void: ##for attaching as a global effect
+	_is_removing = false
 	enabled = true
 	effect_prototype.attach_handler.call(self)
 
@@ -63,6 +70,9 @@ func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit i
 
 func should_show_status_icon() -> bool: ##returns whether this runtime effect is eligible for hp-bar icon presentation
 	return is_instance_valid(effect_prototype) and effect_prototype.show_as_status_icon and is_instance_valid(effect_prototype.icon)
+
+func counts_as_status() -> bool: ##returns whether this attached effect participates in statuslike mechanics
+	return enabled and stacks > 0 and is_instance_valid(effect_prototype) and effect_prototype.counts_as_status
 
 func get_display_duration() -> float: ##returns remaining timed duration, or the authored permanent marker
 	if is_instance_valid(timer) and timer.is_active:
@@ -86,6 +96,8 @@ func refresh_duration(new_duration: float) -> void: ##starts or refreshes a game
 	notify_display_changed()
 
 func notify_display_changed() -> void: ##asks the host unit to refresh this effect's hp-bar icon if it is displayable
+	if _is_removing:
+		return
 	if not should_show_status_icon():
 		return
 	if not is_instance_valid(host):
@@ -94,9 +106,10 @@ func notify_display_changed() -> void: ##asks the host unit to refresh this effe
 	host.effect_display_changed.emit(self, float(stacks), get_display_duration())
 
 func _on_duration_timeout() -> void:
-	if not enabled:
+	if _is_removing or not enabled:
 		return
 	if not is_instance_valid(host):
 		return
 
-	host.remove_effect(effect_prototype)
+	mark_removing()
+	host.remove_effect.call_deferred(effect_prototype)

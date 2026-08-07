@@ -18,7 +18,7 @@ func copy_lineage_from(parent_data: EventData) -> void:
 	lineage = parent_data.lineage.duplicate()
 	recursion = parent_data.recursion
 
-func derive_lineage_from(parent_data: EventData, producer: Object) -> bool:
+func derive_lineage_from(parent_data: EventData, producer: Object) -> bool: ##copies parent lineage, records producer, and clears proc identity until caller assigns the child hit group
 	copy_lineage_from(parent_data)
 
 	if lineage.has_producer(producer):
@@ -28,6 +28,42 @@ func derive_lineage_from(parent_data: EventData, producer: Object) -> bool:
 	recursion += 1
 	_clear_derived_attack_identity()
 	return true
+
+func has_lineage_producer(producer: Object) -> bool: ##returns whether this event has already passed through a producer
+	if not is_instance_valid(producer):
+		return false
+
+	return lineage.has_producer(producer)
+
+func mark_lineage_producer(producer: Object) -> bool: ##records a producer on this event without changing its attack identity
+	if not is_instance_valid(producer):
+		return false
+	if lineage.has_producer(producer):
+		return false
+
+	lineage.push_producer(producer)
+	recursion += 1
+	return true
+
+func get_source_unit(fallback_source: Unit = null) -> Unit: ##extracts hit/report source ownership for generated follow-up hits
+	var source_unit: Unit = null
+	if self is HitData:
+		source_unit = (self as HitData).source
+	elif self is HitReportData:
+		source_unit = (self as HitReportData).source
+
+	if is_instance_valid(source_unit):
+		return source_unit
+	if is_instance_valid(fallback_source):
+		return fallback_source
+	return null
+
+func get_attack_id() -> int: ##extracts the current proc-countable hit group id from hit/report events
+	if self is HitData:
+		return (self as HitData).attack_id
+	if self is HitReportData:
+		return (self as HitReportData).attack_id
+	return 0
 
 func duplicate() -> EventData: ##deep duplicates to create an unrelated, unique eventdata
 	#1. create a new instance of the *actual* subclass (e.g., hitdata, celldata).

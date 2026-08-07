@@ -25,8 +25,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 8],
 	],
 	7: [
-		[Units.Type.SPRINTER, 16],
-		[Units.Type.DRIFTER, 6],
+		[Units.Type.GIANT, 1],
+		#[Units.Type.SPRINTER, 16],
+		#[Units.Type.DRIFTER, 6],
 	],
 	8: [
 		[Units.Type.TROLL, 1],
@@ -45,80 +46,93 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.SUMMONER, 2],
 		[Units.Type.BASIC, 14],
 		[Units.Type.BUFF, 6],
+		[Units.Type.CLERIC, 1],
 	],
 	12: [
 		[Units.Type.GIANT, 1],
 		[Units.Type.HEALER, 2],
-		[Units.Type.WARRIOR, 12],
+		[Units.Type.WARRIOR, 10],
+		[Units.Type.CLERIC, 1],
 	],
 	13: [
 		[Units.Type.SUMMONER, 2],
-		[Units.Type.SPRINTER, 20],
 		[Units.Type.CLERIC, 1],
+		[Units.Type.SPRINTER, 20],
 	],
 	14: [
 		[Units.Type.FLESHBLOB, 6],
-		[Units.Type.SPRINTER, 22],
+		[Units.Type.HEALER, 1],
+		[Units.Type.SPRINTER, 19],
 	],
 	15: [
 		[Units.Type.TROLL, 2],
-		[Units.Type.WARRIOR, 18],
 		[Units.Type.HEALER, 2],
+		[Units.Type.CLERIC, 1],
+		[Units.Type.WARRIOR, 15],
 	],
 	16: [
 		[Units.Type.HULK, 1],
-		[Units.Type.WARRIOR_PLUS, 14],
-		[Units.Type.SPRINTER, 10],
+		[Units.Type.WARRIOR_PLUS, 12],
+		[Units.Type.CLERIC, 1],
+		[Units.Type.SPRINTER, 9],
 	],
 	17: [
-		[Units.Type.SPRINTER_PLUS, 20],
-		[Units.Type.WARRIOR, 12],
+		[Units.Type.SPRINTER_PLUS, 16],
 		[Units.Type.CLERIC, 2],
+		[Units.Type.WARRIOR, 10],
 	],
 	18: [
 		[Units.Type.SUMMONER, 4],
-		[Units.Type.FLESHBLOB, 6],
 		[Units.Type.HEALER_PLUS, 1],
+		[Units.Type.CLERIC, 1],
+		[Units.Type.FLESHBLOB, 6],
 	],
 	19: [
 		[Units.Type.GIANT, 2],
 		[Units.Type.HULK, 1],
 		[Units.Type.TROLL, 2],
-		[Units.Type.WARRIOR_PLUS, 12],
+		[Units.Type.CLERIC, 2],
+		[Units.Type.WARRIOR_PLUS, 9],
 	],
 	20: [
 		[Units.Type.WARRIOR_PLUS, 24],
-		[Units.Type.SPRINTER_PLUS, 24],
 		[Units.Type.HEALER_PLUS, 2],
 		[Units.Type.CLERIC, 2],
+		[Units.Type.SPRINTER_PLUS, 20],
 	],
 	21: [
 		[Units.Type.TROLL_PLUS, 1],
 		[Units.Type.TROLL, 3],
-		[Units.Type.WARRIOR_PLUS, 20],
-		[Units.Type.SPRINTER_PLUS, 18],
+		[Units.Type.WARRIOR_PLUS, 16],
+		[Units.Type.SPRINTER_PLUS, 14],
+		[Units.Type.HEALER_PLUS, 2],
+		[Units.Type.CLERIC, 2],
 	],
 	22: [
 		[Units.Type.HULK_PLUS, 2],
-		[Units.Type.WARRIOR_PLUS, 30],
+		[Units.Type.WARRIOR_PLUS, 20],
 		[Units.Type.HEALER_PLUS, 2],
 		[Units.Type.SUMMONER, 3],
+		[Units.Type.CLERIC, 2],
 	],
 	23: [
 		[Units.Type.GIANT_PLUS, 2],
 		[Units.Type.FLESHBLOB, 8],
-		[Units.Type.SPRINTER_PLUS, 40],
-		[Units.Type.CLERIC, 3],
+		[Units.Type.HEALER_PLUS, 3],
+		[Units.Type.CLERIC, 2],
+		[Units.Type.SPRINTER_PLUS, 26],
+		[Units.Type.WARRIOR_PLUS, 8],
 	],
 	24: [
-		[Units.Type.HULK_PLUS, 2],
-		[Units.Type.GIANT_PLUS, 2],
+		[Units.Type.HULK_PLUS, 1],
+		[Units.Type.GIANT_PLUS, 1],
 		[Units.Type.TROLL_PLUS, 2],
-		[Units.Type.SUMMONER, 4],
+		[Units.Type.SUMMONER, 2],
 		[Units.Type.HEALER_PLUS, 3],
-		[Units.Type.CLERIC, 3],
-		[Units.Type.WARRIOR_PLUS, 40],
+		[Units.Type.CLERIC, 2],
 		[Units.Type.SPRINTER_PLUS, 24],
+		[Units.Type.WARRIOR_PLUS, 30],
+		
 	],
 }
 #--- unit catalog ---
@@ -267,6 +281,7 @@ static func _consolidate_enemy_list(enemies: Array[Units.Type]) -> Array[Array]:
 		final_list.append([type, counts[type]])
 
 	return final_list
+
 #for debug purposes, translates enemy lists into a human readable format
 static func make_readable_enemy_list(enemies: Array[Array]) -> String:
 	var output_string: String = ""

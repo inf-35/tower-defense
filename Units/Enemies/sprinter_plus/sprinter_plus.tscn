@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://d1hdm5xq5tdwi" path="res://Assets/bandit.png" id="12"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="13"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="14"]
-[ext_resource type="Resource" path="res://Units/Enemies/sprinter_plus/sprinter_plus_attack.tres" id="15"]
+[ext_resource type="Resource" uid="uid://eeupqtw6eo1y" path="res://Units/Enemies/sprinter_plus/sprinter_plus_attack.tres" id="15"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("6")
@@ -47,7 +47,7 @@ attack_component = NodePath("AttackComponent")
 
 [node name="AcceleratingBehavior" type="Node" parent="." unique_id=2123889792]
 script = ExtResource("3")
-speed_increase_percent = 0.3
+speed_increase_percent = 0.25
 interval = 0.3
 
 [node name="NavigationComponent" type="Node" parent="." unique_id=1288699964]

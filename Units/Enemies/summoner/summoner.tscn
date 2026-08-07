@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://13cf44n6d3h8"]
+[gd_scene format=3 uid="uid://13cf44n6d3h8"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_unit"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_nav"]
@@ -6,14 +6,18 @@
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_move_data"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="6_health_data"]
-[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_sprite"]
+[ext_resource type="Texture2D" uid="uid://d4ih4yumv1l50" path="res://Assets/summoner.png" id="7_sprite"]
 [ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
-[ext_resource type="Script" path="res://Units/Enemies/summoner/summoner_behavior.gd" id="11_behavior"]
+[ext_resource type="Script" uid="uid://bu2ajp12jmglo" path="res://Units/Enemies/summoner/summoner_behavior.gd" id="11_behavior"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="12_range"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="13_attack"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="14_attack_data"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="15_vfx_info"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="16_particles"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="16_yatpj"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="18_eh6fv"]
 
 [sub_resource type="Resource" id="Resource_movement"]
 script = ExtResource("4_move_data")
@@ -30,13 +34,27 @@ metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
 size = Vector2(82, 84)
 
+[sub_resource type="Resource" id="Resource_summon_vfx"]
+script = ExtResource("15_vfx_info")
+aoe_particles_enabled = true
+aoe_particle_color = Color(0.95, 0.22, 0.88, 0.44)
+aoe_particles_per_cell = 5.0
+aoe_particle_lifetime = 0.48
+aoe_particle_scale_min = 0.48
+aoe_particle_scale_max = 0.96
+aoe_particle_spin_speed_min = -70.0
+aoe_particle_spin_speed_max = 70.0
+aoe_particle_drift_speed_min = 5.0
+aoe_particle_drift_speed_max = 16.0
+aoe_particle_drift_angle_noise_deg = 30.0
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
+
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("14_attack_data")
-cooldown = 5.0
-damage = 0.0
+cooldown = 4.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
-[node name="Summoner" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Summoner" type="Node2D" unique_id=743730064 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_unit")
 hostile = true
@@ -51,61 +69,57 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=1606052384]
 script = ExtResource("2_nav")
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=727296396]
 script = ExtResource("3_move")
 face_towards_movement = false
 movement_data = SubResource("Resource_movement")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=280268538]
 script = ExtResource("5_health")
 health_data = SubResource("Resource_health")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=1614954977]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 2.5)
-scale = Vector2(0.16, 0.16)
 script = ExtResource("8_shadow")
-shadow_size = Vector2(54, 32)
+shadow_size = Vector2(7, 4.1)
 metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
-[node name="Graphics" type="Sprite2D" parent="."]
-self_modulate = Color(0.78, 0.52, 1, 1)
-scale = Vector2(0.16, 0.16)
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1477318187]
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("7_sprite")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1482755593]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 monitoring = false
 script = ExtResource("9_hitbox")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=689360865]
 scale = Vector2(0.9999991, 0.9999991)
 shape = SubResource("RectangleShape2D_hitbox")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=490945850]
 script = ExtResource("10_modifiers")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="SummonerBehavior" type="Node" parent="."]
+[node name="SummonerBehavior" type="Node" parent="." unique_id=477801571]
 script = ExtResource("11_behavior")
-spawn_count = 3
-spawn_radius = 12.0
-max_spawn_attempts = 10
+summon_vfx = SubResource("Resource_summon_vfx")
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1528957767]
 script = ExtResource("12_range")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=1694428245]
 script = ExtResource("13_attack")
 attack_data = SubResource("Resource_attack")
 metadata/_custom_type_script = "uid://detgar3t50qgi"

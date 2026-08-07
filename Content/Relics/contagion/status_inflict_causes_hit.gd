@@ -68,9 +68,11 @@ func _execute_reaction(instance: EffectInstance, trigger_hit: HitData, center_un
 		return
 
 	#attribute the damage to the original attacker
-	secondary_hit.source = trigger_hit.source
+	secondary_hit.source = trigger_hit.get_source_unit()
 	secondary_hit.target = null #targetless aoe
 	secondary_hit.target_affiliation = trigger_hit.target_affiliation
+	secondary_hit.attack_id = AttackComponent.get_next_attack_id()
+	secondary_hit.primary = false
 
 	#configure delivery to happen instantly at the unit's location
 	var delivery_data: DeliveryData = attack_data.generate_generic_delivery_data()

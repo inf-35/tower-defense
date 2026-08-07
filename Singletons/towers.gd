@@ -74,6 +74,14 @@ enum Type {
 	RITE_GLASS,
 	RITE_SALT,
 	RUINS,
+	RITE_ICE,
+	RITE_PASSION,
+	RITE_COPPER,
+	RITE_IRON,
+	SPIKES,
+	RITE_LODESTONE,
+	RITE_SULPHUR,
+	RITE_PLAGUES,
 }
 
 enum Element {
@@ -85,7 +93,7 @@ enum Element {
 	NEUTRAL,
 }
 
-enum Tag {
+enum Tag { ##used for reward qualification
 	POISONS,
 	FROST,
 	FLAME,
@@ -95,6 +103,7 @@ enum Tag {
 	WALL,
 	CANNON,
 	SELF_DAMAGE,
+	BLEED,
 }
 
 var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
@@ -265,6 +274,8 @@ func is_tower_buff_source(tower_type: Type) -> bool:
 		Type.CAMPGROUNDS,
 		Type.OUTPOST,
 		Type.SHIELD,
+		Type.SIPHON,
+		Type.RESONATOR,
 		Type.WATCHTOWER,
 	] or is_tower_rite(tower_type)
 

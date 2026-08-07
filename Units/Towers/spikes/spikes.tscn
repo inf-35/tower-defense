@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://nt71fku28nlf"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_stat_display"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_damage_display"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_hitrate_display"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="5_status_display"]
+[ext_resource type="Script" uid="uid://d36dwm0k51oqg" path="res://Units/Towers/spikes/spikes_behavior.gd" id="6_behavior"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="6_jcdoc"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="7_movement_component"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="8_movement_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="9_health_component"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="10_health_data"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="11_range_component"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_attack_component"]
+[ext_resource type="Resource" uid="uid://gfgaj7q6vj5m" path="res://Units/Towers/spikes/spikes_attack.tres" id="13_attack_data"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_modifiers_component"]
+[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="15_turret_graphics"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_shadow_component"]
+
+[sub_resource type="Resource" id="Resource_health"]
+script = ExtResource("10_health_data")
+max_health = 10.0
+metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_reference"]
+size = Vector2(10, 10)
+
+[node name="Spikes" type="Node2D" unique_id=1532602407 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 1
+z_as_relative = false
+script = ExtResource("1_tower")
+type = 76
+blocking = false
+stat_displays = Array[ExtResource("2_stat_display")]([ExtResource("3_damage_display"), ExtResource("4_hitrate_display"), ExtResource("5_status_display"), ExtResource("6_jcdoc")])
+behavior = NodePath("SpikesBehavior")
+graphics = NodePath("Graphics")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+metadata/_custom_type_script = "uid://glk50fqtygyn"
+
+[node name="SpikesBehavior" type="Node" parent="." unique_id=1379126365]
+script = ExtResource("6_behavior")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=224208818]
+script = ExtResource("7_movement_component")
+movement_data = ExtResource("8_movement_data")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"
+
+[node name="HealthComponent" type="Node" parent="." unique_id=617791641]
+script = ExtResource("9_health_component")
+health_data = SubResource("Resource_health")
+metadata/_custom_type_script = "uid://b016qjmysn53e"
+
+[node name="RangeComponent" type="Node" parent="." unique_id=757540949]
+script = ExtResource("11_range_component")
+metadata/_custom_type_script = "uid://c7bx77xcy58x8"
+
+[node name="AttackComponent" type="Node" parent="." unique_id=1605223667]
+script = ExtResource("12_attack_component")
+attack_data = ExtResource("13_attack_data")
+metadata/_custom_type_script = "uid://detgar3t50qgi"
+
+[node name="reference" type="Sprite2D" parent="." unique_id=1246469993]
+visible = false
+texture = SubResource("PlaceholderTexture2D_reference")
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1862885731]
+self_modulate = Color(1, 1, 1, 0.33)
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("15_turret_graphics")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1149531686]
+script = ExtResource("16_shadow_component")
+height_multiplier = 0.15
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=2042384061]
+script = ExtResource("14_modifiers_component")
+metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

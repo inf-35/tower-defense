@@ -4,6 +4,7 @@ class_name TutorialManager
 signal start_wave_lock_changed(locked: bool)
 signal sequence_finished(sequence_id: StringName)
 signal fact_observed(fact: int)
+signal intro_continue_requested()
 
 @export var overlay_color_rect: ColorRect
 @export var instruction_panel: TutorialPanel
@@ -13,6 +14,7 @@ signal fact_observed(fact: int)
 @export var timeline_anchor: Control
 @export var start_wave_anchor: Control
 @export var time_controls_anchor: Control
+@export var trade_anchor: Control
 
 var _registered_ui_elements: Dictionary[int, Control] = {}
 var _active_sequence: Array[TutorialStep] = []
@@ -65,6 +67,10 @@ func _process(_delta: float) -> void:
 	_monitor_legacy_hover()
 
 func _input(event: InputEvent) -> void:
+	if _active_intro and event.is_action_pressed("interact"):
+		intro_continue_requested.emit()
+		get_viewport().set_input_as_handled()
+		return
 	if not _waiting_for_confirmation:
 		return
 	if not event.is_action_pressed("interact"):
@@ -305,6 +311,8 @@ func _resolve_legacy_anchor(step: TutorialStep) -> Control:
 			return central_anchor
 		TutorialStep.Anchor.TIME_CONTROLS_ANCHOR:
 			return time_controls_anchor
+		TutorialStep.Anchor.TRADE_ANCHOR:
+			return trade_anchor
 	return null
 
 func _update_anchor_position() -> void:

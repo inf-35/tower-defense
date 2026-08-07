@@ -132,7 +132,7 @@ func load_profile() -> bool:
 	if save_dict.has("settings"):
 		var settings_data: Dictionary = save_dict["settings"]
 		Pause.show_all_health_bars = bool(settings_data.get("show_all_health_bars", false))
-		Pause.show_attached_effect_icons = bool(settings_data.get("show_attached_effect_icons", false))
+		Pause.show_attached_effect_icons = bool(settings_data.get("show_attached_effect_icons", true))
 		WindowSettings.apply_startup_settings(settings_data)
 	else:
 		WindowSettings.apply_startup_settings()

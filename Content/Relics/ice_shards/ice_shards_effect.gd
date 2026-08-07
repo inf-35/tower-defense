@@ -58,7 +58,9 @@ func _spawn_shards(instance: EffectInstance, parent_report: HitReportData, cente
 		var hit_data := attack_data.generate_generic_hit_data()
 		if not hit_data.derive_lineage_from(parent_report, instance):
 			continue
-		hit_data.source = source
+		hit_data.source = parent_report.get_source_unit(source)
+		hit_data.attack_id = AttackComponent.get_next_attack_id()
+		hit_data.primary = false
 		hit_data.damage = center_unit.get_stat(Attributes.id.MAX_HEALTH) * damage_multiplier
 		hit_data.target = null #untargeted projectile
 		hit_data.target_affiliation = center_unit.hostile

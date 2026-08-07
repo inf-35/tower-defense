@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_move_data"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="6_health_data"]
-[ext_resource type="Texture2D" uid="uid://djn7a68cfk58e" path="res://Assets/goblin.png" id="7_sprite"]
+[ext_resource type="Texture2D" path="res://Assets/fleshlet.png" id="7_sprite"]
 [ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
@@ -33,8 +33,8 @@ size = Vector2(44, 44)
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("14_attack_data")
 range = 8.0
-cooldown = 1.0
-damage = 2.0
+cooldown = 2.0
+damage = 1.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [node name="Fleshlet" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
@@ -78,7 +78,6 @@ shadow_size = Vector2(34, 20)
 metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
 [node name="Graphics" type="Sprite2D" parent="."]
-self_modulate = Color(0.72, 1, 0.52, 1)
 scale = Vector2(0.075, 0.075)
 texture = ExtResource("7_sprite")
 

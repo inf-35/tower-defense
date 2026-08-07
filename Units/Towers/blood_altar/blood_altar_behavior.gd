@@ -58,7 +58,7 @@ func _start_attack_sequence(target: Unit) -> void: ##consumes one attack context
 		if not is_instance_valid(target) or unit.disabled:
 			break
 
-		_fire_projectile(target, source_position, attack_id, attack_context)
+		_fire_projectile(target, source_position, attack_context)
 		if interval > 0.0:
 			await Clock.await_game_time(interval)
 
@@ -119,7 +119,7 @@ func _create_structure_hit(target: Tower, attack_id: int, attack_context: Attack
 
 	return hit_data
 
-func _fire_projectile(target: Unit, source_position: Vector2, attack_id: int, attack_context: AttackComponent.AttackLineageContext) -> void: ##fires one projectile that inherits the shared lineage stamp for this altar attack
+func _fire_projectile(target: Unit, source_position: Vector2, attack_context: AttackComponent.AttackLineageContext) -> void: ##fires one independently procable projectile that inherits the shared lineage stamp for this altar attack
 	var delivery_data: DeliveryData = attack_component.generate_delivery_data()
 	delivery_data.target = target
 	#delivery_data.use_source_position_override = true
@@ -129,7 +129,7 @@ func _fire_projectile(target: Unit, source_position: Vector2, attack_id: int, at
 	var hit_data: HitData = attack_component.generate_hit_data(delivery_data)
 	hit_data.target = target
 	hit_data.target_affiliation = target.hostile
-	hit_data.attack_id = attack_id
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
 	hit_data.primary = false
 	if not attack_component.apply_attack_context(hit_data, attack_context):
 		return

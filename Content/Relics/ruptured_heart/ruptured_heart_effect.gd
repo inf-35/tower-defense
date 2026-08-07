@@ -42,12 +42,14 @@ func _trigger_explosion(instance: EffectInstance, dying_unit: Unit, hit_report: 
 		return
 
 	var hit_data: HitData = explosion_data.generate_generic_hit_data()
-	hit_data.source = hit_report.source if hit_report != null and is_instance_valid(hit_report.source) else null
 	hit_data.target = null
 	hit_data.target_affiliation = dying_unit.hostile
 	hit_data.damage = poison_stacks * damage_per_stack
 	if not hit_data.derive_lineage_from(hit_report, instance):
 		return
+	hit_data.source = hit_report.get_source_unit() if hit_report != null else null
+	hit_data.attack_id = AttackComponent.get_next_attack_id()
+	hit_data.primary = false
 
 	var delivery_data: DeliveryData = explosion_data.generate_generic_delivery_data()
 	delivery_data.use_source_position_override = true

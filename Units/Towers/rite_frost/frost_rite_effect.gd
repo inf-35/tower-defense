@@ -3,7 +3,7 @@ class_name FrostRiteEffect
 
 @export var qualifying_status: Attributes.Status = Attributes.Status.FROST ##target status required before brittle can be attached
 @export var brittle_effect: BrittleEffect ##temporary effect attached to frosted targets hit by the affected tower
-@export var brittle_duration: float = 2.0 ##seconds brittle remains if not consumed
+@export var brittle_duration: float = 3.0 ##seconds brittle remains after refresh
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_DEALT]
@@ -13,13 +13,13 @@ func create_instance() -> EffectInstance:
 	apply_generics(instance)
 	return instance
 
-func _handle_attach(_instance: EffectInstance) -> void:
-	pass
+func _handle_attach(instance: EffectInstance) -> void:
+	_set_targeting_preference(instance, qualifying_status, true)
 
-func _handle_detach(_instance: EffectInstance) -> void:
-	pass
+func _handle_detach(instance: EffectInstance) -> void:
+	_set_targeting_preference(instance, qualifying_status, false)
 
-func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##marks frosted targets so the next heavy hit deals double damage
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##marks frosted targets so brittle handles heavy-hit multipliers while active
 	if event.event_type != GameEvent.EventType.HIT_DEALT:
 		return
 
