@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CapacityGeneratorEffect" format=3]
+
+[ext_resource type="Script" uid="uid://bigp8gkrdqok7" path="res://Content/Effects/_capacity_generator.gd" id="1_capacity"]
+
+[resource]
+script = ExtResource("1_capacity")
+adjacent_water_capacity_amount = 1.0
+effect_type = 2
+schedule = 1
+metadata/_custom_type_script = "uid://bigp8gkrdqok7"

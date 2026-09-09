@@ -21,6 +21,7 @@ enum id { #trackable value
 	FLAT_DAMAGE_TAKEN, ##flat damage additionally taken per hit
 	REGEN_REMAINDER_PERCENT, ##regen taken as a percentage of remainder health
 	ATTACK_RATE, ##flat attacks-per-second bonus used when resolving cooldown
+	ARMOUR_IGNORE, ##fraction of negative flat damage taken ignored by outgoing hits
 }
 
 enum Status { #diegetic statuses
@@ -34,19 +35,38 @@ enum Status { #diegetic statuses
 	CLEANSE
 }
 
-class StatusEffectData:
+class StatusAttributeData:
 	var attribute: id #what attribute is this status effect targeting
 	var additive_per_stack: float = 0.0
 	var multiplicative_per_stack: float = 1.0
-	var can_stack: bool = true
-	var overlay_color: Color = Color.TRANSPARENT
 
-	func _init(_attribute: id, _aps: float, _mps: float, _cs: bool = true, _oc: Color = Color.TRANSPARENT) -> void:
+	func _init(_attribute: id, _aps: float, _mps: float) -> void:
 		attribute = _attribute
 		additive_per_stack = _aps
 		multiplicative_per_stack = _mps
+
+class StatusEffectData:
+	var attributes: Array[StatusAttributeData] = []
+	var can_stack: bool = true
+	var overlay_color: Color = Color.TRANSPARENT
+
+	func _init(_attributes: Array[StatusAttributeData], _cs: bool = true, _oc: Color = Color.TRANSPARENT) -> void:
+		attributes = _attributes
 		can_stack = _cs
 		overlay_color = _oc
+
+	func get_attribute_data(attribute: id) -> StatusAttributeData: ##returns the authored status row for this attribute, if present
+		for attribute_data: StatusAttributeData in attributes:
+			if attribute_data.attribute == attribute:
+				return attribute_data
+
+		return null
+
+	func primary_attribute() -> id: ##returns the first authored attribute for legacy single-attribute callers
+		if attributes.is_empty():
+			return id.NULL
+
+		return attributes[0].attribute
 
 class ReactionData:
 	var requisites: Dictionary[Status, float] #what statuses in what amount does this reaction need
@@ -60,28 +80,47 @@ class ReactionData:
 #of FROST should be equivalent to one stack of POISON in importance/severity
 var status_effects: Dictionary[Status, StatusEffectData] = {
 	Status.FROST: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.66, true, Color(0, 0, 1, 0.5)
+		[
+			StatusAttributeData.new(id.MAX_SPEED, 0.0, 0.66),
+			StatusAttributeData.new(id.COOLDOWN, 0.0, 1.0 / 0.66),
+		],
+		true,
+		Color(0, 0, 1, 0.5)
 	),
 	Status.BURN: StatusEffectData.new(
-		id.REGENERATION, -1, 1.0, true, Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
+		[StatusAttributeData.new(id.REGENERATION, -1, 1.0)],
+		true,
+		Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
-		id.REGEN_REMAINDER_PERCENT, -0.05, 1.0, true, Color(0, 1, 0, 0.5) #-5% remaining hp per second (capped at 2/s/stack)
+		[StatusAttributeData.new(id.REGEN_REMAINDER_PERCENT, -0.05, 1.0)],
+		true,
+		Color(0, 1, 0, 0.5) #-5% remaining hp per second (capped at 2/s/stack)
 	),
 	Status.HEAT: StatusEffectData.new(
-		id.NULL, 0.0, 1.0  #this effect does nothing by itself, but reacts with FROST
+		[]  #this effect does nothing by itself, but reacts with FROST
 	),
 	Status.CURSED: StatusEffectData.new(
-		id.DAMAGE_TAKEN, 0.0, 1.25, true, Color(0.446, 0.002, 0.768, 0.5)
+		[StatusAttributeData.new(id.DAMAGE_TAKEN, 0.0, 1.25)],
+		true,
+		Color(0.446, 0.002, 0.768, 0.5)
 	),
 	Status.BLEED: StatusEffectData.new(
-		id.FLAT_DAMAGE_TAKEN, 0.5, 1.0, true, Color(1,0,0,0.5),
+		[StatusAttributeData.new(id.FLAT_DAMAGE_TAKEN, 0.5, 1.0)],
+		true,
+		Color(1,0,0,0.5),
 	),
 	Status.STUN: StatusEffectData.new(
-		id.MAX_SPEED, 0.0, 0.2, false, Color(1, 1, 0.5) #80% mvmt reduction
+		[StatusAttributeData.new(id.MAX_SPEED, 0.0, 0.2),
+		StatusAttributeData.new(id.COOLDOWN, 0.0, 10.0),
+		],
+		false,
+		Color(1, 1, 0.5) #80% mvmt reduction
 	),
 	Status.CLEANSE: StatusEffectData.new(
-		id.NULL, 0.0, 1.0, false, Color(0.35, 0.65, 1.0, 0.35)
+		[],
+		false,
+		Color(0.35, 0.65, 1.0, 0.35)
 	)
 }
 

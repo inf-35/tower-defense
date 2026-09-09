@@ -41,4 +41,5 @@ func _trigger_neighbors(instance: EffectInstance, parent_data: EventData, wall: 
 		if is_instance_valid(neighbor.attack_component):
 			neighbor.attack_component.queue_next_attack_context(parent_data, instance)
 			neighbor.attack_component.current_cooldown = 0.0
-			UI.floating_text_manager.show_icon(icon, neighbor.position)
+			BuffComponent.play_link_wisp(wall, neighbor)
+			trigger_target_bonus_feedback(neighbor)

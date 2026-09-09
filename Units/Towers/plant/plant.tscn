@@ -10,7 +10,10 @@
 [ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_c1n2m"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_rirfx"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_c1n2m"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="7_jh1kv"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_odutm"]
+[ext_resource type="Resource" uid="uid://bpcilt04y1bv8" path="res://Units/Towers/plant/plant_adjacency_effect.tres" id="8_8152j"]
+[ext_resource type="Resource" path="res://Units/Towers/plant/plant_forest_adjacency_effect.tres" id="8_forest"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_jh1kv"]
 [ext_resource type="Resource" uid="uid://c1duevi7jhs3q" path="res://Units/Towers/plant/plant_attack.tres" id="9_8152j"]
 [ext_resource type="Texture2D" uid="uid://ohkn5aw1hsmc" path="res://Assets/pot_base.png" id="10_670td"]
@@ -94,11 +97,11 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
+intrinsic_effects = Array[ExtResource("7_jh1kv")]([ExtResource("8_8152j"), ExtResource("8_forest")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="PlantTowerBehavior" type="Node" parent="." unique_id=874438432]
 script = ExtResource("3_670td")
-additive_damage_per_forest = 0.5
 metadata/_custom_type_script = "uid://bpjh5lj6vdqel"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1048465234]

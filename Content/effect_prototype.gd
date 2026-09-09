@@ -36,6 +36,9 @@ func _handle_stack_update(instance: EffectInstance) -> void:
 func on_tick(instance: EffectInstance, delta: float) -> void:
 	pass
 
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##virtual mutation-free introspection surface shared with behavior-authored influence
+	return []
+
 func trigger_source_tower_pulse(instance: EffectInstance) -> void: ##plays the shared rite squash-stretch feedback on the rite tower responsible for a successful proc
 	var source_tower: Tower = _resolve_source_tower(instance)
 	if not is_instance_valid(source_tower):

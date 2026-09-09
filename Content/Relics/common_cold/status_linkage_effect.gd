@@ -47,8 +47,8 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if hit_data.status_effects.has(output_status):
 		existing_vector = hit_data.status_effects[output_status]
 
-	#merge logic: add stacks, take the longest duration
-	var final_stacks: float = existing_vector.x + generated_stacks
+	#merge logic: take the strongest status payload on each axis
+	var final_stacks: float = maxf(existing_vector.x, generated_stacks)
 	var final_duration: float = maxf(existing_vector.y, generated_duration)
 
 	#write back to the hit data

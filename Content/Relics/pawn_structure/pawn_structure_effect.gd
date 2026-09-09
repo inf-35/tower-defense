@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name PawnStructureLocalEffect ##local effect
 
-@export var damage_bonus: float = 0.20
+@export var damage_bonus: float = 0.50
 @export var target_type: Towers.Type = Towers.Type.TURRET
 
 class PawnState extends RefCounted:
@@ -64,6 +64,7 @@ func _evaluate(instance: EffectInstance, is_being_built: bool = false) -> void:
 	var desired_mult = 1.0 + (stacks * damage_bonus)
 
 	if stacks > state.old_stacks:
+		_play_diagonal_source_wisps(tower)
 		UI.floating_text_manager.show_icon(icon, tower.position)
 	state.old_stacks = stacks
 
@@ -79,3 +80,21 @@ func _evaluate(instance: EffectInstance, is_being_built: bool = false) -> void:
 		if state.modifier:
 			tower.modifiers_component.remove_modifier(state.modifier)
 			state.modifier = null
+
+func _play_diagonal_source_wisps(tower: Tower) -> void: ##shows the active diagonal turrets responsible for a newly increased pawn-structure bonus
+	var seen_ids: Dictionary[int, bool] = {}
+	for neighbor: Tower in tower.get_diagonal_towers().values():
+		if not is_instance_valid(neighbor) or neighbor.type != target_type or neighbor.disabled or neighbor.is_queued_for_deletion():
+			continue
+		if seen_ids.has(neighbor.unit_id):
+			continue
+		seen_ids[neighbor.unit_id] = true
+		BuffComponent.play_link_wisp(neighbor, tower)
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##reports pawn structure only when the candidate currently has an active diagonal turret source
+	if not is_instance_valid(candidate) or candidate.hostile or candidate.current_state != Tower.State.ACTIVE:
+		return []
+	for neighbor: Tower in candidate.get_diagonal_towers().values():
+		if is_instance_valid(neighbor) and neighbor.type == target_type and not neighbor.disabled and not neighbor.is_queued_for_deletion():
+			return [TowerInfluence.for_cells(&"pawn_structure", TowerInfluence.Kind.MODIFIER, candidate.get_occupied_cells())]
+	return []

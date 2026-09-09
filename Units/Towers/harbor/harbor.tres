@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://bgnsu04pb37v4"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_tower_data"]
+[ext_resource type="Texture2D" uid="uid://b4ymi0q7wgfg" path="res://Assets/town.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_mf2gj"]
+[ext_resource type="PackedScene" path="res://Units/Towers/harbor/harbor.tscn" id="3_scene"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_unl5f"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_6s50k"]
+
+[resource]
+script = ExtResource("1_tower_data")
+id = 80
+cost = 8.0
+required_capacity = 0.0
+element = 5
+tower_name = "Harbor"
+tower_description = "A waterside settlement. Costs no {POPULATION}, produces 1 {POPULATION} per adjacent water/ice tile, and can only be placed on constructable terrain touching at least 1 water/ice tile."
+icon = ExtResource("2_icon")
+preview = ExtResource("2_icon")
+tower_scene = ExtResource("3_scene")
+metadata/_custom_type_script = "uid://dplrswcru72f4"

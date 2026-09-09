@@ -2,20 +2,23 @@
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_modifier"]
 [ext_resource type="Texture2D" uid="uid://dwughrg78kpf" path="res://Assets/bookends.png" id="1_qxips"]
-[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://xa3pegvs7qkt" path="res://Content/Relics/bookends/bookends_effect.gd" id="2_effect"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_relic"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="4_qxips"]
 
 [sub_resource type="Resource" id="Resource_cooldown"]
 script = ExtResource("1_modifier")
 attribute = 8
-multiplicative = 0.556
+multiplicative = 0.625
+
+[sub_resource type="Resource" id="Resource_damage"]
+script = ExtResource("1_modifier")
+attribute = 6
+multiplicative = 1.6
 
 [sub_resource type="Resource" id="Resource_effect"]
 script = ExtResource("2_effect")
-condition_kind = 3
-match_host_type_on_both_sides = true
-modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_cooldown")])
+modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_cooldown"), SubResource("Resource_damage")])
 icon = ExtResource("1_qxips")
 
 [resource]
@@ -23,5 +26,5 @@ script = ExtResource("3_relic")
 type = 43
 global_effect = SubResource("Resource_effect")
 title = "Bookends"
-description = "Towers with the same tower type of themselves to the left and right gain +80% {UNIT_HITRATE}."
+description = "Towers in a horizontal line of 3 matching tower types gain +60% {UNIT_HITRATE} and +60% {UNIT_DAMAGE}. Does not stack."
 icon = ExtResource("1_qxips")

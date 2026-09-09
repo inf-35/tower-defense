@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ConditionalRelicEffect" format=3 uid="uid://bpcilt04y1bv8"]
+
+[ext_resource type="Script" uid="uid://rwb32u0vv5nj" path="res://Content/Relics/_conditional_relic_effect.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_modifier"]
+
+[sub_resource type="Resource" id="Resource_damage_bonus"]
+script = ExtResource("2_modifier")
+attribute = 6
+additive = 1.0
+
+[resource]
+script = ExtResource("1_effect")
+condition_kind = 2
+host_tower_types = Array[int]([15, 27])
+reference_tower_types = Array[int]([15, 27])
+max_range = 3
+scale_with_count = true
+modifier_prototypes = Array[ExtResource("2_modifier")]([SubResource("Resource_damage_bonus")])

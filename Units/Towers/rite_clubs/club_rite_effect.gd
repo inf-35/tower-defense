@@ -8,8 +8,8 @@ class ClubRiteState extends RefCounted:
 	var attack_counter: int = 0
 
 @export var attacks_required: int = 4 ##unique attacks from each affected tower required before stun is applied
-@export var minimum_trigger_damage: float = 3.0 ##attack damage must exceed this value before clubs counts the attack
-@export var duration: float = 1.0 ##stun duration applied on the qualifying attack
+@export var minimum_trigger_damage: float = 2.0 ##attack damage must exceed this value before clubs counts the attack
+@export var duration: float = 2.0 ##stun duration applied on the qualifying attack
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]

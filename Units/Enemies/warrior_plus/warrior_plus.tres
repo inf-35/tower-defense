@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="UnitData" format=3]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dwv5ew7baeltd"]
 
-[ext_resource type="Texture2D" path="res://Assets/warrior.png" id="1"]
-[ext_resource type="Script" path="res://Content/unit_data..gd" id="2"]
-[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3"]
-[ext_resource type="PackedScene" path="res://Units/Enemies/warrior_plus/warrior_plus.tscn" id="4"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="5"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="6"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/armor.tres" id="7"]
+[ext_resource type="Texture2D" uid="uid://p30x2gd2skej" path="res://Assets/warrior.png" id="1"]
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="2"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://cvsqkb21snqay" path="res://Units/Enemies/warrior_plus/warrior_plus.tscn" id="4"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6"]
+[ext_resource type="Resource" uid="uid://irjol15uv6x6" path="res://Content/StatDisplays/armor.tres" id="7"]
 
 [resource]
 script = ExtResource("2")

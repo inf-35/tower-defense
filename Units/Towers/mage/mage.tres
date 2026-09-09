@@ -10,13 +10,12 @@
 [resource]
 script = ExtResource("2_cqlpt")
 id = 18
-tags = Array[int]([4])
 cost = 7.0
 element = 5
+tags = Array[int]([4])
 tower_name = "Mage"
-tower_description = "Mages energise adjacent contiguous {T_PALISADE|label=Walls}, inflicting {CURSED}"
+tower_description = "Mages energise adjacent contiguous {T_PALISADE|label=Walls}, inflicting {CURSED}. Gains +10% {UNIT_DAMAGE} and  {UNIT_HITRATE} for each Wall in its network."
 icon = ExtResource("1_4g74q")
 preview = ExtResource("1_4g74q")
 tower_scene = ExtResource("3_2trff")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

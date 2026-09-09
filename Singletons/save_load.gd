@@ -2,6 +2,7 @@ extends Node
 
 const SAVE_PATH: String = "user://savegame.json"
 const PROFILE_PATH: String = "user://profile.json"
+const BossEncounters := preload("res://Indexes/boss_encounters.gd")
 
 #public api
 func save_game() -> void:
@@ -16,6 +17,7 @@ func save_game() -> void:
 	#player context
 	save_dict["player"] = Run.player.get_save_data()
 	save_dict["phases"] = Run.phases.get_save_data()
+	save_dict["boss_encounters"] = Run.boss_encounters.get_save_data() if is_instance_valid(Run.boss_encounters) else {}
 
 	#island context
 	if is_instance_valid(Run.references.island):
@@ -81,6 +83,9 @@ func load_game() -> bool:
 		Run.player.load_save_data(save_dict["player"])
 	if save_dict.has("analytics"):
 		Analytics.load_save_data(save_dict["analytics"])
+	if save_dict.has("boss_encounters") and is_instance_valid(Run.boss_encounters):
+		var boss_data: Dictionary = save_dict["boss_encounters"]
+		Run.boss_encounters.load_save_data(boss_data if _should_restore_boss_encounter(boss_data) else {})
 
 	print("SaveLoad: Load Complete.")
 	return true
@@ -140,6 +145,18 @@ func load_profile() -> bool:
 	if save_dict.has("player") and is_instance_valid(Run.player):
 		Run.player.load_profile(save_dict["player"])
 	return true
+
+func _should_restore_boss_encounter(data: Dictionary) -> bool: ##keeps stale boss-test saves from restoring encounters no longer scheduled by phases
+	if data.is_empty() or not bool(data.get("active", false)):
+		return true
+	if not is_instance_valid(Run.phases):
+		return false
+
+	var boss_wave: int = int(data.get("wave_number", 0))
+	var saved_type: BossEncounters.Type = int(data.get("encounter_type", BossEncounters.Type.NONE))
+	if boss_wave <= 0 or saved_type == BossEncounters.Type.NONE:
+		return false
+	return Run.phases.get_boss_encounter_type(boss_wave) == saved_type
 
 func has_save_file() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)

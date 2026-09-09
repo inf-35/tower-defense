@@ -36,18 +36,21 @@ enum ConditionKind {
 @export var granted_effect: EffectPrototype
 ##stack count used when granting the optional local effect
 @export var granted_effect_stacks: int = 1
+##whether qualifying tower-shaped condition sources emit buff-link wisps toward the beneficiary
+@export var show_condition_link_wisps: bool = true
 
 class ConditionalRelicState extends RefCounted:
 	#track runtime grants by tower id so one recalc pass can update, remove, or clean up each host deterministically
-	var active_modifiers: Dictionary[int, Array] = {}
+	var active_modifiers: Dictionary[int, Variant] = {}
 	var active_effects: Dictionary[int, bool] = {}
 	var active_counts: Dictionary[int, int] = {}
+	var attached_host_only: bool = false ##whether this instance was attached intrinsically instead of registered as a global relic
 	#tower lifetime is owned elsewhere, so the relic only keeps weak refs for later cleanup/removal
 	var tower_refs: Dictionary[int, WeakRef] = {}
 	#the island signal outlives individual effect instances, so the callable must be stored for exact disconnect
 	var island_changed_callback: Callable
 
-func _init() -> void: ##registers this relic as a passive global effect whose real work is driven by island change recalc
+func _init() -> void: ##initialises a passive spatial effect for either global registration or intrinsic host attachment
 	global = true
 	event_hooks = [GameEvent.EventType.NONE]
 
@@ -59,6 +62,7 @@ func create_instance() -> EffectInstance: ##creates isolated runtime bookkeeping
 
 func _handle_attach(instance: EffectInstance) -> void: ##subscribes to island topology/content changes and immediately evaluates current towers
 	var state: ConditionalRelicState = instance.state as ConditionalRelicState
+	state.attached_host_only = is_instance_valid(instance.host)
 	#bind a weak ref rather than the live instance so the signal graph never owns a freed runtime object
 	state.island_changed_callback = _on_island_changed.bind(weakref(instance))
 	var island: Island = _get_live_island()
@@ -102,9 +106,15 @@ func _on_island_changed(instance_ref: WeakRef) -> void: ##signal-facing wrapper 
 		return
 	_recalculate_all(effect_instance)
 
-func _recalculate_all(instance: EffectInstance) -> void: ##re-evaluates every allied tower against this relic's current spatial condition
+func _recalculate_all(instance: EffectInstance) -> void: ##re-evaluates the attached host for intrinsic use, or every tower for a hostless global relic
 	#first drop stale bookkeeping so evaluation only sees live hosts
-	_prune_invalid_targets(instance.state as ConditionalRelicState)
+	var state: ConditionalRelicState = instance.state as ConditionalRelicState
+	_prune_invalid_targets(state)
+	if state.attached_host_only:
+		if is_instance_valid(instance.host) and instance.host is Tower:
+			_evaluate_tower(instance, instance.host as Tower)
+		return
+
 	var island: Island = _get_live_island()
 	if not is_instance_valid(island):
 		return
@@ -112,13 +122,13 @@ func _recalculate_all(instance: EffectInstance) -> void: ##re-evaluates every al
 	for tower: Tower in island.get_all_towers():
 		_evaluate_tower(instance, tower)
 
-func _get_live_island() -> Island: ##returns the current island only while it is still live and inside the tree
+func _get_live_island(): ##returns the current island only while it is still live and inside the tree
 	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
 	if not is_instance_valid(island) or not island.is_inside_tree():
 		return null
 	return island
 
-func _get_live_tracked_tower(state: ConditionalRelicState, tower_id: int) -> Tower: ##re-hydrates a weakly tracked host tower for cleanup or modifier updates
+func _get_live_tracked_tower(state: ConditionalRelicState, tower_id: int): ##re-hydrates a weakly tracked host tower for cleanup or modifier updates
 	if not state.tower_refs.has(tower_id):
 		return null
 	var weak_ref: WeakRef = state.tower_refs[tower_id]
@@ -141,18 +151,19 @@ func _prune_invalid_targets(state: ConditionalRelicState) -> void: ##forgets dea
 
 func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void: ##applies, refreshes, or removes this relic's grants for one potential host tower
 	var state: ConditionalRelicState = instance.state as ConditionalRelicState
-	if not _is_valid_host(tower):
+	var evaluation: Dictionary[StringName, Variant] = _evaluate_influence_condition(tower)
+	if not evaluation.get(&"valid_host", false):
 		_remove_from_tower(state, tower)
 		return
 
 	var tower_id: int = tower.unit_id
 	state.tower_refs[tower_id] = weakref(tower)
-	var count: int = _count_matches(tower)
+	var count: int = evaluation.get(&"count", 0)
 	var previous_count: int = state.active_counts.get(tower_id, 0)
 	state.active_counts[tower_id] = count
 
 	#falling below the threshold tears down everything this relic had attached to that tower
-	if count < min_count:
+	if not evaluation.get(&"active", false):
 		_remove_from_tower(state, tower)
 		return
 
@@ -161,7 +172,65 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void: ##applies,
 
 	#feedback only fires on first qualification or when a scaling relic gained more sources
 	if previous_count < min_count or (scale_with_count and count > previous_count):
+		_play_condition_link_wisps(tower)
 		trigger_target_bonus_feedback(tower)
+
+func _play_condition_link_wisps(tower: Tower) -> void: ##visualizes the concrete towers responsible for a newly activated conditional relic grant
+	if not show_condition_link_wisps:
+		return
+	for source_tower: Tower in _get_condition_source_towers(tower):
+		BuffComponent.play_link_wisp(source_tower, tower)
+
+func _get_condition_source_towers(tower: Tower) -> Array[Tower]: ##returns live tower contributors for condition kinds that have a meaningful world-space source
+	var source_towers: Array[Tower] = []
+	var seen_ids: Dictionary[int, bool] = {}
+	match condition_kind:
+		ConditionKind.ADJACENT_TYPES:
+			for candidate: Tower in tower.get_adjacent_towers().values():
+				_append_condition_source(source_towers, seen_ids, candidate, tower)
+		ConditionKind.WITHIN_RANGE_OF_TYPES:
+			var query := TowerTopologyService.Query.new(
+				TowerTopologyService.QueryKind.CARDINAL_RING,
+				1,
+				max_range,
+				TowerTopologyService.ALL_DIRECTIONS
+			)
+			var report: TowerTopologyService.Report = Run.references.island.topology_service.query(tower, query)
+			for candidate: Tower in report.unique_towers:
+				_append_condition_source(source_towers, seen_ids, candidate, tower)
+	return source_towers
+
+func _append_condition_source(sources: Array[Tower], seen_ids: Dictionary[int, bool], candidate: Tower, host_tower: Tower) -> void: ##dedupes multi-tile contributors while applying the same filter used by condition evaluation
+	if not _matches_reference_tower(candidate, host_tower):
+		return
+	if seen_ids.has(candidate.unit_id):
+		return
+	seen_ids[candidate.unit_id] = true
+	sources.append(candidate)
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##describes an active global grant through the same mutation-free surface used by tower behaviors
+	var influences: Array[TowerInfluence] = []
+	var evaluation: Dictionary[StringName, Variant] = _evaluate_influence_condition(candidate)
+	if not evaluation.get(&"active", false):
+		return influences
+	var cells: Array[Vector2i] = candidate.get_occupied_cells()
+	if not modifier_prototypes.is_empty():
+		influences.append(TowerInfluence.for_cells(&"conditional_modifiers", TowerInfluence.Kind.MODIFIER, cells, null, modifier_prototypes))
+	if is_instance_valid(granted_effect):
+		influences.append(TowerInfluence.for_cells(&"conditional_effect", TowerInfluence.Kind.EFFECT, cells, granted_effect))
+	if influences.is_empty():
+		influences.append(TowerInfluence.for_cells(&"conditional_trigger", TowerInfluence.Kind.TRIGGER, cells))
+	return influences
+
+func _evaluate_influence_condition(tower: Tower) -> Dictionary[StringName, Variant]: ##separates pure host/count evaluation from live modifier, effect, feedback, and bookkeeping mutation
+	var valid_host: bool = _is_valid_host(tower)
+	var count: int = _count_matches(tower) if valid_host else 0
+	return {
+		&"valid_host": valid_host,
+		&"active": valid_host and count >= min_count,
+		&"count": count,
+		&"required_count": min_count,
+	}
 
 func _is_valid_host(tower: Tower) -> bool: ##filters evaluation down to live allied active towers and the optional host type whitelist
 	if not is_instance_valid(tower):
@@ -244,7 +313,11 @@ func _count_within_range_of_types(tower: Tower) -> int: ##uses topology queries 
 	return count
 
 func _has_global_types_on_both_sides(tower: Tower, horizontal: bool) -> bool: ##answers the bookends-style "something exists on both sides" condition without constructing a full path/query object
-	var matching_types: Array = [tower.type] if match_host_type_on_both_sides else reference_tower_types
+	var matching_types: Array = []
+	if match_host_type_on_both_sides:
+		matching_types = [tower.type]
+	else:
+		matching_types.assign(reference_tower_types)
 	if matching_types.is_empty():
 		return false
 

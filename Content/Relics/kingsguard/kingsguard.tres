@@ -15,7 +15,7 @@ multiplicative = 0.625
 script = ExtResource("2_effect")
 condition_kind = 2
 reference_tower_types = Array[int]([1])
-max_range = 1
+max_range = 2
 modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_cooldown")])
 icon = ExtResource("1_h202b")
 
@@ -24,5 +24,5 @@ script = ExtResource("3_relic")
 type = 42
 global_effect = SubResource("Resource_effect")
 title = "Kingsguard"
-description = "Towers adjacent to {T_PLAYER_CORE|label=the Keep} gain +60% {UNIT_HITRATE}."
+description = "Towers within 2 tiles of {T_PLAYER_CORE|label=the Keep} gain +60% {UNIT_HITRATE}."
 icon = ExtResource("1_h202b")

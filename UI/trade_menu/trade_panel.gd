@@ -60,6 +60,7 @@ func _instantiate_card(data: Reward, index: int) -> void:
 
 	if not data:
 		var blocker := ShopOptionCard.new()
+		blocker.use_parent_material = true
 		blocker.custom_minimum_size = Vector2(1200, 300)
 		blocker.self_modulate = Color.TRANSPARENT
 		card_list.add_child(blocker)

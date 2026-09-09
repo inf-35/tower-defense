@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Rite of Iron"
 rite_short_name = "iron"
-tower_description = "{RITE_LABEL}. Affects [input:front tower] and [highlight:back tower] of this rite. When the [input:front tower] deals overkill {UNIT_DAMAGE}, that overkill is added to the [highlight:back tower]'s next attack."
+tower_description = "{RITE_LABEL}. Affects [input:front tower] and [highlight:back tower] of this rite. When the [input:front tower] deals overkill {UNIT_DAMAGE}, twice that overkill is added to the [highlight:back tower]'s attacks for the next 2 seconds."
 icon = ExtResource("1_jj0o2")
 preview = ExtResource("1_jj0o2")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])

@@ -8,6 +8,7 @@
 [sub_resource type="Resource" id="Resource_xr361"]
 script = ExtResource("1_xr361")
 input_status = 2
+conversion_rate = 1.0
 schedule = 1
 metadata/_custom_type_script = "uid://c1ydyvx8fvx8g"
 
@@ -17,6 +18,6 @@ type = 2
 reward_tags = Array[int]([1])
 global_effect = SubResource("Resource_xr361")
 title = "Common Cold"
-description = "Each stack of {POISON} inflicted also inflicts half a stack of {FROST}"
+description = "Each stack of {POISON} inflicted also inflicts 1 stack of {FROST}."
 icon = ExtResource("2_4q4qk")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

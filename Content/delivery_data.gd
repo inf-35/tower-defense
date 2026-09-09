@@ -23,6 +23,7 @@ var delivery_method: DeliveryMethod ##delivery method. see CombatManager
 #for projectiles
 var projectile_speed: float ##projectile speed across the 2d game plane
 var initial_vertical_velocity: float ##used for pseudo-3d projectiles, initial vertical velocity
+var arcing: bool 
 var vertical_force: float ##used for pseudo-3d projectiles, simulates gravity
 
 #extension: for simulated projectiles

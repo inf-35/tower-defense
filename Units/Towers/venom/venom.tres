@@ -11,13 +11,12 @@
 [resource]
 script = ExtResource("3_vx6c2")
 id = 21
-tags = Array[int]([0, 3])
 cost = 7.0
 element = 3
+tags = Array[int]([0, 3])
 tower_name = "Venom"
-tower_description = "Fires venom bolts that inflict intense {POISON} but light damage."
+tower_description = "Fires venom bolts. Hits inflict an additional stack of {POISON} for each 1 damage dealt, up to 8 stacks in total."
 icon = ExtResource("1_26xvn")
 preview = ExtResource("2_limp5")
 tower_scene = ExtResource("4_tqxgy")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

@@ -45,14 +45,15 @@ func set_selected(is_selected: bool) -> void: ##pins the active build option int
 func _refresh_state() -> void: ##rebuilds the label so unavailable resource costs share the central bad color and blocked cards read clearly at a glance
 	if _tower_type == Towers.Type.VOID:
 		return
+	if not Run.has_active_run() or not is_instance_valid(Run.player):
+		return
 
 	var cost: float = Towers.get_tower_cost(_tower_type)
 	var capacity_cost: float = Towers.get_tower_capacity(_tower_type)
-	var has_gold: bool = Run.player.flux >= cost
-	var has_capacity: bool = is_zero_approx(capacity_cost) or Run.player.has_capacity(_tower_type)
+	var player: Player = Run.player
+	var has_gold: bool = player.flux >= cost
+	var has_capacity: bool = is_zero_approx(capacity_cost) or player.has_capacity(_tower_type)
 	var title_text: String = Towers.get_tower_name(_tower_type)
-	if Towers.is_tower_rite(_tower_type):
-		title_text += " (%s)" % Run.player.get_rite_count(_tower_type)
 
 	var bad_color_hex: String = KeywordService.get_color_hex("bad")
 	var gold_text: String = "{GOLD|icon_size=40%s} %s" % ["|color=%s" % bad_color_hex if not has_gold else "", str(cost)]

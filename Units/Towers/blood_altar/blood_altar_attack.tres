@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_jwymb"]
 script = ExtResource("3_jwymb")
 type = 5
-cooldown = 1.0
+cooldown = 2.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_oxvma"]
@@ -41,7 +41,7 @@ delivery_method = 1
 range = 25.0
 cooldown = 1.333333
 radius = 6.0
-damage = 0.8
+damage = 0.4
 breaking = true
 status_effects = Array[ExtResource("3_jwymb")]([SubResource("Resource_jwymb")])
 vfx_on_spawn = SubResource("Resource_t0kqn")

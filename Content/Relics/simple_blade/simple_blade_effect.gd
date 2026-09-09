@@ -66,3 +66,8 @@ func _recalculate_all(instance: EffectInstance) -> void:
 			var mod = Modifier.new(Attributes.id.DAMAGE, multiplier, 0.0, -1.0)
 			t.modifiers_component.add_modifier(mod)
 			state.tower_modifiers[t] = mod
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##reports simple blade for every live allied tower participating in its board-wide modifier
+	if not is_instance_valid(candidate) or candidate.hostile or candidate.environmental or candidate.current_state != Tower.State.ACTIVE:
+		return []
+	return [TowerInfluence.for_cells(&"simple_blade", TowerInfluence.Kind.MODIFIER, candidate.get_occupied_cells())]

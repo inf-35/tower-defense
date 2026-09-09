@@ -11,7 +11,7 @@
 script = ExtResource("4_sxpqw")
 texture = ExtResource("5_e3651")
 radius = 2.0
-scale = 0.1
+scale = 0.08
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
@@ -22,5 +22,7 @@ range = 25.0
 cooldown = 1.333333
 damage = 1.2
 vfx_on_spawn = SubResource("Resource_e3651")
-projectile_speed = 80.0
+fire_sound = &"arrow_fire_sound"
+hit_sound = &"arrow_thunk_sound"
+projectile_speed = 70.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

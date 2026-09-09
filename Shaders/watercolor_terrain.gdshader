@@ -23,7 +23,7 @@ uniform sampler2D terrain_wash_texture : filter_nearest;
 // Per-cell control data. Currently we only use R, where higher values mean that
 // a terrain is allowed to "own" the final color instead of being averaged with
 // neighbors. Water uses this to stay legible against land.
-uniform sampler2D terrain_control_texture : filter_nearest;
+uniform sampler2D terrain_control_texture : filter_linear;
 
 // Watercolor noise sources.
 // distortion_texture bends the outer blob and inter-terrain boundaries so the
@@ -52,6 +52,7 @@ uniform vec2 terrain_color_texture_size = vec2(1.0, 1.0);
 uniform float distortion_strength : hint_range(0.0, 10.0) = 5.0;
 uniform float distortion_scale : hint_range(0.001, 0.1) = 0.01;
 uniform float noise_strength = 0.2;
+uniform float pigment_noise_scale : hint_range(0.25, 6.0) = 1.0;
 // cut_threshold is not a transparency cutoff. It is the interior distance, in
 // recovered tile units, that we keep as pure wash before pigment starts to build.
 uniform float cut_threshold : hint_range(0.0, 0.5) = 0.2;
@@ -63,6 +64,7 @@ uniform float distance_field_step = 1.0;
 uniform float center_falloff : hint_range(0.1, 5.0) = 2.0;
 uniform float noise_falloff: hint_range(0.1, 5.0) = 1.0;
 uniform float brush_strength: hint_range(0.0, 1.0) = 0.3;
+uniform float min_paint_coverage: hint_range(0.0, 1.0) = 0.5;
 uniform float terrain_color_strength: hint_range(0.0, 1.0) = 1.0;
 // Controls how soft terrain-to-terrain handoff is. This only affects boundaries
 // between valid terrain cells, not terrain-to-empty edges.
@@ -70,6 +72,12 @@ uniform float terrain_transition_softness : hint_range(0.0, 1.0) = 0.15;
 // Separate from the outer blob distortion: this specifically wobbles the ownership
 // domain used when neighboring terrain types blend into one another.
 uniform float terrain_warp_strength : hint_range(0.0, 12.0) = 8.0;
+uniform vec4 coastline_color : source_color = vec4(0.3, 0.28, 0.22, 1.0);
+uniform float coastline_strength : hint_range(0.0, 1.0) = 0.0;
+uniform float coastline_width : hint_range(0.01, 1.0) = 0.2;
+uniform float waterline_strength : hint_range(0.0, 1.0) = 0.0;
+uniform float waterline_width : hint_range(0.005, 0.25) = 0.03;
+uniform float waterline_level : hint_range(0.0, 0.5) = 0.2;
 
 vec4 sample_terrain_cell(vec2 cell) {
 	// These terrain textures are cell maps, so we sample at the center of the
@@ -252,8 +260,9 @@ void fragment() {
 	// The center should generally be more pigmented than the edge, but we also
 	// perturb that by watercolor noise so the fill is mottled and organic.
 	float vibrancy = pow(wash_to_pigment, center_falloff);
-	float watercolor_noise = pow(texture(noise_texture, noise_uv + vec2(0.002, 0.002) * TIME).r, noise_falloff);
-	vibrancy = vibrancy * (1.0 - noise_strength) + watercolor_noise * vibrancy * noise_strength;
+	float watercolor_noise = pow(texture(noise_texture, noise_uv * pigment_noise_scale + vec2(0.37, 0.19)).r, noise_falloff);
+	float pigment_noise = mix(1.0, smoothstep(0.1, 0.9, watercolor_noise), noise_strength);
+	vibrancy *= pigment_noise;
 
 	// Warp only inter-terrain ownership/color, using the same distorted domain for
 	// normal blending and dominant terrain selection.
@@ -270,6 +279,7 @@ void fragment() {
 	terrain_sample = mix(sample_terrain_map(field_uv), terrain_sample, terrain_sample_valid);
 	wash_sample = mix(sample_wash_map(field_uv), wash_sample, terrain_sample_valid);
 	dominant_sample = mix(sample_dominant_terrain_map(field_uv), dominant_sample, terrain_sample_valid);
+	float water_control = texture(terrain_control_texture, terrain_uv).r;
 
 	// First build the normal multi-terrain body color, then let a dominant terrain
 	// optionally override that ownership. This keeps ordinary terrain transitions soft
@@ -280,7 +290,7 @@ void fragment() {
 
 	// Brush alpha represents paint coverage: fuller stroke areas receive pigment,
 	// while dry gaps stay closer to the same wash layer used at terrain edges.
-	float paint_coverage = pow(clamp(texture(brush_mask_texture, UV).a * 2.0, 0.5, 1.0), 2.0);
+	float paint_coverage = pow(clamp(texture(brush_mask_texture, UV).a * 2.0, min_paint_coverage, 1.0), 2.0);
 	float dry_brush = clamp((1.0 - paint_coverage) * brush_strength * 3.0, 0.0, 1.0);
 	float pigment_weight = vibrancy * (1.0 - dry_brush);
 
@@ -294,6 +304,18 @@ void fragment() {
 	// Paper tint is deliberately subtle. It is there to integrate the paint into
 	// the background, not to recolor the terrain in a dramatic way.
 	final_color.rgb = mix(final_color.rgb, final_color.rgb * paper.rgb, 0.5);
+
+	// thin, irregular contours replace the previous full-tile dark edge wash.
+	float pencil_grain = mix(0.58, 1.0, texture(noise_texture, world_pos * 0.11 + vec2(0.61, 0.23)).r);
+	float coastline_feather = max(fwidth(edge_distance) * 1.35, 0.008);
+	float coastline_distance = abs(edge_distance - 0.5);
+	float coastline_mask = 1.0 - smoothstep(coastline_width, coastline_width + coastline_feather, coastline_distance);
+	float coastline_mix = coastline_mask * coastline_color.a * coastline_strength * pencil_grain * shape_mask;
+	float waterline_feather = max(fwidth(water_control) * 1.2, 0.004);
+	float waterline_distance = abs(water_control - waterline_level);
+	float waterline_mask = 1.0 - smoothstep(waterline_width, waterline_width + waterline_feather, waterline_distance);
+	float waterline_mix = waterline_mask * coastline_color.a * waterline_strength * pencil_grain * shape_mask;
+	final_color.rgb = mix(final_color.rgb, coastline_color.rgb, max(coastline_mix, waterline_mix));
 
 	// Final alpha rule:
 	// - shape_mask removes only true empty space outside the blob

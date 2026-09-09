@@ -1,8 +1,8 @@
 extends EffectPrototype
 class_name BrittleEffect
 
-@export var minimum_trigger_damage: float = 3.0 ##hit must exceed this post-modifier damage before brittle applies
-@export var damage_multiplier: float = 2.5 ##one-stack damage multiplier; extra stacks add the same bonus again
+@export var minimum_trigger_damage: float = 2.0 ##hit must meet this post-modifier damage before brittle applies
+@export var damage_multiplier: float = 2.0 ##one-stack damage multiplier; extra stacks add the same bonus again
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
@@ -33,7 +33,4 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##amplif
 	trigger_source_tower_pulse(instance)
 
 func get_damage_multiplier(instance: EffectInstance) -> float: ##returns the linear multiplier contributed by current brittle stacks
-	return 1.0 + ((damage_multiplier - 1.0) * float(_get_effect_stacks(instance)))
-
-func _get_effect_stacks(instance: EffectInstance) -> int:
-	return maxi(instance.stacks, 1)
+	return 1.0 + ((damage_multiplier - 1.0) * instance.stacks)

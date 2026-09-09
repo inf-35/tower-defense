@@ -5,6 +5,7 @@ enum VisualKind {
 	RECT,
 	LINE,
 	CIRCLE,
+	CELL,
 }
 
 class PreviewVisualState:
@@ -20,7 +21,9 @@ class PreviewVisualState:
 @export var positive_highlight_color: Color = Color(0.35, 1.0, 0.45, 0.48)
 @export var negative_highlight_color: Color = Color(1.0, 0.2, 0.2, 0.48)
 @export var range_color: Color = Color(1.0, 1.0, 1.0, 0.4)
-@export var attack_area_color: Color = Color(1.0, 0.57, 0.57, 0.412)
+@export var attack_area_color: Color = Color(0.96, 0.781, 0.288, 0.8)
+@export var cell_outline_texture: Texture2D ##white-on-transparent texture modulated for tile-sized range indicators
+@export var influence_cell_textures: Dictionary[int, Texture2D] = {} ##optional per-influence-kind grid textures, falling back to cell_outline_texture
 @export var margin: int = 2
 @export var line_width: float = 1.0
 @export var preview_fade_in_duration: float = 0.12 ##time for newly requested preview visuals to ramp from transparent to full alpha
@@ -56,17 +59,19 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	_frame_requested_visuals.clear()
 	if is_instance_valid(_current_tower) and is_instance_valid(_current_tower.behavior):
+		_current_tower.behavior.draw_tower_influences(self)
 		_current_tower.behavior.draw_visuals(self)
 	_finalize_frame_requests()
 	_draw_visual_states()
 
-func preview_cell(cell: Vector2i, color: Color, width: float = 1.0) -> void: ##records one cell outline as a retained preview visual that can fade in and out across mouse movement
-	var cell_size: float = Island.CELL_SIZE - margin
-	var half_size: Vector2 = Vector2.ONE * cell_size * 0.5
-	var rect := Rect2(Island.cell_to_position(cell) - half_size, Vector2.ONE * cell_size)
-	preview_rect(rect, color, false, width)
+func preview_cell(cell: Vector2i, color: Color, width: float = 1.0, texture: Texture2D = null, style_key: int = -1) -> void: ##records one textured cell visual with a stable semantic style identity for overlapping influence kinds
+	_record_cell_visual(Island.cell_to_position(cell), color, width, texture, style_key)
 
 func preview_rect(rect: Rect2, color: Color, filled: bool = false, width: float = 1.0) -> void: ##records one retained rectangle visual keyed by its geometry so the same tile can animate smoothly across preview updates
+	if _is_cell_outline_rect(rect, filled):
+		_record_cell_visual(rect.get_center(), color, width)
+		return
+
 	var payload: Dictionary[StringName, Variant] = {
 		&"rect": rect,
 		&"color": color,
@@ -107,6 +112,73 @@ func preview_circle(center: Vector2, radius: float, color: Color, filled: bool =
 
 func draw_cell(cell: Vector2i, color: Color) -> void:
 	preview_cell(cell, color, 1.0)
+
+func preview_tower_influence(influence: TowerInfluence) -> void: ##renders one shared influence descriptor using centralized kind colors and geometry rules
+	if influence == null:
+		return
+	var color: Color = _get_influence_color(influence)
+	var cell_texture: Texture2D = _get_influence_cell_texture(influence.kind)
+	var style_key: int = int(influence.kind)
+	if influence.geometry == TowerInfluence.Geometry.LINE:
+		var line_color: Color = color
+		line_color.a *= influence.visual_strength
+		if influence.kind == TowerInfluence.Kind.ATTACK:
+			for cell: Vector2i in influence.cells:
+				preview_cell(cell, line_color, line_width, cell_texture, style_key)
+		line_color.a *= 0.66 #the line overlay is a bit more transparent than the cells
+		preview_line(influence.line_from, influence.line_to, line_color, influence.line_width)
+	else:
+		color.a *= influence.visual_strength
+		for cell: Vector2i in influence.cells:
+			preview_cell(cell, color, line_width, cell_texture, style_key)
+	for cell: Vector2i in influence.accent_cells:
+		preview_cell(cell, color, line_width, cell_texture, style_key)
+
+func _get_influence_color(influence: TowerInfluence) -> Color: ##maps semantic relationship roles to one consistent selection-preview palette
+	match influence.visual_role:
+		TowerInfluence.VisualRole.HIGHLIGHT:
+			return highlight_color
+		TowerInfluence.VisualRole.INPUT:
+			return input_color
+		TowerInfluence.VisualRole.POSITIVE:
+			return positive_highlight_color
+		TowerInfluence.VisualRole.NEGATIVE:
+			return negative_highlight_color
+		TowerInfluence.VisualRole.ATTACK:
+			return attack_area_color
+	match influence.kind:
+		TowerInfluence.Kind.INPUT, TowerInfluence.Kind.TRIGGER:
+			return input_color
+		TowerInfluence.Kind.NEGATIVE:
+			return negative_highlight_color
+		TowerInfluence.Kind.ATTACK:
+			return attack_area_color
+		_:
+			return highlight_color
+
+func _get_influence_cell_texture(kind: TowerInfluence.Kind) -> Texture2D: ##selects an authored texture override for one semantic kind while preserving the default grid for all others
+	var kind_key: int = int(kind)
+	if influence_cell_textures.has(kind_key):
+		var texture: Texture2D = influence_cell_textures[kind_key]
+		if is_instance_valid(texture):
+			return texture
+	return cell_outline_texture
+
+func _record_cell_visual(center: Vector2, color: Color, width: float, texture: Texture2D = null, style_key: int = -1) -> void: ##records one tile centre while retaining its semantic texture style through the fade cache
+	var payload: Dictionary[StringName, Variant] = {
+		&"center": center,
+		&"color": color,
+		&"width": width,
+		&"texture": texture,
+		&"style_key": style_key,
+	}
+	_record_visual(VisualKind.CELL, payload)
+
+func _is_cell_outline_rect(rect: Rect2, filled: bool) -> bool: ##recognizes legacy tile-sized rectangles so existing content adopts the textured cell path automatically
+	if filled:
+		return false
+	var cell_size: float = Island.CELL_SIZE - margin
+	return is_equal_approx(rect.size.x, cell_size) and is_equal_approx(rect.size.y, cell_size)
 
 func _record_visual(kind: int, payload: Dictionary[StringName, Variant]) -> void: ##upserts one frame-requested visual while preserving its live alpha state across redraws
 	var signature: PackedInt64Array = _encode_visual_signature(kind, payload)
@@ -162,6 +234,13 @@ func _draw_visual_states() -> void: ##renders the retained visual cache using ea
 		var color: Color = visual_state.payload[&"color"]
 		color.a = visual_state.current_alpha
 		match visual_state.kind:
+			VisualKind.CELL:
+				_draw_cell_visual(
+					visual_state.payload[&"center"],
+					color,
+					visual_state.payload[&"width"],
+					visual_state.payload[&"texture"] as Texture2D
+				)
 			VisualKind.RECT:
 				draw_rect(
 					visual_state.payload[&"rect"],
@@ -186,6 +265,17 @@ func _draw_visual_states() -> void: ##renders the retained visual cache using ea
 					visual_state.payload[&"width"],
 					visual_state.payload[&"antialiased"]
 				)
+
+func _draw_cell_visual(center: Vector2, color: Color, width: float, texture: Texture2D = null) -> void: ##draws the selected hand-rendered grid texture with a procedural outline fallback
+	var cell_size: float = Island.CELL_SIZE - margin
+	var square_size := Vector2.ONE * cell_size
+	var cell_rect := Rect2(center - square_size * 0.5, square_size)
+	var resolved_texture: Texture2D = texture if is_instance_valid(texture) else cell_outline_texture
+	if resolved_texture == null:
+		draw_rect(cell_rect, color, false, width)
+		return
+
+	draw_texture_rect(resolved_texture, cell_rect, false, color)
 
 func _resolve_visual_key(signature: PackedInt64Array) -> int: ##maps one encoded geometry signature to a stable integer key while probing around rare hash collisions
 	var key: int = _hash_signature(signature)
@@ -228,6 +318,15 @@ func _encode_visual_signature(kind: int, payload: Dictionary[StringName, Variant
 				int(payload[&"filled"]),
 				_quantize_float(payload[&"width"]),
 				int(payload[&"antialiased"]),
+			])
+		VisualKind.CELL:
+			var center: Vector2 = payload[&"center"]
+			return PackedInt64Array([
+				kind,
+				_quantize_float(center.x),
+				_quantize_float(center.y),
+				_quantize_float(payload[&"width"]),
+				int(payload.get(&"style_key", -1)),
 			])
 	return PackedInt64Array([kind])
 

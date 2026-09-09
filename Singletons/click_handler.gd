@@ -91,12 +91,11 @@ func _update_preview_tooltip() -> void:
 
 	if preview_is_valid:
 		var msg: String = ""
-		#if it's a rite, show inventory count
 		if Towers.is_tower_rite(preview_tower_prototype.type):
-			var count = Run.player.get_rite_count(preview_tower_prototype.type)
-			msg += "Rite Available: %d\n" % count
+			msg += "Rite learned\n"
 
 		msg += _get_cell_tooltip(island, cell)
+		msg += _get_preview_influence_tooltip()
 		msg += "\n[place] with [LMB]\n[deselect] with [RMB]\n[rotate] with [R]"
 		UI.cursor_info.display_message(msg, false)
 	else:
@@ -111,6 +110,7 @@ func _update_preview_tooltip() -> void:
 				preview_tower_position,
 				preview_tower_prototype
 			)
+		error_msg += _get_preview_influence_tooltip()
 		error_msg += "\n[place] with [LMB]\n[deselect] with [RMB]\n[rotate] with [R]"
 		UI.cursor_info.display_message(error_msg, true)
 
@@ -338,6 +338,49 @@ func _get_cell_tooltip(island: Island, cell: Vector2i) -> String:
 func _is_uncharted_lake_cell(island: Island, cell: Vector2i) -> bool:
 	return island.is_lake_cell(cell) and not island.terrain_base_grid.has(cell)
 
+func _get_preview_influence_tooltip() -> String: ##formats indexed local relationships and pure global evaluations without scanning every tower on the map
+	if not is_instance_valid(preview_tower_prototype) or not is_instance_valid(Run.references.island):
+		return ""
+	var service: TowerInfluenceService = Run.references.island.influence_service
+	if service == null:
+		return ""
+
+	var group_labels: Dictionary[String, String] = {}
+	var group_counts: Dictionary[String, int] = {}
+	var group_source_ids: Dictionary[String, Dictionary] = {}
+	for influence: TowerInfluence in service.get_influences_for_tower(preview_tower_prototype):
+		var source: Tower = influence.get_source()
+		if not is_instance_valid(source):
+			continue
+		var source_kind: String = "rite" if Towers.is_tower_rite(source.type) else "tower"
+		var presentation_kind: TowerInfluence.PresentationKind = influence.get_presentation_kind()
+		var group_key: String = "tower:%d:%d" % [source.type, presentation_kind]
+		if not group_labels.has(group_key):
+			group_labels[group_key] = "%s (%s, %s)" % [Towers.get_tower_name(source.type), source_kind, influence.get_kind_label()]
+			group_counts[group_key] = 0
+			group_source_ids[group_key] = {}
+		var source_ids: Dictionary = group_source_ids[group_key]
+		var source_id: int = source.get_instance_id()
+		if source_ids.has(source_id):
+			continue
+		source_ids[source_id] = true
+		group_counts[group_key] += 1
+
+	for relic: RelicData in service.get_matching_global_relics(preview_tower_prototype):
+		var relic_group_key: String = "relic:%d" % relic.type
+		group_labels[relic_group_key] = "%s (relic, modifier)" % relic.title
+		group_counts[relic_group_key] = group_counts.get(relic_group_key, 0) + 1
+
+	if group_labels.is_empty():
+		return ""
+	var lines: PackedStringArray = PackedStringArray()
+	for group_key: String in group_labels:
+		var count: int = group_counts.get(group_key, 1)
+		var prefix: String = "%dx " % count if count > 1 else ""
+		lines.append(prefix + group_labels[group_key])
+	lines.sort()
+	return "\n\nAffected by:\n%s" % "\n".join(lines)
+
 func _update_preview_visuals() -> void:
 	if not preview_tower_prototype:
 		return
@@ -350,18 +393,11 @@ func _update_preview_visuals() -> void:
 	preview_tower_prototype.facing = preview_tower_facing
 	preview_tower_prototype.size = Tower.get_rotated_size(Towers.get_tower_size(preview_tower_prototype.type), preview_tower_prototype.facing)
 
-	var occupied_cells: Array[Vector2i] = []
-	var size := preview_tower_prototype.size
-
-	for x in size.x:
-		for y in size.y:
-			var navcost: float = preview_tower_prototype.get_navcost_for_cell(preview_tower_position + Vector2i(x,y))
-			if not is_equal_approx(navcost, Navigation.BASE_COST): #filter out cells marked as transparent
-				occupied_cells.append(preview_tower_position + Vector2i(x, y))
+	var blocking_cells: Array[Vector2i] = preview_tower_prototype.get_blocking_cells()
 
 	#send to path renderer
 	if is_instance_valid(Run.references.path_renderer):
-		Run.references.path_renderer.update_preview(occupied_cells)
+		Run.references.path_renderer.update_preview(blocking_cells)
 
 	preview_is_valid = TerrainService.is_area_constructable(Run.references.island, preview_tower_facing, preview_tower_position, preview_tower_prototype.type, true)
 	current_preview.update_visuals(preview_is_valid, preview_tower_facing, preview_tower_position)

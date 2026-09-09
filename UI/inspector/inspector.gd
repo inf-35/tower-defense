@@ -51,14 +51,8 @@ func _on_inspector_contents_tower_update(unit : Unit) -> void:
 	stats.columns = stats_per_line
 
 	if unit != current_unit: #this is a new unit being switched to
-		unit.on_event.connect(func(event: GameEvent):
-			if event.event_type != GameEvent.EventType.REPLACED:
-				return
-
-			var data: UnitReplacedData = event.data as UnitReplacedData
-			if data.old_unit == current_unit:
-				_on_inspected_tower_replaced(current_unit, data.new_unit as Tower)
-		)
+		_disconnect_inspected_unit_event()
+		unit.subscribe_event(GameEvent.EventType.REPLACED, _on_inspected_unit_replaced)
 
 	current_unit = unit
 	#reset preview state when switching towers
@@ -74,6 +68,7 @@ func _on_inspector_contents_tower_update(unit : Unit) -> void:
 	_update_status_display(unit)
 
 func _clear_inspector() -> void: ##drops the currently inspected unit reference and clears transient ui state so hidden inspector transitions do not keep stale actions around
+	_disconnect_inspected_unit_event()
 	current_unit = null
 	_preview_upgrade_type = Towers.Type.VOID
 	inspector_title.text = ""
@@ -136,6 +131,7 @@ func _render_live_stats() -> void: #for standard stat displays
 				text = display_info.label + " " + text
 
 			var label := InteractiveRichTextLabel.new()
+			label.use_parent_material = true
 			label.bbcode_enabled = true
 			label.fit_content = true
 			label.set_parsed_text(text)
@@ -199,6 +195,7 @@ func _render_preview_stats() -> void:
 
 		#create richtextlabel
 		var rtl := InteractiveRichTextLabel.new()
+		rtl.use_parent_material = true
 		rtl.theme_type_variation = "rt_s20_descriptive"
 		rtl.bbcode_enabled = true
 		rtl.set_parsed_text(bbcode)
@@ -306,6 +303,16 @@ func _on_inspected_tower_replaced(_old_tower: Tower, new_tower: Tower) -> void:
 	print("Inspector: replaced!")
 	_on_inspector_contents_tower_update(new_tower)
 
+func _on_inspected_unit_replaced(event: GameEvent) -> void: ##moves the inspector to the replacement emitted by the currently inspected tower
+	var data: UnitReplacedData = event.data as UnitReplacedData
+	if not is_instance_valid(data) or data.old_unit != current_unit:
+		return
+	_on_inspected_tower_replaced(current_unit as Tower, data.new_unit as Tower)
+
+func _disconnect_inspected_unit_event() -> void: ##keeps only the currently inspected unit subscribed to replacement events
+	if is_instance_valid(current_unit):
+		current_unit.unsubscribe_event(GameEvent.EventType.REPLACED, _on_inspected_unit_replaced)
+
 enum DisplayStatModifier {
 	RECIPROCAL,
 	CORE_FLUX,
@@ -365,9 +372,11 @@ func _update_status_display(unit: Unit) -> void:
 
 func _create_status_widget(icon: Texture2D, title: String, desc: String, stacks: float, is_negative_state: bool = false) -> void:
 	var wrapper = Control.new()
+	wrapper.use_parent_material = true
 	wrapper.custom_minimum_size = Vector2(64, 64) #standard icon size
 
 	var tex = TextureRect.new()
+	tex.use_parent_material = true
 	tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	tex.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -388,6 +397,7 @@ func _create_status_widget(icon: Texture2D, title: String, desc: String, stacks:
 	#stack count label
 	if stacks > 1:
 		var lbl = Label.new()
+		lbl.use_parent_material = true
 		lbl.text = str(int(stacks))
 		#position at bottom-right
 		lbl.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)

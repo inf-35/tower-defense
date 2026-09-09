@@ -66,6 +66,7 @@ func _wrap_panel(panel: Control, hidden_offset: Vector2, key: StringName) -> Pan
 	var original_index: int = panel.get_index()
 
 	var anchor: Control = Control.new()
+	anchor.use_parent_material = true
 	anchor.name = "%s_anchor" % key
 	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_copy_layout(panel, anchor)
@@ -73,6 +74,7 @@ func _wrap_panel(panel: Control, hidden_offset: Vector2, key: StringName) -> Pan
 	parent_control.move_child(anchor, original_index)
 
 	var wrapper := PanelMotionWrapper.new()
+	wrapper.use_parent_material = true
 	wrapper.name = "%s_wrapper" % key
 	wrapper.anchor_node = anchor
 	wrapper.hidden_offset = hidden_offset

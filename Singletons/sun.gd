@@ -7,7 +7,7 @@ signal sun_changed
 var global_offset: Vector2 = Vector2(20, 28)
 
 #the color of the shadow (e.g., black for day, teal for winter)
-var shadow_color: Color = Color(0.165, 0.22, 0.33, 0.4)
+var shadow_color: Color = Color(0.15, 0.183, 0.25, 0.631)
 
 func update_sun(direction: Vector2, strength: float, color: Color) -> void:
 	global_offset = direction.normalized() * strength

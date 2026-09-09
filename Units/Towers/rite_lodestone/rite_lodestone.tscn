@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://d4a2ggvyv3e7b"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="2_distributor"]
-[ext_resource type="Script" path="res://Units/Towers/rite_lodestone/lodestone_rite_effect.gd" id="3_lodestone_effect"]
+[ext_resource type="Script" uid="uid://bi8drbvrorvg6" path="res://Units/Towers/rite_lodestone/lodestone_rite_effect.gd" id="3_lodestone_effect"]
 [ext_resource type="Texture2D" uid="uid://bhw12bw4eotj4" path="res://Assets/rite_iron.png" id="4_rite_icon"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_movement"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_movement_data"]
@@ -13,7 +13,9 @@
 
 [sub_resource type="Resource" id="Resource_lodestone"]
 script = ExtResource("3_lodestone_effect")
-schedule = 2
+split_count = 4
+damage_multiplier = 0.5
+split_delay_cooldown_fraction = 0.02
 icon = ExtResource("4_rite_icon")
 show_as_status_icon = true
 
@@ -21,7 +23,7 @@ show_as_status_icon = true
 script = ExtResource("8_health_data")
 max_health = 20.0
 
-[node name="Rite of Lodestone" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Rite of Lodestone" type="Node2D" unique_id=488068280 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_tower")
 type = 77
@@ -31,26 +33,26 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 
-[node name="EffectDistributorBehavior" type="Node" parent="."]
+[node name="EffectDistributorBehavior" type="Node" parent="." unique_id=53348043]
 script = ExtResource("2_distributor")
 buff_effect = SubResource("Resource_lodestone")
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1707320115]
 script = ExtResource("5_movement")
 movement_data = ExtResource("6_movement_data")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1619154210]
 script = ExtResource("7_health")
 health_data = SubResource("Resource_health")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1749824496]
 modulate = Color(0.78, 0.88, 1, 1)
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("4_rite_icon")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=927733263]
 script = ExtResource("10_shadow")
 height_multiplier = 0.5
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1001178399]
 script = ExtResource("9_modifiers")

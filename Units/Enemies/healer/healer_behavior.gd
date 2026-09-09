@@ -47,6 +47,9 @@ func _setup_ally_detection() -> void:
 	_heal_area.collision_mask = Hitbox.get_mask(unit.hostile)
 	_heal_area.monitorable = false
 	_heal_area.monitoring = true
+	
+	for area in _heal_area.get_overlapping_areas(): #record all ialready existing intersections (includes this unit also)
+		_on_ally_entered(area)
 
 	_heal_area.area_entered.connect(_on_ally_entered)
 	_heal_area.area_exited.connect(_on_ally_exited)

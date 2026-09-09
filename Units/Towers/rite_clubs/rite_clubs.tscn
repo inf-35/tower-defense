@@ -16,8 +16,8 @@
 
 [sub_resource type="Resource" id="Resource_oas6b"]
 script = ExtResource("4_0p114")
-attacks_required = 4
-minimum_trigger_damage = 3.0
+minimum_trigger_damage = 1.0
+duration = 1.0
 schedule = 1
 icon = ExtResource("5_0pnf6")
 metadata/_custom_type_script = "uid://duw85e4c21moh"

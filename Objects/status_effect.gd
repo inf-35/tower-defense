@@ -7,7 +7,7 @@ var cooldown: float = 1.0 #negative = permanent
 var source_id: int #TODO: actually make this work
 #runtime variables
 var timer: Clock.GameTimer #a direct reference to the timer node that controls this status's lifecycle
-@warning_ignore("unused_private_class_variable") var _modifier: Modifier #the modifier underlying this status effect
+@warning_ignore("unused_private_class_variable") var _modifiers: Array[Modifier] = [] #the modifiers underlying this status effect
 
 func _init(_status: Attributes.Status, _stack: float, _cooldown: float, _source_id: int) -> void:
 	type = _status
@@ -42,5 +42,5 @@ func cleanup() -> void:
 func can_stack() -> bool:
 	return Attributes.status_effects[type].can_stack
 
-func attribute() -> Attributes.id:
-	return Attributes.status_effects[type].attribute
+func attribute() -> Attributes.id: ##returns the first authored modified attribute for legacy inspector-style callers
+	return Attributes.status_effects[type].primary_attribute()

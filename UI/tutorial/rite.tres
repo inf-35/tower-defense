@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_1")
-success_text = "{RITE_LABEL|label=Rites} modify nearby towers. You can pick them back up into the tower bar by [excavating] them in the inspector below.
+success_text = "{RITE_LABEL|label=Rites} modify nearby towers. Once learned, a rite stays available and can be built for 5 gold. You can learn existing rites by [excavating] them in the inspector below.
 [Q to continue.]"
 panel_anchor = 5
 highlight = false

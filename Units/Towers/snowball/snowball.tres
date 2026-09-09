@@ -14,7 +14,7 @@ cost = 8.0
 element = 1
 tags = Array[int]([1])
 tower_name = "Snowball"
-tower_description = "Faces one direction and fires a piercing snowball that damages and {FROST|label=Freezes} all enemies in a line. The projectile stops only at max range or when hitting a structure."
+tower_description = "Fires piercing snowballs in all four cardinal directions at once, damaging and {FROST|label=Freezing} all enemies in each line. Projectiles stop only at max range or when hitting a structure."
 icon = ExtResource("1_5y808")
 preview = ExtResource("1_5y808")
 tower_scene = ExtResource("4_eo045")

@@ -16,12 +16,12 @@
 [sub_resource type="Resource" id="Resource_1p4ur"]
 script = ExtResource("5_lcwwx")
 attribute = 6
-multiplicative = 1.8
+multiplicative = 2.5
 
 [sub_resource type="Resource" id="Resource_f00g0"]
 script = ExtResource("5_lcwwx")
 attribute = 8
-multiplicative = 1.5
+multiplicative = 1000.0
 
 [sub_resource type="Resource" id="Resource_fbrjq"]
 script = ExtResource("9_x4fyd")

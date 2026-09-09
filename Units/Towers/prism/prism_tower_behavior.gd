@@ -2,10 +2,16 @@ extends Behavior
 class_name PrismBehavior
 
 const PRISM_LASER_SCENE: PackedScene = preload("res://Units/Towers/prism/prism_laser.tscn")
+const PREVIEW_LINE_PREFIX: String = "prism_line_"
+const PREVIEW_BLOCKER_PREFIX: String = "prism_blocker_"
+const PREVIEW_TARGET_PREFIX: String = "prism_target_"
 
 var _owned_lasers: Dictionary[Tower, Node2D] = {}
 var _all_connected_prisms: Array[Tower] = []
 var _is_attached: bool = false
+
+func draw_visuals(canvas: RangeIndicator) -> void: ##beam influence tiles describe prism coverage without the misleading generic range circle
+	_draw_allowed_terrain_visuals(canvas, unit as Tower)
 
 func start() -> void:
 	attach()
@@ -215,30 +221,32 @@ func _is_valid_active_prism(tower: Tower) -> bool:
 func _exit_tree() -> void:
 	detach(false)
 
-func draw_visuals(canvas: RangeIndicator) -> void:
-	var tower = unit as Tower
-	if not is_instance_valid(tower): return
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes each prism beam candidate as visual-only line geometry with explicit blocker accents
+	var tower: Tower = unit as Tower
+	if not is_instance_valid(tower):
+		return []
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		return []
 
-	var island = Run.references.island
-	if not is_instance_valid(island): return
-
-	var start_pos = Island.cell_to_position(tower.tower_position)
-	var dirs = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-
-	for d in dirs:
-		var current_cell = tower.tower_position + d
+	var influences: Array[TowerInfluence] = []
+	var start_pos: Vector2 = Island.cell_to_position(tower.tower_position)
+	var directions: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	for direction_index: int in directions.size():
+		var direction: Vector2i = directions[direction_index]
+		var current_cell: Vector2i = tower.tower_position + direction
 		var distance_tiles: int = 1
-		var max_scan_distance = 50 #safeguard
+		var max_scan_distance: int = 50
 
 		var hit_tower: Tower = null
 		var impact_cell: Vector2i = tower.tower_position
-
-		#cast ray
+		var line_cells: Array[Vector2i] = []
 		while distance_tiles <= max_scan_distance:
 			if not island.terrain_base_grid.has(current_cell):
-				break #hit edge of the map
+				break
 
-			var check_tower = island.get_tower_on_tile(current_cell)
+			line_cells.append(current_cell)
+			var check_tower: Tower = island.get_tower_on_tile(current_cell)
 			if is_instance_valid(check_tower) and check_tower != tower:
 				if check_tower.blocks_line_of_sight_at_cell(current_cell):
 					hit_tower = check_tower
@@ -246,22 +254,51 @@ func draw_visuals(canvas: RangeIndicator) -> void:
 					break
 
 			impact_cell = current_cell
-			current_cell += d
+			current_cell += direction
 			distance_tiles += 1
 
-		var end_pos = Island.cell_to_position(impact_cell)
-
-		#evaluate what we hit
-		if is_instance_valid(hit_tower) and hit_tower.type == tower.type:
-			#successful link to another prism
-			canvas.preview_line(start_pos, end_pos, canvas.highlight_color, 2.0)
-			canvas.draw_cell(impact_cell, canvas.highlight_color)
-		else:
-			#missed, or hit a blocking tower that isn't a prism
-			var fade_color = canvas.highlight_color
-			fade_color.a *= 0.3
-			canvas.preview_line(start_pos, end_pos, fade_color, 2.0)
-
-			#optional: if it hit a wall/non-prism, you could highlight the blockage in red
-			if is_instance_valid(hit_tower):
-				canvas.draw_cell(impact_cell, Color(1.0, 0.2, 0.2, 0.4))
+		if line_cells.is_empty():
+			continue
+		var linked_prism: bool = is_instance_valid(hit_tower) and hit_tower.type == tower.type
+		if is_instance_valid(hit_tower) and not line_cells.is_empty():
+			line_cells.pop_back()
+		var line_kind: TowerInfluence.Kind = TowerInfluence.Kind.ATTACK if linked_prism else TowerInfluence.Kind.LINK
+		var line_visual_role: TowerInfluence.VisualRole = TowerInfluence.VisualRole.ATTACK if linked_prism else TowerInfluence.VisualRole.HIGHLIGHT
+		influences.append(TowerInfluence.for_line(
+			StringName(PREVIEW_LINE_PREFIX + str(direction_index)),
+			line_kind,
+			line_cells,
+			start_pos,
+			Island.cell_to_position(impact_cell),
+			[],
+			null,
+			[],
+			false,
+			TowerInfluence.Scope.WORLD,
+			line_visual_role,
+			1.0 if linked_prism else 0.3,
+			2.0
+		))
+		if linked_prism:
+			influences.append(TowerInfluence.for_cells(
+				StringName(PREVIEW_TARGET_PREFIX + str(direction_index)),
+				TowerInfluence.Kind.OUTPUT,
+				[impact_cell],
+				null,
+				[],
+				false,
+				TowerInfluence.Scope.WORLD,
+				TowerInfluence.VisualRole.HIGHLIGHT
+			))
+		elif is_instance_valid(hit_tower):
+			influences.append(TowerInfluence.for_cells(
+				StringName(PREVIEW_BLOCKER_PREFIX + str(direction_index)),
+				TowerInfluence.Kind.NEGATIVE,
+				[impact_cell],
+				null,
+				[],
+				false,
+				TowerInfluence.Scope.WORLD,
+				TowerInfluence.VisualRole.NEGATIVE
+			))
+	return influences

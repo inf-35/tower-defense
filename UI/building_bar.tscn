@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_rich"]
 
 [node name="building_bar" type="Control" unique_id=596139308 node_paths=PackedStringArray("towers_bar", "trade_button", "trade_button_label", "tower_slot_label")]
+use_parent_material = true
 clip_contents = true
 custom_minimum_size = Vector2(200, 600)
 layout_mode = 3
@@ -24,6 +25,7 @@ trade_button_label = NodePath("HBoxContainer/trade/label")
 tower_slot_label = NodePath("HBoxContainer/TowerSlotsPanel/MarginContainer/slot_label")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=230116015]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,6 +36,7 @@ grow_vertical = 2
 theme_type_variation = &"vbox_10"
 
 [node name="trade" type="Button" parent="HBoxContainer" unique_id=674207593]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -43,6 +46,7 @@ script = ExtResource("4_tkmsn")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
 [node name="label" type="RichTextLabel" parent="HBoxContainer/trade" unique_id=1430566132]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -60,18 +64,22 @@ script = ExtResource("5_rich")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="Panel" type="PanelContainer" parent="HBoxContainer" unique_id=1614997093]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel" unique_id=1947949510]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/MarginContainer" unique_id=1484872741]
+use_parent_material = true
 layout_mode = 2
 
 [node name="towers_bar" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer" unique_id=769491345]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -79,10 +87,12 @@ theme_type_variation = &"vbox_5"
 theme_override_constants/separation = 12
 
 [node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" unique_id=132609132 instance=ExtResource("3_uep1a")]
+use_parent_material = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
 [node name="TowerSlotsPanel" type="PanelContainer" parent="HBoxContainer" unique_id=1509594030]
+use_parent_material = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -90,10 +100,12 @@ mouse_filter = 2
 theme_type_variation = &"simple_panel"
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/TowerSlotsPanel" unique_id=373565510]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginSuperminor"
 
 [node name="slot_label" type="RichTextLabel" parent="HBoxContainer/TowerSlotsPanel/MarginContainer" unique_id=1980623880]
+use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"rt_s20"

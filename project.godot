@@ -15,10 +15,9 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="tower_defense"
-config/version="0.0.2d"
+config/version="0.0.3d"
 run/main_scene="uid://mhb8xv30283p"
 config/features=PackedStringArray("4.6", "Mobile")
-run/max_fps=240
 config/icon="res://Assets/icon.svg"
 
 [audio]
@@ -53,7 +52,7 @@ WindowSettings="*res://Singletons/window_settings.gd"
 Pause="*res://Singletons/pause.gd"
 SaveLoad="*res://Singletons/save_load.gd"
 Analytics="*res://Singletons/analytics.tscn"
-McpBridge="*res://mcp_bridge.gd"
+GlobalContrast="*res://Content/CommonVisuals/global_contrast.tscn"
 
 [display]
 
@@ -76,6 +75,11 @@ theme/custom_font="uid://b1g536c04mk3e"
 
 [input]
 
+toggle_ui={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":72,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 rotate_preview={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":82,"key_label":0,"unicode":114,"location":0,"echo":false,"script":null)

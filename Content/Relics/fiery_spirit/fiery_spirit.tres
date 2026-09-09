@@ -9,7 +9,7 @@ script = ExtResource("2_hyisy")
 target_filter = 2
 required_element = 2
 attribute = 6
-multiplicative = 1.2
+multiplicative = 1.3
 metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [sub_resource type="Resource" id="Resource_hyisy"]
@@ -17,7 +17,7 @@ script = ExtResource("2_hyisy")
 target_filter = 2
 required_element = 2
 attribute = 8
-multiplicative = 0.833
+multiplicative = 0.769
 metadata/_custom_type_script = "uid://cyc5vw8sicomn"
 
 [resource]
@@ -25,6 +25,6 @@ script = ExtResource("2_qbejg")
 type = 5
 modifier_prototypes = Array[ExtResource("2_hyisy")]([SubResource("Resource_qbejg"), SubResource("Resource_hyisy")])
 title = "Fiery Spirit"
-description = "All flame towers ({T_FIREWALL}, {T_SUNBEAM}) gain +20% {UNIT_DAMAGE} and +20% {UNIT_HITRATE}."
+description = "All flame towers ({T_FIREWALL}, {T_SUNBEAM}) gain +30% {UNIT_DAMAGE} and +30% {UNIT_HITRATE}."
 icon = ExtResource("1_qbejg")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

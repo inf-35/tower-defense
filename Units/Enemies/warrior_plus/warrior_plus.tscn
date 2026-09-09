@@ -20,7 +20,7 @@
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("4")
-max_speed = 20.0
+max_speed = 16.0
 acceleration = 200.0
 turn_speed = 100.0
 
@@ -35,7 +35,7 @@ size = Vector2(70, 85)
 [sub_resource type="Resource" id="4"]
 script = ExtResource("14")
 range = 8.0
-cooldown = 1.5
+cooldown = 1.875
 damage = 3.0
 
 [node name="WarriorPlus" type="Node2D" unique_id=734259489 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
@@ -68,7 +68,7 @@ health_data = ExtResource("6")
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1946843787]
 modulate = Color(0.92, 0.66, 0.66, 1)
 material = SubResource("2")
-scale = Vector2(0.12972224, 0.12972224)
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("8")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=391845664]

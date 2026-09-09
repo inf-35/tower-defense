@@ -1,5 +1,45 @@
 extends Node
 #terrain_service.gd (autoload singleton)
+
+var _build_reservations_by_owner: Dictionary[int, Array] = {}
+var _build_reservation_counts: Dictionary[Vector2i, int] = {}
+var _build_reservation_reasons: Dictionary[Vector2i, String] = {}
+
+func reserve_build_cells(owner: Object, cells: Array[Vector2i], reason: String = "Location Blocked") -> void: ##marks temporary non-tower blockers that should reject player construction
+	if not is_instance_valid(owner):
+		return
+
+	release_build_reservations(owner)
+	var owner_id: int = owner.get_instance_id()
+	_build_reservations_by_owner[owner_id] = cells.duplicate()
+	for cell: Vector2i in cells:
+		_build_reservation_counts[cell] = int(_build_reservation_counts.get(cell, 0)) + 1
+		_build_reservation_reasons[cell] = reason
+
+func release_build_reservations(owner: Object) -> void: ##removes all temporary build blockers owned by one runtime object
+	if not is_instance_valid(owner):
+		return
+
+	var owner_id: int = owner.get_instance_id()
+	if not _build_reservations_by_owner.has(owner_id):
+		return
+
+	var cells: Array = _build_reservations_by_owner[owner_id]
+	for cell: Vector2i in cells:
+		var next_count: int = int(_build_reservation_counts.get(cell, 0)) - 1
+		if next_count <= 0:
+			_build_reservation_counts.erase(cell)
+			_build_reservation_reasons.erase(cell)
+		else:
+			_build_reservation_counts[cell] = next_count
+	_build_reservations_by_owner.erase(owner_id)
+
+func is_build_reserved(cell: Vector2i) -> bool: ##returns whether a temporary blocker currently reserves this cell
+	return int(_build_reservation_counts.get(cell, 0)) > 0
+
+func get_build_reservation_reason(cell: Vector2i) -> String: ##returns the first player-facing reason for a temporary build blocker
+	return _build_reservation_reasons.get(cell, "Location Blocked")
+
 #applies a block of new terrain data to the island
 func expand_island(island: Island, block: Dictionary[Vector2i, Terrain.CellData]) -> void:
 	var terrain_changes: Dictionary = {}
@@ -69,6 +109,8 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 			if island.tower_grid.has(cell):
 				if not (is_instance_valid(exclude_tower) and island.tower_grid[cell] == exclude_tower):
 					return false #cannot build on an existing tower
+			if is_build_reserved(cell):
+				return false
 
 			var terrain: Terrain.Base = island.terrain_base_grid[cell]
 
@@ -132,6 +174,8 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 
 			if island.tower_grid.has(check_cell):
 				return "Location Blocked"
+			if is_build_reserved(check_cell):
+				return get_build_reservation_reason(check_cell)
 
 			var terrain = island.terrain_base_grid[check_cell]
 

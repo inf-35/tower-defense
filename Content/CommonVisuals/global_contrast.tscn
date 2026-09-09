@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://d2udsrey3181g"]
+
+[ext_resource type="Shader" uid="uid://bqssietxpdeb8" path="res://Shaders/global_contrast.gdshader" id="1_contrast"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_contrast"]
+shader = ExtResource("1_contrast")
+shader_parameter/contrast = 1.0499999765304
+
+[node name="GlobalContrast" type="CanvasLayer" unique_id=1263710356]
+layer = 500
+
+[node name="BackBufferCopy" type="BackBufferCopy" parent="." unique_id=1481010170]
+copy_mode = 2
+
+[node name="Contrast" type="ColorRect" parent="." unique_id=1855098557]
+material = SubResource("ShaderMaterial_contrast")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

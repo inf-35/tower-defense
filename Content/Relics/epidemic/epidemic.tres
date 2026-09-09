@@ -22,7 +22,7 @@ rotation_mode = 1
 script = ExtResource("3_l8gxq")
 delivery_method = 1
 vfx_on_spawn = SubResource("Resource_mphwl")
-projectile_speed = 160.0
+projectile_speed = 75.0
 
 [sub_resource type="Resource" id="Resource_5aaoq"]
 script = ExtResource("1_0b832")

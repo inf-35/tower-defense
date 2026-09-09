@@ -22,6 +22,7 @@ modulate_color = Color(1, 0.9913333, 0.96, 1)
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5rxqw"]
 
 [node name="tower selection" type="Button" unique_id=1827286885 node_paths=PackedStringArray("card_motion", "card_panel", "tower_icon", "tower_label", "tower_meta")]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 116)
 offset_right = 260.0
 offset_bottom = 116.0
@@ -35,6 +36,7 @@ tower_label = NodePath("CardMotion/Card/MarginContainer/HBoxContainer/Text/VBoxC
 tower_meta = NodePath("CardMotion/Card/MarginContainer/HBoxContainer/Text/VBoxContainer/tower_meta")
 
 [node name="CardMotion" type="Control" parent="." unique_id=1928931001 node_paths=PackedStringArray("content")]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,6 +54,7 @@ idle_sway_duration = 6.8
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="Card" type="PanelContainer" parent="CardMotion" unique_id=166595431]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,25 +66,30 @@ theme_type_variation = &"simple_panel"
 theme_override_styles/panel = SubResource("StyleBoxTexture_tower_card_warm")
 
 [node name="MarginContainer" type="MarginContainer" parent="CardMotion/Card" unique_id=1119537347]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CardMotion/Card/MarginContainer" unique_id=1598043627]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"hbox_10"
 
 [node name="IconPanel" type="PanelContainer" parent="CardMotion/Card/MarginContainer/HBoxContainer" unique_id=983186171]
+use_parent_material = true
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_5rxqw")
 
 [node name="MarginContainer" type="MarginContainer" parent="CardMotion/Card/MarginContainer/HBoxContainer/IconPanel" unique_id=1323396888]
+use_parent_material = true
 layout_mode = 2
 
 [node name="Icon" type="TextureRect" parent="CardMotion/Card/MarginContainer/HBoxContainer/IconPanel/MarginContainer" unique_id=1854526877]
+use_parent_material = true
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 texture = ExtResource("1_c6gwr")
@@ -89,12 +97,14 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Text" type="Control" parent="CardMotion/Card/MarginContainer/HBoxContainer" unique_id=1487497303]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CardMotion/Card/MarginContainer/HBoxContainer/Text" unique_id=1990668737]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -105,6 +115,7 @@ mouse_filter = 2
 theme_type_variation = &"vbox_5"
 
 [node name="tower_label" type="RichTextLabel" parent="CardMotion/Card/MarginContainer/HBoxContainer/Text/VBoxContainer" unique_id=46745563]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
@@ -118,6 +129,7 @@ script = ExtResource("4_23p6x")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="tower_meta" type="RichTextLabel" parent="CardMotion/Card/MarginContainer/HBoxContainer/Text/VBoxContainer" unique_id=1053546706]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2

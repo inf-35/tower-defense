@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3_display"]
 [ext_resource type="PackedScene" uid="uid://b4lf1ed2ub45v" path="res://Units/Enemies/cleric/cleric.tscn" id="4_scene"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_hp"]
+[ext_resource type="Resource" uid="uid://irjol15uv6x6" path="res://Content/StatDisplays/armor.tres" id="6_582ae"]
 [ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="6_speed"]
 
 [resource]
@@ -12,7 +13,7 @@ script = ExtResource("1_data")
 title = "Cleric"
 icon = ExtResource("2_icon")
 description = "Cleanses nearby enemies and briefly prevents new status effects."
-stat_displays = Array[ExtResource("3_display")]([ExtResource("5_hp"), ExtResource("6_speed")])
+stat_displays = Array[ExtResource("3_display")]([ExtResource("5_hp"), ExtResource("6_speed"), ExtResource("6_582ae")])
 important = true
 unit_scene = ExtResource("4_scene")
 flux_value = 0.8

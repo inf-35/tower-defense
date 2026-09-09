@@ -19,7 +19,7 @@ element = 4
 is_rite = true
 tower_name = "Rite of Salt"
 rite_short_name = "salt"
-tower_description = "{RITE_LABEL}. [color=#59ff73]up, down[/color] towers gain 80% {UNIT_DAMAGE}; [color=#ff3333]left, right[/color] towers lose 50% {UNIT_HITRATE}."
+tower_description = "{RITE_LABEL}. [color=#59ff73]up, down[/color] towers gain 150% {UNIT_DAMAGE}; [color=#ff3333]left, right[/color] towers lose 100% {UNIT_HITRATE}."
 icon = SubResource("CompressedTexture2D_nnthe")
 preview = ExtResource("1_ux0rt")
 inspector_actions = Array[ExtResource("2_nnthe")]([ExtResource("3_n0i0m")])

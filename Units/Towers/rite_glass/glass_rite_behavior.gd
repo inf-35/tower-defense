@@ -1,6 +1,8 @@
 extends Behavior
 class_name GlassRiteBehavior
 
+const INFLUENCE_KEY: StringName = &"glass_modifiers"
+
 @export var range_tiles: int = 2
 @export var attack_rate_modifier: ModifierDataPrototype
 @export var max_health_modifier: ModifierDataPrototype
@@ -18,6 +20,7 @@ func attach() -> void:
 func detach() -> void:
 	_unsubscribe()
 	_clear_modifiers()
+	clear_tower_influences()
 
 func _exit_tree() -> void:
 	detach()
@@ -77,6 +80,7 @@ func _distance_to_footprint(offset: Vector2i, host_size: Vector2i) -> int:
 
 func _on_topology_updated(report: TowerTopologyService.Report) -> void:
 	_last_report = report
+	sync_tower_influences()
 	var current_towers: Array[Tower] = []
 
 	for tower: Tower in report.unique_towers:
@@ -84,6 +88,29 @@ func _on_topology_updated(report: TowerTopologyService.Report) -> void:
 			current_towers.append(tower)
 
 	_sync_affected_towers(current_towers)
+
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes glass's full potential ring with the modifiers granted at runtime
+	var tower: Tower = unit as Tower
+	if not is_instance_valid(tower):
+		return []
+	var report: TowerTopologyService.Report = _last_report
+	if report == null and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		report = Run.references.island.topology_service.query(tower, _make_query())
+	if report == null:
+		return []
+
+	var modifier_prototypes: Array[ModifierDataPrototype] = []
+	if is_instance_valid(attack_rate_modifier):
+		modifier_prototypes.append(attack_rate_modifier)
+	if is_instance_valid(max_health_modifier):
+		modifier_prototypes.append(max_health_modifier)
+	return [TowerInfluence.for_cells(
+		INFLUENCE_KEY,
+		TowerInfluence.Kind.MODIFIER,
+		_get_report_cells(report),
+		null,
+		modifier_prototypes
+	)]
 
 func _sync_affected_towers(current_towers: Array[Tower]) -> void:
 	for tower: Tower in _affected_towers.keys():
@@ -144,18 +171,3 @@ func _clear_modifiers() -> void:
 		_remove_modifiers(tower)
 
 	_affected_towers.clear()
-
-func draw_visuals(canvas: RangeIndicator) -> void:
-	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower):
-		return
-
-	var report: TowerTopologyService.Report = _last_report
-	if report == null and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
-		report = Run.references.island.topology_service.query(tower, _make_query())
-
-	if report == null:
-		return
-
-	for cell: Vector2i in report.cells.values():
-		canvas.preview_cell(cell, canvas.highlight_color)

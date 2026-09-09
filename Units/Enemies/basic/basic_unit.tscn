@@ -15,6 +15,14 @@
 [ext_resource type="Resource" uid="uid://dxoe0jx4vnskw" path="res://Content/Health/milita.tres" id="13_j01gd"]
 [ext_resource type="Resource" uid="uid://doci7k8uh2yfj" path="res://Units/Enemies/drifter/drifter_attack.tres" id="13_n0rgw"]
 [ext_resource type="Script" uid="uid://ibj2mt03m5av" path="res://UnitComponents/range_indicator.gd" id="15_bqh04"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="16_movement_data"]
+
+[sub_resource type="Resource" id="Resource_enemy_movement"]
+script = ExtResource("16_movement_data")
+max_speed = 12.8
+acceleration = 200.0
+turn_speed = 100.0
+metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
 shader = ExtResource("6_n0rgw")
@@ -47,6 +55,7 @@ metadata/_custom_type_script = "uid://covwti10fyhl4"
 [node name="MovementComponent" type="Node" parent="." unique_id=347488850]
 script = ExtResource("3_phfvd")
 face_towards_movement = false
+movement_data = SubResource("Resource_enemy_movement")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
 [node name="ContactShadow" type="Node2D" parent="." unique_id=2074337395]

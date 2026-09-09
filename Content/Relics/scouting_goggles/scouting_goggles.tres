@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=4 format=3 uid="uid://cxxbumbm8x4no"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://cxxbumbm8x4no"]
 
 [ext_resource type="Texture2D" uid="uid://cgqoe6fa1amf" path="res://Assets/scouting_goggles.png" id="1_bu86w"]
-[ext_resource type="Script" path="res://Content/Relics/scouting_goggles/scouting_goggles_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://bx5re2iytqkwb" path="res://Content/Relics/scouting_goggles/scouting_goggles_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_4kavf"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_relic"]
 
 [sub_resource type="Resource" id="Resource_effect"]
@@ -13,5 +14,5 @@ script = ExtResource("3_relic")
 type = 40
 global_effect = SubResource("Resource_effect")
 title = "Scouting Goggles"
-description = "Tower attacks deal more damage to distant enemies, up to +80% damage at 8 tiles."
+description = "Tower attacks deal more damage to distant enemies beyond 2 tiles, up to +120% damage at 10 tiles."
 icon = ExtResource("1_bu86w")

@@ -3,36 +3,36 @@ class_name PathRenderer
 
 @export var stroke_texture: Texture2D ##the main brush stroke (straight lines)
 @export var corner_texture: Texture2D ##the stamp for 90 degree turns
+@export var obstruction_warning_renderer: ObstructionWarningRenderer ##single-canvas renderer for tower cells crossed by active routes
+@export var path_wash_layer: PathWashLayer ##low-z watercolor surface for ordinary enemy routes
 
-@export var tint_color: Color = Color(1,1,1,0.6)
-@export var stroke_spacing: float = 5.0 ##distance between stamps on straight lines
-@export var stroke_scale: Vector2 = Vector2(0.1, 0.1)
+@export var stroke_scale: Vector2 = Vector2(0.1, 0.1) ##world-space scale applied to straight and corner route stamps
 
-@export var line_color: Color = Color(0.2, 0.15, 0.1, 0.8) #standard path
-@export var raider_color: Color = Color(0.88, 0.45, 0.12, 0.82) #settlement-raiding route
-@export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) #wall-ignoring path
-@export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) #invalid path
+@export var line_color: Color = Color(0.68, 0.52, 0.19, 0.42) ##ink tint for standard direct-to-keep routes
+@export var raider_color: Color = Color(0.88, 0.45, 0.12, 0.82) ##ink tint for settlement-raiding routes
+@export var phasing_color: Color = Color(0.92, 0.0, 0.015, 0.8) ##ink tint for wall-ignoring routes
+@export var blocked_color: Color = Color(1.0, 0.2, 0.2, 0.8) ##ink tint reserved for invalid hypothetical routes
 
 @export var pos_jitter: float = 0.5 ##random offset in pixels
 @export var rot_jitter: float = 5.0 ##random rotation in degrees
 @export var scale_jitter: float = 0.0 ##random scale variation (e.g. 0.1 = +/- 10%)
 
-@export var wave_frequency: float = 0.8
-@export var wave_min_alpha: float = 0.4
-@export var flow_speed: float = 1.0
+@export var wave_frequency: float = 0.8 ##opacity-wave frequency measured across successive route cells
+@export var wave_min_alpha: float = 0.4 ##minimum route-stamp opacity at the trough of the traveling wave
+@export var flow_speed: float = 1.0 ##game-time speed of the opacity wave moving toward the route goal
 var _time_accumulator: float
 
 var _time_from_last_step: float = 0.0
 const _TIMESTEP: float = 0.2
 
 class PathRender:
-	var start_cell: Vector2i
-	var path_cells: Array[Vector2i]
-	var path_cell_set: Dictionary
-	var points: PackedVector2Array
+	var start_cell: Vector2i ##breach where route begins
+	var path_cells: Array[Vector2i] ##ordered navigation cells returned by route planner
+	var path_cell_set: Dictionary[Vector2i, bool] ##path cells but as a lookup table
+	var points: PackedVector2Array ##Array[Vector2], cells converted to worldspace centers
 	var is_phasing: bool
-	var route_mode: int
-	var is_valid: bool
+	var route_mode: int ##direct-to-keep ro raider chain
+	var is_valid: bool ##whether route is found
 
 	func _init() -> void:
 		path_cells = []
@@ -58,14 +58,25 @@ func _ready() -> void:
 	scale = Vector2.ONE
 	if not Run.is_run_ready():
 		await Run.references_ready
+	_configure_environment_style()
 
 	var island: Island = get_parent() as Island
 	assert(island != null, "PathRenderer must be parented under an Island.")
 	island.navigation_grid_updated.connect(_mark_paths_dirty)
+	island.navigation_grid_soft_updated.connect(_mark_paths_dirty)
 	Run.phases.wave_cycle_started.connect(_mark_paths_dirty)
 	SpawnPointService.spawn_points_changed.connect(_mark_paths_dirty)
 	_is_initialised = true
 	_mark_paths_dirty()
+
+func _configure_environment_style() -> void: ##loads ordinary-route ink and watercolor colors from the run's active environment profile
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	if profile == null:
+		return
+
+	line_color = profile.path_indicator_color
+	if is_instance_valid(path_wash_layer):
+		path_wash_layer.configure_environment(profile)
 
 func _process(_d: float) -> void:
 	if not _is_initialised:
@@ -84,6 +95,10 @@ func _process(_d: float) -> void:
 		_rebuild_preview_paths()
 		_preview_dirty = false
 		redrew = true
+
+	if redrew:
+		_refresh_obstruction_warnings()
+		_refresh_path_wash()
 
 	if redrew or _time_from_last_step > _TIMESTEP:
 		queue_redraw()
@@ -108,6 +123,8 @@ func clear_preview() -> void:
 	_preview_blocker_hash = 0
 	_preview_blockers.clear()
 	_preview_path_cache.clear()
+	_refresh_obstruction_warnings()
+	_refresh_path_wash()
 	queue_redraw()
 
 func _mark_paths_dirty(_unused = null) -> void:
@@ -137,6 +154,68 @@ func _store_committed_path(path_render: PathRender) -> void:
 
 func is_path_cell(cell: Vector2i) -> bool: ##returns whether any currently committed enemy route occupies this tile
 	return _path_cell_set.has(cell)
+
+func _refresh_path_wash() -> void: ##publishes only valid non-phasing routes to the low-z watercolor presentation layer
+	if not is_instance_valid(path_wash_layer):
+		return
+
+	var wash_paths: Array[PackedVector2Array] = []
+	var seen_signatures: Dictionary[int, bool] = {}
+	var active_paths: Array[PathRender] = _preview_path_cache if _is_previewing else _path_cache
+	for path_render: PathRender in active_paths:
+		if not path_render.is_valid or path_render.is_phasing or path_render.points.size() < 2:
+			continue
+		var signature: int = hash(path_render.points)
+		if seen_signatures.has(signature):
+			continue
+		seen_signatures[signature] = true
+		wash_paths.append(path_render.points)
+
+	path_wash_layer.set_paths(wash_paths, _get_route_opacity_scale(wash_paths.size()))
+
+func _get_route_opacity_scale(route_count: int) -> float: ##square-root compresses route density so minor branches remain legible beside heavily shared paths
+	return 1.0 / sqrt(maxf(1.0, float(route_count) * 0.5))
+
+func _refresh_obstruction_warnings() -> void: ##classifies route-obstructing cells by whether normal or only wall-ignoring enemies cross them
+	if not is_instance_valid(obstruction_warning_renderer):
+		return
+
+	var primary_warning_cell_set: Dictionary[Vector2i, bool] = {}
+	var intermediate_warning_cell_set: Dictionary[Vector2i, bool] = {}
+	var active_paths: Array[PathRender] = _preview_path_cache if _is_previewing else _path_cache
+	for path_render: PathRender in active_paths:
+		if not path_render.is_valid:
+			continue
+		for cell: Vector2i in path_render.path_cells:
+			if not _is_route_obstruction_cell(cell):
+				continue
+
+			if path_render.is_phasing:
+				intermediate_warning_cell_set[cell] = true
+			else:
+				primary_warning_cell_set[cell] = true
+
+	for cell: Vector2i in primary_warning_cell_set:
+		intermediate_warning_cell_set.erase(cell)
+
+	var primary_warning_cells: Array[Vector2i] = _get_sorted_cells(primary_warning_cell_set)
+	var intermediate_warning_cells: Array[Vector2i] = _get_sorted_cells(intermediate_warning_cell_set)
+	obstruction_warning_renderer.set_warning_cells(primary_warning_cells, intermediate_warning_cells)
+
+func _is_route_obstruction_cell(cell: Vector2i) -> bool: ##tests preview blockers first, then the live tower's navigation-specific blocking rule
+	if _is_previewing and _preview_blockers.has(cell):
+		return true
+
+	var tower: Tower = Run.references.island.get_tower_on_tile(cell)
+	return is_instance_valid(tower) and tower.obstructs_navigation_at_cell(cell)
+
+func _get_sorted_cells(cell_set: Dictionary[Vector2i, bool]) -> Array[Vector2i]: ##stabilizes renderer inputs so unchanged warning sets do not redraw
+	var cells: Array[Vector2i] = []
+	cells.assign(cell_set.keys())
+	cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return a.y < b.y or (a.y == b.y and a.x < b.x)
+	)
+	return cells
 
 func _rebuild_preview_paths() -> void:
 	_preview_path_cache.clear()
@@ -261,7 +340,7 @@ func _draw() -> void:
 			elif data.is_phasing:
 				draw_color = phasing_color
 
-		draw_color.a = draw_color.a / max(1, list_to_draw.size() * 0.5)
+		draw_color.a *= _get_route_opacity_scale(list_to_draw.size())
 		if data.is_phasing and data.route_mode != NavigationComponent.RouteMode.RAIDER_CHAIN:
 			draw_color.a *= 3.0
 		_draw_stamped_path(data.points, draw_color)

@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_move"]
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_move_data"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
-[ext_resource type="Resource" path="res://Units/Enemies/healer_plus/healer_plus_hp.tres" id="6_hp"]
+[ext_resource type="Resource" uid="uid://kgcyyq08r41l" path="res://Units/Enemies/healer_plus/healer_plus_hp.tres" id="6_hp"]
 [ext_resource type="Texture2D" uid="uid://cflil6vcjb1y8" path="res://Assets/healer.png" id="7_icon"]
 [ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
@@ -19,7 +19,7 @@
 
 [sub_resource type="Resource" id="Resource_movement"]
 script = ExtResource("4_move_data")
-max_speed = 18.0
+max_speed = 14.4
 acceleration = 200.0
 turn_speed = 1000.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
@@ -30,7 +30,7 @@ size = Vector2(88, 110)
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("15_attack_data")
 range = 10.0
-cooldown = 2.0
+cooldown = 2.5
 damage = 1.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
@@ -99,7 +99,7 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 script = ExtResource("11_behavior")
 heal_amount = 1.6
 heal_interval = 1.0
-heal_range = 22.0
+heal_range = 30.0
 metadata/_custom_type_script = "uid://dwx63ohv786ew"
 
 [node name="RangeComponent" type="Node" parent="." unique_id=587421665]

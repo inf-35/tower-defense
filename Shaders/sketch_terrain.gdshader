@@ -1,44 +1,39 @@
 shader_type canvas_item;
 render_mode blend_mix;
 
-// --- inputs ---
-uniform sampler2D grid_data_texture : filter_linear; 
+uniform sampler2D grid_data_texture : filter_linear;
+uniform sampler2D distortion_texture : repeat_enable, filter_linear;
 uniform sampler2D noise_texture : repeat_enable, filter_linear;
 
-// --- configuration ---
 uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 0.8);
 uniform vec4 fill_color : source_color = vec4(1.0, 1.0, 1.0, 0.1);
-
-uniform float noise_scale : hint_range(0.1, 10.0) = 2.0;
-uniform float distortion_strength : hint_range(0.0, 0.1) = 0.02;
-
-// determines where the edge is drawn relative to the grid cells
-uniform float cut_threshold : hint_range(0.0, 1.0) = 0.1;
-uniform float outline_thickness : hint_range(0.0, 0.2) = 0.001;
+uniform vec2 region_pixel_offset = vec2(0.0);
+uniform vec2 region_pixel_size = vec2(1.0);
+uniform float distortion_strength : hint_range(0.0, 10.0) = 5.0;
+uniform float distortion_scale : hint_range(0.001, 0.1) = 0.01;
+uniform float distance_field_step : hint_range(0.001, 1.0) = 1.0;
+uniform float outline_width : hint_range(0.005, 1.0) = 0.018;
 
 void fragment() {
-	// 1. domain warping (wobbly lines)
-	vec2 noise_uv = UV * noise_scale;
-	vec2 noise_val = texture(noise_texture, noise_uv).rg;
-	vec2 distorted_uv = UV + (noise_val - 0.5) * distortion_strength;
-	
-	// 2. sample distance field
-	float dist = texture(grid_data_texture, distorted_uv).r;
-	
-	// 3. calculate outline
-	// edge starts at threshold, ends at threshold + thickness
-	float alpha_start = smoothstep(cut_threshold - 0.01, cut_threshold, dist);
-	float alpha_end = smoothstep(cut_threshold + outline_thickness, cut_threshold + outline_thickness + 0.01, dist);
-	
-	// the outline is the difference (the "band" between start and end)
-	float outline_mask = alpha_start - alpha_end;
-	
-	// 4. calculate fill (interior)
-	float fill_mask = alpha_end;
-	
-	// 5. mix
-	vec4 final_color = mix(vec4(0.0), fill_color, fill_mask);
-	final_color = mix(final_color, outline_color, outline_mask);
-	
+	vec2 world_pos = region_pixel_offset + UV * region_pixel_size;
+	vec2 noise_uv = world_pos * distortion_scale;
+	vec2 noise_val = texture(distortion_texture, noise_uv + vec2(0.002) * TIME).rg;
+	vec2 distortion_px = (noise_val - 0.5) * distortion_strength;
+	vec2 distorted_uv = UV + (distortion_px / max(region_pixel_size, vec2(1.0)));
+	float dist_value = texture(grid_data_texture, distorted_uv).r;
+	float edge_distance = dist_value / max(distance_field_step, 0.001);
+	float shape_mask = step(0.001, dist_value);
+
+	// match the terrain coastline's narrow contour and uneven pencil pressure
+	float pencil_grain = mix(0.58, 1.0, texture(noise_texture, world_pos * 0.11 + vec2(0.61, 0.23)).r);
+	float outline_feather = max(fwidth(edge_distance) * 1.35, 0.008);
+	float outline_distance = abs(edge_distance - 0.5);
+	float outline_mask = 1.0 - smoothstep(outline_width, outline_width + outline_feather, outline_distance);
+	float fill_mask = smoothstep(0.5 + outline_width, 0.5 + outline_width + outline_feather, edge_distance) * shape_mask;
+	float outline_alpha = outline_color.a * outline_mask * pencil_grain * shape_mask;
+
+	vec4 final_color = vec4(fill_color.rgb, fill_color.a * fill_mask);
+	final_color.rgb = mix(final_color.rgb, outline_color.rgb, outline_mask);
+	final_color.a = max(final_color.a, outline_alpha);
 	COLOR = final_color;
 }

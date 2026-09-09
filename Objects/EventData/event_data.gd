@@ -18,10 +18,10 @@ func copy_lineage_from(parent_data: EventData) -> void:
 	lineage = parent_data.lineage.duplicate()
 	recursion = parent_data.recursion
 
-func derive_lineage_from(parent_data: EventData, producer: Object) -> bool: ##copies parent lineage, records producer, and clears proc identity until caller assigns the child hit group
+func derive_lineage_from(parent_data: EventData, producer: Object, max_same_producer_count: int = 1) -> bool: ##copies parent lineage, records producer when its authored repeat limit allows, and clears proc identity until caller assigns the child hit group
 	copy_lineage_from(parent_data)
 
-	if lineage.has_producer(producer):
+	if lineage.count_producer(producer) >= maxi(max_same_producer_count, 1):
 		return false
 
 	lineage.push_producer(producer)
@@ -29,16 +29,36 @@ func derive_lineage_from(parent_data: EventData, producer: Object) -> bool: ##co
 	_clear_derived_attack_identity()
 	return true
 
+func get_lineage_producer_count(producer: Object) -> int: ##returns how many times this event has passed through a runtime producer
+	if not is_instance_valid(producer):
+		return 0
+
+	return lineage.count_producer(producer)
+
 func has_lineage_producer(producer: Object) -> bool: ##returns whether this event has already passed through a producer
 	if not is_instance_valid(producer):
 		return false
 
 	return lineage.has_producer(producer)
 
-func mark_lineage_producer(producer: Object) -> bool: ##records a producer on this event without changing its attack identity
+func get_lineage_producer_label_count(label: StringName) -> int: ##returns how many times this event has passed through a producer family
+	return lineage.count_producer_label(label)
+
+func has_lineage_producer_label(label: StringName) -> bool: ##returns whether this event has already passed through a producer family
+	return lineage.has_producer_label(label)
+
+func mark_lineage_producer_label(label: StringName, max_same_producer_count: int = 1) -> bool: ##records a producer family on this event without changing its attack identity when its repeat limit allows
+	if lineage.count_producer_label(label) >= maxi(max_same_producer_count, 1):
+		return false
+
+	lineage.push_producer_label(label)
+	recursion += 1
+	return true
+
+func mark_lineage_producer(producer: Object, max_same_producer_count: int = 1) -> bool: ##records a producer on this event without changing its attack identity when its repeat limit allows
 	if not is_instance_valid(producer):
 		return false
-	if lineage.has_producer(producer):
+	if lineage.count_producer(producer) >= maxi(max_same_producer_count, 1):
 		return false
 
 	lineage.push_producer(producer)

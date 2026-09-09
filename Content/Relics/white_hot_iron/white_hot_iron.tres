@@ -29,8 +29,9 @@ metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [sub_resource type="Resource" id="Resource_fm8su"]
 script = ExtResource("1_nfytc")
-damage_threshold = 4.0
+damage_threshold = 2.0
 spark_count = 5
+stack_transfer_ratio = 1.0
 search_radius = 30.0
 spark_attack_data = SubResource("Resource_f1jib")
 metadata/_custom_type_script = "uid://ch7sc2jwaeksm"
@@ -40,6 +41,6 @@ script = ExtResource("3_32odi")
 type = 21
 global_effect = SubResource("Resource_fm8su")
 title = "White-Hot Iron"
-description = "When a {BURN|label=Burning} enemy takes 4 or more damage at once, release 5 sparks. Sparks deal 1 damage and inflict {BURN} equal to 50% of the original victim's stacks."
+description = "When a {BURN|label=Burning} enemy takes 2 or more damage at once, release 5 sparks. Sparks deal 1 damage and inflict {BURN} equal to the original victim's stacks."
 icon = ExtResource("7_r2t0r")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

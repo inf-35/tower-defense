@@ -9,6 +9,7 @@ class GameTimer:
 	var duration: float
 	var time_elapsed: float = 0.0
 	var is_active: bool = true
+	var paused: bool = false
 
 enum GameSpeed {
 	PAUSE,
@@ -16,9 +17,9 @@ enum GameSpeed {
 	FAST_FORWARD
 }
 
-const PAUSE_SPEED: float = 0.2
+const PAUSE_SPEED: float = 0.1
 const BASE_SPEED: float = 1.0
-const FAST_FORWARD_SPEED: float = 3.0
+const FAST_FORWARD_SPEED: float = 2.0
 
 #--- public api ---
 #this is the variable the ui will control (e.g., 1.0 for normal, 2.0 for double speed)
@@ -56,6 +57,7 @@ func start() -> void:
 	speed_multiplier = BASE_SPEED
 	game_delta = 0.0
 	physics_game_delta = 0.0
+	_clear_timers()
 
 #the main process loop calculates the scaled delta for game logic
 func _process(delta: float) -> void:
@@ -68,20 +70,42 @@ func _process(delta: float) -> void:
 
 	game_delta = delta * speed_multiplier
 
-	#update all active custom timers
+	_advance_timers(game_delta)
+
+func _advance_timers(delta: float) -> void: ##advances custom game-time timers and clears inactive timers from the hot path
 	if _active_timers.is_empty():
 		return
 
-	#iterate backwards so we can safely remove timers as they finish
 	for i: int in range(_active_timers.size() - 1, -1, -1):
 		var timer: GameTimer = _active_timers[i]
-		if not timer.is_active: continue
+		if not timer.is_active:
+			if DebugAssistant.perf_instrumentation_active:
+				DebugAssistant.record_perf_event(&"clock_timers_removed_inactive")
+			_remove_timer_at(i)
+			continue
+		if timer.paused:
+			continue
 
-		timer.time_elapsed += game_delta
-		if timer.time_elapsed >= timer.duration:
-			timer.is_active = false #prevent re-triggering
-			timer.timeout.emit()
-			_active_timers.remove_at(i)
+		timer.time_elapsed += delta
+		if timer.time_elapsed < timer.duration:
+			continue
+
+		timer.is_active = false
+		if DebugAssistant.perf_instrumentation_active:
+			DebugAssistant.record_perf_event(&"clock_timers_expired")
+		_remove_timer_at(i)
+		timer.timeout.emit()
+
+func _remove_timer_at(index: int) -> void: ##removes a timer without shifting the rest of the array on every expired entry
+	var last_index: int = _active_timers.size() - 1
+	if index != last_index:
+		_active_timers[index] = _active_timers[last_index]
+	_active_timers.pop_back()
+
+func _clear_timers() -> void: ##drops timers from the previous run/session when the game clock is restarted
+	for timer: GameTimer in _active_timers:
+		timer.is_active = false
+	_active_timers.clear()
 
 #the physics process loop does the same for physics-based logic
 func _physics_process(delta: float) -> void:
@@ -94,6 +118,8 @@ func create_game_timer(duration: float) -> GameTimer:
 	var timer := GameTimer.new()
 	timer.duration = duration
 	_active_timers.append(timer)
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"clock_timers_created")
 	return timer
 
 func await_game_time(duration: float) -> Signal:

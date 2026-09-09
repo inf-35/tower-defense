@@ -7,6 +7,6 @@
 [resource]
 script = ExtResource("2_w218f")
 range = 8.0
-cooldown = 2.0
+cooldown = 2.5
 damage = 1.5
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

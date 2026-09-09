@@ -7,6 +7,7 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rkect"]
 
 [node name="CursorInfo" type="PanelContainer" node_paths=PackedStringArray("label")]
+use_parent_material = true
 clip_contents = true
 custom_minimum_size = Vector2(280, 0)
 offset_right = 300.0
@@ -20,6 +21,7 @@ script = ExtResource("2_yjbtq")
 label = NodePath("InteractiveRichTextLabel")
 
 [node name="InteractiveRichTextLabel" type="RichTextLabel" parent="."]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s15"
 theme_override_colors/default_color = Color(0.41568628, 0.3764706, 0.29803923, 1)

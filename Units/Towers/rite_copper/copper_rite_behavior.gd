@@ -1,8 +1,16 @@
 extends Behavior
 class_name CopperRiteBehavior
 
-var _connected_towers: Dictionary[Tower, Callable] = {}
-var _pending_statuses: Dictionary[Tower, Dictionary] = {}
+const INFLUENCE_KEY: StringName = &"copper_pair"
+
+@export var buff_duration: float = 3.0 ##game-time duration of each copied-status attack window
+@export var status_feedback_delay: float = 0.1 ##game-time spacing between copied-status feedback popups from one hit
+
+var _connected_towers: Dictionary[Tower, bool] = {}
+var _active_status_windows: Dictionary[int, Array] = {}
+
+class StatusWindow extends RefCounted:
+	var payload: Dictionary[Attributes.Status, Vector2] = {}
 
 func start() -> void:
 	var tower: Tower = unit as Tower
@@ -10,6 +18,7 @@ func start() -> void:
 	attach()
 
 func attach() -> void:
+	sync_tower_influences()
 	_refresh_connections()
 
 func detach() -> void:
@@ -19,10 +28,26 @@ func detach() -> void:
 		_disconnect_tower(tower)
 
 	_connected_towers.clear()
-	_pending_statuses.clear()
+	_active_status_windows.clear()
+	clear_tower_influences()
 
 func _on_adjacency_updated(_adj_map: Dictionary[Vector2i, Tower]) -> void:
+	sync_tower_influences()
 	_refresh_connections()
+
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes copper's two world-vertical status-sharing endpoints
+	var rite_tower: Tower = unit as Tower
+	if not is_instance_valid(rite_tower):
+		return []
+	var cells: Array[Vector2i] = [
+		rite_tower.tower_position + Vector2i.UP,
+		rite_tower.tower_position + Vector2i.DOWN,
+	]
+	return [TowerInfluence.for_cells(
+		INFLUENCE_KEY,
+		TowerInfluence.Kind.LINK,
+		cells
+	)]
 
 func _refresh_connections() -> void:
 	var current_set: Dictionary[Tower, bool] = {}
@@ -34,9 +59,9 @@ func _refresh_connections() -> void:
 		if _connected_towers.has(tower):
 			continue
 
-		var event_handler: Callable = _on_linked_tower_event.bind(tower)
-		tower.on_event.connect(event_handler)
-		_connected_towers[tower] = event_handler
+		tower.subscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_linked_tower_pre_hit)
+		tower.subscribe_event(GameEvent.EventType.HIT_DEALT, _on_linked_tower_hit_dealt)
+		_connected_towers[tower] = true
 		if is_instance_valid(unit.buff_component):
 			unit.buff_component.activate_new_link(tower)
 
@@ -47,33 +72,33 @@ func _refresh_connections() -> void:
 			continue
 		_disconnect_tower(tower)
 		_connected_towers.erase(tower)
-		_pending_statuses.erase(tower)
+		_clear_status_windows_for_tower(tower)
 
-func _on_linked_tower_event(event: GameEvent, source_tower: Tower) -> void:
-	if event.event_type == GameEvent.EventType.PRE_HIT_DEALT:
-		_release_pending_statuses(source_tower, event.data as HitData)
-		return
+func _on_linked_tower_pre_hit(event: GameEvent) -> void: ##adds live copied-status windows to a linked tower's routed primary attack
+	_apply_active_status_windows(event.unit as Tower, event.data as HitData)
 
-	if event.event_type == GameEvent.EventType.HIT_DEALT:
-		_store_statuses_for_counterpart(source_tower, event.data as HitReportData)
+func _on_linked_tower_hit_dealt(event: GameEvent) -> void: ##copies statuses applied by one linked tower into a window on its counterpart
+	_add_status_window_to_counterpart(event.unit as Tower, event.data as HitReportData)
 
-func _release_pending_statuses(source_tower: Tower, hit_data: HitData) -> void:
+func _apply_active_status_windows(source_tower: Tower, hit_data: HitData) -> void: ##merges every live copied-status window into each primary attack from the receiving tower
 	if not is_instance_valid(source_tower) or not is_instance_valid(hit_data):
 		return
 	if not hit_data.primary or hit_data.negate:
 		return
-	if not _pending_statuses.has(source_tower):
+
+	var tower_id: int = source_tower.unit_id
+	if not _active_status_windows.has(tower_id):
 		return
 
-	var pending: Dictionary = _pending_statuses[source_tower]
-	if pending.is_empty():
+	var windows: Array = _active_status_windows[tower_id]
+	if windows.is_empty():
 		return
 
-	_merge_status_payload(hit_data.status_effects, pending)
-	_pending_statuses.erase(source_tower)
+	for window: StatusWindow in windows:
+		_merge_status_payload_max_independent(hit_data.status_effects, window.payload)
 	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
-func _store_statuses_for_counterpart(source_tower: Tower, report: HitReportData) -> void:
+func _add_status_window_to_counterpart(source_tower: Tower, report: HitReportData) -> void: ##stores statuses applied by one linked tower as a timed infusion window on the other linked tower
 	if not is_instance_valid(source_tower) or report == null:
 		return
 	if report.source != source_tower or report.statuses_applied.is_empty():
@@ -83,12 +108,64 @@ func _store_statuses_for_counterpart(source_tower: Tower, report: HitReportData)
 	if not is_instance_valid(counterpart):
 		return
 
-	var pending: Dictionary = _pending_statuses.get(counterpart, {})
-	_merge_status_payload(pending, report.statuses_applied)
-	_pending_statuses[counterpart] = pending
+	var window := StatusWindow.new()
+	_merge_status_payload_max_independent(window.payload, report.statuses_applied)
+	if window.payload.is_empty():
+		return
+
+	var tower_id: int = counterpart.unit_id
+	if not _active_status_windows.has(tower_id):
+		_active_status_windows[tower_id] = []
+	_active_status_windows[tower_id].append(window)
+	_expire_status_window_after_delay(tower_id, window)
+	_show_status_feedback_sequence(counterpart, window.payload)
 	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
-func _merge_status_payload(target_payload: Dictionary, incoming_payload: Dictionary) -> void:
+func _show_status_feedback_sequence(target: Tower, payload: Dictionary[Attributes.Status, Vector2]) -> void: ##plays one yellow copied-status popup per status so multi-status hits read as several grants
+	if not is_instance_valid(target) or payload.is_empty():
+		return
+	if not is_instance_valid(unit.buff_component):
+		return
+
+	var first: bool = true
+	for status: Attributes.Status in Attributes.Status.values():
+		if not payload.has(status):
+			continue
+
+		if not first:
+			await get_tree().create_timer(maxf(status_feedback_delay, 0.1)).timeout
+		first = false
+		if not is_instance_valid(target) or not is_instance_valid(unit.buff_component):
+			return
+
+		unit.buff_component.activate_target(target, "+%s" % _get_status_feedback_name(status))
+
+func _get_status_feedback_name(status: Attributes.Status) -> String: ##formats copied status enum names for compact world feedback
+	return String(Attributes.Status.keys()[status]).to_lower()
+
+func _expire_status_window_after_delay(tower_id: int, window: StatusWindow) -> void: ##removes one copied-status window after the authored game-time duration
+	await Clock.await_game_time(maxf(buff_duration, 0.0))
+	_remove_status_window(tower_id, window)
+
+func _remove_status_window(tower_id: int, window: StatusWindow) -> void: ##removes one tracked window without touching overlapping copied-status windows
+	if not _active_status_windows.has(tower_id):
+		return
+
+	var windows: Array = _active_status_windows[tower_id]
+	windows.erase(window)
+	if not windows.is_empty():
+		_active_status_windows[tower_id] = windows
+		return
+
+	_active_status_windows.erase(tower_id)
+
+func _clear_status_windows_for_tower(tower: Tower) -> void: ##drops copied-status windows when a tower stops being affected by this copper rite
+	if not is_instance_valid(tower):
+		return
+
+	_active_status_windows.erase(tower.unit_id)
+
+func _merge_status_payload_max_independent(target_payload: Dictionary, incoming_payload: Dictionary) -> void:
 	for status: Attributes.Status in incoming_payload:
 		var incoming: Vector2 = incoming_payload[status]
 		if incoming.x <= 0.0:
@@ -129,22 +206,5 @@ func _disconnect_tower(tower: Tower) -> void:
 	if not is_instance_valid(tower) or not _connected_towers.has(tower):
 		return
 
-	var event_handler: Callable = _connected_towers[tower]
-	if tower.on_event.is_connected(event_handler):
-		tower.on_event.disconnect(event_handler)
-
-func draw_visuals(canvas: RangeIndicator) -> void:
-	_draw_global_offset_cell(canvas, Vector2i.UP)
-	_draw_global_offset_cell(canvas, Vector2i.DOWN)
-
-func _draw_global_offset_cell(canvas: RangeIndicator, offset: Vector2i) -> void:
-	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower):
-		return
-
-	var margin: int = 2
-	var cell_size: int = Island.CELL_SIZE - margin
-	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
-	var pos: Vector2 = Island.cell_to_position(tower.tower_position + offset)
-	var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
-	canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)
+	tower.unsubscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_linked_tower_pre_hit)
+	tower.unsubscribe_event(GameEvent.EventType.HIT_DEALT, _on_linked_tower_hit_dealt)

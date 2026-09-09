@@ -12,17 +12,16 @@ signal relic_slots_changed()
 signal tower_placed(tower_type: Towers.Type, tower: Tower) ##fires only after a tower placement request succeeds and the runtime tower exists
 signal rite_excavated(tower: Tower) ##fires after a rite is successfully returned to inventory through excavation
 
-signal on_event(unit: Unit, game_event: GameEvent) ##global event signal bus, collects events from all units
-#and relevant towers
-
 const DEBUG_REMOVE_RELIC_ACTION: StringName = &"debug_remove_relic"
 
 const DEBUG_CAPACITY: bool = false
-const RITE_EXCAVATION_COST: float = 2.0
+const RITE_EXCAVATION_COST: float = 0.0
 const BASE_RELIC_SLOTS: int = 4
 const RELIC_SLOT_FIRST_COST: float = 8.0
 const RELIC_SLOT_COST_SCALE: float = 1.8
 const MAX_ACTIVE_TOWER_TYPES: int = 999
+const DEBUG_GRANT_TEST_CONTENT: bool = false
+const DEBUG_TEST_FLUX: float = 200.0
 
 #inclusion in Player is merited by their clear player-side nature.
 #various player-side states.
@@ -94,6 +93,7 @@ var global_event_service: GlobalEventService
 var trader_service: TraderService
 
 func _ready() -> void:
+	_ensure_global_event_service()
 	#connect to UI player input signals
 	UI.place_tower_requested.connect(_on_place_tower_requested)
 	UI.sell_tower_requested.connect(_on_sell_tower_requested)
@@ -101,12 +101,12 @@ func _ready() -> void:
 	UI.upgrade_tower_requested.connect(_on_upgrade_tower_requested)
 	UI.reward_rerolled.connect(_on_reward_reroll_requested)
 	#couple playerside logic signals with UI output signals
-	flux_changed.connect(UI.update_flux.emit)
-	capacity_changed.connect(UI.update_capacity.emit)
-	hp_changed.connect(UI.update_health.emit)
-	unlocked_towers_changed.connect(UI.update_tower_types.emit)
-	relics_changed.connect(UI.update_relics.emit)
-	relic_slots_changed.connect(UI.update_relics.emit)
+	flux_changed.connect(UI.queue_update_flux)
+	capacity_changed.connect(UI.queue_update_capacity)
+	hp_changed.connect(UI.queue_update_health)
+	unlocked_towers_changed.connect(UI.queue_update_tower_types)
+	relics_changed.connect(UI.queue_update_relics)
+	relic_slots_changed.connect(UI.queue_update_relics)
 	#Run.phases.wave_ended.connect(func(_wave):
 		#Run.player.flux += 6
 	#)
@@ -142,13 +142,9 @@ func start() -> void:
 	tower_capacity = 0.0
 	used_capacity = 0.0
 
-	if global_event_service: global_event_service.free()
 	if ruin_service: ruin_service.free()
 
-	#setup event bus
-	global_event_service = GlobalEventService.new()
-	add_child(global_event_service)
-	global_event_service.initialise_event_bus(on_event)
+	_ensure_global_event_service()
 
 	#create and setup services
 	ruin_service = RuinService.new()
@@ -159,61 +155,94 @@ func start() -> void:
 	add_child(trader_service)
 	trader_service.initialise()
 
-	#
-	#var reward := Reward.new()
-	#reward.type = Reward.Type.ADD_RITE
-	#reward.rite_type = Towers.Type.RITE_F
-	#
-	#RewardService.apply_reward(reward)
+func _ensure_global_event_service() -> void: ##creates the run-owned global router before sibling services attempt to subscribe
+	if is_instance_valid(global_event_service):
+		return
+
+	global_event_service = GlobalEventService.new()
+	global_event_service.name = "GlobalEventService"
+	add_child(global_event_service)
+
+func publish_event(unit: Unit, event: GameEvent) -> void: ##routes one global event through effects and only its concrete subscriber bucket
+	if is_instance_valid(global_event_service):
+		global_event_service.publish(unit, event)
+
+func subscribe_event(event_type: GameEvent.EventType, callback: Callable) -> void: ##registers a global subscriber for one concrete event type
+	_ensure_global_event_service()
+	global_event_service.subscribe(event_type, callback)
+
+func subscribe_events(event_types: Array[GameEvent.EventType], callback: Callable) -> void: ##registers a global subscriber for several concrete event types
+	_ensure_global_event_service()
+	global_event_service.subscribe_many(event_types, callback)
+
+func unsubscribe_event(event_type: GameEvent.EventType, callback: Callable) -> void: ##removes one typed global subscription
+	if is_instance_valid(global_event_service):
+		global_event_service.unsubscribe(event_type, callback)
+
+func unsubscribe_events(event_types: Array[GameEvent.EventType], callback: Callable) -> void: ##removes several typed global subscriptions
+	if is_instance_valid(global_event_service):
+		global_event_service.unsubscribe_many(event_types, callback)
+
+func is_subscribed_to_event(event_type: GameEvent.EventType, callback: Callable) -> bool: ##reports whether one typed global subscription is active
+	return is_instance_valid(global_event_service) and global_event_service.is_subscribed(event_type, callback)
 
 
 func begin_new_game() -> void:
 	#initial state setup
 	self.unlocked_towers = {
-		Towers.Type.CANNON:true,
+		Towers.Type.TURRET: true,
 		Towers.Type.PALISADE: true,
-		Towers.Type.SPIKES: true,
 		Towers.Type.FARM: true,
-		Towers.Type.POISON: true,
-		Towers.Type.RESONATOR: true,
+		Towers.Type.GENERATOR: true,
 	}
-	
-	var reward := Reward.new()
-	reward.type = Reward.Type.ADD_RITE
-	reward.rite_type = Towers.Type.RITE_IRON
-	RewardService.apply_reward(reward)
-	reward.rite_type = Towers.Type.RITE_PLAGUES
-	RewardService.apply_reward(reward)
-	reward.rite_type = Towers.Type.RITE_SULPHUR
-	RewardService.apply_reward(reward)
-	reward.rite_type = Towers.Type.RITE_LODESTONE
-	RewardService.apply_reward(reward)
-	reward.rite_type = Towers.Type.RITE_FROST
-	#RewardService.apply_reward(reward)
-	#reward.type = Reward.Type.ADD_RELIC
-	#reward.relic = Relics.EDELWEISS
-	#RewardService.apply_reward(reward)
-	###reward.relic = preload("res://Content/Relics/sapphire_idol/sapphire_idol.tres")
-	###RewardService.apply_reward(reward)
-	###reward.relic = Relics.ALCHEMISTS_STONE
-	###RewardService.apply_reward(reward)
-	#reward.relic = Relics.SPRINKLERHEAD
-	#RewardService.apply_reward(reward)
-	#reward.relic = Relics.EPIDEMIC
-	#RewardService.apply_reward(reward)
-	##reward.relic = Relics.RUPTURED_HEART
-	##RewardService.apply_reward(reward)
 
+	if DEBUG_GRANT_TEST_CONTENT:
+		_grant_initial_test_content()
 
-	flux = 30.0
+	flux = DEBUG_TEST_FLUX if DEBUG_GRANT_TEST_CONTENT else 30.0
 	hp = 20.0
 
 	trader_service.start_game()
 
-	UI.update_flux.emit(flux)
-	UI.update_health.emit(hp)
-	UI.update_relics.emit()
-	UI.update_tower_types.emit(unlocked_towers, rite_inventory)
+	UI.queue_update_flux(flux)
+	UI.queue_update_health(hp)
+	UI.queue_update_relics()
+	UI.queue_update_tower_types(unlocked_towers, rite_inventory)
+
+func _grant_initial_test_content() -> void: ##adds the narrow debug palette for checking current refresh and chain interactions
+	var test_tower_types: Array[Towers.Type] = _get_initial_test_tower_types()
+	for tower_type: Towers.Type in test_tower_types:
+		unlock_tower(tower_type)
+
+	var test_rite_types: Array[Towers.Type] = _get_initial_test_rite_types()
+	for rite_type: Towers.Type in test_rite_types:
+		add_rite(rite_type, 1)
+
+	var test_relics: Array[RelicData] = _get_initial_test_relics()
+	relic_slot_capacity = maxi(relic_slot_capacity, test_relics.size())
+	for relic: RelicData in test_relics:
+		add_relic(relic)
+
+func _get_initial_test_tower_types() -> Array[Towers.Type]: ##returns buildable tower unlocks that support current interaction testing
+	return [
+		Towers.Type.CANNON,
+		Towers.Type.OUTPOST,
+		Towers.Type.RESONATOR,
+	]
+
+func _get_initial_test_rite_types() -> Array[Towers.Type]: ##returns learned rites that exercise current status, chain, refresh, and spatial effect work
+	return [
+		Towers.Type.RITE_BALANCE,
+		Towers.Type.RITE_CURSES,
+		Towers.Type.RITE_DRUMS,
+		Towers.Type.RITE_RAMPAGE,
+	]
+
+func _get_initial_test_relics() -> Array[RelicData]: ##returns reward-accessible relics that should be active in debug test starts
+	return [
+		Relics.SIGNAL_FLAG,
+		Relics.TRANCE,
+	]
 
 #capacity helper functions
 func _debug_capacity(channel: String, delta: float, reason: String = "") -> void:
@@ -313,22 +342,22 @@ func get_tower_limit(type: Towers.Type) -> int:
 	return _tower_limits.get(type, -1)
 
 func add_rite(type: Towers.Type, amount: int) -> bool:
-	var current: int = rite_inventory.get(type, 0)
-	var next_count: int = maxi(current + amount, 0)
-	if current <= 0 and next_count > 0 and not can_add_tower_type(type):
+	if not Towers.is_tower_rite(type):
+		return false
+	if amount <= 0:
+		return unlocked_towers.get(type, false)
+	if unlocked_towers.get(type, false):
+		return true
+	if not can_add_tower_type(type):
 		return false
 
-	rite_inventory[type] = next_count
-	if rite_inventory[type] > 0:
-		unlocked_towers[type] = true
-	else:
-		unlocked_towers.erase(type)
-
+	rite_inventory[type] = 1
+	unlocked_towers[type] = true
 	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 	return true
 
-func get_rite_count(type: Towers.Type) -> int: ##number of rites left
-	return rite_inventory.get(type, 0)
+func get_rite_count(type: Towers.Type) -> int: ##returns 1 once this rite has been permanently learned
+	return 1 if unlocked_towers.get(type, false) else 0
 
 #relic entry point (to add new relics)
 func add_relic(relic: RelicData) -> void:
@@ -453,8 +482,6 @@ func _on_place_tower_requested(tower_type: Towers.Type, cell: Vector2i, facing: 
 		if is_instance_valid(placed_tower):
 			tower_placed.emit(tower_type, placed_tower)
 
-		if Towers.is_tower_rite(tower_type):
-			self.add_rite(tower_type, -1)
 	else:
 		self.flux += attempted_cost
 
@@ -524,7 +551,10 @@ func load_save_data(save_data: Dictionary) -> void:
 	for unlocked_tower_type in save_data.unlocked_towers:
 		unlocked_towers[int(unlocked_tower_type)] = bool(save_data.unlocked_towers[unlocked_tower_type])
 	for unlocked_rite_type in save_data.rite_inventory:
-		rite_inventory[int(unlocked_rite_type)] = int(save_data.rite_inventory[unlocked_rite_type])
+		var rite_type: Towers.Type = int(unlocked_rite_type)
+		if int(save_data.rite_inventory[unlocked_rite_type]) > 0 and Towers.is_tower_rite(rite_type):
+			rite_inventory[rite_type] = 1
+			unlocked_towers[rite_type] = true
 	#readd relics in the sequence in which they were originally added
 	for active_relic: Dictionary in save_data.relics:
 		load_relic(active_relic)
@@ -532,10 +562,10 @@ func load_save_data(save_data: Dictionary) -> void:
 	if save_data.has("trader"):
 		trader_service.load_save_data(save_data.trader)
 
-	UI.update_relics.emit()
-	UI.update_flux.emit(flux)
-	UI.update_health.emit(hp)
-	UI.update_tower_types.emit(unlocked_towers, rite_inventory)
+	UI.queue_update_relics()
+	UI.queue_update_flux(flux)
+	UI.queue_update_health(hp)
+	UI.queue_update_tower_types(unlocked_towers, rite_inventory)
 
 func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
 	var relic: RelicData = load(active_relic.resource_path) as RelicData

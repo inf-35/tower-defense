@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://d7x2wjeiq0yv"]
+
+[ext_resource type="Shader" uid="uid://bf1h86sb34dq0" path="res://Shaders/combat_light_overlay.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/max_light_energy = 0.42
+shader_parameter/light_strength = 0.0
+shader_parameter/surface_light_strength = 1.0
+shader_parameter/surface_tint_strength = 0.7
+shader_parameter/lit_chroma_scale = 1.0
+shader_parameter/additive_bloom_strength = 0.12
+shader_parameter/dark_pixel_response = 0.08
+shader_parameter/light_luminance_power = 0.65

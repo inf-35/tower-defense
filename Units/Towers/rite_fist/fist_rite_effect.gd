@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name FistRiteEffect
 
-@export var multiplier_per_status: float = 2.0 ##base damage multiplier applied once per unique status consumed by one rite stack
+@export var multiplier_per_status: float = 3.0 ##base damage multiplier applied once per unique status consumed by one rite stack
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]

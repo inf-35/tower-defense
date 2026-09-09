@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_move_data"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
 [ext_resource type="Resource" uid="uid://ds0pc6ts17vmp" path="res://Units/Enemies/cleric/cleric_hp.tres" id="6_hp"]
-[ext_resource type="Texture2D" path="res://Assets/cleric.png" id="7_icon"]
+[ext_resource type="Texture2D" uid="uid://d1k2jmcwtn332" path="res://Assets/cleric.png" id="7_icon"]
 [ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
 [ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
@@ -19,7 +19,7 @@
 
 [sub_resource type="Resource" id="Resource_movement"]
 script = ExtResource("4_move_data")
-max_speed = 18.0
+max_speed = 14.4
 acceleration = 200.0
 turn_speed = 1000.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
@@ -30,7 +30,7 @@ size = Vector2(80.000046, 100.00003)
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("15_attack_data")
 range = 10.0
-cooldown = 2.0
+cooldown = 2.5
 damage = 0.5
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
@@ -97,7 +97,7 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 [node name="ClericBehavior" type="Node" parent="." unique_id=85477706]
 script = ExtResource("11_behavior")
 cleanse_duration = 1.0
-heal_interval = 0.5
+heal_interval = 1.5
 heal_range = 25.0
 
 [node name="RangeComponent" type="Node" parent="." unique_id=1580744416]

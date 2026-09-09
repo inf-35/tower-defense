@@ -1,20 +1,23 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cffu3d7waawcp"]
 
-[ext_resource type="Script" path="res://UnitComponents/tower.gd" id="1_wqvmb"]
-[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="2_3tlyq"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="3_ocp3w"]
-[ext_resource type="Script" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="4_e31o4"]
-[ext_resource type="Script" path="res://Units/Towers/rite_balance/balance_rite_effect.gd" id="5_c4gr8"]
-[ext_resource type="Script" path="res://Content/attack_data.gd" id="6_n8msu"]
-[ext_resource type="Script" path="res://Content/vfx_info.gd" id="7_ee5lu"]
-[ext_resource type="Texture2D" path="res://Assets/magic_missile.png" id="8_i5fy8"]
-[ext_resource type="Script" path="res://UnitComponents/movement_component.gd" id="9_taum7"]
-[ext_resource type="Resource" path="res://Content/Movement/immobile_mvmt.tres" id="10_qn8yx"]
-[ext_resource type="Script" path="res://UnitComponents/health_component.gd" id="11_xsfg1"]
-[ext_resource type="Script" path="res://Content/health_data.gd" id="12_h4lng"]
-[ext_resource type="Texture2D" path="res://Assets/rite_balance_icon.png" id="13_6teme"]
-[ext_resource type="Script" path="res://UnitComponents/shadow_component.gd" id="14_gukjm"]
-[ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="15_48cg8"]
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_wqvmb"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_3tlyq"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_ocp3w"]
+[ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="4_e31o4"]
+[ext_resource type="Script" uid="uid://cpdnvdm0h80oq" path="res://Units/Towers/rite_balance/balance_rite_effect.gd" id="5_c4gr8"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="5_o37yk"]
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="6_n8msu"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="7_ee5lu"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="7_qr74s"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="8_0ifh0"]
+[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="8_i5fy8"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="9_taum7"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="10_qn8yx"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="11_xsfg1"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="12_h4lng"]
+[ext_resource type="Texture2D" uid="uid://cgnwoy1v4infy" path="res://Assets/rite_balance_icon.png" id="13_6teme"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_gukjm"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="15_48cg8"]
 
 [sub_resource type="Resource" id="Resource_2s24f"]
 script = ExtResource("7_ee5lu")
@@ -27,21 +30,17 @@ rotation_mode = 1
 script = ExtResource("6_n8msu")
 delivery_method = 1
 vfx_on_spawn = SubResource("Resource_2s24f")
-projectile_speed = 160.0
+projectile_speed = 80.0
 
 [sub_resource type="Resource" id="Resource_sgk0e"]
 script = ExtResource("5_c4gr8")
-schedule = 2
-search_radius = 120.0
 projectile_data = SubResource("Resource_e0edi")
 
 [sub_resource type="Resource" id="Resource_h5l8h"]
 script = ExtResource("12_h4lng")
 max_health = 20.0
-regeneration = null
-regen_percent = null
 
-[node name="RiteBalance" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="RiteBalance" type="Node2D" unique_id=721689322 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_wqvmb")
 type = 67
@@ -52,25 +51,25 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 
-[node name="EffectDistributorBehavior" type="Node" parent="."]
+[node name="EffectDistributorBehavior" type="Node" parent="." unique_id=1197131583]
 script = ExtResource("4_e31o4")
 buff_effect = SubResource("Resource_sgk0e")
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=1033905166]
 script = ExtResource("9_taum7")
 movement_data = ExtResource("10_qn8yx")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1149467131]
 script = ExtResource("11_xsfg1")
 health_data = SubResource("Resource_h5l8h")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1089118282]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("13_6teme")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1387571054]
 script = ExtResource("14_gukjm")
 height_multiplier = 0.5
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=668499031]
 script = ExtResource("15_48cg8")

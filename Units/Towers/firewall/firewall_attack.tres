@@ -37,5 +37,6 @@ cooldown = 0.444444
 damage = 0.15
 status_effects = Array[ExtResource("3_130sl")]([SubResource("Resource_na5my")])
 vfx_on_spawn = SubResource("Resource_e3651")
+fire_sound = &"flame_fire_sound"
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

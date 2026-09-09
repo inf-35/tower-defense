@@ -21,14 +21,14 @@
 
 [sub_resource type="Resource" id="Resource_movement"]
 script = ExtResource("4_move_data")
-max_speed = 16.0
+max_speed = 12.8
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="Resource" id="Resource_health"]
 script = ExtResource("6_health_data")
-max_health = 30.0
+max_health = 24.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
@@ -51,7 +51,7 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("14_attack_data")
-cooldown = 4.0
+cooldown = 5.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [node name="Summoner" type="Node2D" unique_id=743730064 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]

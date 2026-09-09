@@ -1,94 +1,34 @@
-#plant_tower_behavior.gd
 extends DefaultTowerBehavior
 class_name PlantTowerBehavior
 
-@export var additive_damage_per_forest: float = 0.2
+const CONDITION_RANGE_INFLUENCE_KEY: StringName = &"plant_condition_range"
 
-var _forest_modifier: Modifier = null
-var _subscription_id: int = -1
-var _last_report: TowerTopologyService.Report ##adjacency report cache
+@export var highlight_range: int = 3 ##maximum cardinal distance shown for the plant's spatial damage condition
 
-func start() -> void:
-	super.start()
-	attach()
+func draw_visuals(canvas: RangeIndicator) -> void: ##draws the normal attack range while shared introspection owns the plant-condition cells
+	super.draw_visuals(canvas)
 
-func attach() -> void:
-	_subscribe()
-	_refresh_forest_bonus()
-
-func detach() -> void:
-	_unsubscribe()
-	if is_instance_valid(modifiers_component) and _forest_modifier != null:
-		modifiers_component.remove_modifier(_forest_modifier)
-	_forest_modifier = null
-	_last_report = null
-
-func _exit_tree() -> void:
-	_unsubscribe()
-
-func _subscribe() -> void:
-	if _subscription_id != -1:
-		return
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes every cell considered by the plant's intrinsic spatial damage condition
+	if not is_instance_valid(unit) or not unit is Tower:
+		return []
 	if not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
-		return
-	_subscription_id = Run.references.island.topology_service.subscribe(self, unit as Tower, _make_query(), _on_topology_updated, false)
+		return []
 
-func _unsubscribe() -> void:
-	if _subscription_id == -1:
-		return
-	if is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
-		Run.references.island.topology_service.unsubscribe(self, _subscription_id)
-	_subscription_id = -1
-
-func _make_query() -> TowerTopologyService.Query:
-	return TowerTopologyService.Query.new(
+	var query := TowerTopologyService.Query.new(
 		TowerTopologyService.QueryKind.CARDINAL_RING,
 		1,
-		2,
-		TowerTopologyService.AXIS_UP | TowerTopologyService.AXIS_RIGHT | TowerTopologyService.AXIS_DOWN | TowerTopologyService.AXIS_LEFT,
+		highlight_range,
+		TowerTopologyService.ALL_DIRECTIONS,
 		[],
 		TowerTopologyService.AxisSpace.WORLD
 	)
-
-func _refresh_forest_bonus() -> void:
-	if not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
-		return
-	_on_topology_updated(Run.references.island.topology_service.query(unit as Tower, _make_query()))
-
-func _on_topology_updated(report) -> void:
-	_last_report = report
-	if not is_instance_valid(modifiers_component):
-		return
-	var forest_tiles: int = 0
-	for tower: Tower in report.towers_by_local_offset.values():
-		if is_instance_valid(tower) and tower.type == Towers.Type.FOREST:
-			forest_tiles += 1
-	var new_modifier := Modifier.new(Attributes.id.DAMAGE)
-	new_modifier.additive = forest_tiles * additive_damage_per_forest
-	new_modifier.multiplicative = 1.0
-	new_modifier.cooldown = -1.0
-	modifiers_component.replace_modifier(_forest_modifier, new_modifier)
-	_forest_modifier = new_modifier
-
-func get_save_data() -> Dictionary:
-	return {}
-
-func load_save_data(save_data: Dictionary) -> void:
-	if save_data.is_empty():
-		return
-	attach()
-
-func draw_visuals(canvas: RangeIndicator) -> void:
-	super.draw_visuals(canvas)
-	var report = _last_report
-	if report == null and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
-		report = Run.references.island.topology_service.query(unit as Tower, _make_query())
-	if report == null:
-		return
-
-	var margin: int = 2
-	var cell_size := Island.CELL_SIZE - margin
-	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
-	for cell: Vector2i in report.cells.values():
-		var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
-		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)
+	var report: TowerTopologyService.Report = Run.references.island.topology_service.query(unit as Tower, query)
+	return [TowerInfluence.for_cells(
+		CONDITION_RANGE_INFLUENCE_KEY,
+		TowerInfluence.Kind.LINK,
+		_get_report_cells(report),
+		null,
+		[],
+		false,
+		TowerInfluence.Scope.WORLD
+	)]

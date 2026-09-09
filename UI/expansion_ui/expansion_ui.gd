@@ -76,12 +76,14 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 		option_buttons.append(btn)
 
 	_confirmation_button = Button.new()
+	_confirmation_button.use_parent_material = true
 	_confirmation_button.text = "Apply expansion."
 	_confirmation_button.pressed.connect(_on_confirmation_pressed)
 	_confirmation_button.disabled = true
 	_vbox.add_child(_confirmation_button)
 
 	_finish_button = Button.new()
+	_finish_button.use_parent_material = true
 	_finish_button.text = "Finish expansions (exit)."
 	_finish_button.pressed.connect(_on_finish_pressed)
 	_finish_button.disabled = true

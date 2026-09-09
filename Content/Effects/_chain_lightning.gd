@@ -4,6 +4,7 @@ class_name ChainLightningEffect
 @export var max_jumps: int = 3 ##maximum number of secondary targets the arc may chain through after the primary hit
 @export var jump_radius: float = 150.0 ##search radius used to find the next nearest valid target after each jump
 @export var damage_falloff_multiplier: float = 0.66 ##damage retained after each jump; values below one decay the chain
+@export var status_cooldown_falloff_multiplier: float = 0.66 ##timed status duration retained after each jump; permanent statuses are unaffected
 @export var show_jump_feedback: bool = true ##when true, each lightning segment draws a short-lived debug line so the full arc is visible
 @export var jump_feedback_color: Color = Color(1.0, 0.9, 0.2, 0.45) ##debug line tint shared by the root strike and chained jumps
 @export var jump_feedback_width: float = 3.0 ##debug line width used for the lightning overlay
@@ -57,6 +58,7 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 		host.attack_component.attack_data,
 		Attributes.id.DAMAGE
 	)
+	var current_status_cooldown_multiplier: float = 1.0
 
 	for i: int in range(max_jumps):
 		#find a new target near the last one hit
@@ -66,6 +68,7 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 			break
 
 		current_damage *= damage_falloff_multiplier
+		current_status_cooldown_multiplier *= status_cooldown_falloff_multiplier
 
 		_play_jump_feedback(last_hit_target.global_position, next_target.global_position)
 		var attack_context: AttackComponent.AttackLineageContext = host.attack_component.create_derived_attack_context(
@@ -75,7 +78,9 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 			last_hit_target.global_position,
 			true,
 			current_damage,
-			initial_report.get_attack_id()
+			initial_report.get_attack_id(),
+			true,
+			current_status_cooldown_multiplier
 		)
 		if not is_instance_valid(attack_context):
 			break

@@ -2,8 +2,8 @@ extends EffectPrototype
 class_name PassionRiteEffect
 
 @export var required_status: Attributes.Status = Attributes.Status.BURN ##enemy status that converts the damage penalty into burn-stack scaling
-@export var no_status_damage_multiplier: float = 0.75 ##damage multiplier against enemies without the required status
-@export var damage_bonus_per_status_stack: float = 1.0 ##1.0 = +100% damage per target status stack per overlapping rite
+@export var no_status_damage_multiplier: float = 0.5 ##damage multiplier against enemies without the required status
+@export var damage_bonus_per_status_stack: float = 2.0 ##2.0 = +200% damage per target status stack per overlapping rite
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.PRE_HIT_DEALT]

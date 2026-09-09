@@ -4,9 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://c16dkdojpq3vp" path="res://Assets/simple_button.png" id="1_iilnk"]
 [ext_resource type="Texture2D" uid="uid://dsiw2ph42seam" path="res://Assets/simple_panel.png" id="1_oj63r"]
 [ext_resource type="Texture2D" uid="uid://cj82ev32f4f8u" path="res://Assets/panel_fancy.png" id="3_oj63r"]
-[ext_resource type="Texture2D" uid="uid://cagi3f0io1m4o" path="res://Assets/fancy_banner.png" id="4_5xyi0"]
+[ext_resource type="Texture2D" uid="uid://c3kxb6m0vig05" path="res://Assets/banner_right.png" id="4_iilnk"]
+[ext_resource type="Texture2D" uid="uid://cx7uso61r5qbv" path="res://Assets/banner_left.png" id="5_iilnk"]
 [ext_resource type="FontVariation" uid="uid://du0bv3ti1a6il" path="res://Fonts/skranji_italic_variation.tres" id="5_oj63r"]
-[ext_resource type="Texture2D" uid="uid://bfd1eld47i43t" path="res://Assets/fancy_banner_flipped.png" id="5_xew0t"]
 [ext_resource type="Texture2D" uid="uid://bjgdunmp1dvg" path="res://Assets/simple_banner.png" id="6_xew0t"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_iilnk"]
@@ -75,21 +75,21 @@ base_font = ExtResource("1_2iung")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1iw5r"]
 content_margin_left = 30.0
-content_margin_top = 45.0
+content_margin_top = 30.0
 content_margin_right = 30.0
-content_margin_bottom = 110.0
-texture = ExtResource("4_5xyi0")
-texture_margin_left = 50.0
-texture_margin_right = 50.0
+content_margin_bottom = 100.0
+texture = ExtResource("4_iilnk")
+texture_margin_left = 80.0
+texture_margin_right = 80.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_oj63r"]
-content_margin_left = 45.0
-content_margin_top = 40.0
+content_margin_left = 60.0
+content_margin_top = 50.0
 content_margin_right = 40.0
-content_margin_bottom = 90.0
-texture = ExtResource("5_xew0t")
-texture_margin_left = 15.0
-texture_margin_right = 20.0
+content_margin_bottom = 95.0
+texture = ExtResource("5_iilnk")
+texture_margin_left = 60.0
+texture_margin_right = 150.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oj63r"]
 bg_color = Color(0.92, 0.55200005, 0.55200005, 1)

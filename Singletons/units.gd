@@ -24,7 +24,8 @@ enum Type {
 	TROLL_PLUS,
 	WARRIOR_PLUS,
 	CLERIC,
-	HEALER_PLUS
+	HEALER_PLUS,
+	OLIPHANT
 }
 
 var unit_stats: Dictionary[Type, UnitData] = {}
@@ -32,8 +33,13 @@ var unit_prototypes: Dictionary[Type, Unit] = {}
 
 const VERBOSE: bool = false
 const GLOBAL_ENEMY_HP_MULTIPLIER: float = 1.25
+const ENEMY_HP_PER_WAVE_MULTIPLIER: float = 0.01
 const GLOBAL_ENEMY_SPEED_MULTIPLIER: float = 1/1.25
 const GLOBAL_ENEMY_DAMAGE_MULTIPLIER: float = 1.0
+const MIN_ENEMY_PRESENTATION_SCALE: float = 0.8
+const MAX_ENEMY_PRESENTATION_SCALE: float = 0.9
+const SMALL_ENEMY_VISUAL_EXTENT: float = 6.0
+const LARGE_ENEMY_VISUAL_EXTENT: float = 11.6
 
 func start() -> void:
 	unit_stats.clear()
@@ -86,6 +92,18 @@ func get_unit_ignore_walls(unit_type: Type) -> bool: ##reads whether the unit's 
 		return false
 	return prototype.navigation_component.ignore_walls
 
+func get_enemy_presentation_scale(graphics: Sprite2D) -> float: ##maps the authored sprite footprint smoothly from the small-enemy test scale to full-sized large enemies
+	if not is_instance_valid(graphics):
+		return 1.0
+
+	var authored_size: Vector2 = graphics.get_rect().size.abs() * graphics.scale.abs()
+	if is_zero_approx(authored_size.x) or is_zero_approx(authored_size.y):
+		return 1.0
+
+	var visual_extent: float = sqrt(authored_size.x * authored_size.y)
+	var size_class: float = sqrt(smoothstep(SMALL_ENEMY_VISUAL_EXTENT, LARGE_ENEMY_VISUAL_EXTENT, visual_extent))
+	return lerpf(MIN_ENEMY_PRESENTATION_SCALE, MAX_ENEMY_PRESENTATION_SCALE, size_class)
+
 func create_unit(unit_type: Type) -> Unit:
 	var _unit: Unit = get_unit_scene(unit_type).instantiate()
 	_unit.flux_value = get_unit_flux(unit_type)
@@ -98,7 +116,7 @@ func create_unit(unit_type: Type) -> Unit:
 		if not is_instance_valid(_unit.modifiers_component):
 			return
 		if _unit.health_component:
-			var global_hp_mod := Modifier.new(Attributes.id.MAX_HEALTH, GLOBAL_ENEMY_HP_MULTIPLIER, 0.0, -1.0)
+			var global_hp_mod := Modifier.new(Attributes.id.MAX_HEALTH, _get_enemy_hp_multiplier_for_current_wave(), 0.0, -1.0)
 			_unit.modifiers_component.add_permanent_modifier(global_hp_mod)
 			_unit.health_component.health = _unit.get_stat(Attributes.id.MAX_HEALTH)
 		if _unit.movement_component:
@@ -117,20 +135,20 @@ func create_unit(unit_type: Type) -> Unit:
 			if not is_instance_valid(_unit.modifiers_component):
 				return
 			if _unit.health_component:
-				var mod_hp = Modifier.new(Attributes.id.MAX_HEALTH, 0.65, 0.0, -1.0)
+				var mod_hp = Modifier.new(Attributes.id.MAX_HEALTH, 0.8, 0.0, -1.0)
 				_unit.modifiers_component.add_permanent_modifier(mod_hp)
 				#force health to update to the new, lowered maximum
 				_unit.health_component.health = _unit.health_component.health
 			if _unit.movement_component:
-				var mod_spd = Modifier.new(Attributes.id.MAX_SPEED, 0.65, 0.0, -1.0)
-				_unit.modifiers_component.add_permanent_modifier(mod_spd)
-			if _unit.attack_component:
-				var mod_cd = Modifier.new(Attributes.id.COOLDOWN, 1.25, 0.0, -1.0)
-				_unit.modifiers_component.add_permanent_modifier(mod_cd),
-
+				var mod_spd = Modifier.new(Attributes.id.MAX_SPEED, 0.8, 0.0, -1.0)
+				_unit.modifiers_component.add_permanent_modifier(mod_spd),
 			CONNECT_ONE_SHOT
 		)
 	return _unit
+
+func _get_enemy_hp_multiplier_for_current_wave() -> float: ##applies the crude per-wave enemy hp growth on top of the global hp tuning
+	var wave_number: int = Run.phases.current_wave_number if is_instance_valid(Run.phases) else 0
+	return GLOBAL_ENEMY_HP_MULTIPLIER * (1.0 + float(wave_number) * ENEMY_HP_PER_WAVE_MULTIPLIER)
 
 func _load_all_unit_stats() -> void:
 	var base_directory: String = "res://Units/Enemies"

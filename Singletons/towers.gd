@@ -82,6 +82,8 @@ enum Type {
 	RITE_LODESTONE,
 	RITE_SULPHUR,
 	RITE_PLAGUES,
+	HARBOR,
+	RITE_BREAKING,
 }
 
 enum Element {
@@ -110,9 +112,10 @@ var tower_stats: Dictionary[Type, TowerData] = {} #populated at startup
 
 var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created and stored as reference
 
-const TOWER_COST_BASE_SCALING: float = 0.05 ##0.05 = +5% cost per existing tower, 0.0 disables scaling
-const TOWER_COST_SCALING_MULTIPLIER: float = 0.0 ##0.0 -> no scaling, 1.0 -> normal scaling
+const TOWER_COST_BASE_SCALING: float = 0.0 ##default per-copy cost growth; individual tower resources may override this
 const TOWER_COST_INCREMENT: float = 0.05  ##smallest increment to which tower price values will snap to
+const PERMANENT_RITE_COST: float = 5.0
+const PERMANENT_RITE_CAPACITY: float = 0.0
 
 const VERBOSE: bool = false
 const PROTOTYPE_LOAD_CHUNK: int = 4
@@ -154,6 +157,8 @@ func get_tower_icon(tower_type: Type) -> Texture2D:
 	return tower_stats[tower_type].icon
 
 func get_tower_base_cost(tower_type: Type) -> float:
+	if is_tower_rite(tower_type):
+		return PERMANENT_RITE_COST
 	return tower_stats[tower_type].cost
 
 func get_tower_actions(tower_type: Type) -> Array[InspectorAction]:
@@ -174,14 +179,16 @@ func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT t
 		return 0.0
 
 	var base_cost: float = tower_stats[tower_type].cost
-	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
+	if is_tower_rite(tower_type):
+		return PERMANENT_RITE_COST
+	if is_tower_environmental(tower_type):
 		return base_cost
 
 	var current_count: int = 0
 	if is_instance_valid(Run.references.island):
 		current_count = Run.references.island.get_towers_by_type(tower_type).size()
 
-	var final_cost: float = base_cost * pow(1.0 + get_cost_scaling(tower_type) * TOWER_COST_SCALING_MULTIPLIER, current_count)
+	var final_cost: float = base_cost * pow(1.0 + get_cost_scaling(tower_type), current_count)
 
 	return snappedf(final_cost, TOWER_COST_INCREMENT)
 
@@ -190,7 +197,9 @@ func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund val
 		push_warning("Towers: tried to get refund value of non-existing tower-type@")
 		return 0.0
 
-	if is_tower_rite(tower_type) or is_tower_environmental(tower_type):
+	if is_tower_rite(tower_type):
+		return PERMANENT_RITE_COST
+	if is_tower_environmental(tower_type):
 		return tower_stats[tower_type].cost
 
 	var current_count: int = 0
@@ -201,7 +210,7 @@ func get_tower_refund_value(tower_type: Type) -> float: ##returns the refund val
 		return tower_stats[tower_type].cost ##nothing to sell; fallback to base cost
 
 	var base_cost: float = tower_stats[tower_type].cost
-	var refund_value: float = base_cost * pow(1.0 +  get_cost_scaling(tower_type) * TOWER_COST_SCALING_MULTIPLIER, current_count - 1)
+	var refund_value: float = base_cost * pow(1.0 + get_cost_scaling(tower_type), current_count - 1)
 
 	return snappedf(refund_value, TOWER_COST_INCREMENT)
 
@@ -209,6 +218,8 @@ func get_max_level(tower_type : Type) -> int:
 	return tower_stats[tower_type].max_level #TODO: actually implement this
 
 func get_tower_capacity(tower_type : Type) -> float:
+	if is_tower_rite(tower_type):
+		return PERMANENT_RITE_CAPACITY
 	return tower_stats[tower_type].required_capacity
 
 func get_tower_scene(tower_type: Type) -> PackedScene:
@@ -266,7 +277,7 @@ func is_tower_rite(tower_type: Type) -> bool:
 	return tower_stats[tower_type].is_rite
 
 func is_raid_target(tower_type: Type) -> bool: ##returns whether enemies with raider routing should visit and destroy this tower type
-	return tower_type in [Type.GENERATOR, Type.HAMLET]
+	return tower_type in [Type.GENERATOR, Type.HAMLET, Type.HARBOR]
 
 func is_tower_buff_source(tower_type: Type) -> bool:
 	return tower_type in [

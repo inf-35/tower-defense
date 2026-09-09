@@ -42,6 +42,7 @@ var target_direction: Vector2:
 
 var velocity: Vector2
 var speed_control: float = 1.0 #goes from 0 to 1, how fast this unit is deciding to move at
+var paused: bool = false ##temporarily stops movement integration while preserving target/path state
 
 func inject_components(n_graphics: Node2D, modifiers_component = null) -> void:
 	graphics = n_graphics
@@ -52,15 +53,23 @@ func inject_components(n_graphics: Node2D, modifiers_component = null) -> void:
 	_modifiers_component.register_data(movement_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
 
-func _ready() -> void:
+func _ready() -> void: ##initialises movement state and removes immutable movement components from the physics loop
 	_STAGGER_CYCLE = 3
 	_stagger = randi_range(0, _STAGGER_CYCLE)
 	position = position #trigger setter functions, esp. cell
 	cell_position = Island.position_to_cell(position)
 	unit.position = position
 
+	if movement_data == null or not movement_data.mobile:
+		set_physics_process(false)
+
 func _physics_process(_delta: float) -> void:
 	_stagger += 1
+
+	if paused:
+		velocity = Vector2.ZERO
+		return
+
 	_accumulated_delta += Clock.physics_game_delta
 
 	var local_max_speed: float = get_stat(_modifiers_component, movement_data, Attributes.id.MAX_SPEED)

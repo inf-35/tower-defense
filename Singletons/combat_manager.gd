@@ -5,7 +5,13 @@ const _DEFAULT_AOE_FIELD_COLOR: Color = Color(0.58, 0.62, 0.6, 0.26)
 const _DEFAULT_AOE_FIELD_PARTICLES_PER_CELL: float = 3.5
 const _DEFAULT_AOE_FIELD_LIFETIME: float = 0.38
 
+const PSEUDOVERTICAL_RATIO: float = 1.0 ##how many +y units per pseudo "+z units" for pseudoverticality
+const PSEUDOVERTICAL_GRAVITY: float = 200.0 ##how strong gravity is
+
 static var _default_aoe_field_vfx_info: VFXInfo
+
+func _ready() -> void: ##keeps the simulated projectile tick loop asleep until the first projectile is registered
+	set_process(false)
 
 class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
@@ -43,9 +49,13 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 			starting_velocity = delivery_data.initial_velocity
 			delay = delivery_data.projectile_lifetime
 
+		var starting_vertical_velocity: float = 0.0
+		if delivery_data.arcing:
+			starting_vertical_velocity = delay * 0.5 * -PSEUDOVERTICAL_GRAVITY
+
 		hit_data.velocity = starting_velocity
 
-		CombatManager._play_spawn_vfx_set(hit_data, source_position, starting_velocity, delay)
+		CombatManager._play_spawn_vfx_set(hit_data, source_position, starting_velocity, delay, starting_vertical_velocity, delivery_data.arcing)
 		Clock.await_game_time(delay).connect(func():
 			_on_timeout()
 		)
@@ -53,7 +63,6 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 	func _on_timeout() -> void:
 		CombatManager._play_impact_vfx_set(hit_data, intercept_position)
 		CombatManager._play_aoe_field_vfx_set(hit_data, intercept_position, hit_data.radius)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
 		var target: Unit = hit_data.target #NOTE: this might be null
 
 		Targeting.add_damage(hit_data.target, -hit_data.expected_damage) #remove expected damage
@@ -63,16 +72,21 @@ class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate f
 			if (target.position - intercept_position).length_squared() > ERROR_TOLERANCE_SQUARED:
 				return #we missed by over error tolerance
 
+			CombatManager._play_hit_sound_set(hit_data, intercept_position)
 			target.take_hit(hit_data)
 			return
 		#if we reach here, the projectile has some aoe
 		var units: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, intercept_position, target_affiliation)
+		var hit_sound_played: bool = false
 		for unit_hit: Unit in units:
 			if delivery_data.excluded_units.has(unit_hit):
 				continue
 
 			var hit_copy = hit_data.duplicate()
 			hit_copy.target = unit_hit
+			if not hit_sound_played:
+				CombatManager._play_hit_sound_set(hit_copy, intercept_position)
+				hit_sound_played = true
 			unit_hit.take_hit(hit_copy)
 
 class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate for ProjectileSimulated (see resolve_hit)
@@ -112,6 +126,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		_raycast_query.hit_from_inside = true
 
 		CombatManager.simulated_projectiles.append(self)
+		CombatManager.set_process(true)
 
 	func start() -> void:
 		var initial_velocity: Vector2
@@ -133,12 +148,17 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			Vector2.ONE,
 			null,
 			hit_data.projectile_tints,
-			delivery_data.projectile_lifetime
+			delivery_data.projectile_lifetime,
+			0.0,
+			false,
+			true
 		)
-		if hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY:
+		if is_instance_valid(vfx_instance) and hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY:
 			vfx_instance.rotation = initial_velocity.angle()
 
 	func tick(delta: float) -> void:
+		if DebugAssistant.perf_instrumentation_active:
+			DebugAssistant.record_perf_event(&"simulated_projectile_ticks")
 		projectile_age += delta
 
 		if is_instance_valid(hit_data.target): #slightly home towards intended target
@@ -157,12 +177,16 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			_sync_projectile_visual()
 
 			#perform custom raycast
+			if DebugAssistant.perf_instrumentation_active:
+				DebugAssistant.record_perf_event(&"simulated_projectile_collision_checks")
 			var result = _perform_raycast(start_pos, end_pos)
 
 			if result.is_empty(): #move to end
 				projectile_position = end_pos
 				break
 			else:
+				if DebugAssistant.perf_instrumentation_active:
+					DebugAssistant.record_perf_event(&"simulated_projectile_collisions")
 				#hit something!
 				var hit_pos: Vector2 = result.position as Vector2
 				var collider: Hitbox = result.collider as Hitbox
@@ -187,12 +211,12 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			return
 
 		if vfx_instance is VFXInstance:
-			vfx_instance.position = projectile_position
+			VFXManager.sync_projectile_vfx(vfx_instance, projectile_position, projectile_velocity)
 			if hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY and not projectile_velocity.is_zero_approx():
 				vfx_instance.rotation = projectile_velocity.angle()
 			return
 
-		vfx_instance.global_position = projectile_position
+		VFXManager.sync_projectile_vfx(vfx_instance, projectile_position, projectile_velocity)
 		if vfx_instance is Node2D and hit_data.vfx_on_spawn.rotation_mode == VFXInfo.RotationMode.FACE_VELOCITY and not projectile_velocity.is_zero_approx():
 			var node_vfx: Node2D = vfx_instance
 			node_vfx.rotation = projectile_velocity.angle()
@@ -214,7 +238,12 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		query.exclude = _exclude_colliders
 
 		if _DEBUG: CombatManager._visualize_line_for_debug(from, to, 2.0, Color.RED)
-		return space_state.intersect_ray(query)
+		if DebugAssistant.perf_instrumentation_active:
+			DebugAssistant.record_perf_event(&"ray_queries")
+		var result: Dictionary = space_state.intersect_ray(query)
+		if DebugAssistant.perf_instrumentation_active and not result.is_empty():
+			DebugAssistant.record_perf_event(&"ray_query_hits")
+		return result
 
 	#returns true if projectile should be destroyed
 	func _handle_collision(hitbox: Hitbox, impact_pos: Vector2) -> bool:
@@ -277,24 +306,30 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 		if is_zero_approx(hit_data.radius):
 			if delivery_data.excluded_units.has(unit):
 				return
+			CombatManager._play_hit_sound_set(hit_copy, impact_pos)
 			unit.take_hit(hit_copy)
 		else:
 			CombatManager._play_aoe_field_vfx_set(hit_data, impact_pos, hit_data.radius)
 			#trigger aoe at this point
 			var units_in_aoe: Array[Unit] = CombatManager.get_units_in_radius(hit_data.radius, impact_pos, target_affiliation)
+			var hit_sound_played: bool = false
 			for hit_unit: Unit in units_in_aoe:
 				if delivery_data.excluded_units.has(hit_unit):
 					continue
 				var aoe_hit: HitData = hit_data.duplicate() as HitData
 				aoe_hit.target = hit_unit
+				if not hit_sound_played:
+					CombatManager._play_hit_sound_set(aoe_hit, impact_pos)
+					hit_sound_played = true
 				hit_unit.take_hit(aoe_hit)
 
 	func _apply_impact_vfx(pos: Vector2) -> void:
 		CombatManager._play_impact_vfx_set(hit_data, pos)
-		Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), pos)
 
 	func _on_destruct(target: Unit = null) -> void:
 		CombatManager.simulated_projectiles.erase(self)
+		if CombatManager.simulated_projectiles.is_empty():
+			CombatManager.set_process(false)
 
 		_destroy_vfx_instance(vfx_instance)
 
@@ -315,6 +350,8 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				vfx.queue_free()
 
 func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"hits_resolved")
 	var target: Unit = hit_data.target #this will be null if the hit does not have a predestined target
 	var source: Unit = hit_data.source
 	var source_position: Vector2
@@ -327,12 +364,13 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 	#NOTE: this expected damage is for the projectile-in-flight regime
 	#registered damage for the anticpiation regime must be deregistered before this
 	Targeting.add_damage(hit_data.target, hit_data.expected_damage) #adds expected damage to target in targeting coordinator
+	_play_fire_sound_set(hit_data, source_position)
 
 	match delivery_data.delivery_method:
 		DeliveryData.DeliveryMethod.HITSCAN:
 			assert(is_instance_valid(target)) #WARNING: hitscan hits cannot be targetless
 			#TODO: implement visuals
-			Audio.play_sound(ID.Sounds.ENEMY_HIT_SOUND, Audio.get_volume_from_damage(hit_data.damage), intercept_position)
+			_play_hit_sound_set(hit_data, intercept_position)
 			target.take_hit(hit_data)
 			if source:
 				hit_data.velocity = (target.global_position - source.global_position).normalized()
@@ -340,7 +378,7 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 
 		DeliveryData.DeliveryMethod.LINE_AOE:
 			var space_state: PhysicsDirectSpaceState2D = source.get_world_2d().direct_space_state
-			var query_params := PhysicsShapeQueryParameters2D.new()
+			var query_params := common_line_aoe_query_params
 
 			var line_vector = intercept_position - source_position
 			var line_length = line_vector.length()
@@ -348,18 +386,25 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			var line_width = hit_data.radius
 
 			#create a rectangle shape for the line query.
-			var shape := RectangleShape2D.new()
+			var shape := common_line_aoe_shape
 			shape.size = Vector2(line_length, line_width)
 
 			query_params.shape = shape
 			#position the query halfway along the line and rotate it to face the target.
 			query_params.transform = Transform2D(line_vector.angle(), source_position + line_vector / 2.0)
 			query_params.collide_with_areas = true
+			query_params.collide_with_bodies = false
 			query_params.collision_mask = Hitbox.get_mask(target.hostile)
 
-			_visualize_shape_for_debug(shape, query_params.transform, 0.5) #visualize for 0.5 second
+			if _DEBUG:
+				_visualize_shape_for_debug(shape, query_params.transform, 0.5) #visualize for 0.5 second
 
+			if DebugAssistant.perf_instrumentation_active:
+				DebugAssistant.record_perf_event(&"line_aoe_queries")
 			var intersecting_colliders: Array[Dictionary] = space_state.intersect_shape(query_params)
+			if DebugAssistant.perf_instrumentation_active:
+				DebugAssistant.record_perf_event(&"line_aoe_query_results", intersecting_colliders.size())
+			var hit_sound_played: bool = false
 			for collider_data : Dictionary in intersecting_colliders:
 				var hitbox = collider_data.collider as Hitbox
 
@@ -371,6 +416,9 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 				var hit_copy: HitData = hit_data.duplicate()
 				hit_copy.velocity = (unit.global_position - source.position).normalized()
 				hit_copy.target = unit
+				if not hit_sound_played:
+					_play_hit_sound_set(hit_copy, intercept_position)
+					hit_sound_played = true
 				unit.take_hit(hit_copy)
 
 			#clean up the initial damage estimate for the primary target.
@@ -381,13 +429,16 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			if hit_data.source:
 				VFXManager.play_vfx(hit_data.vfx_on_spawn, source_position, Vector2.ZERO, INF, Vector2.ONE * 1.8 * hit_data.radius, hit_data.source)
 			_play_aoe_field_vfx_set(hit_data, source_position, hit_data.radius, delivery_data.cone_angle, aim_direction, true)
+			if DebugAssistant.perf_instrumentation_active:
+				DebugAssistant.record_perf_event(&"cone_aoe_radius_queries")
 			var potential_targets: Array[Unit] = get_units_in_radius(hit_data.radius, source_position, hit_data.target_affiliation)
 			if potential_targets.is_empty():
 				return #no potential targets
 
 			#narrow-phase: filter the units to find those within the cone's angle.
-			
+
 			var cone_half_angle_rad: float = deg_to_rad(delivery_data.cone_angle * 0.5)
+			var hit_sound_played: bool = false
 
 			for unit: Unit in potential_targets:
 				if delivery_data.excluded_units.has(unit):
@@ -403,6 +454,9 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 				var hit_copy: HitData = hit_data.duplicate()
 				hit_copy.velocity = to_target_direction
 				hit_copy.target = unit
+				if not hit_sound_played:
+					_play_hit_sound_set(hit_copy, source_position)
+					hit_sound_played = true
 				unit.take_hit(hit_copy)
 
 			#clean up the initial damage estimate for the primary target.
@@ -416,13 +470,25 @@ func resolve_hit(hit_data: HitData, delivery_data: DeliveryData) -> void:
 			var resolver := ProjectileSimulatedResolver.new(hit_data, delivery_data)
 			resolver.start()
 
-static func _play_spawn_vfx_set(hit_data: HitData, position: Vector2, velocity: Vector2, lifetime: float) -> void:
+static func _play_spawn_vfx_set(hit_data: HitData, position: Vector2, velocity: Vector2, lifetime: float, starting_vertical_velocity: float = 0.0, arcing: bool = false) -> void:
 	if is_instance_valid(hit_data.vfx_on_spawn):
-		VFXManager.play_vfx(hit_data.vfx_on_spawn, position, velocity, lifetime, Vector2.ONE, null, hit_data.projectile_tints, lifetime)
+		VFXManager.play_vfx(hit_data.vfx_on_spawn, position, velocity, lifetime, Vector2.ONE, null, hit_data.projectile_tints, lifetime, starting_vertical_velocity, arcing, true)
 
 static func _play_impact_vfx_set(hit_data: HitData, position: Vector2) -> void:
 	if is_instance_valid(hit_data.vfx_on_impact):
 		VFXManager.play_vfx(hit_data.vfx_on_impact, position)
+
+static func _play_fire_sound_set(hit_data: HitData, position: Vector2) -> void: ##plays an authored one-shot fire sound, leaving attacks silent when no id is set
+	if not is_instance_valid(hit_data) or hit_data.fire_sound == &"":
+		return
+
+	Audio.play_sound(hit_data.fire_sound, 0.0, position)
+
+static func _play_hit_sound_set(hit_data: HitData, position: Vector2) -> void: ##plays an authored enemy-hit sound using the existing damage-to-volume curve
+	if not is_instance_valid(hit_data) or hit_data.hit_sound == &"":
+		return
+
+	Audio.play_sound(hit_data.hit_sound, Audio.get_volume_from_damage(hit_data.damage), position)
 
 static func _play_aoe_field_vfx_set(
 	hit_data: HitData,
@@ -472,7 +538,7 @@ static func _get_default_aoe_field_vfx_info() -> VFXInfo:
 	return _default_aoe_field_vfx_info
 
 var simulated_projectiles: Array[ProjectileSimulatedResolver] = [] #projectileresolvers will automatically add and remove themselves as necessary
-func _process(_delta: float) -> void: #simulate all alive projectiles
+func _process(_delta: float) -> void: ##ticks only currently alive simulated projectiles while at least one exists
 	var delta: float = Clock.game_delta
 	for simulated_projectile: ProjectileSimulatedResolver in simulated_projectiles:
 		simulated_projectile.tick(delta)
@@ -512,18 +578,26 @@ func _visualize_line_for_debug(from: Vector2, to: Vector2, width: float = -1.0, 
 
 #helper functions
 static var common_query_circle_shape := CircleShape2D.new() #using a common circleshape prevents unneccessary object creation
+static var common_query_params := PhysicsShapeQueryParameters2D.new()
+static var common_line_aoe_shape := RectangleShape2D.new()
+static var common_line_aoe_query_params := PhysicsShapeQueryParameters2D.new()
 static func get_units_in_radius(radius: float, origin: Vector2, affiliation: bool, exclude_units: Array[Unit] = []) -> Array[Unit]:
 	var circle_shape := common_query_circle_shape
 	var space_state := Run.references.island.get_world_2d().direct_space_state
-	var query_params := PhysicsShapeQueryParameters2D.new()
+	var query_params := common_query_params
 
 	circle_shape.radius = radius
 	query_params.shape = circle_shape
 	query_params.collide_with_areas = true
+	query_params.collide_with_bodies = false
 	query_params.transform = Transform2D(0, origin)
 	query_params.collision_mask = Hitbox.get_mask(affiliation)
 
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"radius_queries")
 	var hitboxes_in_aoe = space_state.intersect_shape(query_params, 2000)
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"radius_query_results", hitboxes_in_aoe.size())
 	if _DEBUG: CombatManager._visualize_shape_for_debug(query_params.shape, query_params.transform, 0.5)
 
 	var output_array: Array[Unit]
@@ -553,9 +627,13 @@ static func get_unit_along_ray(from: Vector2, to: Vector2, affiliation: bool, ex
 
 	if _DEBUG: CombatManager._visualize_line_for_debug(from, to, 2.0, Color.RED)
 
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"ray_queries")
 	var result: Dictionary = space_state.intersect_ray(common_raycast_query_params)
 	if result.is_empty():
 		return null
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"ray_query_hits")
 
 	var hitbox: Hitbox = result.collider as Hitbox
 	if not is_instance_valid(hitbox):

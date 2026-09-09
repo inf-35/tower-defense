@@ -27,15 +27,17 @@ var _current_radius: float = 0.0
 var _progress: float = 0.0 ##0.0 to 1.0, tracks animation completion for gradient sampling
 var _tween: Tween
 
-func _ready() -> void:
+func _ready() -> void: ##starts idle until an authored pulse explicitly plays or autostart requests one
+	set_process(false)
 	reset()
 	if autostart:
 		start()
 
-func start() -> void:
+func start() -> void: ##plays one radius/color pulse and enables redraw processing only for the active animation window
 	if is_instance_valid(_tween):
 		_tween.kill()
 
+	set_process(true)
 	_tween = create_tween()
 	_tween.set_parallel(true)
 
@@ -49,19 +51,21 @@ func start() -> void:
 
 	_tween.chain().tween_callback(_on_finish)
 
-func reset() -> void:
+func reset() -> void: ##returns the pulse to its starting radius without leaving an idle process callback active
 	if is_instance_valid(_tween):
 		_tween.kill()
 
+	set_process(false)
 	_current_radius = start_radius
 	_progress = 0.0
 	queue_redraw()
 
-func _on_finish() -> void:
+func _on_finish() -> void: ##retires processing after the active pulse completes
+	set_process(false)
 	if destroy_on_finish:
 		queue_free()
 
-func _process(_delta: float) -> void:
+func _process(_delta: float) -> void: ##requests redraws only while the tween is advancing the pulse state
 	#only ask the rendering server to redraw if we are actively animating
 	if is_instance_valid(_tween) and _tween.is_running():
 		queue_redraw()

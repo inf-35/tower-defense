@@ -58,3 +58,10 @@ func _has_tracked_tower(state: GlobalDistributorState, tower: Tower) -> bool: ##
 	for stale_ref: WeakRef in stale_refs:
 		state.tower_refs.erase(stale_ref)
 	return false
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##delegates pure candidate evaluation to the local effect this global distributor grants
+	if not is_instance_valid(candidate) or not is_instance_valid(effect_to_grant):
+		return []
+	if tower_type_filter != Towers.Type.VOID and candidate.type != tower_type_filter:
+		return []
+	return effect_to_grant.get_tower_influences(candidate)

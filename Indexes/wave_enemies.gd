@@ -8,7 +8,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 8],
 	],
 	3: [
-		[Units.Type.BUFF, 4],
+		[Units.Type.BUFF, 3],
 		[Units.Type.BASIC, 2],
 	],
 	4: [
@@ -17,11 +17,11 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	5: [
 		[Units.Type.FLESHBLOB, 2],
-		[Units.Type.BASIC, 8],
+		[Units.Type.BASIC, 6],
 	],
 	6: [
 		[Units.Type.HEALER, 1],
-		[Units.Type.BUFF, 6],
+		[Units.Type.BUFF, 4],
 		[Units.Type.BASIC, 8],
 	],
 	7: [
@@ -31,16 +31,16 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 	],
 	8: [
 		[Units.Type.TROLL, 1],
-		[Units.Type.WARRIOR, 8],
+		[Units.Type.WARRIOR, 6],
 	],
 	9: [
-		[Units.Type.SPRINTER, 12],
+		[Units.Type.SPRINTER, 10],
 		[Units.Type.FLESHBLOB, 4],
 	],
 	10: [
 		[Units.Type.CLERIC, 1],
 		[Units.Type.DRIFTER, 8],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 6],
 	],
 	11: [
 		[Units.Type.SUMMONER, 2],
@@ -55,50 +55,48 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.CLERIC, 1],
 	],
 	13: [
-		[Units.Type.SUMMONER, 2],
-		[Units.Type.CLERIC, 1],
-		[Units.Type.SPRINTER, 20],
+		[Units.Type.HULK, 2],
 	],
 	14: [
 		[Units.Type.FLESHBLOB, 6],
 		[Units.Type.HEALER, 1],
-		[Units.Type.SPRINTER, 19],
+		[Units.Type.SPRINTER, 12],
 	],
 	15: [
 		[Units.Type.TROLL, 2],
 		[Units.Type.HEALER, 2],
 		[Units.Type.CLERIC, 1],
-		[Units.Type.WARRIOR, 15],
+		[Units.Type.WARRIOR, 18],
 	],
 	16: [
 		[Units.Type.HULK, 1],
-		[Units.Type.WARRIOR_PLUS, 12],
+		[Units.Type.WARRIOR_PLUS, 8],
 		[Units.Type.CLERIC, 1],
-		[Units.Type.SPRINTER, 9],
+		[Units.Type.SPRINTER, 8],
 	],
 	17: [
-		[Units.Type.SPRINTER_PLUS, 16],
+		[Units.Type.SPRINTER_PLUS, 18],
 		[Units.Type.CLERIC, 2],
-		[Units.Type.WARRIOR, 10],
+		[Units.Type.WARRIOR, 12],
 	],
 	18: [
 		[Units.Type.SUMMONER, 4],
 		[Units.Type.HEALER_PLUS, 1],
 		[Units.Type.CLERIC, 1],
-		[Units.Type.FLESHBLOB, 6],
+		[Units.Type.FLESHBLOB, 8],
 	],
 	19: [
 		[Units.Type.GIANT, 2],
 		[Units.Type.HULK, 1],
 		[Units.Type.TROLL, 2],
 		[Units.Type.CLERIC, 2],
-		[Units.Type.WARRIOR_PLUS, 9],
+		[Units.Type.WARRIOR_PLUS, 12],
 	],
 	20: [
 		[Units.Type.WARRIOR_PLUS, 24],
 		[Units.Type.HEALER_PLUS, 2],
 		[Units.Type.CLERIC, 2],
-		[Units.Type.SPRINTER_PLUS, 20],
+		[Units.Type.SPRINTER_PLUS, 14],
 	],
 	21: [
 		[Units.Type.TROLL_PLUS, 1],
@@ -116,8 +114,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.CLERIC, 2],
 	],
 	23: [
+		[Units.Type.TROLL, 1],
 		[Units.Type.GIANT_PLUS, 2],
-		[Units.Type.FLESHBLOB, 8],
+		[Units.Type.FLESHBLOB, 6],
 		[Units.Type.HEALER_PLUS, 3],
 		[Units.Type.CLERIC, 2],
 		[Units.Type.SPRINTER_PLUS, 26],
@@ -130,8 +129,9 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.SUMMONER, 2],
 		[Units.Type.HEALER_PLUS, 3],
 		[Units.Type.CLERIC, 2],
-		[Units.Type.SPRINTER_PLUS, 24],
-		[Units.Type.WARRIOR_PLUS, 30],
+		[Units.Type.SPRINTER_PLUS, 20],
+		[Units.Type.WARRIOR_PLUS, 20],
+		#[Units.Type.BUFF, 400],
 		
 	],
 }

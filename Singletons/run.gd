@@ -15,6 +15,7 @@ const REFERENCES_SCRIPT := preload("res://Singletons/references.gd")
 const PLAYER_SCRIPT := preload("res://Singletons/player.gd")
 const WAVES_SCRIPT := preload("res://Singletons/waves.gd")
 const PHASES_SCRIPT := preload("res://Singletons/phase_manager.gd")
+const BOSS_ENCOUNTER_SERVICE_SCRIPT := preload("res://Singletons/boss_encounter_service.gd")
 const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
 const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
 const TUTORIAL_DIRECTOR_SCRIPT := preload("res://Singletons/tutorial_director.gd")
@@ -35,12 +36,14 @@ var references: References
 var player: Player
 var waves: Waves
 var phases: Phases
+var boss_encounters: Node
 var power_service: PowerService
 var damage_tracker: DamageTrackerService
 var tutorials: TutorialDirector
 
 signal references_ready ##emitted once the current run is fully booted and safe to use
 signal run_ending ##emitted before the current island-owned run state is cleared
+signal environment_changed(game_environment: GameEnvironment) ##emitted whenever the active environment profile changes or is restored from save data
 
 func has_active_run() -> bool:
 	return is_instance_valid(_run_root)
@@ -62,6 +65,7 @@ func begin_run(island: Island) -> void:
 	player = PLAYER_SCRIPT.new()
 	waves = WAVES_SCRIPT.new()
 	phases = PHASES_SCRIPT.new()
+	boss_encounters = BOSS_ENCOUNTER_SERVICE_SCRIPT.new()
 	power_service = POWER_SERVICE_SCRIPT.new()
 	damage_tracker = DAMAGE_TRACKER_SERVICE_SCRIPT.new()
 	tutorials = TUTORIAL_DIRECTOR_SCRIPT.new()
@@ -70,6 +74,7 @@ func begin_run(island: Island) -> void:
 	_run_root.add_child(player)
 	_run_root.add_child(waves)
 	_run_root.add_child(phases)
+	_run_root.add_child(boss_encounters)
 	_run_root.add_child(power_service)
 	_run_root.add_child(damage_tracker)
 	_run_root.add_child(tutorials)
@@ -95,7 +100,7 @@ func end_run() -> void:
 	_is_run_ready = false
 	if has_active_run():
 		run_ending.emit()
-	_clear_run_handles()
+		_clear_run_handles()
 	
 	current_game_scaling = 1.0
 	current_game_environment = pending_game_environment
@@ -107,6 +112,7 @@ func set_pending_game_difficulty(game_difficulty: GameDifficulty) -> void:
 func set_pending_game_environment(game_environment: GameEnvironment) -> void:
 	pending_game_environment = game_environment
 	current_game_environment = game_environment
+	environment_changed.emit(current_game_environment)
 
 func get_environment_profile(game_environment: GameEnvironment = current_game_environment) -> EnvironmentProfile: ##returns the authored environment profile so runtime systems share one source of truth
 	return ENVIRONMENT_DATABASE.environment_profiles.get(int(game_environment), null)
@@ -127,6 +133,7 @@ func load_save_data(data: Dictionary) -> void:
 	current_game_difficulty = int(data.get("current_game_difficulty", pending_game_difficulty))
 	current_game_scaling = float(data.get("current_game_scaling", 1.0))
 	current_game_environment = int(data.get("current_game_environment", pending_game_environment))
+	environment_changed.emit(current_game_environment)
 	if data.has("tutorials") and is_instance_valid(tutorials):
 		tutorials.load_save_data(data["tutorials"])
 
@@ -153,6 +160,7 @@ func _clear_run_handles() -> void:
 	player = null
 	waves = null
 	phases = null
+	boss_encounters = null
 	power_service = null
 	damage_tracker = null
 	tutorials = null

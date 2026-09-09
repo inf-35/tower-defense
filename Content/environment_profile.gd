@@ -9,8 +9,56 @@ extends Resource
 @export var clear_color: Color = Color(0.992, 0.937, 0.847, 1.0) ##main renderer clear color
 @export var ui_canvas_color: Color = Color(0.992, 0.937, 0.847, 1.0) ##base screen tint used behind the island
 @export var paper_background_color: Color = Color(1.0, 0.976, 0.941, 1.0) ##paper tint used by the terrain renderer background
-@export var lake_preview_outline_color: Color = Color(0.109, 0.239, 0.31, 0.192) ##outline tint for hidden-lake previews
 @export var lake_preview_fill_color: Color = Color(0.252, 0.551, 0.68, 0.024) ##fill tint for hidden-lake previews
+@export_range(0.0, 1.0, 0.01) var lake_preview_outline_strength: float = 0.34 ##relative terrain-contour opacity used around hidden water
+@export_group("Paper")
+@export_range(0.0, 1.0, 0.001) var paper_crumple_strength: float = 0.306 ##opacity of the broad photographed paper folds
+@export_range(0.0, 0.25, 0.001) var paper_grain_strength: float = 0.0 ##opacity of the fine static parchment grain
+@export_range(0.25, 4.0, 0.05) var paper_grain_scale: float = 1.0 ##screen density of the fine parchment grain
+@export var paper_grain_color: Color = Color(0.34, 0.3, 0.23, 1.0) ##ink tint used by fine paper fibres and specks
+@export_range(0.0, 0.25, 0.001) var paper_brush_strength: float = 0.0 ##opacity of the authored brush and fibre texture stored by the paper layer
+@export_group("Route Paint")
+@export var path_wash_color: Color = Color(0.98, 0.94, 0.82, 0.48) ##watercolor ground tint beneath ordinary enemy routes
+@export var path_indicator_color: Color = Color(0.68, 0.52, 0.19, 0.42) ##ink tint for the animated ordinary-route marks
+@export_group("World Style")
+@export var world_style_enabled: bool = false ##enables the environment's pre-lighting palette and value treatment
+@export_range(0.0, 1.0, 0.01) var world_style_strength: float = 1.0 ##blends continuously between authored pixels and the styled result
+@export var world_tone_input: Vector3 = Vector3(0.58, 0.835, 0.902) ##sampled shadow, midtone, and highlight luminance anchors
+@export var world_tone_output: Vector3 = Vector3(0.562, 0.817, 0.922) ##target luminance for the corresponding input anchors
+@export_range(0.0, 2.0, 0.01) var world_neutral_chroma_scale: float = 0.86 ##reduces ordinary environmental colour while retaining its hue
+@export_range(0.0, 2.0, 0.01) var world_accent_chroma_scale: float = 1.06 ##preserves or slightly lifts deliberately saturated gameplay accents
+@export_range(0.0, 1.0, 0.001) var world_accent_chroma_start: float = 0.112 ##chroma where the shader begins transitioning from neutral treatment
+@export_range(0.0, 1.0, 0.001) var world_accent_chroma_end: float = 0.137 ##chroma where the accent treatment is fully applied
+@export_group("Night Lighting")
+@export var night_ambient_color: Color = Color(0.501, 0.589, 0.91, 1.0) ##canvas-wide combat tint applied before local population-building lights
+@export_range(0.01, 2.0, 0.01) var night_transition_seconds: float = 0.5 ##real-time duration of the day-to-night and night-to-day fades
+@export_color_no_alpha var night_light_color: Color = Color(1.0, 0.63, 0.2, 1.0) ##environment-wide hue applied to every local combat light
+@export_range(0.0, 4.0, 0.01) var night_light_energy_multiplier: float = 1.0 ##environment-wide multiplier applied to each light source before pixel-level accumulation and capping
+@export_range(0.0, 1.0, 0.01) var night_max_light_energy: float = 0.42 ##hard cap on accumulated local light at any one screen pixel
+@export_range(0.0, 2.0, 0.01) var night_surface_light_strength: float = 1.0 ##rate at which local light restores the underlying paper and paint values
+@export_range(0.0, 1.0, 0.01) var night_surface_tint_strength: float = 0.7 ##amount of authored light hue mixed into restored surfaces
+@export_range(0.0, 2.0, 0.01) var night_lit_chroma_scale: float = 1.0 ##luminance-preserving colour recovery applied only inside local lights
+@export_range(0.0, 1.0, 0.01) var night_additive_bloom_strength: float = 0.12 ##small additive halo layered over the surface-aware light response
+@export_range(0.0, 1.0, 0.01) var night_dark_pixel_response: float = 0.08 ##minimum local-light response retained by dark ink pixels
+@export_range(0.1, 4.0, 0.05) var night_luminance_power: float = 0.65 ##shapes how strongly pale surfaces respond relative to dark linework
+@export_range(0.0, 1.0, 0.01) var night_ui_tint_strength: float = 0.22 ##portion of the combat-night hue applied to run ui surfaces
+@export_group("Terrain Paint")
+@export_range(0.0, 1.0, 0.01) var terrain_noise_strength: float = 0.2 ##amount of broad watercolor variation within painted terrain
+@export_range(0.25, 6.0, 0.05) var terrain_noise_scale: float = 1.0 ##spatial frequency of pigment variation inside the painted terrain
+@export_range(0.0, 0.5, 0.01) var terrain_cut_threshold: float = 0.2 ##pure-wash depth measured inward from the island boundary
+@export_range(0.0, 2.0, 0.01) var terrain_edge_softness: float = 1.0 ##distance over which wash transitions into body pigment
+@export_range(0.1, 5.0, 0.01) var terrain_center_falloff: float = 2.0 ##shape of the wash-to-pigment transition
+@export_range(0.0, 1.0, 0.01) var terrain_brush_strength: float = 0.3 ##amount of dry-brush breakup exposing the pale wash
+@export_range(0.0, 1.0, 0.01) var terrain_min_paint_coverage: float = 0.5 ##minimum brush coverage retained in gaps between stamped paint marks
+@export_range(0.0, 1.0, 0.01) var terrain_color_strength: float = 1.0 ##strength of authored terrain body colours over their washes
+@export_range(0.0, 1.0, 0.01) var terrain_transition_softness: float = 0.15 ##softness of boundaries between valid terrain families
+@export_range(0.0, 12.0, 0.1) var terrain_warp_strength: float = 8.0 ##world-space wobble applied to terrain-family ownership
+@export var terrain_coastline_color: Color = Color(0.3, 0.28, 0.22, 1.0) ##ink colour used for the optional outer island contour
+@export_range(0.0, 1.0, 0.01) var terrain_coastline_strength: float = 0.0 ##opacity of the outer island contour
+@export_range(0.01, 1.0, 0.01) var terrain_coastline_width: float = 0.2 ##contour width measured inward in recovered tile-distance units
+@export_range(0.0, 1.0, 0.01) var terrain_waterline_strength: float = 0.0 ##opacity of pencil contours between water and neighboring terrain
+@export_range(0.005, 0.25, 0.005) var terrain_waterline_width: float = 0.03 ##half-width of water contours in terrain-control units
+@export_group("")
 @export var terrain_base_overrides: Dictionary[int, TerrainBaseStat] = {} ##full terrain stat overrides keyed by terrain base id
 @export var placement_count_multipliers: Dictionary[int, float] = {} ##per-feature count scalars keyed by tower type
 @export var forest_texture: Texture2D ##forest canopy art for this environment

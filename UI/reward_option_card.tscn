@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_opmj4"]
 
 [node name="card" type="Control" node_paths=PackedStringArray("_icon_target", "_panel_target", "_real_icon_panel", "_real_description_panel", "icon", "title", "tower_meta", "description")]
+use_parent_material = true
 custom_minimum_size = Vector2(1200, 300)
 layout_mode = 3
 anchors_preset = 0
@@ -26,6 +27,7 @@ description = NodePath("HBoxContainer/panel_target/real_description_panel/Margin
 metadata/_custom_type_script = "uid://d4fw7qteemt5e"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
+use_parent_material = true
 custom_minimum_size = Vector2(600, 150)
 layout_mode = 1
 anchors_preset = 15
@@ -36,6 +38,7 @@ grow_vertical = 2
 theme_type_variation = &"hbox_10"
 
 [node name="icon_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
+use_parent_material = true
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 mouse_filter = 1
@@ -48,6 +51,7 @@ idle_sway_duration = 8.0
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="real_icon_panel" type="PanelContainer" parent="HBoxContainer/icon_target"]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -59,20 +63,24 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/icon_target/real_icon_panel"]
+use_parent_material = true
 layout_mode = 2
 theme = ExtResource("1_7mbds")
 theme_type_variation = &"MarginMajor"
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer"]
+use_parent_material = true
 layout_mode = 2
 
 [node name="icon" type="TextureRect" parent="HBoxContainer/icon_target/real_icon_panel/MarginContainer/AspectRatioContainer"]
+use_parent_material = true
 layout_mode = 2
 texture = ExtResource("4_7mbds")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="panel_target" type="Control" parent="HBoxContainer" node_paths=PackedStringArray("content")]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
@@ -82,6 +90,7 @@ auto_play_entrance = true
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="real_description_panel" type="PanelContainer" parent="HBoxContainer/panel_target"]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -91,11 +100,13 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/panel_target/real_description_panel"]
+use_parent_material = true
 layout_mode = 2
 theme = ExtResource("1_7mbds")
 theme_type_variation = &"MarginMinor"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer"]
+use_parent_material = true
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -103,11 +114,13 @@ size_flags_vertical = 3
 theme_type_variation = &"vbox_5"
 
 [node name="Title" type="HBoxContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer"]
+use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"hbox_5"
 
 [node name="inspector_title" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/Title"]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
@@ -121,6 +134,7 @@ script = ExtResource("5_opmj4")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="TowerMeta" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer"]
+use_parent_material = true
 visible = false
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
@@ -133,10 +147,12 @@ script = ExtResource("5_opmj4")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer"]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="description" type="RichTextLabel" parent="HBoxContainer/panel_target/real_description_panel/MarginContainer/VBoxContainer/ScrollContainer"]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3

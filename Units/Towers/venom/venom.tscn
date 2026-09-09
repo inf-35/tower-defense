@@ -8,9 +8,9 @@
 [ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="4_4f5x7"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_d1bpx"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_0ulka"]
-[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="5_nuq0u"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_cjgjr"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_afdid"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="7_mf2g5"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_g6leu"]
 [ext_resource type="Resource" uid="uid://b14iw05wpe1g5" path="res://Units/Towers/venom/venom_attack.tres" id="9_pnk15"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="10_8y7nu"]
@@ -18,13 +18,21 @@
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_13fi5"]
 [ext_resource type="Texture2D" uid="uid://4smmqg2tegf8" path="res://Assets/ballista_turret_bow.png" id="13_fgqcp"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_jq1xm"]
+[ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="15_effect_base"]
+[ext_resource type="Script" uid="uid://d0eysadgnt3r6" path="res://Units/Towers/venom/venom_damage_poison_effect.gd" id="16_venom_effect"]
+
+[sub_resource type="Resource" id="Resource_venom_damage_poison"]
+script = ExtResource("16_venom_effect")
+base_poison_stacks = 1.0
+damage_per_poison_stack = 1.0
+poison_duration = 1.5
 
 [node name="Venom" type="Node2D" unique_id=940353005 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_h6di7")
 type = 21
 turret = NodePath("Graphics/TurretFrame")
-stat_displays = Array[ExtResource("2_j5yn2")]([ExtResource("3_4f5x7"), ExtResource("3_oygta"), ExtResource("4_4f5x7"), ExtResource("5_nuq0u")])
+stat_displays = Array[ExtResource("2_j5yn2")]([ExtResource("3_4f5x7"), ExtResource("3_oygta"), ExtResource("4_4f5x7"), ExtResource("7_mf2g5")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -33,6 +41,7 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
+intrinsic_effects = Array[ExtResource("15_effect_base")]([SubResource("Resource_venom_damage_poison")])
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="DefaultTowerBehavior" type="Node" parent="." unique_id=437344444]
@@ -60,23 +69,25 @@ muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1341314714]
-modulate = Color(0.55, 1, 0.45, 1)
+modulate = Color(0.8366667, 1, 0.8, 1)
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_8y7nu")
 
 [node name="TurretFrame" type="Node2D" parent="Graphics" unique_id=599746218]
 z_index = 1
+use_parent_material = true
 
 [node name="Base" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=845561567]
-modulate = Color(0.45, 1, 0.4, 1)
+use_parent_material = true
 texture = ExtResource("11_ptbb3")
 
 [node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=2087648781]
+use_parent_material = true
 position = Vector2(0.47718072, 1.6484106)
 scale = Vector2(1.3162339, 0.769)
 
 [node name="Bow" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=1844138296]
-modulate = Color(0.55, 1, 0.45, 1)
+use_parent_material = true
 position = Vector2(28.571423, 0)
 texture = ExtResource("13_fgqcp")
 offset = Vector2(-30, 0)

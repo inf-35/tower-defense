@@ -254,29 +254,40 @@ func _reset_layer_state() -> void: ##initializes the fixed layer storage so all 
 		_layer_active.append(false)
 		_layer_tweens.append(null)
 
-func _apply_shader_overlay(overlay_color: Color, overlay_intensity: float) -> void: ##writes the shared overlay push target into the unit shader while preserving node modulate as the primary sampled base
-	_ensure_unit_effects_material()
-	if not _uses_unit_effects_shader():
+func _apply_shader_overlay(overlay_color: Color, overlay_intensity: float) -> void: ##uses the unit-effects shader only while an overlay tint is visibly active
+	if is_zero_approx(overlay_intensity):
+		_clear_shader_overlay()
 		return
-	var material: ShaderMaterial = _root_graphics.material as ShaderMaterial
+
+	var material: ShaderMaterial = _ensure_unit_effects_material()
+	if not is_instance_valid(material):
+		return
 	material.set_shader_parameter(&"overlay_color", overlay_color)
 	material.set_shader_parameter(&"overlay_intensity", overlay_intensity)
 
-func _ensure_unit_effects_material() -> void: ##ensures each unit graphics root owns a unique effects material so overlay writes stay local without relying on shader instance slots
+func _ensure_unit_effects_material() -> ShaderMaterial: ##returns a local unit-effects material when the overlay path needs one
 	if not is_instance_valid(_root_graphics):
-		return
+		return null
 	if _uses_unit_effects_shader():
 		if not _root_graphics.material.resource_local_to_scene:
 			_root_graphics.material = (_root_graphics.material as ShaderMaterial).duplicate()
 			_root_graphics.material.resource_local_to_scene = true
-		return
+		return _root_graphics.material as ShaderMaterial
 	if _root_graphics.material != null:
-		return
+		return null
 
 	var material := ShaderMaterial.new()
 	material.shader = UNIT_EFFECTS_SHADER
 	material.resource_local_to_scene = true
 	_root_graphics.material = material
+	return material
+
+func _clear_shader_overlay() -> void: ##removes the overlay shader when it would sample identically to the plain sprite draw path
+	if not is_instance_valid(_root_graphics):
+		return
+	if not _uses_unit_effects_shader():
+		return
+	_root_graphics.material = null
 
 func _uses_unit_effects_shader() -> bool: ##returns whether the current root graphics material can receive overlay uniform updates
 	if not (_root_graphics.material is ShaderMaterial):

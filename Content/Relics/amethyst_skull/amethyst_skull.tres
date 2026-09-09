@@ -28,15 +28,15 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 [sub_resource type="Resource" id="Resource_wyw1l"]
 script = ExtResource("2_5tggy")
 delivery_method = 1
-status_effects = Array[ExtResource("3_c17k8")]([SubResource("Resource_dk6pn")])
+armour_ignore = 1.0
 vfx_on_spawn = SubResource("Resource_e3651")
-projectile_speed = 160.0
+projectile_speed = 120.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [sub_resource type="Resource" id="Resource_2oygm"]
 script = ExtResource("6_058vl")
 search_radius = 40.0
-damage_multiplier = 0.15
+damage_multiplier = 0.5
 projectile_data = SubResource("Resource_wyw1l")
 delay = 0.3
 metadata/_custom_type_script = "uid://bp6do8b78pj4k"
@@ -46,6 +46,6 @@ script = ExtResource("3_2oygm")
 type = 19
 global_effect = SubResource("Resource_2oygm")
 title = "Amethyst Skull"
-description = "When {CURSED|label=Cursed} units die, a magical bolt dealing 15% of the dead unit's {UNIT_HP} in damage is fired towards a nearby cursed unit (if there is one)."
+description = "When {CURSED|label=Cursed} units are hit, fire a magical bolt at a nearby cursed unit for 50% of the inflicted damage. This bolt ignores {UNIT_ARMOR}."
 icon = ExtResource("7_5tggy")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

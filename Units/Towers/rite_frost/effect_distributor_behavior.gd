@@ -1,6 +1,8 @@
 extends Behavior
 class_name EffectDistributorBehavior
 
+const INFLUENCE_KEY: StringName = &"distributed_effect"
+
 @export var buff_effect: EffectPrototype ##effect to be distributed to adjacencies
 @export_flags("Up", "Right", "Down", "Left") var active_directions: int = 0b1111 ##bitmask to configure adjacencies
 
@@ -13,6 +15,7 @@ func detach() -> void:
 	for t in _buffed_neighbors:
 		_modify_stack(t, -1)
 	_buffed_neighbors.clear()
+	clear_tower_influences()
 
 func attach() -> void:
 	attached = true
@@ -33,6 +36,7 @@ func start() -> void:
 func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
 	if not attached:
 		return
+	sync_tower_influences()
 
 	var current_neighbors: Array[Tower] = []
 	var host_tower: Tower = unit as Tower
@@ -88,6 +92,19 @@ func _on_exit(_hit_report_data: HitReportData = null) -> void:
 	var tower: Tower = unit as Tower
 	tower.adjacency_updated.disconnect(_on_adjacency_updated)
 	tower.tree_exiting.disconnect(_on_exit)
+	clear_tower_influences()
 
-func draw_visuals(canvas: RangeIndicator) -> void:
-	draw_visuals_adjacent_tiles(canvas)
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes the same facing-relative adjacent cells used by live effect distribution
+	var influences: Array[TowerInfluence] = []
+	var host_tower: Tower = unit as Tower
+	if not is_instance_valid(host_tower):
+		return influences
+	if not is_instance_valid(buff_effect):
+		return influences
+	var cells: Array[Vector2i] = []
+	for cell: Vector2i in host_tower.get_adjacent_cells():
+		var offset: Vector2i = cell - host_tower.tower_position
+		if _is_local_direction_allowed(host_tower.facing, offset):
+			cells.append(cell)
+	influences.append(TowerInfluence.for_cells(INFLUENCE_KEY, TowerInfluence.Kind.EFFECT, cells, buff_effect))
+	return influences

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="2_2xcvw"]
 
 [node name="InspectorActionButton" type="Button" unique_id=461822251]
+use_parent_material = true
 custom_minimum_size = Vector2(240, 80)
 offset_right = 240.0
 offset_bottom = 80.0

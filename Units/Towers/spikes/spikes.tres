@@ -1,16 +1,15 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://babx712yl8e4i"]
 
+[ext_resource type="Texture2D" uid="uid://bmk5d2g712ah" path="res://Assets/spikes_total.png" id="1_520va"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_tower_data"]
 [ext_resource type="PackedScene" uid="uid://nt71fku28nlf" path="res://Units/Towers/spikes/spikes.tscn" id="2_scene"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="3_icon"]
-[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="4_preview"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="5_sell"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="6_action_script"]
 
 [resource]
 script = ExtResource("1_tower_data")
 id = 76
-cost = 7.0
+cost = 5.0
 cost_scaling_override = 0.0
 required_capacity = 0.5
 element = 5
@@ -18,8 +17,8 @@ tags = Array[int]([9])
 navcost = 1
 tower_name = "Spikes"
 tower_description = "A field of spikes. Damages enemies who walk over and inflicts {BLEED}"
-icon = ExtResource("3_icon")
-preview = ExtResource("4_preview")
+icon = ExtResource("1_520va")
+preview = ExtResource("1_520va")
 inspector_actions = Array[ExtResource("6_action_script")]([ExtResource("5_sell")])
 tower_scene = ExtResource("2_scene")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

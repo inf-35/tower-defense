@@ -126,6 +126,12 @@ func add_status(type: Attributes.Status, stack: float, cooldown: float, source_i
 	check_reactions_for_status(type)
 	return true
 
+func set_status_timers_paused(paused: bool) -> void: ##pauses or resumes every active status duration timer owned by this component
+	for status_type: Attributes.Status in _status_effects:
+		var status: StatusEffect = _status_effects[status_type]
+		if is_instance_valid(status.timer):
+			status.timer.paused = paused
+
 func _is_status_blocked_by_cleanse(type: Attributes.Status) -> bool:
 	if type == Attributes.Status.CLEANSE:
 		return false
@@ -136,7 +142,7 @@ func update_status(status: StatusEffect) -> void:
 	#if the status has no stacks left, remove it from tracking
 	if status.stack <= 0.0:
 		status.cleanup() #tell the status to clean up its timer
-		remove_modifier(status._modifier)
+		_replace_status_modifiers(status, [])
 		if _status_effects.has(status.type):
 			_status_effects.erase(status.type)
 
@@ -144,19 +150,27 @@ func update_status(status: StatusEffect) -> void:
 		_recalculate_overlay_color()
 		return
 
-	#create a new modifier that reflects the current state of the status effect
-	var old_modifier: Modifier = status._modifier
-	var new_modifier: Modifier = create_underlying_modifier(status)
-	status._modifier = new_modifier
-	if old_modifier != null:
-		replace_modifier(old_modifier, new_modifier)
-	else:
-		add_modifier(new_modifier)
+	#create new modifiers that reflect the current state of the status effect
+	_replace_status_modifiers(status, create_underlying_modifiers(status))
 
 	var time_left: float = status.timer.duration - status.timer.time_elapsed if is_instance_valid(status.timer) else -1.0
 	status_changed.emit(status.type, status.stack, time_left)
 
 	_recalculate_overlay_color()
+
+func _replace_status_modifiers(status: StatusEffect, replacements: Array[Modifier]) -> void: ##swaps one status's modifier rows and invalidates each affected attribute only after the final state is installed
+	var affected_attributes: Dictionary[Attributes.id, bool] = {}
+	for modifier: Modifier in status._modifiers:
+		_modifiers.erase(modifier)
+		affected_attributes[modifier.attribute] = true
+
+	status._modifiers = replacements
+	for modifier: Modifier in replacements:
+		_modifiers.append(modifier)
+		affected_attributes[modifier.attribute] = true
+
+	for attribute: Attributes.id in affected_attributes:
+		_invalidate_stat(attribute)
 
 #helper function to recalculate the visual overlay of units when under status effects
 func _recalculate_overlay_color() -> void:
@@ -225,27 +239,32 @@ func check_reactions_for_status(updated_status_type: Attributes.Status) -> void:
 				_status_effects[status_to_consume].stack -= reaction.requisites[status_to_consume] * reaction_stack
 				update_status(_status_effects[status_to_consume])
 
-func create_underlying_modifier(status: StatusEffect) -> Modifier:
+func create_underlying_modifiers(status: StatusEffect) -> Array[Modifier]: ##creates one runtime modifier per explicit status attribute row
 	#look up the definition of this status type from our central attributes store.
-	var status_data = Attributes.status_effects[status.type]
-	#calculate the total effect based on the number of stacks.
-	var total_additive = status_data.additive_per_stack * status.stack
-	var total_multiplicative = pow(status_data.multiplicative_per_stack, status.stack)
+	var status_data: Attributes.StatusEffectData = Attributes.status_effects[status.type]
+	var output: Array[Modifier] = []
 
-	#create a new modifier instance. note that we don't handle cooldowns here,
-	#as the status effect's cooldown is managed by the add_status function's timer logic.
-	#the source_id should be carried over if needed, assuming statuseffect has one.
-	var new_mod = Modifier.new(
-		status_data.attribute,
-		total_multiplicative,
-		total_additive,
-		-1.0, #cooldown is permanent, as we handle expiration manually
-		null, #status effects generally don't use override.
-		status.source_id #doesnt actually work rn
-	)
-	new_mod.cooldown = -1.0 #status-modifiers are ALWAYS permanent
-	#they are manually removed when their parent status runs out
-	return new_mod
+	for attribute_data: Attributes.StatusAttributeData in status_data.attributes:
+		#calculate the total effect based on the number of stacks.
+		var total_additive: float = attribute_data.additive_per_stack * status.stack
+		var total_multiplicative: float = pow(attribute_data.multiplicative_per_stack, status.stack)
+
+		#create a new modifier instance. note that we don't handle cooldowns here,
+		#as the status effect's cooldown is managed by the add_status function's timer logic.
+		#the source_id should be carried over if needed, assuming statuseffect has one.
+		var new_modifier := Modifier.new(
+			attribute_data.attribute,
+			total_multiplicative,
+			total_additive,
+			-1.0, #cooldown is permanent, as we handle expiration manually
+			null, #status effects generally don't use override.
+			status.source_id #doesnt actually work rn
+		)
+		new_modifier.cooldown = -1.0 #status-modifiers are always permanent
+		#they are manually removed when their parent status runs out
+		output.append(new_modifier)
+
+	return output
 
 func register_stat(attr: Attributes.id, value: float) -> void: #registers a stat
 	if value == null:

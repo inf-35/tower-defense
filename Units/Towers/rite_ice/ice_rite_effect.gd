@@ -3,7 +3,7 @@ class_name IceRiteEffect
 
 @export var qualifying_status: Attributes.Status = Attributes.Status.FROST ##target status required before brittle can be attached
 @export var brittle_effect: BrittleEffect ##temporary statuslike effect attached to frosted targets hit by the affected tower
-@export var brittle_stacks_per_rite: int = 1 ##brittle stacks applied per overlapping rite copy affecting the tower
+@export var brittle_stacks_per_rite: int = 2 ##brittle stacks applied per overlapping rite copy affecting the tower
 @export var brittle_duration: float = 3.0 ##seconds brittle remains after refresh
 
 func _init() -> void:

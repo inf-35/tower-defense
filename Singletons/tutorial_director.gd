@@ -379,7 +379,7 @@ func _build_shop_intro_steps() -> Array[TutorialStep]: ##opens with a real trade
 	open_step.start_wave_locked = true
 
 	var info_step := TutorialStep.new()
-	info_step.instruction_text = "Buy run upgrades here. It automatically restocks after 2 days, though you may restock it manually.\n[Q to continue.]"
+	info_step.instruction_text = "Buy relics and learn rites here. Learned rites stay available in your tower bar. The trader automatically restocks after 2 days, though you may restock it manually.\n[Q to continue.]"
 	info_step.panel_anchor = TutorialStep.Anchor.CENTRAL_ANCHOR
 	info_step.highlight_target = TutorialStep.Reference.TRADE_MENU
 	info_step.trigger_type = TutorialStep.TriggerType.BEGIN_TRIGGERED

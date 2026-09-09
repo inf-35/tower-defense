@@ -44,7 +44,8 @@ func inject_components(modifiers_component: ModifiersComponent) -> void:
 	shield = health_data.max_shield
 	UI.update_unit_health.emit(unit, max_health, health)
 
-func take_damage(damage: float, breaking: bool = false) -> void:
+func take_damage(damage: float, breaking: bool = false) -> float: ##applies incoming damage and returns the direct health loss caused by this call
+	damage = maxf(damage, 0.0)
 	var absorbed_damage: float = 0 #damage absorbed by shield
 	#shield phase
 	if breaking:
@@ -53,30 +54,36 @@ func take_damage(damage: float, breaking: bool = false) -> void:
 		damage -= absorbed_damage
 	#health phase
 	if is_zero_approx(shield): #direct damage is not taken if there is a shield remaining
+		var health_damage: float = minf(damage, health)
 		health -= damage
 		show_damage_number(damage)
+		return health_damage
+
+	return 0.0
 
 func show_damage_number(damage: float) -> void: ##displays the standard damage marker without changing health
-	UI.floating_text_manager.show_value(damage, unit.global_position)
+	UI.floating_text_manager.show_damage_value(damage, unit)
 
 func _ready() -> void:
 	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
 	health = max_health
 	process_mode = Node.PROCESS_MODE_PAUSABLE
-	#_STAGGER_CYCLE = 5
-	#_stagger = randi_range(0, _STAGGER_CYCLE)
+	_next_tick_interval = _get_initial_tick_interval()
 
 const _TICK_INTERVAL: float = 0.25
+const _TICK_STAGGER_BUCKETS: int = 32
 const MAX_POISON_DAMAGE_PER_SECOND: float = 2.0
+var _next_tick_interval: float = _TICK_INTERVAL
 
 func _process(_d : float) -> void:
 	if unit.abstractive:
 		return
 	
 	_accumulated_delta += Clock.game_delta
-	if _accumulated_delta > _TICK_INTERVAL:
+	if _accumulated_delta > _next_tick_interval:
 		_tick(_accumulated_delta)
 		_accumulated_delta = 0.0
+		_next_tick_interval = _TICK_INTERVAL
 
 func _tick(delta: float) -> void:
 	var regeneration: float = get_stat(_modifiers_component, health_data, Attributes.id.REGENERATION)
@@ -95,12 +102,19 @@ func _tick(delta: float) -> void:
 	var difference = benchmark - health
 	_record_status_damage(difference, delta)
 	if difference > 0.1:
-		UI.floating_text_manager.show_value(difference, unit.global_position, Color.WHITE, 0.8)
+		UI.floating_text_manager.show_damage_value(difference, unit, Color.TRANSPARENT, 0.8)
 
 	if is_zero_approx(health): #we die due to a status effect
 		unit.died.emit(HitReportData.blank_hit_report)
 
 	_accumulated_delta = 0.0
+
+func _get_initial_tick_interval() -> float: ##distributes first maintenance ticks so units keep identical integration without converging on one frame
+	if not is_instance_valid(unit) or unit.abstractive:
+		return _TICK_INTERVAL
+
+	var stagger_bucket: int = unit.get_instance_id() % _TICK_STAGGER_BUCKETS
+	return _TICK_INTERVAL * float(stagger_bucket + 1) / float(_TICK_STAGGER_BUCKETS)
 
 func _get_uncapped_poison_delta(delta: float) -> float:
 	if not is_instance_valid(_modifiers_component):
@@ -109,7 +123,11 @@ func _get_uncapped_poison_delta(delta: float) -> float:
 		return 0.0
 
 	var poison_stacks: float = _get_poison_stack_count()
-	return Attributes.status_effects[Attributes.Status.POISON].additive_per_stack * poison_stacks * max_health * delta
+	var poison_data: Attributes.StatusAttributeData = Attributes.status_effects[Attributes.Status.POISON].get_attribute_data(Attributes.id.REGEN_REMAINDER_PERCENT)
+	if poison_data == null:
+		return 0.0
+
+	return poison_data.additive_per_stack * poison_stacks * max_health * delta
 
 func _get_poison_stack_count() -> float:
 	if not is_instance_valid(_modifiers_component):
@@ -132,19 +150,10 @@ func _record_status_damage(net_damage: float, delta: float) -> void: ##allocates
 	for status_type: Attributes.Status in _modifiers_component._status_effects:
 		var status: StatusEffect = _modifiers_component._status_effects[status_type]
 		var status_data: Attributes.StatusEffectData = Attributes.status_effects[status.type]
-		if not DamageTrackerService.STATUS_DAMAGE_ATTRIBUTES.has(status_data.attribute):
-			continue
 
 		var contribution: float = 0.0
-		match status_data.attribute:
-			Attributes.id.REGENERATION:
-				contribution = -(status_data.additive_per_stack * status.stack * delta)
-			Attributes.id.REGEN_PERCENT:
-				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
-			Attributes.id.REGEN_REMAINDER_PERCENT:
-				contribution = -(status_data.additive_per_stack * status.stack * max_health * delta)
-				if status.type == Attributes.Status.POISON:
-					contribution = -_cap_poison_delta(-contribution, delta, status.stack)
+		for attribute_data: Attributes.StatusAttributeData in status_data.attributes:
+			contribution += _get_status_damage_contribution(status, attribute_data, delta)
 
 		if contribution <= 0.0:
 			continue
@@ -159,6 +168,23 @@ func _record_status_damage(net_damage: float, delta: float) -> void: ##allocates
 	for status_type: Attributes.Status in contributions:
 		var share: float = contributions[status_type] / total_negative_contribution
 		Run.damage_tracker.record_status_damage(status_type, clamped_damage * share)
+
+func _get_status_damage_contribution(status: StatusEffect, attribute_data: Attributes.StatusAttributeData, delta: float) -> float: ##returns positive expected damage caused by one regen-like status attribute row
+	if not DamageTrackerService.STATUS_DAMAGE_ATTRIBUTES.has(attribute_data.attribute):
+		return 0.0
+
+	var contribution: float = 0.0
+	match attribute_data.attribute:
+		Attributes.id.REGENERATION:
+			contribution = -(attribute_data.additive_per_stack * status.stack * delta)
+		Attributes.id.REGEN_PERCENT:
+			contribution = -(attribute_data.additive_per_stack * status.stack * max_health * delta)
+		Attributes.id.REGEN_REMAINDER_PERCENT:
+			contribution = -(attribute_data.additive_per_stack * status.stack * max_health * delta)
+			if status.type == Attributes.Status.POISON:
+				contribution = -_cap_poison_delta(-contribution, delta, status.stack)
+
+	return maxf(contribution, 0.0)
 
 func get_save_data() -> Dictionary:
 	return {

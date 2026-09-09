@@ -3,6 +3,7 @@ class_name BalanceRiteEffect
 
 @export var search_radius: float = 120.0
 @export var projectile_data: AttackData
+@export var max_chain_count: int = 4 ##maximum number of balance-produced bolts allowed in one recursive lineage
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_DEALT]
@@ -24,6 +25,9 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var report: HitReportData = event.data as HitReportData
 	if not report or report.overkill <= 0.0:
+		return
+	var safe_chain_count: int = maxi(max_chain_count, 1)
+	if report.get_lineage_producer_count(instance) >= safe_chain_count:
 		return
 
 	var source_tower: Tower = instance.host as Tower
@@ -64,7 +68,7 @@ func _fire_overkill_bolt(instance: EffectInstance, source_tower: Tower, parent_r
 		return
 
 	var hit_data: HitData = projectile_data.generate_generic_hit_data()
-	if not hit_data.derive_lineage_from(parent_report, instance):
+	if not hit_data.derive_lineage_from(parent_report, instance, max_chain_count):
 		return
 	hit_data.source = parent_report.get_source_unit(source_tower)
 	hit_data.target = target

@@ -17,7 +17,7 @@ var _dirty: bool = false
 
 func _ready() -> void:
 	set_process(false)
-	Run.player.on_event.connect(_on_player_event)
+	Run.player.subscribe_event(GameEvent.EventType.HIT_DEALT, _on_player_event)
 	Run.waves.wave_started.connect(_on_wave_started)
 
 func has_entries() -> bool: ##returns whether the current cached ranking has at least one entry
@@ -53,10 +53,8 @@ func clear_for_wave(wave_number: int) -> void: ##drops all ranking state for the
 	UI.reset_damage_tracker.emit(wave_number)
 	UI.update_damage_tracker.emit(_sorted_entries, _max_damage)
 
-func _on_player_event(_unit: Unit, game_event: GameEvent) -> void: ##filters the global event stream down to final tower-attributed damage reports
-	if Run.waves.current_combat_wave_number <= 0:
-		return
-	if game_event.event_type != GameEvent.EventType.HIT_DEALT:
+func _on_player_event(_unit: Unit, game_event: GameEvent) -> void: ##records final tower-attributed damage from the routed hit-dealt stream
+	if not _is_tracking_active():
 		return
 	if !(game_event.data is HitReportData):
 		return
@@ -72,7 +70,7 @@ func _on_player_event(_unit: Unit, game_event: GameEvent) -> void: ##filters the
 	_record_damage(hit_report.source as Tower, hit_report.damage_caused)
 
 func record_status_damage(status_type: Attributes.Status, damage_caused: float) -> void: ##records unattributed status damage into one aggregate row per status type
-	if Run.waves.current_combat_wave_number <= 0:
+	if not _is_tracking_active():
 		return
 	if damage_caused <= 0.0:
 		return
@@ -158,3 +156,10 @@ func _rebuild_sorted_entries() -> void: ##rebuilds the cached sorted snapshot co
 
 func _on_wave_started(wave_number: int) -> void:
 	clear_for_wave(wave_number)
+
+func _is_tracking_active() -> bool: ##accepts boss combat, which deliberately bypasses ordinary wave counters
+	if Run.waves.current_combat_wave_number > 0:
+		return true
+	if not is_instance_valid(Run.phases):
+		return false
+	return Run.phases.current_phase == Phases.GamePhase.COMBAT_WAVE

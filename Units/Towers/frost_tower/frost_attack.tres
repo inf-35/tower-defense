@@ -9,7 +9,7 @@
 
 [sub_resource type="Resource" id="Resource_h67ia"]
 script = ExtResource("3_7up7a")
-cooldown = 2.666667
+cooldown = 6.0
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Gradient" id="Gradient_ylyuq"]
@@ -37,5 +37,6 @@ range = 15.0
 damage = 0.2
 status_effects = Array[ExtResource("3_7up7a")]([SubResource("Resource_h67ia")])
 vfx_on_spawn = SubResource("Resource_ir1ub")
+fire_sound = &"aoe_fire_sound"
 cone_angle = 360.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

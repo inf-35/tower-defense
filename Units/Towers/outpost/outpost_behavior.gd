@@ -1,11 +1,15 @@
 extends Behavior
 class_name CommandPostBehavior
 
+const INPUT_INFLUENCE_KEY: StringName = &"outpost_inputs"
+const OUTPUT_INFLUENCE_KEY: StringName = &"outpost_output"
+
 @export var suppression_modifier: ModifierDataPrototype
 @export var attacks_required: int = 1
 @export var max_commands_per_second: float = 3.0 ##maximum times this outpost can command its target each second
 @export var command_beam_vfx: VFXInfo ##authored pulse beam settings used when this outpost forces its linked tower to attack
 @export var passive_beam_strength: float = 0.33 ##scales the continuous beam so the passive link reads softly behind command pulses
+@export var icon: Texture2D ##icon shown when the outpost commands its target tower
 
 var _target_tower: Tower = null
 var _target_suppression_modifier: Modifier
@@ -30,6 +34,7 @@ func start() -> void:
 
 func detach() -> void:
 	_release_target()
+	clear_tower_influences()
 	_seen_attack_ids.clear()
 	_can_command = true
 	_command_limit_token += 1
@@ -51,26 +56,23 @@ func _on_my_adjacency_updated(adj_map: Dictionary) -> void:
 			continue
 		current_neighbors[neighbor] = true
 		if not _my_neighbors.has(neighbor):
-			neighbor.on_event.connect(_on_neighbor_event.bind(neighbor))
+			neighbor.subscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_neighbor_event)
 
 	var to_remove: Array[Tower] = []
 	for old_neighbor: Tower in _my_neighbors:
 		if current_neighbors.has(old_neighbor):
 			continue
-		var callback: Callable = _on_neighbor_event.bind(old_neighbor)
-		if is_instance_valid(old_neighbor) and old_neighbor.on_event.is_connected(callback):
-			old_neighbor.on_event.disconnect(callback)
+		if is_instance_valid(old_neighbor):
+			old_neighbor.unsubscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_neighbor_event)
 		to_remove.append(old_neighbor)
 
 	for old_neighbor: Tower in to_remove:
 		_my_neighbors.erase(old_neighbor)
 
 	_my_neighbors = current_neighbors
+	sync_tower_influences()
 
-func _on_neighbor_event(event: GameEvent, _source: Tower) -> void:
-	if event.event_type != GameEvent.EventType.PRE_HIT_DEALT:
-		return
-
+func _on_neighbor_event(event: GameEvent) -> void: ##adds the outpost's directional bonus only to routed attacks from current neighboring towers
 	var hit_data: HitData = event.data as HitData
 	if not is_instance_valid(hit_data):
 		return
@@ -91,6 +93,7 @@ func _recalculate_target() -> void:
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower) or tower.abstractive or tower.disabled:
 		_release_target()
+		sync_tower_influences()
 		return
 
 	var scan: Tower.ForwardScanResult = tower.scan_forward(49)
@@ -100,6 +103,7 @@ func _recalculate_target() -> void:
 		_release_target()
 		if is_instance_valid(found_tower):
 			_bind_target(found_tower)
+	sync_tower_influences()
 
 func _bind_target(target: Tower) -> void:
 	_target_tower = target
@@ -110,7 +114,7 @@ func _bind_target(target: Tower) -> void:
 	_target_suppression_modifier = suppression_modifier.generate_modifier()
 	target.modifiers_component.add_modifier(_target_suppression_modifier)
 	if is_instance_valid(unit.buff_component):
-		unit.buff_component.activate_new_link(target)
+		unit.buff_component.activate_new_link(target, false)
 	_refresh_passive_beam()
 
 func _release_target() -> void:
@@ -128,6 +132,8 @@ func _command_target_to_fire() -> void: ##forces the linked tower to fire and br
 	if is_instance_valid(_last_trigger_hit):
 		_target_tower.attack_component.queue_next_attack_context(_last_trigger_hit, self)
 	_target_tower.attack_component.current_cooldown = 0.0
+	if is_instance_valid(unit.buff_component):
+		unit.buff_component.activate_target(_target_tower, "", icon, false)
 	VFXManager.play_swirl_line_info(command_beam_vfx, unit.global_position, _target_tower.global_position)
 
 	if is_instance_valid(animation_player):
@@ -175,34 +181,62 @@ func _clear_passive_beam() -> void:
 
 func _exit_tree() -> void:
 	_release_target()
+	clear_tower_influences()
 	for neighbor: Tower in _my_neighbors:
-		var callback: Callable = _on_neighbor_event.bind(neighbor)
-		if is_instance_valid(neighbor) and neighbor.on_event.is_connected(callback):
-			neighbor.on_event.disconnect(callback)
+		if is_instance_valid(neighbor):
+			neighbor.unsubscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_neighbor_event)
 	_my_neighbors.clear()
 
-func draw_visuals(canvas: RangeIndicator) -> void:
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes rear command inputs and the forward output lane through one shared spatial model
 	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower): return
+	if not is_instance_valid(tower) or tower.disabled:
+		return []
 
 	var back_direction: Vector2i = -tower.get_forward_direction()
+	var input_cells: Array[Vector2i] = []
 	for cell: Vector2i in tower.get_adjacent_cells():
 		var offset: Vector2i = cell - tower.tower_position
 		if Tower.get_side_from_offset(tower.size, offset) != Tower.get_side_from_offset(tower.size, back_direction):
 			continue
-		var fade_color: Color = canvas.input_color
-		fade_color.a *= 0.5
-		canvas.draw_cell(cell, fade_color)
+		input_cells.append(cell)
 
-	var scan: Tower.ForwardScanResult = tower.scan_forward(20)
-	var target: Tower = scan.hit_tower
-	var start_pos: Vector2 = Island.cell_to_position(tower.tower_position)
-	if is_instance_valid(target):
-		var end_pos: Vector2 = Island.cell_to_position(scan.impact_cell)
-		canvas.preview_line(start_pos, end_pos, canvas.highlight_color, 2.0)
-		canvas.draw_cell(scan.impact_cell, canvas.highlight_color)
-	else:
-		var end_pos: Vector2 = Island.cell_to_position(scan.last_valid_cell)
-		var fade_color: Color = canvas.highlight_color
-		fade_color.a *= 0.3
-		canvas.preview_line(start_pos, end_pos, fade_color, 2.0)
+	var influences: Array[TowerInfluence] = [TowerInfluence.for_cells(
+		INPUT_INFLUENCE_KEY,
+		TowerInfluence.Kind.INPUT,
+		input_cells,
+		null,
+		[],
+		false,
+		TowerInfluence.Scope.TOWER,
+		TowerInfluence.VisualRole.INPUT
+	)]
+
+	var scan: Tower.ForwardScanResult = tower.scan_forward(49)
+	if scan.distance_tiles <= 0:
+		return influences
+	var output_cells: Array[Vector2i] = []
+	var direction: Vector2i = tower.get_forward_direction()
+	for distance: int in range(1, scan.distance_tiles + 1):
+		output_cells.append(tower.tower_position + direction * distance)
+	var accent_cells: Array[Vector2i] = []
+	if is_instance_valid(scan.hit_tower):
+		accent_cells.append(scan.impact_cell)
+	var output_modifiers: Array[ModifierDataPrototype] = []
+	if is_instance_valid(suppression_modifier):
+		output_modifiers.append(suppression_modifier)
+	influences.append(TowerInfluence.for_line(
+		OUTPUT_INFLUENCE_KEY,
+		TowerInfluence.Kind.OUTPUT,
+		output_cells,
+		Island.cell_to_position(tower.tower_position),
+		Island.cell_to_position(scan.impact_cell),
+		accent_cells,
+		null,
+		output_modifiers,
+		false,
+		TowerInfluence.Scope.TOWER,
+		TowerInfluence.VisualRole.HIGHLIGHT,
+		1.0 if is_instance_valid(scan.hit_tower) else 0.3,
+		2.0
+	))
+	return influences

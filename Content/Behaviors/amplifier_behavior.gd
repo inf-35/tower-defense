@@ -2,6 +2,8 @@
 extends Behavior
 class_name AmplifierBehavior
 
+const INFLUENCE_KEY: StringName = &"adjacent_modifiers"
+
 #--- configuration ---
 #assign a modifierdataprototype resource in the inspector to define the buff this amplifier provides.
 @export var modifier_prototypes: Array[ModifierDataPrototype] ##modifier that will be applied to adjacent towers (per adjacent amplifier)
@@ -16,6 +18,7 @@ func detach() -> void:
 	attached = false
 	#revoke our contribution from all current neighbors
 	_clear_all_modifiers()
+	clear_tower_influences()
 
 func attach() -> void:
 	attached = true
@@ -42,6 +45,7 @@ func start() -> void:
 func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:
 	if not attached:
 		return
+	sync_tower_influences()
 	#fail gracefully if no modifier is defined for this amplifier.
 	if modifier_prototypes.is_empty():
 		_clear_all_modifiers() #clear any existing effects and stop
@@ -68,6 +72,22 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 #this is the canonical cleanup function, called automatically when the tower is destroyed.
 func _exit_tree() -> void:
 	_clear_all_modifiers()
+	clear_tower_influences()
+
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes every potential adjacent modifier target, including empty preview slots
+	var influences: Array[TowerInfluence] = []
+	if not is_instance_valid(unit) or not unit is Tower:
+		return influences
+	if modifier_prototypes.is_empty():
+		return influences
+	influences.append(TowerInfluence.for_cells(
+		INFLUENCE_KEY,
+		TowerInfluence.Kind.MODIFIER,
+		(unit as Tower).get_adjacent_cells(),
+		null,
+		modifier_prototypes
+	))
+	return influences
 
 func _apply_modifier_to_tower(target_tower: Tower) -> void:
 	if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
@@ -99,19 +119,3 @@ func _clear_all_modifiers() -> void:
 	for tower: Tower in towers_to_clear:
 		_remove_modifiers_from_tower(tower)
 	_applied_modifiers.clear()
-
-func draw_visuals(canvas: RangeIndicator) -> void:
-	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower): return
-
-	var margin: int = 2
-	var cell_size := Island.CELL_SIZE - margin
-	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
-
-	var adj_cells: Array[Vector2i] = tower.get_adjacent_cells()
-
-	for cell: Vector2i in adj_cells:
-		var pos = Island.cell_to_position(cell)
-		var rect: Rect2 = Rect2(pos - half_size, Vector2(cell_size, cell_size))
-
-		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)

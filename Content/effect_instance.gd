@@ -59,7 +59,7 @@ func attach_global() -> void: ##for attaching as a global effect
 	enabled = true
 	effect_prototype.attach_handler.call(self)
 
-func handle_event_unfiltered(event: GameEvent = null) -> void: #called by Unit in setup_event_bus
+func handle_event_unfiltered(event: GameEvent = null) -> void: ##runs this already-indexed effect without repeating its event-type check
 	if not enabled:
 		return
 	if not global:

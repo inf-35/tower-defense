@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://cbbwimg3tw7kf"]
 
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
 [ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_tag_rule"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="3_wdxc7"]
 
 [sub_resource type="Resource" id="Resource_require_flame"]
 script = ExtResource("2_tag_rule")

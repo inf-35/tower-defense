@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://dmddglpsgrkis"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://dmddglpsgrkis"]
 
 [ext_resource type="Texture2D" uid="uid://gxq5eeakbnxf" path="res://Assets/rite_rampage.png" id="1_cseyc"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vhbba"]
@@ -15,7 +15,7 @@ element = 4
 is_rite = true
 tower_name = "Rite of Rampage"
 rite_short_name = "rampage"
-tower_description = "{RITE_LABEL}. When adjacent towers kill enemies, they immediately attack again."
+tower_description = "{RITE_LABEL}. When adjacent towers kill enemies, they immediately attack again. Can chain up to 3 times."
 icon = ExtResource("1_cseyc")
 preview = ExtResource("1_cseyc")
 inspector_actions = Array[ExtResource("2_vhbba")]([ExtResource("3_15qpp")])

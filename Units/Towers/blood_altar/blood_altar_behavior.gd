@@ -1,10 +1,39 @@
 extends Behavior
 class_name BloodAltarBehavior
 
+const INFLUENCE_KEY: StringName = &"structure_inputs"
+
 @export var structure_damage: float = 1.0 ##damage dealt to each adjacent allied structure as the altar primes itself
 @export_range(0.0, 1.0, 0.01) var projectile_interval_proportion: float = 0.1 ##share of total cooldown spent spacing the follow-up projectiles
 
 var _is_firing_sequence: bool = false
+
+func start() -> void: ##registers the altar's damageable adjacent input slots before normal attack updates begin
+	sync_tower_influences()
+
+func attach() -> void: ##restores input-slot indexing when a ruined altar returns to active play
+	sync_tower_influences()
+
+func detach() -> void: ##removes input-slot indexing while the altar is ruined or leaving the board
+	clear_tower_influences()
+
+func _exit_tree() -> void:
+	clear_tower_influences()
+
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes potential launch structures rather than only occupied altar adjacencies
+	var influences: Array[TowerInfluence] = []
+	var tower: Tower = unit as Tower
+	if not is_instance_valid(tower):
+		return influences
+	influences.append(TowerInfluence.for_cells(
+		INFLUENCE_KEY,
+		TowerInfluence.Kind.INPUT,
+		tower.get_adjacent_cells(),
+		null,
+		[],
+		true
+	))
+	return influences
 
 func update(_delta: float) -> void: ##starts a staggered volley once a valid target exists and the altar is idle
 	if _is_firing_sequence:
@@ -41,7 +70,7 @@ func _start_attack_sequence(target: Unit) -> void: ##consumes one attack context
 	signal_event.event_type = GameEvent.EventType.PRE_HIT_DEALT
 	signal_event.data = signal_hit
 	signal_event.unit = unit
-	unit.on_event.emit(signal_event)
+	unit.publish_event(signal_event)
 
 	var damaged_structure_positions: Array[Vector2] = _damage_adjacent_structures(attack_id, attack_context)
 	if damaged_structure_positions.is_empty():
@@ -81,8 +110,10 @@ func _damage_adjacent_structures(attack_id: int, attack_context: AttackComponent
 		if not is_instance_valid(structure_hit):
 			continue
 
+		var source_position: Vector2 = adjacent_tower.global_position
 		adjacent_tower.take_hit(structure_hit)
-		damaged_structure_positions.append(adjacent_tower.global_position)
+		BuffComponent.play_link_wisp_from_position(source_position, tower)
+		damaged_structure_positions.append(source_position)
 
 	return damaged_structure_positions
 
@@ -135,7 +166,3 @@ func _fire_projectile(target: Unit, source_position: Vector2, attack_context: At
 		return
 
 	unit.deal_hit(hit_data, delivery_data)
-
-func draw_visuals(canvas: RangeIndicator) -> void: ##shows the tower range plus the adjacent structures it can siphon
-	super.draw_visuals(canvas)
-	draw_visuals_adjacent_tiles(canvas)

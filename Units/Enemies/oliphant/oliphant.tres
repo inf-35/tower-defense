@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://duek70vp15e26"]
+
+[ext_resource type="Script" uid="uid://bnpluy6agmetj" path="res://Content/unit_data..gd" id="1_data"]
+[ext_resource type="Texture2D" uid="uid://cstg513r7j5a2" path="res://Assets/hulk.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="3_display"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="4_health"]
+[ext_resource type="Resource" uid="uid://irjol15uv6x6" path="res://Content/StatDisplays/armor.tres" id="5_6cncs"]
+[ext_resource type="Resource" uid="uid://bfqcyg57w0c83" path="res://Content/StatDisplays/max_speed.tres" id="5_speed"]
+[ext_resource type="PackedScene" uid="uid://cj4a4cvt6ide6" path="res://Units/Enemies/oliphant/oliphant.tscn" id="6_scene"]
+
+[resource]
+script = ExtResource("1_data")
+title = "Oliphant"
+icon = ExtResource("2_icon")
+description = "A huge siege beast. Its speed rises during each boss subwave, then resets during prep."
+stat_displays = Array[ExtResource("3_display")]([ExtResource("4_health"), ExtResource("5_6cncs"), ExtResource("5_speed")])
+important = true
+unit_scene = ExtResource("6_scene")
+flux_value = 4.0
+strength_value = 8.0

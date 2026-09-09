@@ -40,9 +40,9 @@ func _load_all_rewards() -> void:
 		if reward.type == Reward.Type.UNLOCK_TOWER:
 			reward.price = snappedf(randf_range(6.0, 10.0), 0.1)
 		elif reward.type == Reward.Type.ADD_RITE:
-			reward.price = snappedf(randf_range(2.0, 5.0), 0.1)
+			reward.price = snappedf(randf_range(4.0, 10.0), 0.1)
 		elif reward.type == Reward.Type.ADD_RELIC:
-			reward.price = snappedf(randf_range(3.0, 7.0), 0.1)
+			reward.price = snappedf(randf_range(4.5, 10.5), 0.1)
 
 func _scan_directory_recursive(path: String) -> void: ##loads authored reward prototypes into the shared runtime pool
 	var dir := DirAccess.open(path)
@@ -76,11 +76,17 @@ func _scan_directory_recursive(path: String) -> void: ##loads authored reward pr
 
 	dir.list_dir_end()
 
-func generate_and_present_choices(choice_count: int, type_filter: Array[Reward.Type] = []) -> bool: ##uses the global reward pool to roll a standard choice screen
+func generate_and_present_choices(
+	choice_count: int,
+	type_filter: Array[Reward.Type] = [],
+	allow_reroll: bool = true,
+	title: String = ""
+) -> bool: ##uses the global reward pool to roll a standard choice screen
 	var config := RewardChoiceConfig.new()
 	config.choice_count = choice_count
 	config.type_filter = type_filter
-	config.allow_reroll = true
+	config.allow_reroll = allow_reroll
+	config.title = title
 	config.include_global_pool = true
 	return _present_rewards_from_config(config, false)
 
@@ -192,6 +198,8 @@ func _player_already_has_reward(reward: Reward) -> bool:
 			return reward.tower_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.tower_type)
 		Reward.Type.ADD_RELIC:
 			return _player_has_relic_type(reward.relic.type) if is_instance_valid(reward.relic) else false
+		Reward.Type.ADD_RITE:
+			return reward.rite_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.rite_type)
 		_:
 			return false
 
@@ -218,6 +226,9 @@ func get_reward_block_reason(reward: Reward) -> String: ##returns the current re
 				return "Already owned."
 			if not Run.player.has_free_relic_slot():
 				return "No free relic slots."
+		Reward.Type.ADD_RITE:
+			if reward.rite_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.rite_type):
+				return "Already unlocked."
 
 	return ""
 

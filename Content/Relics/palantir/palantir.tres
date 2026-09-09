@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_range"]
 script = ExtResource("1_modifier")
 attribute = 7
-multiplicative = 2.0
+multiplicative = 1.8
 
 [sub_resource type="Resource" id="Resource_cooldown"]
 script = ExtResource("1_modifier")
@@ -19,7 +19,7 @@ multiplicative = 0.556
 [sub_resource type="Resource" id="Resource_effect"]
 script = ExtResource("2_effect")
 reference_tower_types = Array[int]([6, 26])
-min_count = 4
+min_count = 3
 modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_range"), SubResource("Resource_cooldown")])
 icon = ExtResource("1_xjkpu")
 
@@ -28,5 +28,5 @@ script = ExtResource("3_relic")
 type = 41
 global_effect = SubResource("Resource_effect")
 title = "Palantir"
-description = "Towers adjacent to 4 or more {T_PALISADE|label=Walls} gain +100% {UNIT_RANGE} and +80% {UNIT_HITRATE}."
+description = "Towers adjacent to 3 or more {T_PALISADE|label=Walls} gain +80% {UNIT_RANGE} and +80% {UNIT_HITRATE}."
 icon = ExtResource("1_xjkpu")

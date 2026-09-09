@@ -26,6 +26,13 @@ func setup_effect(effect_instance: EffectInstance) -> void: ##initialises this i
 
 func setup_icon(icon_texture: Texture2D) -> void: ##applies the shared texture-progress presentation for statuses and displayed effects
 	add_to_group(DebugAssistant.GROUP_STATUS_ICONS)
+	visible = true
+	set_process(true)
+	_current_duration = 0.0
+	_max_seen_duration = 0.1
+	tint_under = Color.WHITE
+	if is_instance_valid(stack_label):
+		stack_label.text = ""
 	if not is_instance_valid(icon_texture):
 		return
 
@@ -33,6 +40,16 @@ func setup_icon(icon_texture: Texture2D) -> void: ##applies the shared texture-p
 	texture_under = fitted_texture
 	texture_progress = fitted_texture
 	step = 0.01
+
+func prepare_for_pool() -> void: ##resets transient display state before the hp bar reuses this icon node
+	remove_from_group(DebugAssistant.GROUP_STATUS_ICONS)
+	visible = false
+	set_process(false)
+	_current_duration = 0.0
+	_max_seen_duration = 0.1
+	value = 0.0
+	if is_instance_valid(stack_label):
+		stack_label.text = ""
 
 static func _get_aspect_fitted_texture(icon_texture: Texture2D) -> Texture2D: ##returns a cached icon texture padded to the status-icon canvas without stretching the source art
 	var cache_key: String = _get_texture_cache_key(icon_texture)

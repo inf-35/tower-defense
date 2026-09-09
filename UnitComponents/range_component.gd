@@ -2,9 +2,8 @@ extends UnitComponent
 class_name RangeComponent
 
 #responsible for identifying targets for towers
-var area: Area2D ##rangefinding area
+const RANGE_QUERY_CACHE_DURATION_MSEC: int = 80 ##maximum age of a reusable physics-query snapshot
 
-var _enemies_in_range: Array[Unit] = []
 @export var targeting_mode: TargetingMode = TargetingMode.CLOSEST
 
 #if this is set, get_target will prioritize it over all other logic.
@@ -13,6 +12,8 @@ var priority_target_override: Unit = null
 var attack_component: AttackComponent
 var modifiers_component: ModifiersComponent
 var _status_targeting_preferences: Dictionary[Attributes.Status, int] = {}
+var _cached_enemies_in_range: Array[Unit] = []
+var _range_query_cache_expires_at_msec: int = 0
 
 enum TargetingMode {
 	CLOSEST,
@@ -25,59 +26,38 @@ enum TargetingMode {
 func _ready() -> void:
 	set_process(false)
 
-func inject_components(_attack_component: AttackComponent, _modifiers_component: ModifiersComponent) -> void:
+func inject_components(_attack_component: AttackComponent, _modifiers_component: ModifiersComponent) -> void: ##stores the combat data used by on-demand range queries
 	attack_component = _attack_component
 	modifiers_component = _modifiers_component
 
-	if attack_component == null or modifiers_component == null:
+	if is_instance_valid(modifiers_component) and not modifiers_component.stat_changed.is_connected(_on_stat_changed):
+		modifiers_component.stat_changed.connect(_on_stat_changed)
+
+func _query_enemies_in_range() -> Array[Unit]: ##returns a briefly reusable combat-manager snapshot using this unit's live modified range
+	if not is_instance_valid(unit) or not is_instance_valid(attack_component) or not is_instance_valid(modifiers_component):
+		return []
+	if not is_instance_valid(attack_component.attack_data):
+		return []
+
+	var current_ticks_msec: int = Time.get_ticks_msec()
+	if current_ticks_msec < _range_query_cache_expires_at_msec:
+		return _cached_enemies_in_range
+
+	var attack_range: float = attack_component.get_stat(
+		modifiers_component,
+		attack_component.attack_data,
+		Attributes.id.RANGE
+	)
+	_cached_enemies_in_range = CombatManager.get_units_in_radius(attack_range, unit.global_position, not unit.hostile)
+	_range_query_cache_expires_at_msec = current_ticks_msec + RANGE_QUERY_CACHE_DURATION_MSEC
+	return _cached_enemies_in_range
+
+func _on_stat_changed(attribute: Attributes.id) -> void: ##invalidates cached overlaps immediately when the tower's range changes
+	if attribute != Attributes.id.RANGE:
 		return
 
-	area = Area2D.new() #generate range area
-	area.name = "Range"
-	#set detection bitmasks
-	area.collision_layer = 0
-	area.collision_mask = Hitbox.get_mask(not unit.hostile)
-	area.monitoring = true
-	area.monitorable = false
-
-	var shape := CircleShape2D.new()
-	shape.radius = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.RANGE)
-
-	var collision := CollisionShape2D.new()
-	collision.shape = shape
-	area.add_child.call_deferred(collision)
-
-	unit.add_child.call_deferred(area)
-
-	modifiers_component.stat_changed.connect(func(attr: Attributes.id): #change radius of detection area to fit range
-		if not attr == Attributes.id.RANGE:
-			return
-
-		shape.radius = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.RANGE)
-	)
-
-	area.area_entered.connect(func(enemy_area_candidate: Area2D):
-		if not enemy_area_candidate is Hitbox:
-			return
-
-		if enemy_area_candidate.unit == null:
-			return
-
-		if enemy_area_candidate.unit.hostile == unit.hostile: #same affiliation
-			return
-
-		_enemies_in_range.append(enemy_area_candidate.unit)
-	)
-
-	area.area_exited.connect(func(exiting_area_candidate: Area2D):
-		if not exiting_area_candidate is Hitbox:
-			return
-
-		if exiting_area_candidate.unit == null:
-			return
-
-		_enemies_in_range.erase(exiting_area_candidate.unit)
-	)
+	_range_query_cache_expires_at_msec = 0
+	_cached_enemies_in_range.clear()
 
 #checks hard constraints only (death, despawned, incorporeal).
 #soft constraints (like overkill) are handled in the selection logic.
@@ -100,16 +80,17 @@ func is_target_valid(target_unit) -> bool:
 	return true
 
 #checks if priority (ie priority and non overkilled targets) are available
-func are_priority_targets_available() -> bool:
+func are_priority_targets_available() -> bool: ##checks one current range snapshot for a preferred non-overkilled target
+	var enemies_in_range: Array[Unit] = _query_enemies_in_range()
 	if is_instance_valid(priority_target_override):
-		if _enemies_in_range.has(priority_target_override):
+		if enemies_in_range.has(priority_target_override):
 			return true
 
 	var global_priority_target: Unit = Targeting.get_priority_target()
-	if is_target_valid(global_priority_target) and _enemies_in_range.has(global_priority_target):
+	if is_target_valid(global_priority_target) and enemies_in_range.has(global_priority_target):
 		return true
 
-	for enemy: Unit in _enemies_in_range:
+	for enemy: Unit in enemies_in_range:
 		if not is_target_valid(enemy):
 			continue
 
@@ -132,25 +113,26 @@ func remove_status_targeting_preference(status: Attributes.Status) -> void: ##re
 
 	_status_targeting_preferences[status] = next_count
 
-func get_target() -> Unit:
-	if _enemies_in_range.is_empty():
+func get_target() -> Unit: ##selects one target from the current range snapshot using the established priority rules
+	var enemies_in_range: Array[Unit] = _query_enemies_in_range()
+	if enemies_in_range.is_empty():
 		return null
 
 	if is_instance_valid(priority_target_override):
-		if _enemies_in_range.has(priority_target_override):
+		if enemies_in_range.has(priority_target_override):
 			return priority_target_override
 
 	if unit.attack_only_when_blocked:
 		return null
 
 	var global_priority_target: Unit = Targeting.get_priority_target()
-	if is_target_valid(global_priority_target) and _enemies_in_range.has(global_priority_target):
+	if is_target_valid(global_priority_target) and enemies_in_range.has(global_priority_target):
 		return global_priority_target
 
 	var primary_candidates: Array[Unit] = []
 	var overkilled_candidates: Array[Unit] = []
 
-	for enemy: Unit in _enemies_in_range:
+	for enemy: Unit in enemies_in_range:
 		if not is_target_valid(enemy):
 			continue
 
@@ -166,8 +148,9 @@ func get_target() -> Unit:
 
 	return null
 
-func get_targets(count: int) -> Array[Unit]:
-	if _enemies_in_range.is_empty():
+func get_targets(count: int) -> Array[Unit]: ##selects several targets from one shared range-query snapshot
+	var enemies_in_range: Array[Unit] = _query_enemies_in_range()
+	if enemies_in_range.is_empty():
 		return []
 
 	var priority_candidates: Array[Unit] = []
@@ -175,7 +158,7 @@ func get_targets(count: int) -> Array[Unit]:
 	var overkilled_candidates: Array[Unit] = []
 	var global_priority_target: Unit = Targeting.get_priority_target()
 
-	for enemy: Unit in _enemies_in_range:
+	for enemy: Unit in enemies_in_range:
 		if not is_target_valid(enemy):
 			continue
 

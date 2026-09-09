@@ -39,7 +39,7 @@ func _recalculate_target() -> void: ##rescans the forward lane and keeps the mod
 			_grant_buff(found_tower, scan.distance_tiles)
 			_currently_buffed_tower = found_tower
 			if is_instance_valid(unit.buff_component):
-				unit.buff_component.activate_new_link(found_tower)
+				unit.buff_component.activate_new_link(found_tower, false)
 
 	elif is_instance_valid(_currently_buffed_tower):
 		_grant_buff(_currently_buffed_tower, scan.distance_tiles)

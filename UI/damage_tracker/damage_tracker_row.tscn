@@ -10,6 +10,7 @@ bg_color = Color(1, 1, 1, 0)
 bg_color = Color(0.3549, 0.6139467, 0.91, 1)
 
 [node name="DamageTrackerRow" type="Control" unique_id=1000143000 node_paths=PackedStringArray("tower_icon", "tower_name_label", "damage_bar", "damage_value_label")]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 3
 anchors_preset = 0
@@ -24,6 +25,7 @@ damage_bar = NodePath("HBoxContainer/Main/VBoxContainer/DamageBar")
 damage_value_label = NodePath("HBoxContainer/DamageValue")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=971458978]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,17 +35,20 @@ grow_vertical = 2
 theme_type_variation = &"hbox_5"
 
 [node name="Icon" type="TextureRect" parent="HBoxContainer" unique_id=250489298]
+use_parent_material = true
 custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Main" type="Control" parent="HBoxContainer" unique_id=762129149]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Main" unique_id=593164099]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,11 +58,13 @@ grow_vertical = 2
 theme_type_variation = &"vbox_5"
 
 [node name="TowerName" type="Label" parent="HBoxContainer/Main/VBoxContainer" unique_id=1210426467]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"text_s15"
 text = "Tower"
 
 [node name="DamageBar" type="ProgressBar" parent="HBoxContainer/Main/VBoxContainer" unique_id=1614639249]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 theme_type_variation = &"healthbar"
@@ -66,6 +73,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_ea526")
 show_percentage = false
 
 [node name="DamageValue" type="Label" parent="HBoxContainer" unique_id=2143799167]
+use_parent_material = true
 custom_minimum_size = Vector2(72, 0)
 layout_mode = 2
 theme_type_variation = &"text_s15"

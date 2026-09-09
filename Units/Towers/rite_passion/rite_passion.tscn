@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://blqdi5nkt5f88"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="2_distributor"]
-[ext_resource type="Script" path="res://Units/Towers/rite_passion/passion_rite_effect.gd" id="3_passion_effect"]
+[ext_resource type="Script" uid="uid://ccmw0hvofgwpy" path="res://Units/Towers/rite_passion/passion_rite_effect.gd" id="3_passion_effect"]
 [ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="4_rite_icon"]
 [ext_resource type="Texture2D" uid="uid://8pct63uq5iqc" path="res://Assets/rite_flame_sigil.png" id="5_effect_icon"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_movement"]
@@ -14,6 +14,7 @@
 
 [sub_resource type="Resource" id="Resource_passion"]
 script = ExtResource("3_passion_effect")
+damage_bonus_per_status_stack = 1.5
 schedule = 0
 icon = ExtResource("5_effect_icon")
 show_as_status_icon = true
@@ -22,7 +23,7 @@ show_as_status_icon = true
 script = ExtResource("9_health_data")
 max_health = 20.0
 
-[node name="Rite of Passion" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Rite of Passion" type="Node2D" unique_id=1282988119 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_tower")
 type = 73
@@ -32,25 +33,25 @@ modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 
-[node name="EffectDistributorBehavior" type="Node" parent="."]
+[node name="EffectDistributorBehavior" type="Node" parent="." unique_id=687764892]
 script = ExtResource("2_distributor")
 buff_effect = SubResource("Resource_passion")
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=640029600]
 script = ExtResource("6_movement")
 movement_data = ExtResource("7_movement_data")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1449295148]
 script = ExtResource("8_health")
 health_data = SubResource("Resource_health")
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1752655820]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("4_rite_icon")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1608237157]
 script = ExtResource("11_shadow")
 height_multiplier = 0.5
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=450118935]
 script = ExtResource("10_modifiers")

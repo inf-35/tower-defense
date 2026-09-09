@@ -1,8 +1,5 @@
 extends Node2D
 class_name Unit
-@warning_ignore_start("unused_signal")
-
-signal on_event(event: GameEvent) #polymorphic event bus
 signal components_ready() ##fires when all components and the unit is ready
 signal died(hit_report_data: HitReportData) ##fires upon unit death. hooks onto on_killed, which defines unit death behaviour. hit_report_data contains info of the hit that killed the enemy, if any
 signal effect_display_changed(effect_instance: EffectInstance, stacks: float, duration: float) ##emitted when an opted-in attached effect should refresh its hp-bar icon
@@ -10,7 +7,6 @@ signal effect_display_removed(effect_instance: EffectInstance) ##emitted before 
 
 signal changed_cell(old_cell: Vector2i, new_cell: Vector2i) ##fires upon unit moving from one cell to another
 
-var HP_BAR_SCENE: PackedScene = load("res://UI/unit_hp_bar/unit_hp_bar.tscn")
 #core behaviours
 @export var incorporeal: bool ##this unit basically doesnt exist (think tower previews)
 @export var phasing: bool ##this unit can phase through walls NOTE: change navigation component's ignore_walls to modify pathfinding behaviour
@@ -47,6 +43,7 @@ var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x
 	EffectPrototype.Schedule.ADDITIVE: {},
 	EffectPrototype.Schedule.REACTIVE: {},
 }
+var _event_subscribers: Dictionary[GameEvent.EventType, Array] = {}
 #unit state
 var unit_id: int = Run.references.assign_unit_id()
 var enemy_type: Units.Type ##assigned by Units.create_unit
@@ -60,6 +57,7 @@ var abstractive: bool: #fathis unit is not an actual unit (see prototypes, Tower
 var disabled: bool:
 	set(nd):
 		disabled = nd
+		set_process(not disabled or _DEBUG_DRAW)
 		if disabled:
 			set_tint_layer(TintService.LAYER_DISABLED, Color(0.0, 0.0, 0.0, 0.3), 1.0, true)
 		else:
@@ -73,6 +71,11 @@ var _action_graphics_scale: Vector2 = Vector2.ONE
 var _action_graphics_tween: Tween
 
 const BEHAVIOR_CYCLE: int = 3
+const GLOBAL_WAVE_EVENT_TYPES: Array[GameEvent.EventType] = [
+	GameEvent.EventType.WAVE_PREP_STARTED,
+	GameEvent.EventType.WAVE_STARTED,
+	GameEvent.EventType.WAVE_ENDED,
+]
 var behavior_stagger: int = 0
 
 func _ready() -> void:
@@ -123,7 +126,7 @@ func _create_components() -> void:
 
 		var collision := CollisionShape2D.new()
 		collision.shape = shape
-		hitbox.add_child.call_deferred(collision)
+		hitbox.add_child(collision)
 		#set detection bitmasks
 		hitbox.collision_layer = Hitbox.get_mask(hostile)
 		hitbox.collision_mask = 0
@@ -174,9 +177,9 @@ func _prepare_components() -> void:
 		var evt := GameEvent.new()
 		evt.event_type = GameEvent.EventType.DIED
 		evt.data = hit_report_data
-		on_event.emit(evt) #this also fires the global died signal
+		publish_event(evt) #this also fires the global died event
 	)
-	changed_cell.connect(func(new_cell: Vector2i, old_cell: Vector2i):
+	changed_cell.connect(func(old_cell: Vector2i, new_cell: Vector2i):
 		var changed_cell_data := ChangedCellData.new()
 		changed_cell_data.new_cell = new_cell
 		changed_cell_data.original_cell = old_cell
@@ -184,7 +187,7 @@ func _prepare_components() -> void:
 		var evt := GameEvent.new()
 		evt.event_type = GameEvent.EventType.CHANGED_CELL
 		evt.data = changed_cell_data
-		on_event.emit(evt)
+		publish_event(evt)
 	)
 
 	if graphics != null:
@@ -194,7 +197,9 @@ func _prepare_components() -> void:
 			TintService.LAYER_SIDE_TINT,
 			_resolve_tint_target_from_multiplier(DebugAssistant.enemy_graphics_tint if hostile else DebugAssistant.allied_graphics_tint)
 		)
-		_base_graphics_scale = graphics.scale
+		var presentation_scale: float = Units.get_enemy_presentation_scale(graphics) if (hostile and not self is Tower) else 1.0
+		_base_graphics_scale = graphics.scale * presentation_scale
+		_apply_enemy_presentation_helper_scale(presentation_scale)
 		_apply_graphics_scale_layers()
 
 	if navigation_component != null:
@@ -222,7 +227,7 @@ func _prepare_components() -> void:
 
 	if health_component != null:
 		health_component.inject_components(modifiers_component)
-		_attach_health_bar()
+		_register_world_ui()
 
 	if attack_component != null:
 		attack_component.inject_components(modifiers_component)
@@ -234,64 +239,113 @@ func _prepare_components() -> void:
 		if "unit" in child:
 			child.unit = self
 
-func _setup_event_bus() -> void:
-	Run.player.on_event.connect(func(_unit: Unit, event: GameEvent): #propagate wave events from global to local scope
-		if not (event.event_type == GameEvent.EventType.WAVE_PREP_STARTED or event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED):
-			return
+func _setup_event_bus() -> void: ##subscribes this unit only to the three global wave events that must enter local effect scope
+	if not is_instance_valid(Run.player):
+		return
+	Run.player.subscribe_events(GLOBAL_WAVE_EVENT_TYPES, _on_global_wave_event)
 
-		on_event.emit(event)
-	)
+func publish_event(event: GameEvent) -> void: ##runs local effects, then global effects, then exact local behavior subscribers
+	_dispatch_event(event, true)
 
-	on_event.connect(func(event: GameEvent): #setup main event bus
-		if event.data.recursion > EffectInstance.GLOBAL_RECURSION_LIMIT:
-			return #prevent recursion
+func subscribe_event(event_type: GameEvent.EventType, callback: Callable) -> void: ##registers one local listener only for the requested event type
+	if event_type == GameEvent.EventType.NONE or not callback.is_valid():
+		return
+	if not _event_subscribers.has(event_type):
+		_event_subscribers[event_type] = [] as Array[Callable]
 
-		event.unit = self
-		#execute local effects
-		for schedule_class: EffectPrototype.Schedule in effects: #call effects by schedule class
-			var scheduled_effects: Dictionary = effects[schedule_class] #multiplicative -> additive -> reactive
-			if not scheduled_effects.has(event.event_type):
-				continue #no scheduled effects of correct event type
-			for effect_instance: EffectInstance in scheduled_effects[event.event_type]:
-				effect_instance.handle_event_unfiltered(event)
-		#exectue global effects
-		if event.event_type == GameEvent.EventType.WAVE_PREP_STARTED or event.event_type == GameEvent.EventType.WAVE_STARTED or event.event_type == GameEvent.EventType.WAVE_ENDED: #reject up-propagation of inherently global events
-			return
-		Run.player.on_event.emit(self, event) #link local and global event bus (local events firing earlier)
-	)
+	var subscribers: Array[Callable] = _event_subscribers[event_type]
+	if not subscribers.has(callback):
+		subscribers.append(callback)
 
-func _attach_health_bar() -> void:
-	if abstractive or disabled or DebugAssistant.disable_hp_bars:
+func subscribe_events(event_types: Array[GameEvent.EventType], callback: Callable) -> void: ##registers one local listener for several concrete event types
+	for event_type: GameEvent.EventType in event_types:
+		subscribe_event(event_type, callback)
+
+func unsubscribe_event(event_type: GameEvent.EventType, callback: Callable) -> void: ##removes one local listener from one concrete event bucket
+	if not _event_subscribers.has(event_type):
 		return
 
-	if not HP_BAR_SCENE.can_instantiate():
-		push_error("Unit: hp bar scene could not be instantiated.")
+	var subscribers: Array[Callable] = _event_subscribers[event_type]
+	subscribers.erase(callback)
+	if subscribers.is_empty():
+		_event_subscribers.erase(event_type)
+
+func unsubscribe_events(event_types: Array[GameEvent.EventType], callback: Callable) -> void: ##removes one local listener from several concrete event buckets
+	for event_type: GameEvent.EventType in event_types:
+		unsubscribe_event(event_type, callback)
+
+func is_subscribed_to_event(event_type: GameEvent.EventType, callback: Callable) -> bool: ##reports whether an exact local subscription is active
+	if not _event_subscribers.has(event_type):
+		return false
+
+	var subscribers: Array[Callable] = _event_subscribers[event_type]
+	return subscribers.has(callback)
+
+func _on_global_wave_event(_unit: Unit, event: GameEvent) -> void: ##enters one global wave event into this unit without propagating it back upward
+	_dispatch_event(event, false)
+
+func _dispatch_event(event: GameEvent, propagate_global: bool) -> void: ##preserves local-effect then global-effect then local-listener ordering for one mutable payload
+	if not is_instance_valid(event):
 		return
 
-	var hp_bar: UnitHPBar = HP_BAR_SCENE.instantiate()
-	if not is_instance_valid(hp_bar):
-		push_error("Unit: hp bar scene instantiated to an invalid control.")
+	event.unit = self
+	if event.data.recursion <= EffectInstance.GLOBAL_RECURSION_LIMIT:
+		_dispatch_local_effects(event)
+		if propagate_global and is_instance_valid(Run.player):
+			Run.player.publish_event(self, event)
+
+	_dispatch_local_subscribers(event)
+
+func _dispatch_local_effects(event: GameEvent) -> void: ##runs only local effect buckets authored for this event in deterministic schedule order
+	for schedule_class: EffectPrototype.Schedule in effects:
+		var scheduled_effects: Dictionary = effects[schedule_class]
+		if not scheduled_effects.has(event.event_type):
+			continue
+		var effects_of_type: Array = scheduled_effects[event.event_type]
+		if DebugAssistant.perf_instrumentation_active:
+			DebugAssistant.record_perf_event(&"local_effect_callbacks", effects_of_type.size())
+		for effect_instance: EffectInstance in effects_of_type:
+			effect_instance.handle_event_unfiltered(event)
+
+func _dispatch_local_subscribers(event: GameEvent) -> void: ##routes one local event only to bespoke listeners registered for its concrete type
+	if not _event_subscribers.has(event.event_type):
 		return
 
-	add_child.call_deferred(hp_bar)
-	hp_bar.ready.connect(func():
-		if not hp_bar.has_method(&"setup"):
-			push_error("Unit: hp bar scene is missing setup().")
-			return
-		hp_bar.call(&"setup", self, health_component)
-		#connect hitbox mouse events to the hp bar
-		var hitbox_node := hitbox
-		hitbox_node.visible = true #doesnt actl affect graphics, just makes it hoverable
-		hitbox_node.process_mode = Node.PROCESS_MODE_ALWAYS #allows hovering to work even when paused
-		if is_instance_valid(hitbox_node):
-			#ensure hitbox is pickable
-			hitbox_node.input_pickable = true
+	var subscribers: Array[Callable] = _event_subscribers[event.event_type]
+	var dispatch_snapshot: Array[Callable] = subscribers.duplicate()
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"local_event_subscriber_callbacks", dispatch_snapshot.size())
+	for callback: Callable in dispatch_snapshot:
+		if not callback.is_valid():
+			subscribers.erase(callback)
+			continue
+		callback.call(event)
 
-			hitbox_node.mouse_entered.connect(Callable(hp_bar, &"on_mouse_entered"))
-			hitbox_node.mouse_exited.connect(Callable(hp_bar, &"on_mouse_exited")),
+	if subscribers.is_empty():
+		_event_subscribers.erase(event.event_type)
 
-		CONNECT_ONE_SHOT
-	)
+func _exit_tree() -> void: ##removes run-owned wave subscriptions while the player service is still available
+	if is_instance_valid(Run.player):
+		Run.player.unsubscribe_events(GLOBAL_WAVE_EVENT_TYPES, _on_global_wave_event)
+
+func _register_world_ui() -> void: ##registers this unit's health model with the island-owned pooled world-space presenter
+	if abstractive or disabled or has_meta(ID.UnitMeta.IS_BOSS):
+		return
+	if not is_instance_valid(UI.world_unit_ui_manager):
+		push_warning("Unit: world unit ui manager is unavailable; skipping health presentation registration.")
+		return
+	UI.world_unit_ui_manager.register_unit(self)
+
+func _apply_enemy_presentation_helper_scale(scale_multiplier: float) -> void: ##keeps the authored contact shadow aligned with enemy graphics while leaving gameplay nodes at full scale
+	if not hostile or is_equal_approx(scale_multiplier, 1.0):
+		return
+
+	var contact_shadow: Node2D = get_node_or_null("ContactShadow") as Node2D
+	if not is_instance_valid(contact_shadow):
+		return
+
+	contact_shadow.scale *= scale_multiplier
+	contact_shadow.position *= scale_multiplier
 
 func _attach_intrinsic_effects() -> void:
 	for effect_prototype: EffectPrototype in intrinsic_effects:
@@ -549,28 +603,33 @@ func take_hit(hit: HitData) -> void:
 	if not is_instance_valid(health_component): #this specifically catches the player core, which doesnt have a health
 		return
 
+	if Run.has_active_run() and is_instance_valid(Run.boss_encounters) and Run.boss_encounters.suppresses_boss_hits(self):
+		return
+
 	if is_zero_approx(health_component.health): #we're dead
 		return
 
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"hits_received")
+
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
-	hit.damage += get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float
+	hit.damage += _resolve_flat_damage_taken(hit, get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float)
 
 	hit.damage = maxf(hit.damage, 0.0)
 
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.HIT_RECEIVED
 	evt.data = hit as HitData
-	on_event.emit(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
+	publish_event(evt) #trigger any local post-hit-received effects, accordingly mutate evt.data
 
 	if hit.negate: #ignore negated hits
 		health_component.show_damage_number(0.0)
 		return
 
 	var damage: float = evt.data.damage
-	var benchmark: float = health_component.health #NOTE: this indirect system of measurement is used due to custom setter functionality
-	health_component.take_damage(damage, evt.data.breaking)
+	var benchmark: float = health_component.health #NOTE: retained for overkill calculation against pre-hit health
+	var direct_health_damage: float = health_component.take_damage(damage, evt.data.breaking)
 	#measure what happened
-	var delta_health: float = benchmark - health_component.health #measure damage caused
 	var unit_dead: bool = is_zero_approx(health_component.health) #are we dead?
 	#compose a hit report, and send it to the source of the hit
 	var hit_report := HitReportData.new()
@@ -581,18 +640,19 @@ func take_hit(hit: HitData) -> void:
 	hit_report.primary = hit.primary
 	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
-	hit_report.damage_caused = delta_health
+	hit_report.damage_caused = direct_health_damage
 	hit_report.overkill = maxf(damage - benchmark, 0.0) if unit_dead else 0.0
 
-	if unit_dead and not is_zero_approx(delta_health):
+	if unit_dead and not is_zero_approx(direct_health_damage):
 		hit_report.death_caused = true
 
 		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
 
 		died.emit(hit_report) #NOTE: this is when the unit dies
 	elif graphics:
-		ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
-		play_hit_flash()
+		var hit_feedback_admitted: bool = ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
+		if hit_feedback_admitted:
+			play_hit_flash()
 
 	for modifier: Modifier in hit.modifiers:
 		modifiers_component.add_modifier(modifier)
@@ -612,20 +672,41 @@ func take_hit(hit: HitData) -> void:
 
 	if not is_instance_valid(hit.source):
 		return
-	hit.source.on_event.emit(hit_report_evt) #cause source of hit to emit report
+	hit.source.publish_event(hit_report_evt) #cause source of hit to emit report
 
 func deal_hit(hit: HitData, delivery_data : DeliveryData = null) -> void:
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"hits_dealt_events")
+
 	var evt: GameEvent = GameEvent.new()
 	evt.event_type = GameEvent.EventType.PRE_HIT_DEALT
 	evt.data = hit
 
-	on_event.emit(evt) #trigger any pre-hit-received effects, such as damage buffs
+	publish_event(evt) #trigger any pre-hit-received effects, such as damage buffs
 	#------ HANDOVER --------
 	if delivery_data == null: #fallback on guaranteed instant hit
 		push_warning("no targeting data!")
 		hit.target.take_hit(hit) #cause target to take hit
 	else:
 		CombatManager.resolve_hit(hit, delivery_data)
+
+func _resolve_flat_damage_taken(hit: HitData, flat_damage_taken: float) -> float: ##applies armour-ignore only to negative flat damage taken before the hit subtracts armour
+	if flat_damage_taken >= 0.0:
+		return flat_damage_taken
+
+	var armour_ignore: float = _get_hit_armour_ignore(hit)
+	return flat_damage_taken * (1.0 - armour_ignore)
+
+func _get_hit_armour_ignore(hit: HitData) -> float: ##pulls the attacker's outgoing armour-ignore stat when the source can expose combat stats
+	var payload_armour_ignore: float = clampf(hit.armour_ignore, 0.0, 1.0)
+	if not is_instance_valid(hit.source):
+		return payload_armour_ignore
+
+	var armour_ignore = hit.source.get_stat(Attributes.id.ARMOUR_IGNORE)
+	if armour_ignore == null:
+		return payload_armour_ignore
+
+	return maxf(payload_armour_ignore, clampf(float(armour_ignore), 0.0, 1.0))
 
 #this is a virtual function that deals with actual death (connects to the died signal)
 func on_killed(hit_report_data: HitReportData) -> void:
@@ -656,7 +737,7 @@ func get_stat(attr: Attributes.id) -> Variant: #generic get stat function
 			return movement_component.get_stat(modifiers_component, movement_component.movement_data, attr)
 
 	if attack_component != null:
-		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN or attr == Attributes.id.ATTACK_RATE:
+		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN or attr == Attributes.id.ATTACK_RATE or attr == Attributes.id.ARMOUR_IGNORE:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
 
 	return null

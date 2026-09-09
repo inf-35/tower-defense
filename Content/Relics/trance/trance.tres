@@ -7,6 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_be2qu"]
 script = ExtResource("1_sloqq")
+icon = ExtResource("2_be2qu")
 metadata/_custom_type_script = "uid://bsqsmnqngcku6"
 
 [resource]

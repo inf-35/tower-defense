@@ -21,7 +21,7 @@ func _handle_attach(_instance: EffectInstance) -> void:
 func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
-func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##shortens the killer tower's remaining cooldown after a qualifying kill and shows the relic feedback
 	if event.event_type != GameEvent.EventType.DIED:
 		return
 
@@ -42,3 +42,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 	if is_instance_valid(killer) and is_instance_valid(killer.attack_component):
 		#directly modify the local variable as requested
 		killer.attack_component.current_cooldown *= cooldown_multiplier
+		if killer is Tower:
+			if is_instance_valid(victim):
+				BuffComponent.play_link_wisp_from_position(victim.global_position, killer)
+			trigger_target_bonus_feedback(killer as Tower)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://mhb8xv30283p"]
+[gd_scene format=3 uid="uid://mhb8xv30283p"]
 
 [ext_resource type="Script" uid="uid://cc0cpxad1o1nw" path="res://UI/main_menu.gd" id="1_06t4h"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_7vrkn"]
@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
 
-[node name="MainMenu" type="Node2D" node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "deeps_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" unique_id=565802774 node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "deeps_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
@@ -20,9 +20,9 @@ difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
 normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
 hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=855020591]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI"]
+[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=1275051319]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -31,10 +31,10 @@ grow_vertical = 2
 theme = ExtResource("2_7vrkn")
 theme_type_variation = &"MarginMajor"
 
-[node name="Control" type="Control" parent="UI/MarginContainer"]
+[node name="Control" type="Control" parent="UI/MarginContainer" unique_id=1109132065]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control" unique_id=1565830081]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -50,7 +50,7 @@ grow_vertical = 2
 theme_type_variation = &"vbox_20"
 alignment = 2
 
-[node name="continue" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="continue" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=115808597]
 visible = false
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
@@ -58,33 +58,33 @@ theme_override_font_sizes/font_size = 60
 text = "Continue"
 script = ExtResource("4_jix8l")
 
-[node name="new_game" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="new_game" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=1627441974]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
 text = "New Game"
 script = ExtResource("4_jix8l")
 
-[node name="settings" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="settings" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=1743910478]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_font_sizes/font_size = 60
 text = "Settings"
 script = ExtResource("4_jix8l")
 
-[node name="feedback" type="Button" parent="UI/MarginContainer/Control/VBoxContainer"]
+[node name="feedback" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=2143961620]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
-theme_override_font_sizes/font_size = 60
 theme_override_colors/font_color = Color(0.14901961, 0.3254902, 0.7411765, 1)
 theme_override_colors/font_focus_color = Color(0.14799999, 0.32559997, 0.74, 1)
 theme_override_colors/font_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
 theme_override_colors/font_hover_color = Color(0.14799999, 0.32559997, 0.74, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
+theme_override_font_sizes/font_size = 60
 text = "Feedback"
 script = ExtResource("4_jix8l")
 
-[node name="environment_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]
+[node name="environment_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=635979494]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -99,38 +99,38 @@ offset_bottom = 221.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/environment_panel"]
+[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/environment_panel" unique_id=477318061]
 layout_mode = 2
 theme_type_variation = &"MarginSuper"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/environment_panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/environment_panel/MarginContainer" unique_id=173141132]
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
-[node name="Label" type="Label" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=1466698759]
 layout_mode = 2
 text = "Choose an environment"
 horizontal_alignment = 1
 
-[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=1721808762]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "Woods"
 script = ExtResource("4_jix8l")
 
-[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=731609570]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "Winter"
 script = ExtResource("4_jix8l")
 
-[node name="deeps" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer"]
+[node name="deeps" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=590733693]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "The Deeps"
 script = ExtResource("4_jix8l")
 
-[node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control"]
+[node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=948902790]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -145,32 +145,32 @@ offset_bottom = 221.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/difficulty_panel"]
+[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/difficulty_panel" unique_id=1985579830]
 layout_mode = 2
 theme_type_variation = &"MarginSuper"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer" unique_id=47655096]
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
-[node name="Label" type="Label" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=272690617]
 layout_mode = 2
 text = "Choose a difficulty"
 horizontal_alignment = 1
 
-[node name="normal" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer"]
+[node name="normal" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=494658812]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "Normal"
 script = ExtResource("4_jix8l")
 
-[node name="hard" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer"]
+[node name="hard" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=471109702]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
 text = "Hard"
 script = ExtResource("4_jix8l")
 
-[node name="TextureRect" type="TextureRect" parent="UI/MarginContainer/Control"]
+[node name="TextureRect" type="TextureRect" parent="UI/MarginContainer/Control" unique_id=1755269779]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -182,30 +182,31 @@ offset_bottom = 466.0
 grow_horizontal = 2
 texture = ExtResource("4_glbon")
 
-[node name="AnalyticsNotice" type="Label" parent="UI/MarginContainer/Control"]
+[node name="AnalyticsNotice" type="Label" parent="UI/MarginContainer/Control" unique_id=1943911136]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 700.0
 offset_bottom = 760.0
-theme_override_font_sizes/font_size = 22
+grow_horizontal = 2
 theme_override_colors/font_color = Color(0.21176471, 0.21176471, 0.21176471, 0.88)
+theme_override_font_sizes/font_size = 22
 text = "This game records anonymous session and run analytics to help guide balance and development."
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="AudioListener2D" type="AudioListener2D" parent="."]
+[node name="AudioListener2D" type="AudioListener2D" parent="." unique_id=1086262203]
 current = true
 
-[node name="Parallax2D" type="Parallax2D" parent="."]
+[node name="Parallax2D" type="Parallax2D" parent="." unique_id=485589762]
 z_index = 2
 repeat_size = Vector2(1400, 1400)
 autoscroll = Vector2(70, 70)
 repeat_times = 200
 
-[node name="Sprite2D" type="Sprite2D" parent="Parallax2D"]
+[node name="Sprite2D" type="Sprite2D" parent="Parallax2D" unique_id=551256432]
 texture_repeat = 2
 position = Vector2(1897, 1166)
 texture = ExtResource("3_glbon")

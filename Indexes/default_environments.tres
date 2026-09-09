@@ -14,6 +14,42 @@
 [sub_resource type="Resource" id="Resource_woods_profile"]
 script = ExtResource("2_environment_profile")
 display_name = "Woods"
+clear_color = Color(0.96, 0.91, 0.81, 1)
+ui_canvas_color = Color(0.96, 0.91, 0.81, 1)
+paper_background_color = Color(0.96, 0.91, 0.81, 1)
+paper_crumple_strength = 0.092
+paper_grain_strength = 0.085
+paper_grain_scale = 1.15
+paper_brush_strength = 0.06
+world_style_enabled = true
+world_tone_output = Vector3(0.54, 0.81, 0.905)
+world_neutral_chroma_scale = 0.75
+world_accent_chroma_scale = 1.3
+world_accent_chroma_start = 0.12
+world_accent_chroma_end = 0.24
+night_ambient_color = Color(0.2664, 0.43216, 0.74, 1)
+night_max_light_energy = 0.82
+night_surface_light_strength = 1.5
+night_surface_tint_strength = 0.4
+night_lit_chroma_scale = 1.14
+night_additive_bloom_strength = 0.06
+night_dark_pixel_response = 0.04
+night_ui_tint_strength = 0.25
+terrain_noise_strength = 0.4
+terrain_noise_scale = 2.6
+terrain_cut_threshold = 0.18
+terrain_edge_softness = 0.85
+terrain_center_falloff = 1.75
+terrain_brush_strength = 0.32
+terrain_min_paint_coverage = 0.46
+terrain_color_strength = 0.7375
+terrain_transition_softness = 0.2
+terrain_warp_strength = 6.0
+terrain_coastline_color = Color(0.22, 0.205, 0.17, 1)
+terrain_coastline_strength = 0.82
+terrain_coastline_width = 0.018
+terrain_waterline_strength = 0.72
+terrain_waterline_width = 0.0125
 forest_texture = ExtResource("6_woods_forest")
 forest_shadow_texture = ExtResource("7_woods_shadow")
 forest_shadow_position = Vector2(0, 33.33)
@@ -21,10 +57,19 @@ forest_shadow_scale = Vector2(1.047, 1.032)
 
 [sub_resource type="Resource" id="Resource_winter_earth"]
 script = ExtResource("3_terrain_base_stat")
-color = Color(0.935, 0.94, 0.922, 1)
-wash_color = Color(0.95, 0.956, 0.94, 0.22)
+color = Color(0.9405, 0.969375, 0.99, 1)
+wash_color = Color(0.9405, 0.969375, 0.99, 0.24313726)
 navigable = true
 constructable = true
+
+[sub_resource type="Resource" id="Resource_l5wiw"]
+script = ExtResource("3_terrain_base_stat")
+color = Color(0.92, 0.76835334, 0.5244, 0.8235294)
+wash_color = Color(0.92, 0.76835334, 0.5244, 0.39607844)
+texture = ExtResource("10_settlement_icon")
+navigable = true
+constructable = true
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_highland_modifier"]
 script = ExtResource("4_modifier")
@@ -46,13 +91,44 @@ display_name = "Winter"
 open_water_base = 4
 open_water_label = "Ice"
 lake_noise_frequency_multiplier = 1.15
-clear_color = Color(0.9098039, 0.8745098, 0.81960785, 1)
-ui_canvas_color = Color(0.91, 0.87511665, 0.819, 1)
-paper_background_color = Color(0.972, 0.972, 0.964, 1)
-lake_preview_outline_color = Color(0.398, 0.53, 0.64, 0.192)
+clear_color = Color(0.965, 0.965, 0.95, 1)
+ui_canvas_color = Color(0.965, 0.96, 0.94, 1)
+paper_background_color = Color(0.955, 0.96, 0.955, 1)
 lake_preview_fill_color = Color(0.772, 0.861, 0.93, 0.03)
+paper_crumple_strength = 0.175
+paper_grain_strength = 0.16
+paper_grain_scale = 1.2
+paper_brush_strength = 0.065
+path_wash_color = Color(0.8649, 0.89745, 0.93, 0.61960787)
+path_indicator_color = Color(0.34080002, 0.41968, 0.48, 0.43529412)
+world_style_enabled = true
+world_tone_output = Vector3(0.5, 0.85, 0.955)
+world_neutral_chroma_scale = 0.6
+world_accent_chroma_scale = 0.8
+world_accent_chroma_start = 0.12
+world_accent_chroma_end = 0.25
+night_ambient_color = Color(0.2632, 0.3275067, 0.56, 1)
+night_light_color = Color(1, 0.79, 0.55, 1)
+night_surface_light_strength = 1.4
+night_surface_tint_strength = 1.0
+night_lit_chroma_scale = 1.5
+terrain_noise_strength = 0.38
+terrain_noise_scale = 2.8
+terrain_cut_threshold = 0.14
+terrain_edge_softness = 0.8
+terrain_center_falloff = 1.65
+terrain_brush_strength = 0.28
+terrain_color_strength = 0.78
+terrain_transition_softness = 0.18
+terrain_warp_strength = 5.5
+terrain_coastline_color = Color(0.25, 0.29, 0.32, 1)
+terrain_coastline_strength = 0.74
+terrain_coastline_width = 0.018
+terrain_waterline_strength = 0.6
+terrain_waterline_width = 0.0125
 terrain_base_overrides = Dictionary[int, ExtResource("3_terrain_base_stat")]({
 0: SubResource("Resource_winter_earth"),
+1: SubResource("Resource_l5wiw"),
 2: SubResource("Resource_winter_highland")
 })
 placement_count_multipliers = Dictionary[int, float]({
@@ -107,7 +183,6 @@ lake_noise_frequency_multiplier = 1.28
 clear_color = Color(0.66330004, 0.66475165, 0.67, 1)
 ui_canvas_color = Color(0.6627451, 0.6627451, 0.67058825, 1)
 paper_background_color = Color(1, 0.9764706, 0.9411765, 1)
-lake_preview_outline_color = Color(0.416, 0.62, 0.401, 0.24)
 lake_preview_fill_color = Color(0.565, 0.762, 0.482, 0.055)
 terrain_base_overrides = Dictionary[int, ExtResource("3_terrain_base_stat")]({
 0: SubResource("Resource_deeps_earth"),

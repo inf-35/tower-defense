@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_tnhaf")
-instruction_text = "[Open] the trade menu to view and purchase upgrades and towers."
-success_text = "Buy run upgrades in this menu. Pressing [T] also opens and closes the menu.
+instruction_text = "[Open] the trade menu to view and purchase relics and rites."
+success_text = "Buy relics and learn rites in this menu. New tower types are chosen on tower reward waves. Pressing [T] also opens and closes the menu.
 [Q to continue.]"
 panel_anchor = 2
 trigger_action = &"0"

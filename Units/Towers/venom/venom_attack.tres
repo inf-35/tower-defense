@@ -2,15 +2,14 @@
 
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_be0u8"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_0ow5o"]
-[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_qjnyu"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_0ow5o"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_0ow5o"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_yfkn7"]
 
-[sub_resource type="Resource" id="Resource_x7527"]
-script = ExtResource("3_qjnyu")
+[sub_resource type="Resource" id="Resource_qjnyu"]
+script = ExtResource("3_0ow5o")
 type = 2
-stack = 4.0
-cooldown = 0.533333
+cooldown = 1.5
 metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_be0u8"]
@@ -29,8 +28,8 @@ script = ExtResource("2_0ow5o")
 delivery_method = 1
 range = 35.0
 cooldown = 2.5
-damage = 0.5
-status_effects = Array[ExtResource("3_qjnyu")]([SubResource("Resource_x7527")])
+damage = 1.0
+status_effects = Array[ExtResource("3_0ow5o")]([SubResource("Resource_qjnyu")])
 vfx_on_spawn = SubResource("Resource_0ow5o")
 projectile_speed = 80.0
 cone_angle = 180.0

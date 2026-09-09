@@ -69,9 +69,20 @@ func _evaluate_tower(_instance: EffectInstance, tower: Tower) -> void:
 	if adjacent_stacks > 0:
 		_apply_buff_to_tower(state, tower, adjacent_stacks)
 		if previous_stacks == 0 or adjacent_stacks > previous_stacks:
+			_play_adjacent_source_wisps(tower)
 			trigger_target_bonus_feedback(tower)
 	else:
 		_remove_buff_from_tower(state, tower)
+
+func _play_adjacent_source_wisps(tower: Tower) -> void: ##shows which neighboring towers supplied a newly gained adjacency stack
+	var seen_ids: Dictionary[int, bool] = {}
+	for neighbor: Tower in tower.get_adjacent_towers().values():
+		if not _matches_adjacent_tower(neighbor, tower):
+			continue
+		if seen_ids.has(neighbor.unit_id):
+			continue
+		seen_ids[neighbor.unit_id] = true
+		BuffComponent.play_link_wisp(neighbor, tower)
 
 func _apply_buff_to_tower(state: AdjacencyState, tower: Tower, stacks: int) -> void:
 	if not is_instance_valid(tower.modifiers_component):
@@ -121,3 +132,24 @@ func _matches_adjacent_tower(candidate: Tower, host_tower: Tower) -> bool:
 	if adjacent_tower_type == Towers.Type.VOID:
 		return true
 	return candidate.type == adjacent_tower_type
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##reports the adjacency relic when at least one currently adjacent source matches its authored filters
+	if not _is_valid_host(candidate):
+		return []
+	var has_match: bool = false
+	for neighbor: Tower in candidate.get_adjacent_towers().values():
+		if _matches_adjacent_tower(neighbor, candidate):
+			has_match = true
+			break
+	if not has_match:
+		return []
+	var modifiers: Array[ModifierDataPrototype] = []
+	if is_instance_valid(modifier_prototype):
+		modifiers.append(modifier_prototype)
+	return [TowerInfluence.for_cells(
+		&"adjacency_boost",
+		TowerInfluence.Kind.MODIFIER,
+		candidate.get_occupied_cells(),
+		null,
+		modifiers
+	)]

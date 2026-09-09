@@ -20,12 +20,13 @@ const DELETE_TOOLTIP_HINT: String = "RMB: destroy relic"
 
 var _manual_entries: Array[Dictionary] = []
 var _last_hovered_control_path: String = ""
+var _display_refresh_queued: bool = false
 
 func _ready() -> void:
 	if not Run.is_run_ready():
 		await Run.references_ready
 	if display_mode == DisplayMode.PLAYER_RELICS:
-		UI.update_relics.connect(_refresh_display)
+		UI.update_relics.connect(_queue_refresh_display)
 		UI.update_flux.connect(_on_flux_changed)
 	set_process(debug_hover_icons)
 
@@ -74,6 +75,18 @@ func show_entries(entries: Array[Dictionary]) -> void:
 	_manual_entries = entries.duplicate(true)
 	if is_node_ready():
 		_refresh_display()
+
+func _queue_refresh_display() -> void: ##collapses multiple same-frame relic display invalidations into one child rebuild
+	if _display_refresh_queued:
+		return
+	_display_refresh_queued = true
+	call_deferred("_flush_refresh_display")
+
+func _flush_refresh_display() -> void: ##runs the deferred relic display rebuild after paired economy/relic signals settle
+	_display_refresh_queued = false
+	if not is_node_ready():
+		return
+	_refresh_display()
 
 func _create_player_relic_slots() -> void: ##rebuilds the live relic bar as framed occupied slots, empty slots, and the trailing purchase button
 	var relic_entries: Array[Dictionary] = []
@@ -161,6 +174,7 @@ func _create_purchase_slot_button() -> void: ##adds the trailing purchase-slot s
 
 func _build_icon_node(entry: Dictionary) -> TextureRect: ##creates the icon node shared by manual relic/tower strips and slotted live relic entries
 	var icon_node := TextureRect.new()
+	icon_node.use_parent_material = true
 	icon_node.texture = entry.get("icon")
 	icon_node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon_node.stretch_mode = icon_stretch_mode
@@ -174,7 +188,7 @@ func _on_purchase_slot_pressed() -> void:
 func _on_flux_changed(_flux: float) -> void:
 	if display_mode != DisplayMode.PLAYER_RELICS:
 		return
-	_refresh_display()
+	_queue_refresh_display()
 
 #--- tooltip integration ---
 

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=6 format=3 uid="uid://cq8fk6wk6wb6a"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cq8fk6wk6wb6a"]
 
-[ext_resource type="Texture2D" path="res://Assets/rite_fist.png" id="1_pskx4"]
+[ext_resource type="Texture2D" uid="uid://cmt8tloh8m24" path="res://Assets/rite_fist.png" id="1_pskx4"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vpfkn"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_domf5"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_f4n2c"]
@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Rite of the Fist"
 rite_short_name = "fist"
-tower_description = "{RITE_LABEL}. Adjacent towers' attacks consume all target {STATUS_EFFECT_LABEL|label=statuses}. Damage doubles once per status consumed. Stacked rites compound this per status."
+tower_description = "{RITE_LABEL}. Adjacent towers' attacks consume all target {STATUS_EFFECT_LABEL|label=statuses}. Damage doubles exponentially per status consumed. Stacked rites compound this per status."
 icon = ExtResource("1_pskx4")
 preview = ExtResource("1_pskx4")
 inspector_actions = Array[ExtResource("2_vpfkn")]([ExtResource("3_domf5")])

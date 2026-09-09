@@ -9,16 +9,16 @@
 
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
-color = Color(0.82664496, 0.87, 0.7569, 1)
-wash_color = Color(0.82331, 0.87, 0.7482, 0.23529412)
+color = Color(0.67208064, 0.79125, 0.6721125, 0.6675)
+wash_color = Color(0.82041377, 0.87, 0.758525, 0.13441177)
 navigable = true
 constructable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_u30vj"]
 script = ExtResource("2_2st4k")
-color = Color(0.88, 0.7754267, 0.60719997, 0.5803922)
-wash_color = Color(0.88, 0.7619333, 0.57199997, 0.14901961)
+color = Color(0.775, 0.70942837, 0.60965, 0.422549)
+wash_color = Color(0.88875, 0.82149166, 0.71025, 0.10612745)
 texture = ExtResource("5_4wuia")
 navigable = true
 constructable = true
@@ -32,8 +32,8 @@ metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_4wuia"]
 script = ExtResource("2_2st4k")
-color = Color(0.56880003, 0.72, 0.6318, 0.49411765)
-wash_color = Color(0.654902, 0.8, 0.6862745, 0.24)
+color = Color(0.51060003, 0.69, 0.55246, 0.3764706)
+wash_color = Color(0.7293627, 0.8, 0.7157843, 0.12625)
 texture = ExtResource("6_0duxl")
 navigable = true
 constructable = true
@@ -42,16 +42,16 @@ metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_0duxl"]
 script = ExtResource("2_2st4k")
-color = Color(0.75200003, 0.8, 0.7928, 1)
-wash_color = Color(0.728, 0.8, 0.78800005, 0.101960786)
-dominance_strength = 0.75
+color = Color(0.54025, 0.695, 0.79035, 0.615)
+wash_color = Color(0.7035, 0.80875, 0.851, 0.1002451)
+dominance_strength = 0.72375
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
 
 [sub_resource type="Resource" id="Resource_ice"]
 script = ExtResource("2_2st4k")
-color = Color(0.8536, 0.91956, 0.97, 1)
-wash_color = Color(0.843, 0.905, 0.952, 0.14509805)
-dominance_strength = 0.75
+color = Color(0.8272, 0.89676, 0.94, 1)
+wash_color = Color(0.364, 0.7006999, 0.91, 0.12941177)
+dominance_strength = 0.7
 texture = ExtResource("6_4wuia")
 navigable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"

@@ -91,7 +91,10 @@ var tower_position: Vector2i = Vector2i.ZERO:
 			modifiers_component.add_modifier(new_modifier)
 
 var _terrain_modifiers: Array[Modifier] = [] ##modifiers for terrain effects (i.e. high ground)
-var size: Vector2i = Vector2i.ONE ##this is inclusive of facing
+var size: Vector2i = Vector2i.ONE: ##this is inclusive of facing
+	set(new_size):
+		size = new_size
+		_configure_hitbox()
 
 #this function is called by 'sell()' or 'on_killed()'
 func enter_ruin_state(reason: RuinService.RuinReason) -> void:
@@ -139,7 +142,7 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 
 	#3. become non-blocking for pathfinding
 	self.blocking = false
-	Run.references.island.update_navigation_grid()
+	Run.references.island.update_navigation_grid(false)
 	Run.references.island.tower_changed.emit(tower_position)
 
 func enter_active_state() -> void:
@@ -197,19 +200,29 @@ func excavate() -> void:
 	enter_ruin_state(RuinService.RuinReason.SOLD)
 	died.emit(HitReportData.blank_hit_report)
 
-func _create_hitbox() -> void:
-	hitbox = Hitbox.new()
-	var collision_shape := CollisionShape2D.new()
-	var shape_bound := RectangleShape2D.new()
-	shape_bound.size = size * Island.CELL_SIZE
+func _configure_hitbox() -> void: ##reuses the unit-owned hitbox and sizes its collision shape to this tower's footprint
+	if not is_instance_valid(hitbox):
+		return
 
-	collision_shape.shape = shape_bound
+	var collision_shape: CollisionShape2D
+	for child: Node in hitbox.get_children():
+		if child is CollisionShape2D:
+			collision_shape = child as CollisionShape2D
+			break
+
+	if not is_instance_valid(collision_shape):
+		collision_shape = CollisionShape2D.new()
+		hitbox.add_child(collision_shape)
+
+	var shape_bound: RectangleShape2D = collision_shape.shape as RectangleShape2D
+	if not is_instance_valid(shape_bound):
+		shape_bound = RectangleShape2D.new()
+		collision_shape.shape = shape_bound
+
+	shape_bound.size = Vector2(size) * Island.CELL_SIZE
 	hitbox.collision_mask = 0
 	hitbox.collision_layer = Hitbox.get_mask(hostile)
 	hitbox.unit = self
-
-	hitbox.add_child(collision_shape)
-	add_child.call_deferred(hitbox)
 
 func _ready() -> void:
 	name = name + " " + str(unit_id)
@@ -218,8 +231,8 @@ func _ready() -> void:
 	_setup_event_bus()
 	_attach_intrinsic_effects()
 	_create_components()
+	_configure_hitbox()
 	_prepare_components()
-	_create_hitbox()
 
 	if not is_instance_valid(behavior):
 		behavior = DefaultBehavior.new()
@@ -238,7 +251,7 @@ func _ready() -> void:
 		event.event_type = GameEvent.EventType.ADJACENCY_UPDATED
 		event.data = adjacency_data
 
-		on_event.emit(event)
+		publish_event(event)
 	)
 
 	Run.phases.wave_ended.connect(func(_wave_number: int): #heal up at the end of every wave
@@ -254,7 +267,7 @@ func _ready() -> void:
 	evt.unit = self
 
 	if not abstractive:
-		Run.player.on_event.emit(null, evt) #fire global event (that we just got built)
+		Run.player.publish_event(null, evt) #fire global event (that we just got built)
 
 func get_occupied_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
@@ -404,14 +417,25 @@ func get_navcost_for_cell(_cell: Vector2i) -> int: ##returns navigation cost for
 		return behavior.get_navcost_for_cell(_cell)
 	return Towers.get_tower_navcost(self.type)
 
-func blocks_tile_at_cell(cell: Vector2i) -> bool: ##answers whether this specific occupied cell behaves as a solid blocker
-	if type == Towers.Type.PLAYER_CORE:
-		return true
+func get_blocking_cells() -> Array[Vector2i]: ##returns only occupied cells that currently obstruct enemy movement
+	var blocking_cells: Array[Vector2i] = []
+	for cell: Vector2i in get_occupied_cells():
+		if obstructs_navigation_at_cell(cell):
+			blocking_cells.append(cell)
+	return blocking_cells
+
+func obstructs_navigation_at_cell(cell: Vector2i) -> bool: ##answers whether this occupied cell adds a blocking cost to enemy navigation
 	if current_state != State.ACTIVE:
 		return false
 	if not blocking:
 		return false
 	return get_navcost_for_cell(cell) > Navigation.BASE_COST
+
+func blocks_tile_at_cell(cell: Vector2i) -> bool: ##answers whether this cell is physically solid for scans, projectiles, and spawn placement
+	#the keep is a traversable navigation goal but remains physically solid
+	if type == Towers.Type.PLAYER_CORE:
+		return true
+	return obstructs_navigation_at_cell(cell)
 
 func blocks_line_of_sight_at_cell(cell: Vector2i) -> bool: ##keeps beam/lane scans aligned with movement-blocking cells
 	return blocks_tile_at_cell(cell)

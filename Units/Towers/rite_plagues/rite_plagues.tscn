@@ -1,10 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://lhjhylxcw3q"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_eqypi"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="3_sjjme"]
-[ext_resource type="Script" path="res://Units/Towers/rite_plagues/plague_rite_effect.gd" id="4_4swbb"]
+[ext_resource type="Script" uid="uid://kx1k17hjkg18" path="res://Units/Towers/rite_plagues/plague_rite_effect.gd" id="4_4swbb"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="4_uk3dd"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="5_207df"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="6_j8r1l"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="6_p3qie"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="7_8do0j"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="7_kekc5"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_pbyua"]
 [ext_resource type="Texture2D" uid="uid://bve6w360ouk63" path="res://Assets/poison_rite.png" id="9_ttmr5"]
@@ -25,19 +28,14 @@ rotation_mode = 1
 script = ExtResource("11_attack")
 delivery_method = 1
 vfx_on_spawn = SubResource("Resource_plague_projectile_vfx")
-projectile_speed = 160.0
+projectile_speed = 120.0
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_4swbb")
+projectile_count = 4
+projectile_data = SubResource("Resource_plague_projectile")
 icon = ExtResource("9_ttmr5")
 show_as_status_icon = true
-required_status = 2
-spread_status = 2
-stack_multiplier = 1.0
-spread_duration = 2.0
-spread_radius = 45.0
-projectile_count = 2
-projectile_data = SubResource("Resource_plague_projectile")
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("8_pbyua")

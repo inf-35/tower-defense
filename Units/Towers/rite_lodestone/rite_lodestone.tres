@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_action_script"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_destroy"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_tower_data"]
-[ext_resource type="PackedScene" path="res://Units/Towers/rite_lodestone/rite_lodestone.tscn" id="5_scene"]
+[ext_resource type="PackedScene" uid="uid://d4a2ggvyv3e7b" path="res://Units/Towers/rite_lodestone/rite_lodestone.tscn" id="5_scene"]
 
 [resource]
 script = ExtResource("4_tower_data")
@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Rite of Lodestone"
 rite_short_name = "lodestone"
-tower_description = "{RITE_LABEL}. Adjacent towers split each attack into 3 parts, each with 33% {UNIT_DAMAGE}."
+tower_description = "{RITE_LABEL}. Adjacent towers split each attack into 4 parts, each with 50% {UNIT_DAMAGE}."
 icon = ExtResource("1_icon")
 preview = ExtResource("1_icon")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])

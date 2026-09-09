@@ -38,6 +38,7 @@ const TARGET_DEVIATION_SQUARED = TARGET_DEVIATION_FROM_WAYPOINT ** 2
 const NAVIGATION_UPDATE_INTERVAL: float = 5.0 / 60.0 ##matches the old 5-frame cadence at 60 fps while staying stable across frame rates and game speeds
 
 var _navigation_update_accumulator: float = 0.0
+var _path_dirty: bool = false
 
 func inject_components(movement: MovementComponent) -> void:
 	movement_component = movement
@@ -45,6 +46,7 @@ func inject_components(movement: MovementComponent) -> void:
 func _ready() -> void:
 	#listen for global path updates (e.g. maze changed)
 	Run.references.island.navigation_grid_updated.connect(update_path)
+	Run.references.island.navigation_grid_soft_updated.connect(mark_path_dirty)
 	_navigation_update_accumulator = randf() * NAVIGATION_UPDATE_INTERVAL
 
 func _process(delta: float) -> void:
@@ -66,12 +68,19 @@ func _process(delta: float) -> void:
 	_navigation_update_accumulator = fmod(_navigation_update_accumulator, NAVIGATION_UPDATE_INTERVAL)
 
 	var route_goal_changed: bool = _sync_route_goal()
+	var repathed_this_tick: bool = false
 	if route_goal_changed:
 		update_path()
+		repathed_this_tick = true
+
+	if _path_dirty:
+		update_path()
+		repathed_this_tick = true
 
 	#3. path maintenance
 	if _path.is_empty():
-		update_path()
+		if not repathed_this_tick:
+			update_path()
 		if _path.is_empty():
 			_check_for_obstructions()
 			if is_instance_valid(blocking_tower):
@@ -146,9 +155,13 @@ func _handle_moving_state() -> void:
 #--- navigation integration ---
 
 func update_path() -> void:
+	_path_dirty = false
 	_sync_route_goal()
 	var path_data = Navigation.find_path(movement_component.cell_position, goal, ignore_walls)
 	_process_path_result(path_data)
+
+func mark_path_dirty() -> void: ##defers non-urgent path refreshes to this component's already staggered update cadence
+	_path_dirty = true
 
 func _process_path_result(path_data: Navigation.PathData) -> void:
 	_update_deviation()

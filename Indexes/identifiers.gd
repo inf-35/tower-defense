@@ -13,6 +13,9 @@ class UnitState: ##for ui/attribute resolution
 
 class UnitMeta: ##for meta attribute
 	const IS_IMPORTANT: StringName = &"is_important" ##is a unit "important"? see unitdata
+	const IS_BOSS: StringName = &"is_boss" ##marks the persistent enemy owned by a boss encounter
+	const BOSS_ENCOUNTER_TYPE: StringName = &"boss_encounter_type" ##stores the owning boss encounter id on the boss unit
+	const BOSS_MINION_ENCOUNTER_TYPE: StringName = &"boss_minion_encounter_type" ##stores the owning boss encounter id on tracked minions
 
 class TerrainGen:
 	const SEED_DURATION_WAVES: StringName = &"seed_duration_waves" #used for pregen feature initial state definition
@@ -31,3 +34,14 @@ class Sounds:
 	const BUTTON_HOVER_SOUND: StringName = &"button_hover_sound"
 	const BUTTON_CLICK_SOUND: StringName = &"button_click_sound"
 	const TOWER_PLACED_SOUND: StringName = &"tower_placed_sound"
+	
+	const COIN_PICKUP_SOUND: StringName = &"coin_pickup_sound"
+	const COIN_SPEND_SOUND: StringName = &"coin_spend_sound"
+	const ARROW_FIRE_SOUND: StringName = &"arrow_fire_sound"
+	const ARROW_THUNK_SOUND: StringName = &"arrow_thunk_sound"
+	const CANNON_FIRE_SOUND: StringName = &"cannon_fire_sound"
+	const AOE_FIRE_SOUND: StringName = &"aoe_fire_sound"
+	const FLAME_FIRE_SOUND: StringName = &"flame_fire_sound"
+	const MUSIC_COMBAT_LOOP: StringName = &"combat_loop"
+	const AMBIENCE_BIRDSONG: StringName = &"ambience_birdsong"
+	const AMBIENCE_WOODS: StringName = &"ambience_woods"

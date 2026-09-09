@@ -27,11 +27,13 @@ func detach() -> void:
 	attached = false
 	_unsubscribe()
 	_clear_all_modifiers()
+	clear_tower_influences()
 	_last_report = null
 
 func _exit_tree() -> void:
 	_unsubscribe()
 	_clear_all_modifiers()
+	clear_tower_influences()
 
 func _subscribe() -> void:
 	if _subscription_id != -1 or not is_instance_valid(Run.references.island) or not is_instance_valid(Run.references.island.topology_service):
@@ -67,6 +69,7 @@ func _refresh_report() -> void:
 
 func _on_topology_updated(report) -> void:
 	_last_report = report
+	sync_tower_influences()
 	if not attached:
 		return
 	if modifier_prototypes.is_empty():
@@ -86,16 +89,18 @@ func _on_topology_updated(report) -> void:
 			if is_instance_valid(unit.buff_component):
 				unit.buff_component.activate_new_link(tower)
 
-func draw_visuals(canvas: RangeIndicator) -> void:
-	var report = _last_report
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes the configured topology pattern through the shared modifier relationship surface
+	var influences: Array[TowerInfluence] = []
+	var report: TowerTopologyService.Report = _last_report
 	if report == null and is_instance_valid(unit) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
 		report = Run.references.island.topology_service.query(unit as Tower, _make_query())
-	if report == null:
-		return
-
-	var margin: int = 2
-	var cell_size := Island.CELL_SIZE - margin
-	var half_size: Vector2 = Vector2(cell_size, cell_size) * 0.5
-	for cell: Vector2i in report.cells.values():
-		var rect: Rect2 = Rect2(Island.cell_to_position(cell) - half_size, Vector2(cell_size, cell_size))
-		canvas.preview_rect(rect, canvas.highlight_color, false, 1.0)
+	if report == null or modifier_prototypes.is_empty():
+		return influences
+	influences.append(TowerInfluence.for_cells(
+		INFLUENCE_KEY,
+		TowerInfluence.Kind.MODIFIER,
+		_get_report_cells(report),
+		null,
+		modifier_prototypes
+	))
+	return influences

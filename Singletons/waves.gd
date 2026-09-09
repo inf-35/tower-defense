@@ -2,6 +2,8 @@
 extends Node #"Service" type singleton, mainly called by Phases
 class_name Waves
 
+const BossEncounters := preload("res://Indexes/boss_encounters.gd")
+
 signal wave_started(wave_number_int: int)
 signal wave_ended(wave_number_int: int)
 
@@ -44,7 +46,7 @@ func _ready() -> void:
 		evt.event_type = GameEvent.EventType.WAVE_STARTED
 		evt.data = wave_data
 
-		Run.player.on_event.emit(null, evt)
+		Run.player.publish_event(null, evt)
 	)
 
 	wave_ended.connect(func(wave: int):
@@ -55,7 +57,7 @@ func _ready() -> void:
 		evt.event_type = GameEvent.EventType.WAVE_ENDED
 		evt.data = wave_data
 
-		Run.player.on_event.emit(null, evt)
+		Run.player.publish_event(null, evt)
 	)
 
 	_reconciliation_timer = Timer.new()
@@ -68,6 +70,12 @@ func _ready() -> void:
 func get_planned_enemies_for_wave(wave: int) -> Array[Array]: ##returns the stable planned enemy roster for the active wave cycle and falls back to generated data otherwise
 	if wave <= 0:
 		return []
+
+	var boss_encounter_type: BossEncounters.Type = _get_boss_encounter_type_for_wave(wave)
+	if boss_encounter_type != BossEncounters.Type.NONE:
+		if Run.has_active_run() and is_instance_valid(Run.boss_encounters) and Run.boss_encounters.active_wave_number == wave:
+			return Run.boss_encounters.get_preview_enemy_stacks()
+		return BossEncounters.get_preview_enemy_stacks(boss_encounter_type, 0)
 
 	if _wave_enemy_preview_cache.has(wave):
 		var cached_wave_stacks: Array[Array] = _wave_enemy_preview_cache[wave]
@@ -146,7 +154,7 @@ func _spawn_enemies_for_current_wave() -> void:
 			if current_combat_wave_number == 0:
 				return
 
-			var breach: Tower = _get_breach_for_spawn_index(spawn_sequence_index)
+			var breach: Tower = get_breach_for_spawn_index(spawn_sequence_index)
 			if not is_instance_valid(breach):
 				push_warning("Waves: No active breaches found. Cannot spawn enemies.")
 				_end_combat_wave() #end the wave if we can't spawn anything
@@ -159,15 +167,23 @@ func _spawn_enemies_for_current_wave() -> void:
 
 		await Clock.await_game_time(enemy_stagger * 0.8)
 
-func spawn_enemy(unit_type: Units.Type, position: Vector2) -> Unit:
+func spawn_enemy(unit_type: Units.Type, position: Vector2, wave_tracked: bool = true) -> Unit:
+	return _spawn_enemy_internal(unit_type, position, wave_tracked)
+
+func spawn_enemy_untracked(unit_type: Units.Type, position: Vector2) -> Unit: ##spawns an enemy on combat targeting layers without touching ordinary wave counters
+	return _spawn_enemy_internal(unit_type, position, false)
+
+func _spawn_enemy_internal(unit_type: Units.Type, position: Vector2, wave_tracked: bool = true) -> Unit:
 	var unit: Unit = Units.create_unit(unit_type)
 	unit.add_to_group(ENEMY_GROUP)
-	unit.ready.connect(_register_enemy_death_tracking.bind(unit), CONNECT_ONE_SHOT)
+	if wave_tracked:
+		unit.ready.connect(_register_enemy_death_tracking.bind(unit), CONNECT_ONE_SHOT)
 	Run.references.island.add_child.call_deferred(unit)
 	unit.movement_component.set_deferred(&"position", position)
 
 	#increment the spawned counter only after the unit is created
-	_enemies_spawned += 1
+	if wave_tracked:
+		_enemies_spawned += 1
 	return unit
 
 func _register_enemy_death_tracking(unit: Unit) -> void:
@@ -182,6 +198,8 @@ func _on_wave_cycle_started(wave_number: int) -> void: ##seeds a stable roster f
 
 func _cache_wave_enemy_plan(wave: int) -> void:
 	if wave <= 0:
+		return
+	if _get_boss_encounter_type_for_wave(wave) != BossEncounters.Type.NONE:
 		return
 	if _wave_enemy_preview_cache.has(wave):
 		return
@@ -265,7 +283,7 @@ func _refresh_breach_enemy_assignments() -> void: ##rebuilds per-breach enemy as
 		_breach_enemy_assignments[breach.unit_id] = WaveEnemies._consolidate_enemy_list(assigned_units)
 		UI.update_unit_state.emit(breach)
 
-func _get_breach_for_spawn_index(spawn_index: int) -> Tower: ##chooses the live breach for one spawn using the same distance-weighted cycle as the preview
+func get_breach_for_spawn_index(spawn_index: int) -> Tower: ##chooses the live breach for one spawn using the same distance-weighted cycle as the preview
 	var active_breaches: Array[Tower] = SpawnPointService.get_active_breaches()
 	var breach_cycle: Array[Tower] = _get_breach_spawn_cycle(active_breaches)
 	if breach_cycle.is_empty():
@@ -314,6 +332,11 @@ func _get_breach_keep_distance(breach: Tower) -> float: ##uses tile-space straig
 		var keep: Tower = Run.references.keep
 		return Vector2(breach.tower_position - keep.tower_position).length()
 	return Vector2(breach.tower_position).length()
+
+func _get_boss_encounter_type_for_wave(wave: int) -> BossEncounters.Type: ##reads boss scheduling defensively so wave previews can bypass ordinary rosters
+	if not Run.has_active_run() or not is_instance_valid(Run.phases):
+		return BossEncounters.Type.NONE
+	return Run.phases.get_boss_encounter_type(wave)
 
 #the primary, high-frequency update method
 func _on_enemy_died(_died_unit: Unit) -> void:

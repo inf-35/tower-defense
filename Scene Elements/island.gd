@@ -1,6 +1,8 @@
 extends Node2D
 class_name Island
 
+const COMBAT_LIGHTING_SERVICE_SCRIPT := preload("res://Content/CommonVisuals/combat_lighting_service.gd")
+
 @warning_ignore_start("unused_signal")
 signal terrain_changed
 signal tower_created(tower: Tower) ##this signal fires when a tower is created.
@@ -8,6 +10,7 @@ signal tower_changed(tower_position: Vector2i) ##fires when a tower is created, 
 signal island_changed ##fires when anything changes
 signal expansion_applied
 signal navigation_grid_updated
+signal navigation_grid_soft_updated ##fires when paths can refresh on their normal staggered cadence
 
 #--- attachments ---
 @export var terrain_renderer: TerrainRenderer
@@ -17,6 +20,8 @@ signal navigation_grid_updated
 #--- services ---
 var expansion_service: ExpansionService
 var topology_service: TowerTopologyService
+var influence_service: TowerInfluenceService
+var combat_lighting_service: CombatLightingService
 
 #--- grids & state (data container role) ---
 var terrain_base_grid: Dictionary[Vector2i, Terrain.Base] = {}
@@ -29,6 +34,7 @@ var shore_boundary_tiles: Array[Vector2i] = []
 
 var _preview_choices: Dictionary[int, ExpansionChoice] = {}
 var _highlighted_choice_id: int = -1
+var game_ending: bool = false ##true once the run is ending, so tower exits skip live island maintenance
 
 #lookup caches
 var _towers_by_type: Dictionary[Towers.Type, Array] = {} ##towers.type -> array[tower]
@@ -60,10 +66,15 @@ func _ready() -> void:
 
 	terrain_changed.connect(func(): island_changed.emit())
 	tower_changed.connect(func(tower_change): island_changed.emit())
+	UI.display_game_over.connect(func(_is_victory: bool): _mark_game_ending())
+	Run.run_ending.connect(_mark_game_ending)
 
 	expansion_service = ExpansionService.new()
 	topology_service = TowerTopologyService.new(self)
+	influence_service = TowerInfluenceService.new()
+	combat_lighting_service = COMBAT_LIGHTING_SERVICE_SCRIPT.new()
 	add_child.call_deferred(expansion_service)
+	add_child(combat_lighting_service)
 	_show_loading("Preparing island...", 0.0)
 
 	_boot_game.call_deferred()
@@ -73,6 +84,11 @@ func _boot_game() -> void:
 	await Run.phases.start_game(_set_loading_status)
 	await Run.finalize_run_setup()
 	_hide_loading()
+
+	#var sampler := PerfSampler.new()
+	#get_tree().root.add_child(sampler)
+	#sampler.start_sampling()
+	#print("terra... incognita")
 
 func generate_new_island() -> void:
 	_set_loading_status("Preparing terrain...", 0.66)
@@ -130,26 +146,11 @@ func _setup_preview_renderer() -> void:
 	#add to scene (z-index higher so it draws on top)
 	preview_renderer.z_index = 10
 
-	#manually override the material to use the sketch shader
-	#wait for the node to be ready or force setup
 	preview_renderer.start()
-
-	var sketch_mat := ShaderMaterial.new()
-	sketch_mat.shader = preload("res://Shaders/sketch_terrain.gdshader")
-
-	#re-use noise from main renderer if possible, or create new
-	var noise = FastNoiseLite.new()
-	noise.frequency = 0.02
-	var noise_tex = NoiseTexture2D.new()
-	noise_tex.noise = noise
-	noise_tex.seamless = true
-
-	sketch_mat.set_shader_parameter("grid_data_texture", preview_renderer._grid_texture)
-	sketch_mat.set_shader_parameter("noise_texture", noise_tex)
-	sketch_mat.set_shader_parameter("outline_color", Color(0, 0, 0, 0.8))
-	sketch_mat.set_shader_parameter("fill_color", Color(1, 1, 1, 0.2))
-
-	preview_renderer._terrain_rect.material = sketch_mat
+	preview_renderer._terrain_rect.material = _create_terrain_outline_material(
+		preview_renderer,
+		Color(1.0, 1.0, 1.0, 0.2)
+	)
 
 func _setup_lake_preview_renderer() -> void:
 	if not is_instance_valid(lake_preview_renderer):
@@ -160,20 +161,41 @@ func _setup_lake_preview_renderer() -> void:
 	lake_preview_renderer.z_index = Layers.FLOATING_UI
 	lake_preview_renderer.start()
 
-	var sketch_mat := ShaderMaterial.new()
-	sketch_mat.shader = preload("res://Shaders/sketch_terrain.gdshader")
-	var noise := FastNoiseLite.new()
-	noise.frequency = 0.025
-	var noise_tex := NoiseTexture2D.new()
-	noise_tex.noise = noise
-	noise_tex.seamless = true
-	sketch_mat.set_shader_parameter("grid_data_texture", lake_preview_renderer._grid_texture)
-	sketch_mat.set_shader_parameter("noise_texture", noise_tex)
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	var fill_color := Color(0.252, 0.551, 0.68, 0.024)
+	var outline_strength: float = 0.34
+	if profile != null:
+		fill_color = profile.lake_preview_fill_color
+		outline_strength = profile.lake_preview_outline_strength
+	lake_preview_renderer._terrain_rect.material = _create_terrain_outline_material(
+		lake_preview_renderer,
+		fill_color,
+		outline_strength
+	)
+
+func _create_terrain_outline_material(renderer: TerrainRenderer, fill_color: Color, outline_strength: float = 1.0) -> ShaderMaterial: ##builds transient terrain surfaces with the main terrain's authored pencil contour
+	var material := ShaderMaterial.new()
+	material.shader = preload("res://Shaders/sketch_terrain.gdshader")
+	material.set_shader_parameter(&"grid_data_texture", renderer._grid_texture)
+	material.set_shader_parameter(&"fill_color", fill_color)
+	material.set_shader_parameter(&"distance_field_step", 1.0 / maxf(renderer.max_gradient_depth, 0.001))
+	material.set_shader_parameter(&"region_pixel_offset", renderer._terrain_rect.position)
+	material.set_shader_parameter(&"region_pixel_size", renderer._terrain_rect.size)
+
+	var terrain_material: ShaderMaterial = terrain_renderer._terrain_rect.material as ShaderMaterial
+	if terrain_material != null:
+		material.set_shader_parameter(&"distortion_texture", terrain_material.get_shader_parameter(&"distortion_texture"))
+		material.set_shader_parameter(&"noise_texture", terrain_material.get_shader_parameter(&"noise_texture"))
+		material.set_shader_parameter(&"distortion_strength", terrain_material.get_shader_parameter(&"distortion_strength"))
+		material.set_shader_parameter(&"distortion_scale", terrain_material.get_shader_parameter(&"distortion_scale"))
+
 	var profile: EnvironmentProfile = Run.get_environment_profile()
 	if profile != null:
-		sketch_mat.set_shader_parameter("outline_color", profile.lake_preview_outline_color)
-		sketch_mat.set_shader_parameter("fill_color", profile.lake_preview_fill_color)
-	lake_preview_renderer._terrain_rect.material = sketch_mat
+		var outline_color: Color = profile.terrain_coastline_color
+		outline_color.a *= profile.terrain_coastline_strength * outline_strength
+		material.set_shader_parameter(&"outline_color", outline_color)
+		material.set_shader_parameter(&"outline_width", profile.terrain_coastline_width)
+	return material
 
 #--- public api / request handlers ---
 #this is the main entry point for player actions like building or selling
@@ -207,7 +229,6 @@ func construct_tower_at(cell: Vector2i, tower_type: Towers.Type, tower_facing: T
 	tower.set_initial_behaviour_state(initial_state)
 	tower.add_to_group(Run.references.TOWER_GROUP)
 
-	tower.died.connect(func(_hit_report_data): update_navigation_grid()) #as unit becoems non-blocking upon unit death
 	tower.tree_exiting.connect(_on_tower_destroyed.bind(tower), CONNECT_ONE_SHOT)
 
 	add_child(tower)
@@ -256,7 +277,7 @@ func upgrade_tower(old_tower: Tower, new_type: Towers.Type) -> void:
 	evt.event_type = GameEvent.EventType.REPLACED
 	evt.data = UnitReplacedData.new(old_tower, new_tower)
 	#trigger local components (effects/behaviors transfer state)
-	old_tower.on_event.emit(evt)
+	old_tower.publish_event(evt)
 
 	#cleanup old tower
 	old_tower.queue_free() #(automatically cleans up tower_grid)
@@ -264,7 +285,7 @@ func upgrade_tower(old_tower: Tower, new_type: Towers.Type) -> void:
 	##visual feedback
 	#VFXManager.play_vfx(ID.Particles.CONSTRUCTION_PUFF, new_tower.global_position, Vector2.UP)
 
-func update_navigation_grid() -> void:
+func update_navigation_grid(immediate_repath: bool = true) -> void:
 	Navigation.grid.clear()
 
 	for cell: Vector2i in terrain_base_grid:
@@ -278,7 +299,10 @@ func update_navigation_grid() -> void:
 
 	Navigation.clear_field()
 
-	navigation_grid_updated.emit()
+	if immediate_repath:
+		navigation_grid_updated.emit()
+	else:
+		navigation_grid_soft_updated.emit()
 	queue_redraw()
 
 func update_shore_boundary() -> void: #used for expansion
@@ -504,6 +528,9 @@ func _choice_land_cells(choice: ExpansionChoice) -> Array[Vector2i]:
 
 #signal handlers
 func _on_tower_destroyed(tower: Tower) -> void:
+	if game_ending:
+		return
+
 	var cell: Vector2i = tower.tower_position
 	#clear tower grid
 	for local_cell: Vector2i in tower.get_occupied_cells():
@@ -520,6 +547,9 @@ func _on_tower_destroyed(tower: Tower) -> void:
 		_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
 	UI.update_tower_counts.emit()
+
+func _mark_game_ending() -> void: ##prevents mass tower frees during game-over teardown from running live gameplay update paths
+	game_ending = true
 
 func update_adjacencies_around_tower(tower: Tower) -> void:
 	if is_instance_valid(topology_service):
@@ -681,6 +711,8 @@ func _clear_island_state() -> void:
 	_towers_by_type.clear()
 	if is_instance_valid(topology_service):
 		topology_service.clear()
+	if influence_service != null:
+		influence_service.clear()
 
 	#wipe nodes
 	for tower in get_tree().get_nodes_in_group(Run.references.TOWER_GROUP):

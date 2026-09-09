@@ -19,14 +19,14 @@
 
 [sub_resource type="Resource" id="Resource_movement"]
 script = ExtResource("4_move_data")
-max_speed = 16.0
+max_speed = 12.8
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="Resource" id="Resource_health"]
 script = ExtResource("6_health_data")
-max_health = 15.0
+max_health = 12.0
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
@@ -35,7 +35,7 @@ size = Vector2(90, 90)
 [sub_resource type="Resource" id="Resource_attack"]
 script = ExtResource("14_attack_data")
 range = 8.0
-cooldown = 2.0
+cooldown = 2.5
 damage = 1.5
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 

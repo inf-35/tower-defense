@@ -12,7 +12,7 @@ const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline se
 const FRONTIER_EVENING_BIAS: float = 1.125
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
-const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.003
+const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.002
 const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.75
 
 #--- procedural configuration ---

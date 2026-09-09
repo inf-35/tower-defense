@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VFXInfo" format=3 uid="uid://dbx7icsqgd6qa"]
+
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="1_8x8ya"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="1_vfx"]
+
+[resource]
+script = ExtResource("1_vfx")
+vfx_type = 1
+radius = 7.0
+projectile_trail_max_points = 12
+projectile_trail_outer_width = 3.0
+projectile_trail_inner_width = 0.8
+projectile_trail_outer_color = Color(1, 1, 1, 0.52)
+lifetime = 0.8
+graphical_layer = 400

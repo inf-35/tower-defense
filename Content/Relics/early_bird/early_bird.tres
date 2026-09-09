@@ -9,14 +9,14 @@
 [sub_resource type="Resource" id="Resource_gubha"]
 script = ExtResource("2_gubha")
 attribute = 8
-multiplicative = 0.556
+multiplicative = 0.455
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_0l13k"]
 script = ExtResource("2_gubha")
 attribute = 6
-multiplicative = 1.8
+multiplicative = 2.2
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
@@ -30,6 +30,6 @@ script = ExtResource("3_0l13k")
 type = 22
 global_effect = SubResource("Resource_1gyvc")
 title = "Early Bird"
-description = "The first tower to hit an enemy in a wave gains a +80% {UNIT_HITRATE} and {UNIT_DAMAGE} buff for that wave."
+description = "The first tower to hit an enemy in a wave gains a +120% {UNIT_HITRATE} and {UNIT_DAMAGE} buff for that wave."
 icon = ExtResource("3_gubha")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

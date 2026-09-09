@@ -1,8 +1,9 @@
 extends EffectPrototype
 class_name ScoutingGogglesEffect
 
-@export var max_bonus: float = 0.8 ##maximum bonus damage reached at or beyond the configured distance
-@export var max_distance: float = 80.0 ##distance in world units at which the damage bonus reaches its maximum
+@export var max_bonus: float = 1.2 ##maximum bonus damage reached at or beyond the configured distance
+@export var min_distance: float = 20.0 ##distance in world units at which damage bonus remains at minimum (0.0)
+@export var max_distance: float = 100.0 ##distance in world units at which the damage bonus reaches its maximum
 
 func _init() -> void:
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
@@ -33,7 +34,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 		return
 
 	var distance: float = source_tower.global_position.distance_to(target.global_position)
-	var bonus_proportion: float = clampf(distance / maxf(max_distance, 0.001), 0.0, 1.0)
+	var bonus_proportion: float = clampf((distance - min_distance) / maxf(max_distance - min_distance, 0.001), 0.0, 1.0)
 	hit_data.damage *= 1.0 + (max_bonus * bonus_proportion)
 
 func _is_valid_attack(source_tower: Tower, target: Unit) -> bool:

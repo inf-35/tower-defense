@@ -32,10 +32,13 @@ var wave_plan: Dictionary[int, Wave] = {}
 
 const FINAL_WAVE: int = 24
 const DEBUG_PRINT_REPORTS: bool = true
+const TOWER_REWARD_START_WAVE: int = 2
+const TOWER_REWARD_INTERVAL: int = 4
 
 class Wave: ##internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
 	var combat_variant: CombatVariant = CombatVariant.NORMAL
+	var boss_encounter_type: BossEncounters.Type = BossEncounters.Type.NONE
 
 func _ready() -> void:
 	wave_cycle_started.connect(UI.start_wave.emit)
@@ -51,7 +54,7 @@ func _emit_wave_prep_event(wave: int) -> void:
 	var event := GameEvent.new()
 	event.event_type = GameEvent.EventType.WAVE_PREP_STARTED
 	event.data = wave_data
-	Run.player.on_event.emit(null, event)
+	Run.player.publish_event(null, event)
 
 func start_game(progress_callback: Callable = Callable()) -> void:
 	_report_loading(progress_callback, "Preparing references...", 0.08)
@@ -71,6 +74,7 @@ func start_game(progress_callback: Callable = Callable()) -> void:
 	Run.player.start()
 	SpawnPointService.start()
 	TowerNetworkManager.start()
+	Run.boss_encounters.start()
 	Run.references.start()
 	Run.tutorials.refresh_runtime_connections()
 
@@ -113,11 +117,13 @@ func _generate_wave_plan() -> void:
 		var wave := Wave.new()
 		if i % Run.waves.WAVES_PER_EXPANSION_CHOICE == 0:
 			wave.day_events.append(DayEvent.EXPANSION)
+		if _is_tower_reward_wave(i):
+			wave.day_events.append(DayEvent.REWARD_TOWER)
 
 		if wave.day_events.is_empty():
 			wave.day_events.append(DayEvent.NONE)
 
-		if i == 20 or i == 40 or i == FINAL_WAVE:
+		if i == 20 or i == 40:
 			wave.combat_variant = CombatVariant.BOSS
 		elif i in [7, 13, 19]:
 			wave.combat_variant = CombatVariant.SURGE
@@ -126,12 +132,31 @@ func _generate_wave_plan() -> void:
 
 		wave_plan[i] = wave
 
+	_disable_oliphant_test_wave()
 	wave_schedule_updated.emit()
+
+func _disable_oliphant_test_wave() -> void: ##keeps generated and older saved plans on the ordinary wave-24 roster
+	if not wave_plan.has(FINAL_WAVE):
+		return
+
+	var final_wave: Wave = wave_plan[FINAL_WAVE]
+	final_wave.combat_variant = CombatVariant.NORMAL
+	final_wave.boss_encounter_type = BossEncounters.Type.NONE
+
+func _is_tower_reward_wave(wave_num: int) -> bool:
+	if wave_num < TOWER_REWARD_START_WAVE:
+		return false
+	return (wave_num - TOWER_REWARD_START_WAVE) % TOWER_REWARD_INTERVAL == 0
 
 func get_combat_variant(wave_num: int) -> CombatVariant:
 	if wave_plan.has(wave_num):
 		return wave_plan[wave_num].combat_variant
 	return CombatVariant.NORMAL
+
+func get_boss_encounter_type(wave_num: int) -> BossEncounters.Type:
+	if wave_plan.has(wave_num):
+		return wave_plan[wave_num].boss_encounter_type
+	return BossEncounters.Type.NONE
 
 func has_day_event(wave_num: int, event: DayEvent) -> bool:
 	if wave_plan.has(wave_num):
@@ -183,15 +208,17 @@ func _start_choice_phase(type: ChoiceType) -> void:
 	current_choice_type = type
 	_report("starting choice phase of type: " + str(ChoiceType.keys()[type]))
 	UI.start_phase.emit(current_wave_number, false, current_choice_type + 1)
-	UI.choice_selected.connect(_on_player_made_choice, CONNECT_ONE_SHOT)
+	_disconnect_choice_selected_listener()
 
 	match type:
 		ChoiceType.EXPANSION:
 			Run.references.island.expansion_service.expansion_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			Run.references.island.expansion_service.start_expansion_phase()
 		ChoiceType.REWARD_TOWER:
-			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER])
+			_connect_choice_selected_listener()
+			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER], false, "Choose a tower")
 		ChoiceType.REWARD_RELIC:
+			_connect_choice_selected_listener()
 			RewardService.generate_and_present_choices(3, [Reward.Type.ADD_RELIC, Reward.Type.ADD_RITE])
 
 func _on_player_made_choice(choice_id: int) -> void:
@@ -208,6 +235,7 @@ func _on_choice_applied() -> void:
 	if current_phase != GamePhase.CHOICE:
 		return
 	_report("a choice has been successfully applied by its handler.")
+	_disconnect_choice_selected_listener()
 
 	if not choice_queue.is_empty():
 		UI.day_event_ended.emit()
@@ -216,6 +244,7 @@ func _on_choice_applied() -> void:
 	_advance_phase()
 
 func _start_building_phase() -> void:
+	_disconnect_choice_selected_listener()
 	current_phase = GamePhase.BUILDING
 	UI.start_phase.emit(current_wave_number, false, DayEvent.NONE)
 	_report("starting building phase for wave " + str(current_wave_number))
@@ -245,10 +274,27 @@ func _start_combat_wave() -> void:
 		_advance_phase()
 		return
 
+	var boss_encounter_type: BossEncounters.Type = get_boss_encounter_type(current_wave_number)
+	if boss_encounter_type != BossEncounters.Type.NONE:
+		if Run.waves.wave_ended.is_connected(_on_combat_wave_ended):
+			Run.waves.wave_ended.disconnect(_on_combat_wave_ended)
+		_start_boss_combat_wave(boss_encounter_type)
+		return
+
 	if Run.waves.wave_ended.is_connected(_on_combat_wave_ended):
 		Run.waves.wave_ended.disconnect(_on_combat_wave_ended)
 	Run.waves.wave_ended.connect(_on_combat_wave_ended, CONNECT_ONE_SHOT)
 	Run.waves.start_combat_wave(current_wave_number)
+
+func _start_boss_combat_wave(boss_encounter_type: BossEncounters.Type) -> void: ##starts or resumes the active boss encounter without incrementing the displayed wave number
+	if not is_instance_valid(Run.boss_encounters):
+		push_error("Phases: Boss encounter service not found. Cannot start boss wave.")
+		current_phase = GamePhase.IDLE
+		_advance_phase()
+		return
+
+	_connect_boss_encounter_listeners()
+	Run.boss_encounters.start_or_resume_subwave(current_wave_number, boss_encounter_type)
 
 func _on_combat_wave_ended(_wave_number: int) -> void:
 	if current_phase != GamePhase.COMBAT_WAVE:
@@ -262,11 +308,59 @@ func _on_combat_wave_ended(_wave_number: int) -> void:
 
 	_advance_phase()
 
+func _on_boss_subwave_cleared(_wave_number: int, _subwave_index: int) -> void: ##enters normal prep hooks for a boss subwave without consuming a new wave number or scheduled day event
+	if current_phase != GamePhase.COMBAT_WAVE:
+		return
+	_report("boss subwave cleared for wave " + str(current_wave_number) + ". entering prep without advancing wave.")
+	Run.waves.wave_ended.emit(current_wave_number)
+	wave_ended.emit(current_wave_number)
+	wave_cycle_started.emit(current_wave_number)
+	_start_building_phase()
+	phase_advanced.emit()
+
+func _on_boss_encounter_ended(_wave_number: int, _encounter_type: int) -> void: ##finishes the real boss wave once the persistent boss dies
+	if current_phase != GamePhase.COMBAT_WAVE:
+		return
+	_report("boss encounter ended for wave " + str(current_wave_number) + ".")
+	_disconnect_boss_encounter_listeners()
+	Run.waves.wave_ended.emit(current_wave_number)
+	wave_ended.emit(current_wave_number)
+
+	if current_wave_number >= FINAL_WAVE:
+		start_game_over(true)
+		return
+
+	_advance_phase()
+
 func start_game_over(is_victory: bool) -> void:
+	_disconnect_choice_selected_listener()
+	_disconnect_boss_encounter_listeners()
 	is_game_over = true
 	current_phase = GamePhase.GAME_OVER
 	UI.display_game_over.emit(is_victory)
 	_report("Game over!")
+
+func _connect_choice_selected_listener() -> void: ##arms the phase-owned choice listener exactly once for the current choice phase
+	_disconnect_choice_selected_listener()
+	UI.choice_selected.connect(_on_player_made_choice, CONNECT_ONE_SHOT)
+
+func _disconnect_choice_selected_listener() -> void: ##clears stale phase-owned choice listeners left by service-completed choices such as expansion finish
+	if UI.choice_selected.is_connected(_on_player_made_choice):
+		UI.choice_selected.disconnect(_on_player_made_choice)
+
+func _connect_boss_encounter_listeners() -> void: ##arms phase-owned boss listeners exactly once across repeated boss subwaves
+	if not Run.boss_encounters.subwave_cleared.is_connected(_on_boss_subwave_cleared):
+		Run.boss_encounters.subwave_cleared.connect(_on_boss_subwave_cleared)
+	if not Run.boss_encounters.encounter_ended.is_connected(_on_boss_encounter_ended):
+		Run.boss_encounters.encounter_ended.connect(_on_boss_encounter_ended)
+
+func _disconnect_boss_encounter_listeners() -> void: ##removes boss listeners after final boss death or game teardown
+	if not is_instance_valid(Run.boss_encounters):
+		return
+	if Run.boss_encounters.subwave_cleared.is_connected(_on_boss_subwave_cleared):
+		Run.boss_encounters.subwave_cleared.disconnect(_on_boss_subwave_cleared)
+	if Run.boss_encounters.encounter_ended.is_connected(_on_boss_encounter_ended):
+		Run.boss_encounters.encounter_ended.disconnect(_on_boss_encounter_ended)
 
 func get_save_data() -> Dictionary:
 	var data: Dictionary = {
@@ -280,6 +374,7 @@ func get_save_data() -> Dictionary:
 		plan_export[str(wave_num)] = {
 			"day_events": wave_data.day_events,
 			"combat_variant": wave_data.combat_variant,
+			"boss_encounter_type": int(wave_data.boss_encounter_type),
 		}
 
 	data["wave_plan"] = plan_export
@@ -296,10 +391,12 @@ func load_save_data(data: Dictionary) -> void:
 		var entry: Dictionary = plan_import[key]
 		var new_data := Wave.new()
 		new_data.combat_variant = int(entry.get("combat_variant", CombatVariant.NORMAL))
+		new_data.boss_encounter_type = int(entry.get("boss_encounter_type", BossEncounters.Type.NONE))
 		for evt: Variant in entry.get("day_events", []):
 			new_data.day_events.append(int(evt))
 		wave_plan[wave_num] = new_data
 
+	_disable_oliphant_test_wave()
 	_start_building_phase()
 	if current_phase != GamePhase.BUILDING:
 		push_warning("Phases: Loading save, but non-building phase detected.")

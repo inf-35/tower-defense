@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/boss_health_bar/boss_health_bar.gd" id="1_boss_bar"]
+
+[node name="BossHealthBar" type="PanelContainer" node_paths=PackedStringArray("title_label", "subwave_label", "health_bar", "health_label")]
+use_parent_material = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -280.0
+offset_top = 12.0
+offset_right = 280.0
+offset_bottom = 82.0
+grow_horizontal = 2
+mouse_filter = 2
+script = ExtResource("1_boss_bar")
+title_label = NodePath("MarginContainer/VBoxContainer/Header/Title")
+subwave_label = NodePath("MarginContainer/VBoxContainer/Header/Subwave")
+health_bar = NodePath("MarginContainer/VBoxContainer/HealthBar")
+health_label = NodePath("MarginContainer/VBoxContainer/HealthLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+use_parent_material = true
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+use_parent_material = true
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+use_parent_material = true
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+use_parent_material = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Boss"
+
+[node name="Subwave" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+use_parent_material = true
+layout_mode = 2
+text = "Subwave 1"
+horizontal_alignment = 2
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+use_parent_material = true
+custom_minimum_size = Vector2(520, 18)
+layout_mode = 2
+max_value = 1.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+use_parent_material = true
+layout_mode = 2
+text = "0 / 0"
+horizontal_alignment = 1

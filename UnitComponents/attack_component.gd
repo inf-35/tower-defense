@@ -11,6 +11,8 @@ class AttackLineageContext extends RefCounted:
 	var source_position: Vector2 = Vector2.ZERO
 	var use_damage_override: bool = false
 	var damage_override: float = 0.0
+	var use_status_cooldown_multiplier: bool = false
+	var status_cooldown_multiplier: float = 1.0
 
 @export var attack_data: Data ##must resolve to attackdata and stay registered with modifiers
 @export var muzzle: Marker2D ##optional origin marker for projectile and hitscan attacks
@@ -21,6 +23,7 @@ var _queued_attack_use_source_position_override: bool = false
 var _queued_attack_source_position: Vector2 = Vector2.ZERO
 var _queued_attack_use_damage_override: bool = false
 var _queued_attack_damage_override: float = 0.0
+var _queued_attack_max_same_producer_count: int = 1
 
 #proxy variables
 var damage: float:
@@ -41,6 +44,7 @@ var range: float:
 var current_cooldown: float = 0.0 ##centralised value for cooldown to next attack, starts at cooldown and ticks towards zero
 
 static var _next_attack_id: int = 1
+const MIN_ATTENUATED_STATUS_COOLDOWN: float = 0.001
 
 static func get_next_attack_id() -> int:
 	var attack_id: int = _next_attack_id
@@ -57,7 +61,7 @@ func _process(_delta: float) -> void: ##ticks attack cooldown in game time
 func inject_components(modifiers_component: ModifiersComponent) -> void: ##registers attack data against the host modifier stack
 	_modifiers_component = modifiers_component
 	_modifiers_component.register_data(attack_data)
-	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN])
+	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN, Attributes.id.ARMOUR_IGNORE])
 	_modifiers_component.stat_changed.connect(_on_stat_changed)
 
 func refresh_cooldown() -> void: ##resets the local cooldown using the current modified attack rate
@@ -78,7 +82,8 @@ func queue_next_attack_context(
 	use_source_position_override: bool = false,
 	source_position: Vector2 = Vector2.ZERO,
 	use_damage_override: bool = false,
-	damage_override: float = 0.0
+	damage_override: float = 0.0,
+	max_same_producer_count: int = 1
 ) -> void: ##arms the next logical attack to inherit lineage and optional one-shot overrides from an external producer
 	if not is_instance_valid(parent_data) or not is_instance_valid(producer):
 		_clear_queued_attack_context()
@@ -90,6 +95,7 @@ func queue_next_attack_context(
 	_queued_attack_source_position = source_position
 	_queued_attack_use_damage_override = use_damage_override
 	_queued_attack_damage_override = damage_override
+	_queued_attack_max_same_producer_count = maxi(max_same_producer_count, 1)
 
 func pull_attack_context() -> AttackLineageContext: ##builds a reusable lineage stamp for one logical attack and consumes any queued override
 	var attack_context := AttackLineageContext.new()
@@ -101,7 +107,7 @@ func pull_attack_context() -> AttackLineageContext: ##builds a reusable lineage 
 		attack_context.damage_override = _queued_attack_damage_override
 
 		var template_data := EventData.new()
-		if not template_data.derive_lineage_from(_queued_attack_parent_data, _queued_attack_producer):
+		if not template_data.derive_lineage_from(_queued_attack_parent_data, _queued_attack_producer, _queued_attack_max_same_producer_count):
 			_clear_queued_attack_context()
 			return null
 
@@ -125,13 +131,16 @@ func create_derived_attack_context(
 	source_position: Vector2 = Vector2.ZERO,
 	use_damage_override: bool = false,
 	damage_override: float = 0.0,
-	attack_id_override: int = 0
+	attack_id_override: int = 0,
+	use_status_cooldown_multiplier: bool = false,
+	status_cooldown_multiplier: float = 1.0,
+	max_same_producer_count: int = 1
 ) -> AttackLineageContext: ##builds a one-off derived context for explicit follow-up attacks with optional proc-group inheritance
 	if not is_instance_valid(parent_data) or not is_instance_valid(producer):
 		return null
 
 	var template_data := EventData.new()
-	if not template_data.derive_lineage_from(parent_data, producer):
+	if not template_data.derive_lineage_from(parent_data, producer, max_same_producer_count):
 		return null
 
 	var attack_context := AttackLineageContext.new()
@@ -144,6 +153,8 @@ func create_derived_attack_context(
 	attack_context.source_position = source_position
 	attack_context.use_damage_override = use_damage_override
 	attack_context.damage_override = damage_override
+	attack_context.use_status_cooldown_multiplier = use_status_cooldown_multiplier
+	attack_context.status_cooldown_multiplier = status_cooldown_multiplier
 	return attack_context
 
 func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContext) -> bool: ##copies a prepared lineage stamp plus any authored damage or proc-group override onto a hit
@@ -154,6 +165,8 @@ func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContex
 	hit_data.recursion = attack_context.recursion
 	if attack_context.use_damage_override:
 		hit_data.damage = attack_context.damage_override
+	if attack_context.use_status_cooldown_multiplier:
+		_apply_status_cooldown_multiplier(hit_data, attack_context.status_cooldown_multiplier)
 
 	if attack_context.use_attack_id_override:
 		hit_data.attack_id = attack_context.attack_id_override
@@ -161,6 +174,16 @@ func apply_attack_context(hit_data: HitData, attack_context: AttackLineageContex
 		hit_data.attack_id = 0
 
 	return true
+
+func _apply_status_cooldown_multiplier(hit_data: HitData, multiplier: float) -> void: ##scales timed status durations on a derived hit without turning them into permanent statuses
+	var safe_multiplier: float = maxf(multiplier, 0.0)
+	for status: Attributes.Status in hit_data.status_effects:
+		var status_payload: Vector2 = hit_data.status_effects[status]
+		if status_payload.y <= 0.0:
+			continue
+
+		status_payload.y = maxf(status_payload.y * safe_multiplier, MIN_ATTENUATED_STATUS_COOLDOWN)
+		hit_data.status_effects[status] = status_payload
 
 func attack(target: Unit, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true) -> void: ##builds a standard single-target attack, optionally spending cooldown, while honouring one-shot lineage overrides
 	var attack_context: AttackLineageContext = pull_attack_context()
@@ -180,6 +203,8 @@ func fire_sibling_attack(target: Unit, parent_hit_data: HitData, damage_multipli
 		return
 	if not is_instance_valid(parent_hit_data):
 		return
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"sibling_attacks_started")
 
 	var delivery_data: DeliveryData = generate_delivery_data()
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
@@ -203,6 +228,8 @@ func fire_sibling_attack(target: Unit, parent_hit_data: HitData, damage_multipli
 func _attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true, primary: bool = true) -> void: ##shared execution path for both normal attacks and immediate explicit follow-up attacks
 	if attack_data == null or not is_instance_valid(target):
 		return
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"attacks_started")
 
 	if spend_cooldown:
 		refresh_cooldown()
@@ -242,6 +269,7 @@ func generate_delivery_data() -> DeliveryData: ##builds mutable delivery data us
 	delivery_data.delivery_method = attack_data.delivery_method
 	delivery_data.cone_angle = attack_data.cone_angle
 	delivery_data.projectile_speed = attack_data.projectile_speed
+	delivery_data.arcing = attack_data.arcing
 
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:
@@ -255,6 +283,7 @@ func generate_hit_data(delivery_data: DeliveryData = null) -> HitData: ##builds 
 	var hit_data := HitData.new()
 	hit_data.damage = get_stat(_modifiers_component, attack_data, Attributes.id.DAMAGE)
 	hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RADIUS)
+	hit_data.armour_ignore = get_stat(_modifiers_component, attack_data, Attributes.id.ARMOUR_IGNORE)
 	if delivery_data and delivery_data.delivery_method == DeliveryData.DeliveryMethod.CONE_AOE:
 		hit_data.radius = get_stat(_modifiers_component, attack_data, Attributes.id.RANGE)
 		#range is used inplace of radius in cone aoe towers (i.e. flamethrower, frost)
@@ -267,6 +296,8 @@ func generate_hit_data(delivery_data: DeliveryData = null) -> HitData: ##builds 
 
 	hit_data.vfx_on_impact = attack_data.vfx_on_impact
 	hit_data.vfx_on_spawn = attack_data.vfx_on_spawn
+	hit_data.fire_sound = attack_data.fire_sound
+	hit_data.hit_sound = attack_data.hit_sound
 
 	hit_data.source = unit
 
@@ -279,6 +310,7 @@ func _clear_queued_attack_context() -> void: ##drops any pending external lineag
 	_queued_attack_source_position = Vector2.ZERO
 	_queued_attack_use_damage_override = false
 	_queued_attack_damage_override = 0.0
+	_queued_attack_max_same_producer_count = 1
 
 #used for projectile-based attacks with non-zero traverse times
 const MAXIMUM_ACCEPTABLE_INACCURACY: float = 1.0

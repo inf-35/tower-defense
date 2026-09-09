@@ -77,7 +77,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"UNIT_RADIUS": {
 		"title": "Radius",
 		"display": "",
-		"description": "How large the AOE of attacks are.",
+		"description": "How large the AOE of attacks are. 10u = 1 tile.",
 		"icon": preload("res://Assets/radius.png")
 	},
 	"UNIT_ARMOR": {
@@ -89,7 +89,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"FROST": {
 		"title": "Frost",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Frozen units move 33% slower per stack of frost.",
+		"description": "{STATUS_EFFECT_LABEL}. Frozen units move and attack 33% slower per stack of frost.",
 		"icon": preload("res://Assets/frost_effect_icon.png")
 	},
 	"BURN": {
@@ -101,7 +101,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"BRITTLE": {
 		"title": "Brittle",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Brittle units take +150% damage per stack on hits above 3 damage.",
+		"description": "{STATUS_EFFECT_LABEL}. Brittle units take +100% damage per stack on hits above 2 damage.",
 		"icon": preload("res://Assets/brittle_effect_icon.png")
 	},
 	"BLEED": {
@@ -125,7 +125,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"STUN": {
 		"title": "Stun",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 20% speed.",
+		"description": "{STATUS_EFFECT_LABEL}. Stunned units move at 20% speed and attack 10x slower.",
 		"icon": preload("res://Assets/stun_icon.png"),
 	},
 	"STATUS": {
@@ -143,7 +143,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"RITE_LABEL": {
 		"title": "Rite",
 		"display": "[Rite]",
-		"description": "Powerful, limited-use structures. Complements and enhances your towers' abilities on the field.",
+		"description": "Powerful support structures that modify nearby towers. Once learned, rites stay available and can be built for 5 gold.",
 		"icon": null,
 	},
 	"KEYWORD_TUTORIAL": {
@@ -309,7 +309,7 @@ func parse_text_for_bbcode(text: String) -> String:
 			else:
 				inner_content += data.title
 
-			var color_code = "blue" #default
+			var color_code = "dark_blue" #default
 			if params.has("color"):
 				color_code = params.color
 
@@ -318,6 +318,7 @@ func parse_text_for_bbcode(text: String) -> String:
 			#replaced text with parsed text
 			parsed_text = parsed_text.replace(full_placeholder, bbcode_link)
 		else:
+			
 			#cleanup broken tags
 			parsed_text = parsed_text.replace(full_placeholder, keyword)
 

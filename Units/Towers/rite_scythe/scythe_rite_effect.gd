@@ -1,7 +1,7 @@
 extends EffectPrototype
 class_name ScytheRiteEffect
 
-@export var negated_attacks_required: int = 3 ##base number of attacks banked before the payout attack
+@export var negated_attacks_required: int = 2 ##base number of attacks banked before the payout attack
 @export var payout_multiplier: float = 3.0 ##base multiplier applied to cumulative banked damage on the payout attack
 
 class ScytheRiteState extends RefCounted:

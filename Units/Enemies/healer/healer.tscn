@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bl12mn0bm7utq"]
+[gd_scene format=3 uid="uid://bl12mn0bm7utq"]
 
 [ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_y0lj0"]
 [ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_l3ud4"]
@@ -19,7 +19,7 @@
 
 [sub_resource type="Resource" id="Resource_86qj0"]
 script = ExtResource("4_wcil4")
-max_speed = 14.0
+max_speed = 11.2
 acceleration = 200.0
 turn_speed = 1000.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
@@ -30,11 +30,11 @@ size = Vector2(80.000046, 100.00003)
 [sub_resource type="Resource" id="Resource_luiw2"]
 script = ExtResource("15_tqofa")
 range = 10.0
-cooldown = 2.0
+cooldown = 2.5
 damage = 1.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
-[node name="Healer" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+[node name="Healer" type="Node2D" unique_id=1828425328 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_y0lj0")
 hostile = true
@@ -50,22 +50,22 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
-[node name="NavigationComponent" type="Node" parent="."]
+[node name="NavigationComponent" type="Node" parent="." unique_id=245401004]
 script = ExtResource("2_l3ud4")
 metadata/_custom_type_script = "uid://covwti10fyhl4"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=636767395]
 script = ExtResource("3_o0jft")
 face_towards_movement = false
 movement_data = SubResource("Resource_86qj0")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=777237351]
 script = ExtResource("5_xj78e")
 health_data = ExtResource("6_3u0om")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="ContactShadow" type="Node2D" parent="."]
+[node name="ContactShadow" type="Node2D" parent="." unique_id=710285369]
 z_index = 10
 z_as_relative = false
 position = Vector2(0, 0.5)
@@ -74,38 +74,38 @@ script = ExtResource("7_k8dvw")
 shadow_size = Vector2(50, 30)
 metadata/_custom_type_script = "uid://clft1opmwpvj0"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=323589274]
 position = Vector2(1, -3)
 scale = Vector2(0.095833324, 0.095833324)
 texture = ExtResource("7_8vdnj")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1597676319]
 visible = false
 scale = Vector2(0.1, 0.1)
 collision_mask = 0
 script = ExtResource("8_ub73x")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1669450087]
 position = Vector2(-5.7220404e-06, 0)
 scale = Vector2(0.9999992, 0.9999992)
 shape = SubResource("RectangleShape2D_1ej4o")
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="ModifiersComponent" type="Node" parent="." unique_id=428323301]
 script = ExtResource("9_cg248")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="HealerBehavior" type="Node" parent="."]
+[node name="HealerBehavior" type="Node" parent="." unique_id=1012185572]
 script = ExtResource("10_8vdnj")
 heal_amount = 0.8
 heal_interval = 1.5
 heal_range = 20.0
 metadata/_custom_type_script = "uid://dwx63ohv786ew"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=285964249]
 script = ExtResource("12_6okpw")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="."]
+[node name="AttackComponent" type="Node" parent="." unique_id=1930353980]
 script = ExtResource("13_cgqdq")
 attack_data = SubResource("Resource_luiw2")
 metadata/_custom_type_script = "uid://detgar3t50qgi"

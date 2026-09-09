@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Rite of Sulphur"
 rite_short_name = "sulphur"
-tower_description = "{RITE_LABEL}. Adjacent towers have 50% less {UNIT_DAMAGE}, but gain +8 {UNIT_RADIUS}."
+tower_description = "{RITE_LABEL}. Adjacent towers have 50% less {UNIT_DAMAGE}, but gain +16 {UNIT_RADIUS}."
 icon = ExtResource("1_icon")
 preview = ExtResource("1_icon")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])

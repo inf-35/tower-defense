@@ -14,7 +14,7 @@ cost = 2.0
 required_capacity = 0.0
 element = 5
 tower_name = "Hamlet"
-tower_description = "A small settlement. Produces 1 {POPULATION}, but can only be placed adjacent to {T_GENERATOR|label=Villages}"
+tower_description = "A small settlement. Produces 2 {POPULATION}, but can only be placed adjacent to {T_GENERATOR|label=Villages}"
 icon = ExtResource("1_4d2o5")
 preview = ExtResource("1_4d2o5")
 tower_scene = ExtResource("6_gigfl")

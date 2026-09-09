@@ -40,9 +40,9 @@ func _connect_run_signals() -> void: ##subscribes to run-scoped events once the 
 
 	if not is_instance_valid(Run.player):
 		return
-	if Run.player.on_event.is_connected(_on_player_event):
+	if Run.player.is_subscribed_to_event(GameEvent.EventType.TOWER_BUILT, _on_player_event):
 		return
-	Run.player.on_event.connect(_on_player_event)
+	Run.player.subscribe_event(GameEvent.EventType.TOWER_BUILT, _on_player_event)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_overridden:
@@ -230,9 +230,6 @@ func _should_cancel_soft_snap(event: InputEvent) -> bool:
 	return false
 
 func _on_player_event(_unit: Unit, event: GameEvent) -> void: ##adds a small placement shake for real allied tower builds after the placement actually succeeds
-	if event.event_type != GameEvent.EventType.TOWER_BUILT:
-		return
-
 	var build_data: BuildTowerData = event.data as BuildTowerData
 	if not is_instance_valid(build_data) or not is_instance_valid(build_data.tower):
 		return

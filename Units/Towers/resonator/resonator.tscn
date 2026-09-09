@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_stat_display"]
 [ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_health_stat"]
 [ext_resource type="Script" uid="uid://bam3thfei3wm0" path="res://Units/Towers/resonator/resonator_behavior.gd" id="4_behavior"]
-[ext_resource type="Texture2D" path="res://Assets/resonator.png" id="5_graphics"]
+[ext_resource type="Texture2D" uid="uid://cmugyv423cmqa" path="res://Assets/resonator.png" id="5_graphics"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="6_shadow"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="7_modifiers"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_health"]
@@ -31,8 +31,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="ResonatorBehavior" type="Node" parent="." unique_id=1339536219]
 script = ExtResource("4_behavior")
-cooldown_advance_percent = 1.0
-max_resonances_per_second = 3.0
+max_resonances_per_second = 5.0
 icon = ExtResource("5_graphics")
 metadata/_custom_type_script = "uid://bam3thfei3wm0"
 
@@ -47,6 +46,7 @@ health_data = SubResource("Resource_health")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1787182419]
+rotation = 1.5707964
 scale = Vector2(0.065, 0.065)
 texture = ExtResource("5_graphics")
 

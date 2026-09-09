@@ -26,7 +26,7 @@ movement_component = NodePath("MovementComponent")
 
 [node name="IronRiteBehavior" type="Node" parent="." unique_id=723027415]
 script = ExtResource("2_behavior")
-overkill_transfer_ratio = 1.0
+overkill_transfer_ratio = 2.0
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1290907607]
 script = ExtResource("4_movement")

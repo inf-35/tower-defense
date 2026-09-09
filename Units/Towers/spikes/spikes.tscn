@@ -15,8 +15,9 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_attack_component"]
 [ext_resource type="Resource" uid="uid://gfgaj7q6vj5m" path="res://Units/Towers/spikes/spikes_attack.tres" id="13_attack_data"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="14_modifiers_component"]
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="15_turret_graphics"]
+[ext_resource type="Texture2D" uid="uid://br46frbw7ved0" path="res://Assets/spikes_base.png" id="15_ram8j"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="16_shadow_component"]
+[ext_resource type="Texture2D" uid="uid://dy2c6di82rs80" path="res://Assets/spikes_protruding.png" id="17_itji7"]
 
 [sub_resource type="Resource" id="Resource_health"]
 script = ExtResource("10_health_data")
@@ -69,13 +70,25 @@ visible = false
 texture = SubResource("PlaceholderTexture2D_reference")
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1862885731]
-self_modulate = Color(1, 1, 1, 0.33)
+modulate = Color(1, 1, 1, 0.6509804)
+z_index = 50
+z_as_relative = false
+y_sort_enabled = true
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("15_turret_graphics")
+texture = ExtResource("15_ram8j")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1149531686]
 script = ExtResource("16_shadow_component")
-height_multiplier = 0.15
+height_multiplier = 0.2
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=277837697]
+z_index = 2
+texture = ExtResource("17_itji7")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D" unique_id=1553845569]
+script = ExtResource("16_shadow_component")
+height_multiplier = 0.25
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="ModifiersComponent" type="Node" parent="." unique_id=2042384061]

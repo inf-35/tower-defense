@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Hammer Rite"
 rite_short_name = "hammer"
-tower_description = "{RITE_LABEL}. Adjacent towers deal up to +70% {UNIT_DAMAGE|label=Damage} to enemies near the Keep, losing 7% per tile away."
+tower_description = "{RITE_LABEL}. Adjacent towers deal up to +200% {UNIT_DAMAGE|label=Damage} to enemies near the Keep, losing 33% per tile away."
 icon = ExtResource("1_1jbvf")
 preview = ExtResource("1_1jbvf")
 inspector_actions = Array[ExtResource("2_cw4s5")]([ExtResource("3_y5y31")])

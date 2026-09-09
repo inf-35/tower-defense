@@ -31,7 +31,7 @@ func _handle_event(_instance: EffectInstance, event: GameEvent) -> void:
 		return
 
 	var hit_data: HitData = event.data as HitData
-	if not _is_nonlethal_tower_hit(tower, hit_data):
+	if not _is_tower_hit(hit_data):
 		return
 
 	_trigger_explosion(_instance, hit_data, tower)
@@ -67,9 +67,7 @@ func _trigger_explosion(instance: EffectInstance, parent_hit: HitData, tower: To
 	CombatManager.resolve_hit(hit_data, delivery_data)
 	UI.floating_text_manager.show_icon(icon, tower.global_position)
 
-func _is_nonlethal_tower_hit(tower: Tower, hit_data: HitData) -> bool:
+func _is_tower_hit(hit_data: HitData) -> bool: ##allows any positive allied tower hit to detonate, including lethal hits
 	if not is_instance_valid(hit_data) or hit_data.negate or hit_data.damage <= 0.0:
 		return false
-	if not is_instance_valid(tower.health_component):
-		return false
-	return hit_data.damage < tower.health_component.health
+	return true

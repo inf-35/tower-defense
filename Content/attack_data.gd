@@ -22,6 +22,10 @@ class_name AttackData
 	set(new_value):
 		damage = new_value
 		value_changed.emit(Attributes.id.DAMAGE)
+@export var armour_ignore: float = 0.0: ##fraction of negative flat damage taken ignored by outgoing hits
+	set(new_value):
+		armour_ignore = new_value
+		value_changed.emit(Attributes.id.ARMOUR_IGNORE)
 @export var breaking: bool = false ##can this attack damage shields?
 
 @export var status_effects: Array[StatusEffectPrototype] = []
@@ -30,10 +34,13 @@ class_name AttackData
 @export_group("Presentation")
 @export var vfx_on_spawn: VFXInfo #covers the projectile's lifetime, should consist of the projectile itself
 @export var vfx_on_impact: VFXInfo #effects that occur when the projectile dies
+@export var fire_sound: StringName = &"" ##optional sound id played once when this attack is fired
+@export var hit_sound: StringName = ID.Sounds.ENEMY_HIT_SOUND ##sound id played when this attack actually hits an enemy
 
 @export_group("Projectile Properties")
 @export var projectile_speed: float = 10.0 #only applicable for delivery_method == PROJECTILE
 @export var vertical_force: float = -10.0
+@export var arcing: bool = true ##is this projectile affected by gravity
 @export var projectile_lifetime: float = -1.0 ##lifetime of projectile before despawning (negative = infinite)
 
 @export_group("Projectile Simulated")
@@ -65,12 +72,15 @@ func generate_generic_hit_data() -> HitData: ##generates a generic (unitless) hi
 	hit_data.damage = damage
 	hit_data.expected_damage = damage
 	hit_data.radius = radius
+	hit_data.armour_ignore = armour_ignore
 	hit_data.breaking = breaking
 	hit_data.modifiers = generate_modifiers()
 	hit_data.status_effects = format_status_effects()
 
 	hit_data.vfx_on_impact = vfx_on_impact
 	hit_data.vfx_on_spawn = vfx_on_spawn
+	hit_data.fire_sound = fire_sound
+	hit_data.hit_sound = hit_sound
 
 	return hit_data
 
@@ -80,6 +90,7 @@ func generate_generic_delivery_data() -> DeliveryData: ##generates a generic (un
 	delivery_data.cone_angle = cone_angle
 	delivery_data.projectile_speed = projectile_speed
 	delivery_data.projectile_lifetime = projectile_lifetime
+	delivery_data.arcing = arcing
 
 	if delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_ABSTRACT\
 	or delivery_data.delivery_method == DeliveryData.DeliveryMethod.PROJECTILE_SIMULATED:

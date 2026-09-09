@@ -21,7 +21,19 @@
 [ext_resource type="Texture2D" uid="uid://dykg0w6ijl6m" path="res://Assets/paper_background.png" id="19_uq18n"]
 [ext_resource type="Script" uid="uid://cnxbhp7sm72re" path="res://UI/floating_text/floating_text_manager.gd" id="20_hkouh"]
 [ext_resource type="PackedScene" uid="uid://dxij1uny2nk2o" path="res://UI/floating_text/floating_text.tscn" id="21_q2og1"]
+[ext_resource type="Texture2D" uid="uid://5lu1ky24mlwc" path="res://Assets/paper_texture.png" id="21_sunp3"]
 [ext_resource type="Shader" uid="uid://c470efx242vnm" path="res://Shaders/screen_boil.gdshader" id="22_hwxyc"]
+[ext_resource type="Script" uid="uid://bokv6cftwit87" path="res://UI/unit_hp_bar/world_unit_ui_manager.gd" id="23_world_ui"]
+[ext_resource type="PackedScene" uid="uid://d3v0hdv25fw2n" path="res://UI/unit_hp_bar/unit_hp_bar.tscn" id="24_hp_bar"]
+[ext_resource type="Script" uid="uid://drcqbhaqns13y" path="res://Scene Elements/obstruction_warning_renderer.gd" id="25_obstruction_warning_renderer"]
+[ext_resource type="Texture2D" uid="uid://ctihokk778bxv" path="res://Assets/obstruction_warning.png" id="26_obstruction_warning"]
+[ext_resource type="Texture2D" uid="uid://c4121i8dqmtmm" path="res://Assets/obstruction_warning_intermediate.png" id="27_obstruction_warning_intermediate"]
+[ext_resource type="Texture2D" uid="uid://lcppqflnka8m" path="res://Assets/blank_grid.png" id="28_blank_grid"]
+[ext_resource type="Texture2D" uid="uid://cxfg7msvaqb2y" path="res://Assets/sword_grid.png" id="29_sword_grid"]
+[ext_resource type="Texture2D" uid="uid://dxdbwljncyu70" path="res://Assets/bad_grid.png" id="30_bad_grid"]
+[ext_resource type="Script" path="res://UI/ui_visibility_toggle.gd" id="31_ui_visibility"]
+[ext_resource type="Shader" path="res://Shaders/paper_grain.gdshader" id="32_paper_grain"]
+[ext_resource type="Script" uid="uid://ccjlpbls3vyv1" path="res://Scene Elements/path_wash_layer.gd" id="33_path_wash"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q2og1"]
 
@@ -31,6 +43,23 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_q2og1")
 shader_parameter/boil_speed = 3.30800015713
 shader_parameter/boil_strength = 0.0010000000475
 shader_parameter/noise_scale = 5.60000026274012
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_paper_grain"]
+seed = 1837
+frequency = 0.35
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_paper_grain"]
+width = 256
+height = 256
+seamless = true
+noise = SubResource("FastNoiseLite_paper_grain")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_paper_grain"]
+shader = ExtResource("32_paper_grain")
+shader_parameter/grain_strength = 0.0
+shader_parameter/grain_scale = 1.0
+shader_parameter/grain_color = Color(0.34, 0.3, 0.23, 1)
+shader_parameter/grain_texture = SubResource("NoiseTexture2D_paper_grain")
 
 [node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer", "lake_preview_renderer")]
 y_sort_enabled = true
@@ -42,11 +71,18 @@ lake_preview_renderer = NodePath("LakePreviewRenderer")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1723399969]
 zoom = Vector2(12, 12)
 script = ExtResource("2_04hb4")
+minimum_player_zoom = 8.0
 
 [node name="AudioListener2D" type="AudioListener2D" parent="Camera2D" unique_id=107970021]
 current = true
 
 [node name="UI" parent="." unique_id=1683695170 instance=ExtResource("2_hdtfb")]
+
+[node name="UIVisibilityToggle" type="Node" parent="." node_paths=PackedStringArray("canvas_layers", "canvas_items")]
+process_mode = 3
+script = ExtResource("31_ui_visibility")
+canvas_layers = Array[NodePath]([NodePath("../UI"), NodePath("../UI/TutorialManager"), NodePath("../Tooltips")])
+canvas_items = Array[NodePath]([NodePath("../ObstructionWarnings")])
 
 [node name="BoilOverlay" type="CanvasLayer" parent="." unique_id=1253245311]
 process_mode = 3
@@ -74,14 +110,23 @@ process_mode = 3
 z_index = 250
 script = ExtResource("3_fgmf3")
 
-[node name="PathRenderer" type="Node2D" parent="." unique_id=1267335686]
+[node name="PathRenderer" type="Node2D" parent="." unique_id=1267335686 node_paths=PackedStringArray("obstruction_warning_renderer", "path_wash_layer")]
 z_index = 200
+z_as_relative = false
 script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
 corner_texture = ExtResource("8_aibdv")
-stroke_spacing = 10.0
+obstruction_warning_renderer = NodePath("../ObstructionWarnings")
+path_wash_layer = NodePath("../PathWashLayer")
 flow_speed = 3.0
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
+
+[node name="ObstructionWarnings" type="Node2D" parent="." unique_id=68995237]
+z_index = 500
+z_as_relative = false
+script = ExtResource("25_obstruction_warning_renderer")
+warning_texture = ExtResource("26_obstruction_warning")
+intermediate_warning_texture = ExtResource("27_obstruction_warning_intermediate")
 
 [node name="PreviewRenderer" type="Node2D" parent="." unique_id=1992026522]
 z_index = 250
@@ -96,7 +141,7 @@ shader = ExtResource("8_c7iw8")
 max_gradient_depth = 2.5
 draw_background = false
 
-[node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("paper_rect", "color_rect")]
+[node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("paper_rect", "paper_grain_rect", "color_rect")]
 script = ExtResource("7_b4opu")
 is_main_terrain_renderer = true
 shader = ExtResource("9_8ervs")
@@ -105,10 +150,28 @@ draw_background = false
 background_stain_color = Color(0, 0, 0, 0)
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
 paper_rect = NodePath("paper_rect")
+paper_grain_rect = NodePath("paper_rect2")
 color_rect = NodePath("color_rect")
 
+[node name="paper_rect2" type="TextureRect" parent="TerrainRenderer" unique_id=1632982907]
+material = SubResource("ShaderMaterial_paper_grain")
+z_as_relative = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2073.6
+offset_top = -1166.4
+offset_right = 50588.9
+offset_bottom = 27408.6
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.06, 0.06)
+mouse_filter = 2
+texture = ExtResource("21_sunp3")
+stretch_mode = 1
+
 [node name="paper_rect" type="TextureRect" parent="TerrainRenderer" unique_id=9571044]
-modulate = Color(1, 1, 1, 0.078431375)
+modulate = Color(1, 1, 1, 0.30588236)
 z_as_relative = false
 anchors_preset = 15
 anchor_right = 1.0
@@ -135,6 +198,11 @@ scale = Vector2(0.08, 0.08)
 mouse_filter = 2
 color = Color(0.99215686, 0.9372549, 0.84705883, 1)
 
+[node name="PathWashLayer" type="Node2D" parent="."]
+z_index = 0
+z_as_relative = false
+script = ExtResource("33_path_wash")
+
 [node name="NavigationDebugger" type="Node2D" parent="." unique_id=1062625785]
 visible = false
 z_index = 100
@@ -146,6 +214,11 @@ metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
 z_index = 500
 z_as_relative = false
 script = ExtResource("18_aibdv")
+cell_outline_texture = ExtResource("28_blank_grid")
+influence_cell_textures = Dictionary[int, Texture2D]({
+6: ExtResource("29_sword_grid"),
+7: ExtResource("30_bad_grid")
+})
 preview_fade_in_duration = 0.05
 preview_fade_out_duration = 0.27
 metadata/_custom_type_script = "uid://ibj2mt03m5av"
@@ -153,6 +226,8 @@ metadata/_custom_type_script = "uid://ibj2mt03m5av"
 [node name="InworldUI" type="Node2D" parent="." unique_id=2111889340]
 z_index = 400
 z_as_relative = false
+script = ExtResource("23_world_ui")
+health_bar_scene = ExtResource("24_hp_bar")
 
 [node name="FloatingTextManager" type="Node2D" parent="." unique_id=1889057357]
 z_index = 400

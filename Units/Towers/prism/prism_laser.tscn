@@ -5,8 +5,7 @@
 [node name="PrismLaser" type="Area2D" unique_id=1577214031 node_paths=PackedStringArray("collision_shape")]
 script = ExtResource("1_3k5b6")
 collision_shape = NodePath("CollisionShape2D")
-color_start = Color(1, 0.8, 0.19999999, 0.3019608)
-color_end = Color(1, 0.8, 0.19999999, 0.5764706)
+beam_width = 4.0
 metadata/_custom_type_script = "uid://cglhkkavm76aw"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=475995019]

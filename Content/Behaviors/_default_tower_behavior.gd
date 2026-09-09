@@ -33,7 +33,7 @@ func start() -> void:
 	)
 
 #this is the main update loop, called by the unit's _process function
-func update(_delta: float) -> void:
+func update(_delta: float) -> void: ##tracks one target through wind-up and releases at that locked unit while it remains hard-valid
 	_stagger += 1
 	if _stagger % _STAGGER_CYCLE != 0:
 		return
@@ -71,7 +71,7 @@ func update(_delta: float) -> void:
 			var required_turn_speed: float = angle_diff / maxf(attack_cooldown, 0.01)
 			_rotate_turret(target_angle, required_turn_speed * Clock.game_delta)
 			#if the wind-up timer finishes, execute the attack
-			if _is_attack_possible():
+			if _is_attack_possible(false):
 				_attack(_locked_target)
 				#transition back to the ready state
 				_enter_state(State.READY)

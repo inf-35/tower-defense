@@ -7,8 +7,15 @@ var canvas_item: RID  #the rid of the visual on the renderingserver.
 
 var position: Vector2
 var velocity: Vector2
+var visual_velocity: Vector2
+var trail_points: PackedVector2Array = PackedVector2Array()
 var rotation: float = 0.0 #in radians
+var vertical: float = 0.0
+var vertical_velocity: float = 0.0
+var vertical_gravity: float = 0.0
+var arcing: bool = false
 var scale: Vector2 = Vector2.ONE #overall scale
+var is_projectile: bool = false
 var projectile_tints: Array[Color] = []
 var projectile_tint_lifetime: float = -1.0
 

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ChainLightningEffect" load_steps=2 format=3 uid="uid://cr16wxfnweavd"]
+[gd_resource type="Resource" script_class="ChainLightningEffect" format=3 uid="uid://cr16wxfnweavd"]
 
 [ext_resource type="Script" uid="uid://bqevvdjq5qm6s" path="res://Content/Effects/_chain_lightning.gd" id="1_8c215"]
 
@@ -7,4 +7,5 @@ script = ExtResource("1_8c215")
 max_jumps = 8
 jump_radius = 60.0
 damage_falloff_multiplier = 0.85
+status_cooldown_falloff_multiplier = 0.85
 metadata/_custom_type_script = "uid://bqevvdjq5qm6s"

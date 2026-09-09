@@ -33,6 +33,8 @@
 [ext_resource type="PackedScene" uid="uid://ctvr3nc8sdjbw" path="res://UI/damage_tracker/damage_tracker_panel.tscn" id="26_damage_tracker"]
 [ext_resource type="Script" uid="uid://750rn7tmpx2h" path="res://UI/player_damage_feedback.gd" id="27_damage_feedback"]
 [ext_resource type="Shader" uid="uid://cdnu76alxvtkf" path="res://Shaders/player_damage_vignette.gdshader" id="28_damage_vignette"]
+[ext_resource type="PackedScene" path="res://UI/boss_health_bar/boss_health_bar.tscn" id="29_boss_bar"]
+[ext_resource type="Material" path="res://UI/ui_color_replace.tres" id="30_ui_color_replace"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
 shader = ExtResource("22_b47fn")
@@ -81,13 +83,22 @@ mouse_filter = 1
 
 [node name="CursorInfo" parent="." unique_id=442512609 instance=ExtResource("23_vlen6")]
 visible = false
+material = ExtResource("30_ui_color_replace")
+use_parent_material = false
 offset_right = 74.0
 offset_bottom = 34.0
 
 [node name="LoadingScreen" parent="." unique_id=1318486233 instance=ExtResource("24_1")]
 visible = false
+material = ExtResource("30_ui_color_replace")
+use_parent_material = false
+
+[node name="BossHealthBar" parent="." unique_id=1297275621 instance=ExtResource("29_boss_bar")]
+visible = false
+material = ExtResource("30_ui_color_replace")
 
 [node name="PlayerDamageFeedback" type="Control" parent="." unique_id=1883371124 node_paths=PackedStringArray("overlay_rect")]
+material = ExtResource("30_ui_color_replace")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,8 +124,11 @@ mouse_filter = 2
 [node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
 visible = false
 z_index = 0
+material = ExtResource("30_ui_color_replace")
+use_parent_material = false
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=878017124]
+material = ExtResource("30_ui_color_replace")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -125,12 +139,14 @@ theme = ExtResource("1_v6kvy")
 theme_type_variation = &"MarginMinor"
 
 [node name="ui_space" type="Control" parent="Margin" unique_id=1725694392]
+use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 
 [node name="tutorial_anchors" type="Control" parent="Margin/ui_space" unique_id=1028206979]
 z_index = 600
 z_as_relative = false
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -140,6 +156,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="tutorial_panel" type="PanelContainer" parent="Margin/ui_space/tutorial_anchors" unique_id=1280998084 node_paths=PackedStringArray("header_label", "checklist_container", "paragraph_label", "footer_label")]
+use_parent_material = true
 layout_mode = 0
 offset_left = 210.0
 offset_top = 227.0
@@ -152,15 +169,18 @@ paragraph_label = NodePath("MarginContainer/VBoxContainer/paragraph_label")
 footer_label = NodePath("MarginContainer/VBoxContainer/footer_label")
 
 [node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel" unique_id=1118652707]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer" unique_id=1200001001]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"vbox_5"
 
 [node name="header_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001002]
 visible = false
+use_parent_material = true
 clip_contents = false
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -175,10 +195,12 @@ metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="checklist" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001003]
 visible = false
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"vbox_5"
 
 [node name="paragraph_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=872103735]
+use_parent_material = true
 clip_contents = false
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -193,6 +215,7 @@ metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="footer_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001004]
 visible = false
+use_parent_material = true
 clip_contents = false
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -206,6 +229,7 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="central_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=231738217]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -221,6 +245,7 @@ grow_vertical = 0
 mouse_filter = 2
 
 [node name="tower_bar_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1679238732]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 14.0
@@ -230,6 +255,7 @@ offset_bottom = 504.0
 mouse_filter = 2
 
 [node name="trade_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1027622576]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 523.0
@@ -239,6 +265,7 @@ offset_bottom = 679.0
 mouse_filter = 2
 
 [node name="start_wave_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=445037132]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -252,6 +279,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="stats_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1340884095]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 515.0
@@ -261,6 +289,7 @@ offset_bottom = 386.0
 mouse_filter = 2
 
 [node name="timeline_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=48694761]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -273,6 +302,7 @@ grow_horizontal = 0
 mouse_filter = 2
 
 [node name="time_controls_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=200914322]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -288,6 +318,7 @@ mouse_filter = 2
 process_mode = 3
 visible = false
 z_index = 2
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -304,6 +335,7 @@ feedback_button = NodePath("PanelContainer/Control/buttons/feedback_button_wrapp
 quit_button = NodePath("PanelContainer/Control/buttons/main_menu_button")
 
 [node name="Background" type="Panel" parent="Margin/ui_space/game_over_screen" unique_id=1635600364]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -312,6 +344,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/game_over_screen" unique_id=1865014060]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -327,14 +360,17 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/game_over_screen/PanelContainer" unique_id=529838181]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMajor"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer" unique_id=1483797215]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"vbox_10"
 
 [node name="status_text" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer" unique_id=119659859]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s40"
 bbcode_enabled = true
@@ -346,6 +382,7 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="wave_text" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer" unique_id=103296584]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
@@ -356,12 +393,14 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="Towers" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer" unique_id=678641152]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 theme_type_variation = &"vbox_5"
 
 [node name="towers_title" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers" unique_id=1432251385]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s20_descriptive"
 text = "Towers used"
@@ -370,10 +409,12 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers" unique_id=1218743993]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="towers" type="GridContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Towers/ScrollContainer" unique_id=193276530]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -383,11 +424,13 @@ icon_size = Vector2(96, 96)
 display_mode = 1
 
 [node name="Relics" type="VBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer" unique_id=1769512982]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_type_variation = &"vbox_5"
 
 [node name="relics_title" type="RichTextLabel" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics" unique_id=1921196976]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s20_descriptive"
 text = "Relics collected"
@@ -396,10 +439,12 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics" unique_id=1242708999]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="relics" type="GridContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/MarginContainer/VBoxContainer/Relics/ScrollContainer" unique_id=2057362655]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -408,9 +453,11 @@ script = ExtResource("10_aasu8")
 display_mode = 1
 
 [node name="Control" type="Control" parent="Margin/ui_space/game_over_screen/PanelContainer" unique_id=517019646]
+use_parent_material = true
 layout_mode = 2
 
 [node name="buttons" type="HBoxContainer" parent="Margin/ui_space/game_over_screen/PanelContainer/Control" unique_id=1669351190]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -426,6 +473,7 @@ grow_vertical = 0
 theme_type_variation = &"hbox_20"
 
 [node name="feedback_button_wrapper" type="Control" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons" unique_id=1402294511 node_paths=PackedStringArray("content")]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("12_tsiox")
@@ -435,6 +483,7 @@ idle_sway_angle = 2.5
 idle_sway_duration = 3.4
 
 [node name="feedback_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons/feedback_button_wrapper" unique_id=59315362]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 63)
 layout_mode = 0
 anchor_left = 0.5
@@ -456,11 +505,13 @@ theme_override_font_sizes/font_size = 45
 text = "Feedback"
 
 [node name="restart_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons" unique_id=1242919575]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = " Restart "
 
 [node name="main_menu_button" type="Button" parent="Margin/ui_space/game_over_screen/PanelContainer/Control/buttons" unique_id=1719110100]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Main Menu"
@@ -481,6 +532,7 @@ grow_vertical = 2
 size_flags_horizontal = 0
 
 [node name="Stats" type="Control" parent="Margin/ui_space" unique_id=1363415251]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 2.0
@@ -490,6 +542,7 @@ offset_bottom = 302.0
 mouse_filter = 2
 
 [node name="RelicDisplay" type="GridContainer" parent="Margin/ui_space/Stats" unique_id=233400822]
+use_parent_material = true
 layout_mode = 0
 offset_left = 61.0
 offset_top = 129.0
@@ -501,13 +554,15 @@ columns = 12
 script = ExtResource("10_aasu8")
 
 [node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/Stats" unique_id=312359174]
+use_parent_material = true
 layout_mode = 0
-offset_right = 620.0
+offset_right = 761.0
 offset_bottom = 225.0
 mouse_filter = 2
 theme_type_variation = &"fancy_banner"
 
 [node name="stats_label" type="RichTextLabel" parent="Margin/ui_space/Stats/PanelContainer" unique_id=439874556]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"rt_s20"
@@ -533,6 +588,7 @@ grow_horizontal = 0
 grow_vertical = 2
 
 [node name="TimeControls" type="Control" parent="Margin/ui_space" unique_id=1232310798]
+use_parent_material = true
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 1
 anchors_preset = 1
@@ -546,18 +602,20 @@ mouse_filter = 2
 theme_type_variation = &"vbox_10"
 
 [node name="PanelContainer" type="PanelContainer" parent="Margin/ui_space/TimeControls" unique_id=1207361410]
+use_parent_material = true
 layout_direction = 2
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -510.0
+offset_left = -540.0
 offset_bottom = 180.0
 grow_horizontal = 0
 mouse_filter = 2
 theme_type_variation = &"fancy_banner_flipped"
 
 [node name="WaveTimeline" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer" unique_id=524460370 node_paths=PackedStringArray("slot_container", "pips_layer")]
+use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("9_x42ai")
@@ -567,6 +625,7 @@ pip_scene = ExtResource("10_m8qfw")
 metadata/_custom_type_script = "uid://brbwle80gvof"
 
 [node name="pips_layer" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline" unique_id=872653977]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -576,10 +635,15 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="slot_container" type="HBoxContainer" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline" unique_id=1685568909]
+use_parent_material = true
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.87900007
+offset_left = -1.0
+offset_top = -16.0
+offset_right = 4.0
+offset_bottom = 7.234997
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -587,36 +651,43 @@ theme_type_variation = &"hbox_10"
 alignment = 1
 
 [node name="slot" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=758914113]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="slot2" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=2131792931]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="slot3" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=1083859989]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="slot4" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=1834481937]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="slot5" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=942074740]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="slot6" type="Control" parent="Margin/ui_space/TimeControls/PanelContainer/WaveTimeline/slot_container" unique_id=1769559104]
+use_parent_material = true
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="BattleButtonPanel" type="Control" parent="Margin/ui_space/TimeControls" unique_id=1726003001]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -631,6 +702,7 @@ grow_horizontal = 0
 grow_vertical = 2
 
 [node name="BattleButton" type="Button" parent="Margin/ui_space/TimeControls/BattleButtonPanel" unique_id=1609551988]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -645,6 +717,7 @@ script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
 [node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls" unique_id=1604513753 node_paths=PackedStringArray("battle_button", "pause_button", "base_button", "fast_forward_button")]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -667,6 +740,7 @@ base_button = NodePath("AnimatableUI2/PlayButton")
 fast_forward_button = NodePath("AnimatableUI3/FastForwardButton")
 
 [node name="AnimatableUI" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" unique_id=211061727 node_paths=PackedStringArray("content")]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 script = ExtResource("12_tsiox")
@@ -675,6 +749,7 @@ hover_scale = Vector2(1.3, 1.3)
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="PauseButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI" unique_id=1587765318]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 0
 offset_right = 20.0
@@ -686,6 +761,7 @@ script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
 [node name="AnimatableUI2" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" unique_id=30287618 node_paths=PackedStringArray("content")]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 script = ExtResource("12_tsiox")
@@ -694,6 +770,7 @@ hover_scale = Vector2(1.3, 1.3)
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="PlayButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI2" unique_id=1013923333]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 0
 offset_right = 20.0
@@ -705,6 +782,7 @@ script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
 [node name="AnimatableUI3" type="Control" parent="Margin/ui_space/TimeControls/TimeControlButtons" unique_id=1382252821 node_paths=PackedStringArray("content")]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 script = ExtResource("12_tsiox")
@@ -713,6 +791,7 @@ hover_scale = Vector2(1.3, 1.3)
 metadata/_custom_type_script = "uid://2p1hsv7rivsk"
 
 [node name="FastForwardButton" type="TextureButton" parent="Margin/ui_space/TimeControls/TimeControlButtons/AnimatableUI3" unique_id=43189685]
+use_parent_material = true
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 0
 offset_right = 20.0
@@ -724,6 +803,7 @@ script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
 
 [node name="PanelContainer2" type="TextureRect" parent="Margin/ui_space/TimeControls" unique_id=1313031168]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 1.0
@@ -739,6 +819,7 @@ texture = ExtResource("16_aasu8")
 expand_mode = 1
 
 [node name="WaveLabel" type="RichTextLabel" parent="Margin/ui_space/TimeControls/PanelContainer2" unique_id=198944153]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -760,6 +841,7 @@ horizontal_alignment = 1
 script = ExtResource("6_b5f40")
 
 [node name="IncomingEnemyPanel" type="PanelContainer" parent="Margin/ui_space/TimeControls" unique_id=1563197209]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -773,15 +855,18 @@ mouse_filter = 2
 theme_type_variation = &"simple_panel"
 
 [node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel" unique_id=1650848154]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
 [node name="IncomingEnemyBar" type="VBoxContainer" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer" unique_id=429844098 node_paths=PackedStringArray("roster_label")]
+use_parent_material = true
 layout_mode = 2
 script = ExtResource("11_nnaea")
 roster_label = NodePath("Roster")
 
 [node name="Roster" type="RichTextLabel" parent="Margin/ui_space/TimeControls/IncomingEnemyPanel/MarginContainer/IncomingEnemyBar" unique_id=1396115686]
+use_parent_material = true
 custom_minimum_size = Vector2(230, 0)
 layout_mode = 2
 theme_type_variation = &"rt_s15"
@@ -809,6 +894,7 @@ time_control_buttons_panel = NodePath("../TimeControls/TimeControlButtons")
 inspector_panel = NodePath("../Inspector")
 
 [node name="RewardPickupAnimator" type="Control" parent="Margin/ui_space" unique_id=2114500012 node_paths=PackedStringArray("relic_target", "tower_target")]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -824,6 +910,7 @@ metadata/_edit_lock_ = true
 [node name="Expansion" type="Panel" parent="." unique_id=1600268793 node_paths=PackedStringArray("_vbox")]
 visible = false
 self_modulate = Color(1, 1, 1, 0)
+material = ExtResource("30_ui_color_replace")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -834,6 +921,7 @@ script = ExtResource("2_dajm1")
 _vbox = NodePath("OptionsContainer")
 
 [node name="OptionsContainer" type="VBoxContainer" parent="Expansion" unique_id=1418432886]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -847,6 +935,7 @@ metadata/_edit_use_anchors_ = true
 [node name="Reward" type="Panel" parent="." unique_id=1166250422 node_paths=PackedStringArray("card_list", "reroll_button", "skip_button", "title_label")]
 visible = false
 z_index = 1
+material = ExtResource("30_ui_color_replace")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -861,6 +950,7 @@ skip_button = NodePath("CenterContainer/main_container/skip")
 title_label = NodePath("CenterContainer/main_container/title")
 
 [node name="CenterContainer" type="CenterContainer" parent="Reward" unique_id=94962506]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -869,11 +959,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="main_container" type="VBoxContainer" parent="Reward/CenterContainer" unique_id=1969875064]
+use_parent_material = true
 custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
 [node name="title" type="RichTextLabel" parent="Reward/CenterContainer/main_container" unique_id=2009480183]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s20"
 theme_override_colors/default_color = Color(1, 0.98039216, 0.95686275, 1)
@@ -885,16 +977,19 @@ script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="card_list" type="VBoxContainer" parent="Reward/CenterContainer/main_container" unique_id=713995152]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
 [node name="skip" type="Button" parent="Reward/CenterContainer/main_container" unique_id=1630843295]
+use_parent_material = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Skip"
 
 [node name="reroll" type="Button" parent="Reward/CenterContainer/main_container" unique_id=120652893]
+use_parent_material = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 8

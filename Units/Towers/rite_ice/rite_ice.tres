@@ -19,7 +19,7 @@ upgrades_into = Dictionary[int, float]({
 tags = Array[int]([1])
 tower_name = "Rite of Ice"
 rite_short_name = "ice"
-tower_description = "{RITE_LABEL}. When adjacent towers hit {FROST|label=Frosted} enemies, they inflict 1 stack of {BRITTLE}, lasting 3 seconds."
+tower_description = "{RITE_LABEL}. When adjacent towers hit {FROST|label=Frosted} enemies, they inflict 2 stacks of {BRITTLE}, lasting 3 seconds."
 icon = ExtResource("1_icon")
 preview = ExtResource("1_icon")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])

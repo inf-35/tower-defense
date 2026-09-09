@@ -12,6 +12,7 @@ class_name TerrainRenderer
 @export var brush_textures: Array[Texture2D]
 
 @export var paper_rect: TextureRect
+@export var paper_grain_rect: TextureRect
 @export var color_rect: ColorRect
 
 var cell_size: float = Island.CELL_SIZE
@@ -67,6 +68,26 @@ func _setup_configuration() -> void:
 		return
 	RenderingServer.set_default_clear_color(profile.clear_color)
 	color_rect.color = profile.ui_canvas_color
+	_configure_paper_layers(profile)
+
+func _configure_paper_layers(profile: EnvironmentProfile) -> void: ##separates broad paper folds from fine grain so each environment can tune them independently
+	if is_instance_valid(paper_rect):
+		var crumple_modulate: Color = paper_rect.modulate
+		crumple_modulate.a = profile.paper_crumple_strength
+		paper_rect.modulate = crumple_modulate
+
+	if not is_instance_valid(paper_grain_rect):
+		return
+	var grain_material: ShaderMaterial = paper_grain_rect.material as ShaderMaterial
+	if grain_material == null:
+		return
+
+	grain_material = grain_material.duplicate() as ShaderMaterial
+	paper_grain_rect.material = grain_material
+	grain_material.set_shader_parameter(&"grain_strength", profile.paper_grain_strength)
+	grain_material.set_shader_parameter(&"grain_scale", profile.paper_grain_scale)
+	grain_material.set_shader_parameter(&"grain_color", profile.paper_grain_color)
+	grain_material.set_shader_parameter(&"brush_strength", profile.paper_brush_strength)
 
 func _setup_visuals() -> void:
 	#initialize with a small empty grid
@@ -133,6 +154,7 @@ func _setup_visuals() -> void:
 	mat.set_shader_parameter("distortion_texture", noise_tex)
 	mat.set_shader_parameter("noise_texture", watercolor_tex)
 	mat.set_shader_parameter("distance_field_step", 1.0 / maxf(max_gradient_depth, 0.001))
+	_apply_environment_shader_configuration(mat)
 
 	#placeholder paper (replace with load("res://...") if you have one)
 	var paper_img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
@@ -155,6 +177,34 @@ func _setup_visuals() -> void:
 	add_child(_decoration_container)
 
 	_update_rect_transform()
+
+func _apply_environment_shader_configuration(material: ShaderMaterial) -> void: ##applies environment-authored paint controls only to the main watercolor terrain surface
+	if not is_main_terrain_renderer:
+		return
+
+	var profile: EnvironmentProfile = Run.get_environment_profile()
+	if profile == null:
+		return
+
+	material.set_shader_parameter(&"noise_strength", profile.terrain_noise_strength)
+	material.set_shader_parameter(&"pigment_noise_scale", profile.terrain_noise_scale)
+	material.set_shader_parameter(&"cut_threshold", profile.terrain_cut_threshold)
+	material.set_shader_parameter(&"edge_softness", profile.terrain_edge_softness)
+	material.set_shader_parameter(&"center_falloff", profile.terrain_center_falloff)
+	material.set_shader_parameter(&"brush_strength", profile.terrain_brush_strength)
+	material.set_shader_parameter(&"min_paint_coverage", profile.terrain_min_paint_coverage)
+	material.set_shader_parameter(&"terrain_color_strength", profile.terrain_color_strength)
+	material.set_shader_parameter(&"terrain_transition_softness", profile.terrain_transition_softness)
+	material.set_shader_parameter(&"terrain_warp_strength", profile.terrain_warp_strength)
+	material.set_shader_parameter(&"coastline_color", profile.terrain_coastline_color)
+	material.set_shader_parameter(&"coastline_strength", profile.terrain_coastline_strength)
+	material.set_shader_parameter(&"coastline_width", profile.terrain_coastline_width)
+	material.set_shader_parameter(&"waterline_strength", profile.terrain_waterline_strength)
+	material.set_shader_parameter(&"waterline_width", profile.terrain_waterline_width)
+	var open_water_base: Terrain.Base = profile.get_open_water_base()
+	var water_base_stat: TerrainBaseStat = Terrain.get_base_stat(open_water_base)
+	var waterline_level: float = water_base_stat.dominance_strength * water_base_stat.color.a * 0.5
+	material.set_shader_parameter(&"waterline_level", waterline_level)
 
 #accepts a list of tiles to add/remove to minimize resize operations
 #changes: dictionary of { vector2i cell: terrain.base terrain }, or false to remove

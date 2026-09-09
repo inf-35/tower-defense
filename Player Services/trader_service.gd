@@ -158,7 +158,6 @@ func _generate_stock(mark_unseen: bool) -> void: ##rebuilds trader stock and opt
 	var pool: Array[Reward] = RewardService.get_rewards(
 		SLOT_COUNT,
 		[
-			Reward.Type.UNLOCK_TOWER,
 			Reward.Type.ADD_RELIC,
 			Reward.Type.ADD_RITE,
 		]

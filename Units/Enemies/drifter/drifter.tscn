@@ -18,14 +18,14 @@
 
 [sub_resource type="Resource" id="Resource_5dfik"]
 script = ExtResource("4_oxo2e")
-max_speed = 30.0
+max_speed = 24.0
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="Resource" id="Resource_oxo2e"]
 script = ExtResource("5_mt1ix")
-max_health = 4.0
+max_health = 3.2
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mt1ix"]

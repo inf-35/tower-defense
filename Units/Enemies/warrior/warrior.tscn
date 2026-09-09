@@ -20,15 +20,15 @@
 
 [sub_resource type="Resource" id="Resource_mb2by"]
 script = ExtResource("4_nspst")
-max_speed = 18.0
+max_speed = 14.4
 acceleration = 200.0
 turn_speed = 100.0
 metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="Resource" id="Resource_d3klt"]
 script = ExtResource("5_lj1uh")
-max_health = 10.0
-flat_damage_taken = -0.6
+max_health = 9.6
+flat_damage_taken = -0.5
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_j01gd"]
@@ -42,7 +42,7 @@ size = Vector2(70, 85)
 [sub_resource type="Resource" id="Resource_pineb"]
 script = ExtResource("14_mb2by")
 range = 8.0
-cooldown = 1.5
+cooldown = 1.875
 damage = 2.5
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 

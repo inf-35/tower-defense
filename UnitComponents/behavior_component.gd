@@ -41,19 +41,22 @@ func initialise(host_unit: Unit) -> void: ##his function is called by the unit t
 
 	start()
 
-	unit.on_event.connect(func(event: GameEvent):
-		if event.event_type == GameEvent.EventType.WAVE_STARTED:
-			_cooldown = 0.0 #reset timer upon wave starting
+	unit.subscribe_event(GameEvent.EventType.WAVE_STARTED, _on_unit_wave_started_event)
+	unit.subscribe_event(GameEvent.EventType.HIT_RECEIVED, _on_unit_hit_received_event)
+	unit.subscribe_event(GameEvent.EventType.REPLACED, _on_unit_replaced_event)
 
-		if event.event_type == GameEvent.EventType.HIT_RECEIVED:
-			_play_animation(&"hit")
+func _on_unit_wave_started_event(_event: GameEvent) -> void: ##resets behavior timing when the routed combat wave begins
+	_cooldown = 0.0
 
-		if event.event_type == GameEvent.EventType.REPLACED: #handle transfer to new unit behavior
-			var data: UnitReplacedData = event.data as UnitReplacedData
-			if data.old_unit == unit:
-				if is_instance_valid(data.new_unit.behavior):
-					transfer_state(data.new_unit.behavior)
-	)
+func _on_unit_hit_received_event(_event: GameEvent) -> void: ##plays the authored hit reaction only for routed incoming-hit events
+	_play_animation(&"hit")
+
+func _on_unit_replaced_event(event: GameEvent) -> void: ##hands behavior state to the replacement unit created by an upgrade
+	var data: UnitReplacedData = event.data as UnitReplacedData
+	if not is_instance_valid(data) or data.old_unit != unit:
+		return
+	if is_instance_valid(data.new_unit.behavior):
+		transfer_state(data.new_unit.behavior)
 
 func detach() -> void: ##function called when the unit wants to detach this behavior (i.e. upon death)
 	pass
@@ -90,6 +93,35 @@ func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 	if not tower.get_stat(Attributes.id.RANGE):
 		return
 	canvas.preview_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
+
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##virtual introspection surface shared by spatial indexing and selection rendering
+	return []
+
+func sync_tower_influences() -> void: ##atomically publishes this behavior's current introspection descriptors to the island index
+	var service: TowerInfluenceService = _get_tower_influence_service()
+	if service == null or not unit is Tower:
+		return
+	service.sync_influences(self, unit as Tower, get_tower_influences())
+
+func clear_tower_influences() -> void: ##removes every relationship published by this behavior during detach or teardown
+	var service: TowerInfluenceService = _get_tower_influence_service()
+	if service != null:
+		service.clear_owner(self)
+
+func draw_tower_influences(canvas: RangeIndicator) -> void: ##renders the same descriptors used by indexing without requiring subclass draw methods to call super
+	for influence: TowerInfluence in get_tower_influences():
+		canvas.preview_tower_influence(influence)
+
+func _get_tower_influence_service() -> TowerInfluenceService: ##resolves the run-scoped influence index without making behavior logic depend on preview ui lifetime
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return null
+	return Run.references.island.influence_service
+
+func _get_report_cells(report: TowerTopologyService.Report) -> Array[Vector2i]: ##normalizes topology report values into the typed cells expected by influence descriptors
+	var cells: Array[Vector2i] = []
+	if report != null:
+		cells.assign(report.cells.values())
+	return cells
 
 func _draw_allowed_terrain_visuals(canvas: RangeIndicator, tower: Tower) -> void: ##highlights authored allowed-terrain cells for preview prototypes, even when those cells are already occupied
 	if not is_instance_valid(tower) or not tower.abstractive:
@@ -157,18 +189,26 @@ func _is_attack_possible(target_needed: bool = true) -> bool:
 
 	return false
 
-func _attempt_simple_attack() -> bool:
-	if not _is_attack_possible():
+func _attempt_simple_attack() -> bool: ##fires one ordinary targeted attack while querying range only once for this update
+	if attack_component == null or range_component == null:
 		return false
 
-	var target = range_component.get_target() as Unit
-	if target:
-		#print(_cooldown, " ", attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.COOLDOWN))
-		attack_component.attack(target)
-		unit.queue_redraw()
-		return true
+	if unit.disabled:
+		return false
 
-	return false
+	if unit.attack_only_when_blocked and not unit.blocked:
+		return false
+
+	if attack_component.current_cooldown > 0.0:
+		return false
+
+	var target: Unit = range_component.get_target() as Unit
+	if not target:
+		return false
+
+	attack_component.attack(target)
+	unit.queue_redraw()
+	return true
 
 func _attempt_navigate_to_origin() -> bool:
 	if not is_instance_valid(navigation_component):

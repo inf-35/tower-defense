@@ -5,39 +5,67 @@ const DEFAULT_CAPACITY: int = 10
 
 var _capacity: int = DEFAULT_CAPACITY
 var _agent_keys: Array[int] = []
-var _agent_labels: Dictionary[int, String] = {}
+var _agent_labels: Array[String] = []
 
-func duplicate() -> EventLineage:
+func duplicate() -> EventLineage: ##returns an independent lineage copy with producer order and repeat counts preserved
 	var lineage := EventLineage.new()
 	lineage._capacity = _capacity
-
-	for agent_key: int in _agent_keys:
-		lineage._agent_keys.append(agent_key)
-
-	for agent_key: int in _agent_labels:
-		lineage._agent_labels[agent_key] = _agent_labels[agent_key]
+	lineage._agent_keys = _agent_keys.duplicate()
+	lineage._agent_labels = _agent_labels.duplicate()
 
 	return lineage
 
-func has_producer(producer: Object) -> bool:
+func has_producer(producer: Object) -> bool: ##returns whether a runtime producer appears at least once in this lineage
+	return count_producer(producer) > 0
+
+func count_producer(producer: Object) -> int: ##counts how many times a runtime producer appears in this lineage
 	var producer_key: int = get_producer_key(producer)
 	if producer_key <= 0:
-		return false
+		return 0
 
-	return _agent_keys.has(producer_key)
+	var count: int = 0
+	for agent_key: int in _agent_keys:
+		if agent_key == producer_key:
+			count += 1
+	return count
 
-func push_producer(producer: Object) -> void:
-	var producer_key: int = get_producer_key(producer)
-	if producer_key <= 0 or _agent_keys.has(producer_key):
+func has_producer_label(label: StringName) -> bool: ##returns whether a producer family label appears at least once in this lineage
+	return count_producer_label(label) > 0
+
+func count_producer_label(label: StringName) -> int: ##counts how many times a producer family label appears in this lineage
+	if String(label).is_empty():
+		return 0
+
+	var count: int = 0
+	for producer_label: String in _agent_labels:
+		if producer_label == String(label):
+			count += 1
+
+	return count
+
+func push_producer_label(label: StringName) -> void: ##records a producer family occurrence while preserving repeat counts
+	var producer_label: String = String(label)
+	if producer_label.is_empty():
 		return
 
-	_agent_keys.append(producer_key)
-	_agent_labels[producer_key] = get_producer_label(producer)
+	var producer_key: int = -absi(producer_label.hash())
+	if producer_key == 0:
+		producer_key = -1
+	_push_producer_entry(producer_key, producer_label)
 
+func push_producer(producer: Object) -> void: ##records a runtime producer occurrence while preserving repeat counts
+	var producer_key: int = get_producer_key(producer)
+	if producer_key <= 0:
+		return
+
+	_push_producer_entry(producer_key, get_producer_label(producer))
+
+func _push_producer_entry(producer_key: int, producer_label: String) -> void: ##stores one lineage occurrence and trims old entries when the bounded history is full
+	_agent_keys.append(producer_key)
+	_agent_labels.append(producer_label)
 	while _agent_keys.size() > _capacity:
-		var removed_key: int = _agent_keys[0]
 		_agent_keys.remove_at(0)
-		_agent_labels.erase(removed_key)
+		_agent_labels.remove_at(0)
 
 static func get_producer_key(producer: Object) -> int:
 	if not is_instance_valid(producer):

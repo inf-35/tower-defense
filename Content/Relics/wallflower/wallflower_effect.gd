@@ -51,3 +51,19 @@ func _evaluate(instance: EffectInstance) -> void:
 		if state.modifier:
 			tower.modifiers_component.remove_modifier(state.modifier)
 			state.modifier = null
+
+func get_tower_influences(candidate: Tower = null) -> Array[TowerInfluence]: ##reports wallflower only while the candidate has no adjacent tower
+	if not is_instance_valid(candidate) or candidate.hostile or candidate.current_state != Tower.State.ACTIVE:
+		return []
+	if not candidate.get_adjacent_towers().is_empty():
+		return []
+	var modifiers: Array[ModifierDataPrototype] = []
+	if is_instance_valid(modifier_prototype):
+		modifiers.append(modifier_prototype)
+	return [TowerInfluence.for_cells(
+		&"wallflower",
+		TowerInfluence.Kind.MODIFIER,
+		candidate.get_occupied_cells(),
+		null,
+		modifiers
+	)]

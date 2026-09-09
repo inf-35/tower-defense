@@ -18,13 +18,13 @@
 [sub_resource type="Resource" id="Resource_8djvc"]
 script = ExtResource("5_0diy1")
 attribute = 8
-multiplicative = 0.5
+multiplicative = 0.333333
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_abxx4"]
 script = ExtResource("6_blors")
 buff_modifier = SubResource("Resource_8djvc")
-self_damage = 1.0
+self_damage = 2.0
 metadata/_custom_type_script = "uid://ck5g2oyg3bfft"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]

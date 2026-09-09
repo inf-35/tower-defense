@@ -1,6 +1,9 @@
 extends Behavior
 class_name SoulLinkBehavior
 
+const FORWARD_INFLUENCE_KEY: StringName = &"soul_link_forward"
+const BACK_INFLUENCE_KEY: StringName = &"soul_link_back"
+
 var _forward_tower: Tower
 var _back_tower: Tower
 
@@ -16,6 +19,7 @@ func detach() -> void:
 	_disconnect_island_updates()
 	_disconnect_forward_tower()
 	_back_tower = null
+	clear_tower_influences()
 
 func _exit_tree() -> void:
 	detach()
@@ -45,6 +49,7 @@ func _refresh_links() -> void:
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower) or tower.abstractive:
 		return
+	sync_tower_influences()
 
 	var forward_direction: Vector2i = tower.get_forward_direction()
 	var new_forward_tower: Tower = _get_tower_at_offset(forward_direction)
@@ -78,25 +83,21 @@ func _connect_forward_tower() -> void:
 	if not is_instance_valid(_forward_tower):
 		return
 
-	if _forward_tower.on_event.is_connected(_on_forward_tower_event):
+	if _forward_tower.is_subscribed_to_event(GameEvent.EventType.HIT_RECEIVED, _on_forward_tower_event):
 		return
 
-	_forward_tower.on_event.connect(_on_forward_tower_event)
+	_forward_tower.subscribe_event(GameEvent.EventType.HIT_RECEIVED, _on_forward_tower_event)
 
 func _disconnect_forward_tower() -> void:
 	if not is_instance_valid(_forward_tower):
 		_forward_tower = null
 		return
 
-	if _forward_tower.on_event.is_connected(_on_forward_tower_event):
-		_forward_tower.on_event.disconnect(_on_forward_tower_event)
+	_forward_tower.unsubscribe_event(GameEvent.EventType.HIT_RECEIVED, _on_forward_tower_event)
 
 	_forward_tower = null
 
-func _on_forward_tower_event(event: GameEvent) -> void:
-	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
-		return
-
+func _on_forward_tower_event(event: GameEvent) -> void: ##shares routed incoming damage from the currently linked forward tower
 	if unit.disabled:
 		return
 
@@ -146,18 +147,40 @@ func _is_linkable_tower(candidate: Tower) -> bool:
 
 	return true
 
-func draw_visuals(canvas: RangeIndicator) -> void:
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes the forward damage input and rear transfer output as facing-relative links
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower):
-		return
+		return []
 
 	var start_pos: Vector2 = Island.cell_to_position(tower.tower_position)
 	var forward_direction: Vector2i = tower.get_forward_direction()
-
-	_draw_adjacent_link(canvas, start_pos, tower.tower_position + forward_direction, canvas.positive_highlight_color)
-	_draw_adjacent_link(canvas, start_pos, tower.tower_position - forward_direction, canvas.negative_highlight_color)
-
-func _draw_adjacent_link(canvas: RangeIndicator, start_pos: Vector2, cell: Vector2i, color: Color) -> void:
-	var end_pos: Vector2 = Island.cell_to_position(cell)
-	canvas.preview_line(start_pos, end_pos, color, 2.0)
-	canvas.draw_cell(cell, color)
+	var forward_cell: Vector2i = tower.tower_position + forward_direction
+	var back_cell: Vector2i = tower.tower_position - forward_direction
+	return [
+		TowerInfluence.for_line(
+			FORWARD_INFLUENCE_KEY,
+			TowerInfluence.Kind.INPUT,
+			[forward_cell],
+			start_pos,
+			Island.cell_to_position(forward_cell),
+			[forward_cell],
+			null,
+			[],
+			true,
+			TowerInfluence.Scope.TOWER,
+			TowerInfluence.VisualRole.POSITIVE
+		),
+		TowerInfluence.for_line(
+			BACK_INFLUENCE_KEY,
+			TowerInfluence.Kind.OUTPUT,
+			[back_cell],
+			start_pos,
+			Island.cell_to_position(back_cell),
+			[back_cell],
+			null,
+			[],
+			true,
+			TowerInfluence.Scope.TOWER,
+			TowerInfluence.VisualRole.NEGATIVE
+		),
+	]

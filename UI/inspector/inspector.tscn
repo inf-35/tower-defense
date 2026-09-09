@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="5_re0sn"]
 
 [node name="inspector" type="Control" unique_id=1202429556 node_paths=PackedStringArray("tower_overview", "inspector_icon", "healthbar", "inspector_title", "subtitle", "status_container", "button_container", "stats", "description")]
+use_parent_material = true
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -33,6 +34,7 @@ stats = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollC
 description = NodePath("tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer/description")
 
 [node name="tower_overview" type="PanelContainer" parent="." unique_id=2011773452]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,18 +43,22 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="tower_overview" unique_id=1492953737]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMajor"
 
 [node name="Inspector" type="HBoxContainer" parent="tower_overview/MarginContainer" unique_id=497054174]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"hbox_20"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector" unique_id=1584106431]
+use_parent_material = true
 clip_contents = true
 layout_mode = 2
 
 [node name="AspectRatioSolid" type="AspectRatioContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2" unique_id=2122526670]
+use_parent_material = true
 custom_minimum_size = Vector2(240, 240)
 layout_mode = 2
 size_flags_vertical = 3
@@ -60,17 +66,20 @@ script = ExtResource("2_6mo1h")
 metadata/_custom_type_script = "uid://bxcpffjdkujg"
 
 [node name="TextureRect" type="TextureRect" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2/AspectRatioSolid" unique_id=488543638]
+use_parent_material = true
 layout_mode = 2
 texture = ExtResource("5_l0dwj")
 expand_mode = 1
 
 [node name="HealthBar" type="ProgressBar" parent="tower_overview/MarginContainer/Inspector/VBoxContainer2" unique_id=2036106495]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 theme_type_variation = &"healthbar"
 show_percentage = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector" unique_id=194371142]
+use_parent_material = true
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -78,39 +87,46 @@ size_flags_vertical = 3
 theme_type_variation = &"vbox_5"
 
 [node name="Title" type="HBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer" unique_id=1137439860]
+use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"hbox_5"
 
 [node name="inspector_title" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title" unique_id=1237114775]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"LabelHeader"
 text = "Inspector"
 vertical_alignment = 2
 
 [node name="subtitle" type="Label" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title" unique_id=47517871]
+use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"LabelInlineheader"
 text = "mk "
 vertical_alignment = 2
 
 [node name="status_container" type="HBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/Title" unique_id=822424982]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"hbox_10"
 alignment = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer" unique_id=1818426643]
+use_parent_material = true
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer" unique_id=450705472]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"vbox_10"
 
 [node name="stats" type="GridContainer" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1804509666]
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -118,6 +134,7 @@ theme_override_constants/h_separation = 20
 columns = 3
 
 [node name="description" type="RichTextLabel" parent="tower_overview/MarginContainer/Inspector/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1144582009]
+use_parent_material = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_stretch_ratio = 0.5
@@ -129,6 +146,7 @@ script = ExtResource("5_re0sn")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
 [node name="action_button_container" type="HBoxContainer" parent="." unique_id=1729740271]
+use_parent_material = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 1.0

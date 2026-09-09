@@ -4,6 +4,7 @@ class_name InteractiveRichTextLabel
 
 var _tooltip_instance: TooltipPanel
 var _enabled: bool = false
+var _raw_parsed_text: String = ""
 
 func _init() -> void:
 	#ensure bbcode is enabled
@@ -19,10 +20,12 @@ func _ready() -> void:
 
 #this is the new, clean public api for this component
 #all scripts must call this for text modification
-func set_parsed_text(_text: String) -> void:
+func set_parsed_text(_text: String) -> void: ##parses a raw keyword string only when the caller-provided source text actually changes
 	#use the service to convert user-friendly text into bbcode
-	if text != _text:
-		self.text = KeywordService.parse_text_for_bbcode(_text)
+	if _raw_parsed_text == _text:
+		return
+	_raw_parsed_text = _text
+	self.text = KeywordService.parse_text_for_bbcode(_text)
 
 func _on_meta_hover_started(meta: Variant) -> void:
 	if not _enabled:

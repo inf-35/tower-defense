@@ -34,6 +34,16 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var line_width: float = 3.0
 @export var line_length: float = 20.0
 
+@export_group("Projectile Trail")
+@export var projectile_trail_enabled: bool = true ##when true, projectile-spawned procedural vfx leave a smoothed tapered trail
+@export var projectile_trail_max_points: int = 10 ##maximum sampled positions retained for the ribbon path
+@export var projectile_trail_sample_distance: float = 2.0 ##minimum world-space movement before recording another trail sample
+@export var projectile_trail_smooth_steps: int = 3 ##catmull-rom subdivisions between recorded samples
+@export var projectile_trail_outer_width: float = 1.2 ##soft outer ribbon width at the projectile head
+@export var projectile_trail_inner_width: float = 0.4 ##bright inner ribbon width at the projectile head
+@export var projectile_trail_outer_color: Color = Color(1.0, 1.0, 1.0, 0.62) ##outer ribbon color before lighting compensation
+@export var projectile_trail_inner_color: Color = Color(1.0, 1.0, 1.0, 1.0) ##inner ribbon color before lighting compensation
+
 @export_group("Swirl Line")
 @export var swirl_particle_texture: Texture2D = preload("res://Assets/particle_whirl.png") ##sprite used by authored swirl-line effects when no bespoke texture is supplied
 @export var swirl_color: Color = Color(1.0, 1.0, 1.0, 0.35) ##base tint and opacity applied to every swirl particle before lifetime fade
@@ -66,7 +76,7 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var rotation_mode: RotationMode = RotationMode.STATIC #changed default
 enum RotationMode { STATIC, FACE_VELOCITY, SPIN }
 @export var spin_speed: float = 180.0
-@export var graphical_layer: int = 1000
+@export var graphical_layer: int = Layers.ALLIED_PROJECTILES
 
 @export var scale_over_lifetime: Curve
 @export var color_over_lifetime: Gradient

@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="TowerData" format=3]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://575t3t5fbvax"]
 
-[ext_resource type="Texture2D" path="res://Assets/rite_balance_icon.png" id="1_cp52n"]
-[ext_resource type="Script" path="res://Content/tower_data.gd" id="2_mwpf0"]
-[ext_resource type="Resource" path="res://Content/InspectorActions/destroy.tres" id="3_f6cmi"]
-[ext_resource type="PackedScene" path="res://Units/Towers/rite_balance/rite_balance.tscn" id="4_mxli8"]
+[ext_resource type="Texture2D" uid="uid://cgnwoy1v4infy" path="res://Assets/rite_balance_icon.png" id="1_cp52n"]
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_mwpf0"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_vaknr"]
+[ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_f6cmi"]
+[ext_resource type="PackedScene" uid="uid://cffu3d7waawcp" path="res://Units/Towers/rite_balance/rite_balance.tscn" id="4_mxli8"]
 
 [resource]
 script = ExtResource("2_mwpf0")
@@ -15,8 +16,8 @@ element = 4
 is_rite = true
 tower_name = "Rite of Balance"
 rite_short_name = "balance"
-tower_description = "{RITE_LABEL}. Adjacent towers turn overkill damage into seeking bolts."
+tower_description = "{RITE_LABEL}. Adjacent towers turn overkill damage into seeking bolts. Can chain up to 4 times."
 icon = ExtResource("1_cp52n")
 preview = ExtResource("1_cp52n")
-inspector_actions = Array[InspectorAction]([ExtResource("3_f6cmi")])
+inspector_actions = Array[ExtResource("2_vaknr")]([ExtResource("3_f6cmi")])
 tower_scene = ExtResource("4_mxli8")

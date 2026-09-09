@@ -48,6 +48,7 @@ func _play_icon_pickup(icon_texture: Texture2D, source_position: Vector2, target
 		return
 
 	var icon := TextureRect.new()
+	icon.use_parent_material = true
 	icon.texture = icon_texture
 	icon.custom_minimum_size = Vector2(120, 120)
 	icon.size = icon.custom_minimum_size
