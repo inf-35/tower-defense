@@ -34,6 +34,8 @@ var _terrain_wash_image: Image
 var _terrain_wash_texture: ImageTexture
 var _terrain_control_image: Image
 var _terrain_control_texture: ImageTexture
+var _terrain_dominance_image: Image
+var _terrain_dominance_texture: ImageTexture
 var _grid_data: Dictionary = {} #stores vector2i -> terrain.base
 #visual state trackers
 var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} #stores vector2i -> sprite2d
@@ -102,6 +104,9 @@ func _setup_visuals() -> void:
 	_terrain_control_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_terrain_control_image.fill(Color.BLACK)
 	_terrain_control_texture = ImageTexture.create_from_image(_terrain_control_image)
+	_terrain_dominance_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	_terrain_dominance_image.fill(Color.TRANSPARENT)
+	_terrain_dominance_texture = ImageTexture.create_from_image(_terrain_dominance_image)
 	_brush_viewport = SubViewport.new()
 	_brush_viewport.name = "BrushMaskViewport"
 	_brush_viewport.disable_3d = true
@@ -151,6 +156,7 @@ func _setup_visuals() -> void:
 	mat.set_shader_parameter("terrain_color_texture", _terrain_color_texture)
 	mat.set_shader_parameter("terrain_wash_texture", _terrain_wash_texture)
 	mat.set_shader_parameter("terrain_control_texture", _terrain_control_texture)
+	mat.set_shader_parameter("terrain_dominance_texture", _terrain_dominance_texture)
 	mat.set_shader_parameter("distortion_texture", noise_tex)
 	mat.set_shader_parameter("noise_texture", watercolor_tex)
 	mat.set_shader_parameter("distance_field_step", 1.0 / maxf(max_gradient_depth, 0.001))
@@ -186,15 +192,12 @@ func _apply_environment_shader_configuration(material: ShaderMaterial) -> void: 
 	if profile == null:
 		return
 
-	material.set_shader_parameter(&"noise_strength", profile.terrain_noise_strength)
-	material.set_shader_parameter(&"pigment_noise_scale", profile.terrain_noise_scale)
 	material.set_shader_parameter(&"cut_threshold", profile.terrain_cut_threshold)
 	material.set_shader_parameter(&"edge_softness", profile.terrain_edge_softness)
 	material.set_shader_parameter(&"center_falloff", profile.terrain_center_falloff)
 	material.set_shader_parameter(&"brush_strength", profile.terrain_brush_strength)
 	material.set_shader_parameter(&"min_paint_coverage", profile.terrain_min_paint_coverage)
 	material.set_shader_parameter(&"terrain_color_strength", profile.terrain_color_strength)
-	material.set_shader_parameter(&"terrain_transition_softness", profile.terrain_transition_softness)
 	material.set_shader_parameter(&"terrain_warp_strength", profile.terrain_warp_strength)
 	material.set_shader_parameter(&"coastline_color", profile.terrain_coastline_color)
 	material.set_shader_parameter(&"coastline_strength", profile.terrain_coastline_strength)
@@ -337,6 +340,7 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 	_terrain_color_image.fill(Color.TRANSPARENT)
 	_terrain_wash_image.fill(Color.TRANSPARENT)
 	_terrain_control_image.fill(Color.BLACK)
+	_terrain_dominance_image.fill(Color.TRANSPARENT)
 
 	#if input is empty, just update texture and return
 	if new_land_tiles.is_empty():
@@ -344,6 +348,7 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 		_terrain_color_texture.set_image(_terrain_color_image)
 		_terrain_wash_texture.set_image(_terrain_wash_image)
 		_terrain_control_texture.set_image(_terrain_control_image)
+		_terrain_dominance_texture.set_image(_terrain_dominance_image)
 		return
 
 	#calculate new bounds
@@ -420,15 +425,18 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	var new_color_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	var new_wash_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	var new_control_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_L8)
+	var new_dominance_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	new_color_img.fill(Color.TRANSPARENT)
 	new_wash_img.fill(Color.TRANSPARENT)
 	new_control_img.fill(Color.BLACK)
+	new_dominance_img.fill(Color.TRANSPARENT)
 
 	#update state
 	_grid_image = new_img
 	_terrain_color_image = new_color_img
 	_terrain_wash_image = new_wash_img
 	_terrain_control_image = new_control_img
+	_terrain_dominance_image = new_dominance_img
 	_min_coord = new_origin
 	_size_cells = new_size
 	#update visual rect
@@ -542,6 +550,7 @@ func _update_terrain_color_map() -> void:
 	_terrain_color_image.fill(Color.TRANSPARENT)
 	_terrain_wash_image.fill(Color.TRANSPARENT)
 	_terrain_control_image.fill(Color.BLACK)
+	_terrain_dominance_image.fill(Color.TRANSPARENT)
 	for global_pos: Vector2i in _grid_data:
 		var local_pos: Vector2i = global_pos - _min_coord
 		if local_pos.x < 0 or local_pos.y < 0 or local_pos.x >= _size_cells.x or local_pos.y >= _size_cells.y:
@@ -550,16 +559,26 @@ func _update_terrain_color_map() -> void:
 		var terrain_type: Terrain.Base = _grid_data[global_pos]
 		var terrain_color := Terrain.get_color(terrain_type)
 		terrain_color.a = clamp(terrain_color.a, 0.0, 1.0)
-		_terrain_color_image.set_pixelv(local_pos, terrain_color)
+		_terrain_color_image.set_pixelv(local_pos, _premultiply_color(terrain_color))
 		var wash_color := Terrain.get_wash_color(terrain_type)
 		wash_color.a = clamp(wash_color.a, 0.0, 1.0)
-		_terrain_wash_image.set_pixelv(local_pos, wash_color)
-		var dominance := Terrain.get_dominance_strength(terrain_type) * terrain_color.a
+		_terrain_wash_image.set_pixelv(local_pos, _premultiply_color(wash_color))
+		var dominance := clampf(Terrain.get_dominance_strength(terrain_type) * terrain_color.a, 0.0, 1.0)
 		_terrain_control_image.set_pixelv(local_pos, Color(dominance, dominance, dominance))
+		_terrain_dominance_image.set_pixelv(local_pos, Color(
+			terrain_color.r * dominance,
+			terrain_color.g * dominance,
+			terrain_color.b * dominance,
+			dominance
+		))
 
 	_terrain_color_texture.set_image(_terrain_color_image)
 	_terrain_wash_texture.set_image(_terrain_wash_image)
 	_terrain_control_texture.set_image(_terrain_control_image)
+	_terrain_dominance_texture.set_image(_terrain_dominance_image)
+
+func _premultiply_color(color: Color) -> Color: ##packs filtered terrain maps so transparent neighbors do not darken blended color
+	return Color(color.r * color.a, color.g * color.a, color.b * color.a, color.a)
 
 func _terrain_type_from_change(change) -> Terrain.Base:
 	if change is int:

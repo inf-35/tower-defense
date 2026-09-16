@@ -48,15 +48,12 @@ extends Resource
 @export_range(0.0, 2.0, 0.01) var night_projectile_chroma_boost: float = 0.75 ##saturation lift applied before projectile chroma is drawn
 @export_range(0.0, 1.0, 0.01) var night_projectile_shading_fraction: float = 0.35 ##fraction of combat-night ambient reapplied to otherwise exempt projectile visuals
 @export_group("Terrain Paint")
-@export_range(0.0, 1.0, 0.01) var terrain_noise_strength: float = 0.2 ##amount of broad watercolor variation within painted terrain
-@export_range(0.25, 6.0, 0.05) var terrain_noise_scale: float = 1.0 ##spatial frequency of pigment variation inside the painted terrain
 @export_range(0.0, 0.5, 0.01) var terrain_cut_threshold: float = 0.2 ##pure-wash depth measured inward from the island boundary
 @export_range(0.0, 2.0, 0.01) var terrain_edge_softness: float = 1.0 ##distance over which wash transitions into body pigment
 @export_range(0.1, 5.0, 0.01) var terrain_center_falloff: float = 2.0 ##shape of the wash-to-pigment transition
 @export_range(0.0, 1.0, 0.01) var terrain_brush_strength: float = 0.3 ##amount of dry-brush breakup exposing the pale wash
 @export_range(0.0, 1.0, 0.01) var terrain_min_paint_coverage: float = 0.5 ##minimum brush coverage retained in gaps between stamped paint marks
 @export_range(0.0, 1.0, 0.01) var terrain_color_strength: float = 1.0 ##strength of authored terrain body colours over their washes
-@export_range(0.0, 1.0, 0.01) var terrain_transition_softness: float = 0.15 ##softness of boundaries between valid terrain families
 @export_range(0.0, 12.0, 0.1) var terrain_warp_strength: float = 8.0 ##world-space wobble applied to terrain-family ownership
 @export var terrain_coastline_color: Color = Color(0.3, 0.28, 0.22, 1.0) ##ink colour used for the optional outer island contour
 @export_range(0.0, 1.0, 0.01) var terrain_coastline_strength: float = 0.0 ##opacity of the outer island contour
