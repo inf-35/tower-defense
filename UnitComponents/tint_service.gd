@@ -18,6 +18,10 @@ const LAYER_COUNT: int = 8
 
 const HIT_FLASH_COLOR: Color = Color(1.0, 1.0, 1.0, 1.0)
 const UNIT_EFFECTS_SHADER: Shader = preload("res://Shaders/unit_effects.gdshader")
+const ENEMY_CORRECTION_TINT_COLOR: Color = Color(1.12, 0.847, 0.786, 1.0)
+const ENEMY_CORRECTION_TINT_STRENGTH: float = 0.22
+const ENEMY_BRIGHTNESS_LIFT: float = 0.3
+const ENEMY_CHROMA_SCALE: float = 1.6
 
 var _owner: Node
 var _root_graphics: Sprite2D
@@ -209,7 +213,7 @@ func _apply_tints() -> void: ##rebuilds the graphics sprite modulate from author
 		)
 
 	_root_graphics.modulate = final_color
-	_apply_shader_overlay(overlay_color, overlay_intensity)
+	_apply_shader_effects(overlay_color, overlay_intensity)
 
 func get_overlay_state() -> Dictionary[StringName, Variant]: ##returns the currently composed shader-overlay target so detached visuals can continue fading after the unit dies
 	var overlay_color: Color = Color.WHITE
@@ -254,8 +258,10 @@ func _reset_layer_state() -> void: ##initializes the fixed layer storage so all 
 		_layer_active.append(false)
 		_layer_tweens.append(null)
 
-func _apply_shader_overlay(overlay_color: Color, overlay_intensity: float) -> void: ##uses the unit-effects shader only while an overlay tint is visibly active
-	if is_zero_approx(overlay_intensity):
+func _apply_shader_effects(overlay_color: Color, overlay_intensity: float) -> void: ##uses the unit-effects shader for transient overlays and persistent hostile readability correction
+	var correction_state: Dictionary[StringName, Variant] = _get_color_correction_state()
+	var has_correction: bool = _has_visible_color_correction(correction_state)
+	if is_zero_approx(overlay_intensity) and not has_correction:
 		_clear_shader_overlay()
 		return
 
@@ -264,6 +270,10 @@ func _apply_shader_overlay(overlay_color: Color, overlay_intensity: float) -> vo
 		return
 	material.set_shader_parameter(&"overlay_color", overlay_color)
 	material.set_shader_parameter(&"overlay_intensity", overlay_intensity)
+	material.set_shader_parameter(&"correction_tint", correction_state[&"tint"])
+	material.set_shader_parameter(&"correction_tint_strength", correction_state[&"tint_strength"])
+	material.set_shader_parameter(&"brightness_lift", correction_state[&"brightness_lift"])
+	material.set_shader_parameter(&"chroma_scale", correction_state[&"chroma_scale"])
 
 func _ensure_unit_effects_material() -> ShaderMaterial: ##returns a local unit-effects material when the overlay path needs one
 	if not is_instance_valid(_root_graphics):
@@ -288,6 +298,30 @@ func _clear_shader_overlay() -> void: ##removes the overlay shader when it would
 	if not _uses_unit_effects_shader():
 		return
 	_root_graphics.material = null
+
+func _get_color_correction_state() -> Dictionary[StringName, Variant]: ##returns the persistent presentation correction applied to broad unit families
+	if _is_hostile_owner():
+		return {
+			&"tint": ENEMY_CORRECTION_TINT_COLOR,
+			&"tint_strength": ENEMY_CORRECTION_TINT_STRENGTH,
+			&"brightness_lift": ENEMY_BRIGHTNESS_LIFT,
+			&"chroma_scale": ENEMY_CHROMA_SCALE,
+		}
+
+	return {
+		&"tint": Color.WHITE,
+		&"tint_strength": 0.0,
+		&"brightness_lift": 0.0,
+		&"chroma_scale": 1.0,
+	}
+
+func _has_visible_color_correction(correction_state: Dictionary[StringName, Variant]) -> bool: ##reports whether persistent correction requires the unit-effects material
+	return float(correction_state[&"tint_strength"]) > 0.0\
+		or float(correction_state[&"brightness_lift"]) > 0.0\
+		or not is_equal_approx(float(correction_state[&"chroma_scale"]), 1.0)
+
+func _is_hostile_owner() -> bool: ##detects enemy-owned tint services without coupling callers to a separate rendering path
+	return is_instance_valid(_owner) and "hostile" in _owner and bool(_owner.hostile)
 
 func _uses_unit_effects_shader() -> bool: ##returns whether the current root graphics material can receive overlay uniform updates
 	if not (_root_graphics.material is ShaderMaterial):

@@ -31,13 +31,17 @@ func detach() -> void:
 	clear_tower_influences()
 
 func attach() -> void:
-	_refresh_connections((unit as Tower).get_adjacent_towers())
+	var tower: Tower = unit as Tower
+	if is_instance_valid(tower) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		_refresh_connections(Run.references.island.topology_service.get_adjacency_report(tower))
 
-func _refresh_connections(adj_map: Dictionary[Vector2i, Tower]) -> void:
+func _refresh_connections(adjacency_data: AdjacencyReportData) -> void:
 	sync_tower_influences()
+	if adjacency_data == null:
+		return
 	var current_set: Dictionary[Tower, bool] = {}
 	var adjacent_towers: Array[Tower] = []
-	adjacent_towers.assign(adj_map.values())
+	adjacent_towers.assign(adjacency_data.unique_towers)
 
 	for neighbor: Tower in adjacent_towers:
 		if not is_instance_valid(neighbor):

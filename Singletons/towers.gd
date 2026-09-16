@@ -84,6 +84,7 @@ enum Type {
 	RITE_PLAGUES,
 	HARBOR,
 	RITE_BREAKING,
+	RITE_PITCHFORK,
 }
 
 enum Element {

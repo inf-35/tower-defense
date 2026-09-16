@@ -39,12 +39,17 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 	
 	var origin_position: Vector2 = report.target.global_position
 	var hostile: bool = report.target.hostile
+	var rite_tower: Tower = _resolve_source_tower(instance)
+	if is_instance_valid(rite_tower):
+		BuffComponent.play_link_wisp_from_position(origin_position, rite_tower)
+
 	await Clock.await_game_time(0.01)
 	var target: Unit = _find_random_enemy(origin_position, hostile)
 	if not is_instance_valid(target):
 		return
 
 	trigger_source_tower_pulse(instance)
+	_play_balance_output_wisp(instance, source_tower)
 	_fire_overkill_bolt(instance, source_tower, report, origin_position, target, report.overkill * _get_effect_stacks(instance))
 
 func _find_random_enemy(origin_position: Vector2, hostile: bool) -> Unit: ##rolls one valid hostile in the local search radius instead of biasing toward the nearest target
@@ -84,6 +89,19 @@ func _fire_overkill_bolt(instance: EffectInstance, source_tower: Tower, parent_r
 	delivery_data.intercept_position = target.global_position
 
 	CombatManager.resolve_hit(hit_data, delivery_data)
+
+func _play_balance_output_wisp(instance: EffectInstance, target_tower: Tower) -> void: ##shows the rite feeding the adjacent tower whose overkill triggered balance
+	if not is_instance_valid(target_tower):
+		return
+
+	var rite_tower: Tower = _resolve_source_tower(instance)
+	if is_instance_valid(rite_tower):
+		BuffComponent.play_link_wisp(rite_tower, target_tower)
+		return
+
+	var source_tower: Tower = instance.host as Tower
+	if is_instance_valid(source_tower):
+		BuffComponent.play_link_wisp(source_tower, target_tower)
 
 func _get_effect_stacks(instance: EffectInstance) -> int:
 	return maxi(instance.stacks, 1)

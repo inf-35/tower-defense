@@ -1,5 +1,8 @@
 extends Node
 
+const CURSOR_HOTSPOT: Vector2 = Vector2(0, 20)
+const HAND_CURSOR: Texture2D = preload("res://Assets/button_cursor.png")
+const ARROW_CURSOR: Texture2D = preload("res://Assets/pointer_cursor.png")
 #--- state management ---
 enum State { IDLE, PREVIEWING, ENTITY_SELECTED }
 var current_state: State = State.IDLE
@@ -20,12 +23,18 @@ signal tower_was_selected(tower: Tower)
 signal tower_was_deselected()
 
 func _ready() -> void:
+	refresh_custom_cursors()
 	if not Run.is_run_ready():
 		await Run.references_ready
 
 	UI.tower_selected.connect(_on_build_tower_selected)
 	UI.update_flux.connect(func(_flux: float): _update_preview_visuals())
 	UI.update_capacity.connect(func(_used: float, _total: float): _update_preview_visuals())
+
+func refresh_custom_cursors() -> void: ##reapplies cursor textures after display mode changes recreate the native cursor state
+	Input.set_custom_mouse_cursor(ARROW_CURSOR, Input.CursorShape.CURSOR_ARROW, CURSOR_HOTSPOT)
+	Input.set_custom_mouse_cursor(HAND_CURSOR, Input.CursorShape.CURSOR_POINTING_HAND, CURSOR_HOTSPOT)
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func start() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS

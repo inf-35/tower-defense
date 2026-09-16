@@ -32,7 +32,7 @@ var unit_stats: Dictionary[Type, UnitData] = {}
 var unit_prototypes: Dictionary[Type, Unit] = {}
 
 const VERBOSE: bool = false
-const GLOBAL_ENEMY_HP_MULTIPLIER: float = 1.25
+const GLOBAL_ENEMY_HP_MULTIPLIER: float = 0.8
 const ENEMY_HP_PER_WAVE_MULTIPLIER: float = 0.01
 const GLOBAL_ENEMY_SPEED_MULTIPLIER: float = 1/1.25
 const GLOBAL_ENEMY_DAMAGE_MULTIPLIER: float = 1.0

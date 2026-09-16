@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://disweiiup8s07"]
+
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_ue3rh"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="3_cbmer"]
+
+[resource]
+script = ExtResource("1_reward")
+id_name = "pitchfork_rite"
+description = "rite reward"
+type = 3
+rite_type = 82
+metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

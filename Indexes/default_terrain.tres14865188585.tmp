@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="TerrainDatabase" format=3 uid="uid://cshhypbo4uoaw"]
+
+[ext_resource type="Script" uid="uid://bb5bm1s2h1ack" path="res://Objects/Indexes/terrain_database.gd" id="1_h065e"]
+[ext_resource type="Script" uid="uid://dk1gy0e6eorr2" path="res://Objects/Indexes/terrain_base_stat.gd" id="2_2st4k"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_u30vj"]
+[ext_resource type="Texture2D" uid="uid://dd5gwksu38758" path="res://Assets/ruins_placeholder.png" id="5_4wuia"]
+[ext_resource type="Texture2D" uid="uid://pb6220cxxuje" path="res://Assets/highland_placeholder.png" id="6_0duxl"]
+[ext_resource type="Texture2D" uid="uid://bfxy0j7adsitd" path="res://Assets/ice_terrain.png" id="6_4wuia"]
+
+[sub_resource type="Resource" id="Resource_2st4k"]
+script = ExtResource("2_2st4k")
+color = Color(0.67208064, 0.79125, 0.6721125, 0.6675)
+wash_color = Color(0.82041377, 0.87, 0.758525, 0.13441177)
+navigable = true
+constructable = true
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[sub_resource type="Resource" id="Resource_u30vj"]
+script = ExtResource("2_2st4k")
+color = Color(0.775, 0.70942837, 0.60965, 0.422549)
+wash_color = Color(0.88875, 0.82149166, 0.71025, 0.10612745)
+texture = ExtResource("5_4wuia")
+navigable = true
+constructable = true
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[sub_resource type="Resource" id="Resource_p873x"]
+script = ExtResource("3_u30vj")
+attribute = 7
+multiplicative = 1.5
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_4wuia"]
+script = ExtResource("2_2st4k")
+color = Color(0.51060003, 0.69, 0.55246, 0.3764706)
+wash_color = Color(0.7293627, 0.8, 0.7157843, 0.12625)
+texture = ExtResource("6_0duxl")
+navigable = true
+constructable = true
+modifiers = Array[ExtResource("3_u30vj")]([SubResource("Resource_p873x")])
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[sub_resource type="Resource" id="Resource_0duxl"]
+script = ExtResource("2_2st4k")
+color = Color(0.54025, 0.695, 0.79035, 0.615)
+wash_color = Color(0.7035, 0.80875, 0.851, 0.1002451)
+dominance_strength = 0.72375
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[sub_resource type="Resource" id="Resource_ice"]
+script = ExtResource("2_2st4k")
+color = Color(0.8272, 0.89676, 0.94, 1)
+wash_color = Color(0.364, 0.7006999, 0.91, 0.12941177)
+dominance_strength = 0.7
+texture = ExtResource("6_4wuia")
+navigable = true
+metadata/_custom_type_script = "uid://dk1gy0e6eorr2"
+
+[resource]
+script = ExtResource("1_h065e")
+terrain_base_types = Dictionary[int, ExtResource("2_2st4k")]({
+0: SubResource("Resource_2st4k"),
+1: SubResource("Resource_u30vj"),
+2: SubResource("Resource_4wuia"),
+3: SubResource("Resource_0duxl"),
+4: SubResource("Resource_ice")
+})
+metadata/_custom_type_script = "uid://bb5bm1s2h1ack"

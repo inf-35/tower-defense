@@ -9,6 +9,7 @@ class_name ChainLightningEffect
 @export var jump_feedback_color: Color = Color(1.0, 0.9, 0.2, 0.45) ##debug line tint shared by the root strike and chained jumps
 @export var jump_feedback_width: float = 3.0 ##debug line width used for the lightning overlay
 @export var jump_feedback_duration: float = 0.18 ##seconds each debug line persists before it is cleaned up
+@export var jump_particle_swirls: Array[VFXInfo] = [] ##authored swirl layers drawn underneath each visible lightning segment
 
 func _init() -> void:
 	#listen for when the host deals a hit
@@ -46,11 +47,11 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##only r
 	_execute_chain_lightning(instance, host_tower, hit_report)
 
 func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_report: HitReportData) -> void: ##walks chained hits through attack_component.attack so the attack pipeline still owns pre-hit mutation and delivery
-	var primary_target: Unit = initial_report.target
-	var already_hit: Array[Unit] = [primary_target]
-	var last_hit_target: Unit = primary_target
+	var target_hostile: bool = initial_report.target.hostile
+	var target_position: Vector2 = initial_report.target.global_position
+	var already_hit: Array[Unit] = [initial_report.target]
 
-	_play_jump_feedback(_get_attack_origin(host), primary_target.global_position)
+	_play_jump_feedback(_get_attack_origin(host), target_position)
 
 	#calculate base damage from the tower's stats
 	var current_damage: float = host.attack_component.get_stat(
@@ -62,7 +63,7 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 
 	for i: int in range(max_jumps):
 		#find a new target near the last one hit
-		var next_target: Unit = _find_next_jump_target(last_hit_target, jump_radius, already_hit)
+		var next_target: Unit = _find_next_jump_target(target_position, target_hostile, jump_radius, already_hit)
 
 		if not is_instance_valid(next_target):
 			break
@@ -70,12 +71,12 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 		current_damage *= damage_falloff_multiplier
 		current_status_cooldown_multiplier *= status_cooldown_falloff_multiplier
 
-		_play_jump_feedback(last_hit_target.global_position, next_target.global_position)
+		_play_jump_feedback(target_position, next_target.global_position)
 		var attack_context: AttackComponent.AttackLineageContext = host.attack_component.create_derived_attack_context(
 			initial_report,
 			instance,
 			true,
-			last_hit_target.global_position,
+			target_position,
 			true,
 			current_damage,
 			initial_report.get_attack_id(),
@@ -87,14 +88,16 @@ func _execute_chain_lightning(instance: EffectInstance, host: Tower, initial_rep
 		host.attack_component.attack_with_context(next_target, attack_context, Vector2.ZERO, false, false)
 		#update state for next loop iteration
 		already_hit.append(next_target)
-		last_hit_target = next_target
+		target_position = next_target.global_position
+		target_hostile = next_target.hostile
+		await Clock.await_game_time(0.1)
 
-func _find_next_jump_target(from_target: Unit, radius: float, excluded_targets: Array[Unit]) -> Unit: ##picks the nearest valid follow-up target that has not already been chained this cast
+func _find_next_jump_target(from_target_position: Vector2, from_target_hostile: bool, radius: float, excluded_targets: Array[Unit]) -> Unit: ##picks the nearest valid follow-up target that has not already been chained this cast
 	#query combat manager for valid targets nearby
 	var potential_targets: Array[Unit] = CombatManager.get_units_in_radius(
 		radius,
-		from_target.global_position,
-		from_target.hostile,
+		from_target_position,
+		from_target_hostile,
 		excluded_targets
 	)
 
@@ -127,18 +130,38 @@ func _play_jump_feedback(start_position: Vector2, end_position: Vector2) -> void
 	if start_position.is_equal_approx(end_position):
 		return
 
-	var parent: Node = Run.references.projectiles if is_instance_valid(Run.references.projectiles) else Run.references.island
-	if not is_instance_valid(parent):
-		return
+	for swirl_info: VFXInfo in jump_particle_swirls:
+		if swirl_info == null:
+			continue
+
+		var swirl_line: SwirlLineVFX = VFXManager.play_swirl_line(
+			start_position,
+			end_position,
+			swirl_info.swirl_color,
+			swirl_info.swirl_width,
+			swirl_info.lifetime,
+			swirl_info.swirl_particles_per_tile,
+			swirl_info.swirl_scale_min,
+			swirl_info.swirl_scale_max,
+			swirl_info.swirl_drift_speed_min,
+			swirl_info.swirl_drift_speed_max,
+			swirl_info.swirl_drift_angle_noise_deg,
+			swirl_info.graphical_layer
+		)
+		if is_instance_valid(swirl_line) and is_instance_valid(swirl_info.swirl_particle_texture):
+			swirl_line.set_texture(swirl_info.swirl_particle_texture)
+
 	var line := Line2D.new()
 	line.width = jump_feedback_width
 	line.default_color = jump_feedback_color
 	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
 	line.end_cap_mode = Line2D.LINE_CAP_ROUND
-	line.z_index = Layers.ALLIED_PROJECTILES
+	line.z_index = Layers.ALLIED_PROJECTILES + 1
+	line.z_as_relative = false
 	line.add_point(start_position)
 	line.add_point(end_position)
-	parent.add_child(line)
+	if not VFXManager.add_exempt_node(line, Vector2.ZERO):
+		return
 
 	Clock.await_game_time(jump_feedback_duration).connect(func() -> void:
 		if is_instance_valid(line):

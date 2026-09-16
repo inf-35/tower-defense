@@ -11,12 +11,6 @@
 [ext_resource type="Texture2D" uid="uid://cuhsw8o5nes3h" path="res://Assets/amethyst_skull_icon.png" id="7_5tggy"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="8_c17k8"]
 
-[sub_resource type="Resource" id="Resource_dk6pn"]
-script = ExtResource("3_c17k8")
-type = 4
-cooldown = 3.0
-metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
-
 [sub_resource type="Resource" id="Resource_e3651"]
 script = ExtResource("4_2l3en")
 texture = ExtResource("5_x6ns0")
@@ -35,7 +29,7 @@ metadata/_custom_type_script = "uid://bxee20ha7a0bv"
 
 [sub_resource type="Resource" id="Resource_2oygm"]
 script = ExtResource("6_058vl")
-search_radius = 40.0
+search_radius = 80.0
 damage_multiplier = 0.5
 projectile_data = SubResource("Resource_wyw1l")
 delay = 0.3

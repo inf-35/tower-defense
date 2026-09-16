@@ -64,7 +64,7 @@ func _ready() -> void:
 	#pre-populate
 	if text_scene:
 		for i in range(initial_pool_size):
-			_create_new_text()
+			_pool.append(_create_new_text())
 
 #--- public api ---
 
@@ -145,26 +145,23 @@ func show_text_with_profile(
 	ramp_up_ratio: float = 0.0,
 	fade_out_ratio: float = 0.3,
 	scale_mod: float = 1.0,
-	ignore_pause: bool = false
+	ignore_pause: bool = false,
+	custom_time: float = -1.0
 ) -> void:
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"floating_text_text_requests")
 	if DebugAssistant.disable_floating_text:
 		return
-	_spawn_text(text, world_pos, color, scale_mod, peak_alpha, ramp_up_ratio, fade_out_ratio, ignore_pause)
+	_spawn_text(text, world_pos, color, scale_mod, peak_alpha, ramp_up_ratio, fade_out_ratio, ignore_pause, custom_time)
 
-func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0, ignore_pause: bool = false) -> void:
+func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0, ignore_pause: bool = false, custom_time: float = -1.0) -> void:
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"floating_text_icon_requests")
 	if DebugAssistant.disable_floating_text:
 		return
 	if not icon: return
 
-	var instance: FloatingText
-	if _pool.is_empty():
-		instance = _create_new_text()
-	else:
-		instance = _pool.pop_back()
+	var instance: FloatingText = _borrow_text()
 
 	_active_count += 1
 
@@ -172,7 +169,7 @@ func show_icon(icon: Texture2D, world_pos: Vector2, scale_mod: float = 1.0, igno
 	var vel: Vector2 = Vector2(0, -7.0)
 	instance.scale = Vector2(0.06, 0.06) * scale_mod
 
-	var lifetime = 0.5 if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else 1.2
+	var lifetime = custom_time if custom_time > 0.0 else (0.5 if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else 1.2)
 	var color: Color = Color(1,1,1,0.5) if Run.phases.current_phase == Run.phases.GamePhase.COMBAT_WAVE else Color.WHITE
 	instance.setup_icon(icon, world_pos, color, vel, 0.0, lifetime, self, ignore_pause) #0 gravity
 	if DebugAssistant.perf_instrumentation_active:
@@ -214,12 +211,7 @@ func _spawn_text(
 	ignore_pause: bool = false,
 	lifetime_override: float = -1.0
 ) -> FloatingText:
-	var instance: FloatingText
-
-	if _pool.is_empty():
-		instance = _create_new_text()
-	else:
-		instance = _pool.pop_back()
+	var instance: FloatingText = _borrow_text()
 
 	_active_count += 1
 
@@ -330,6 +322,14 @@ func _get_damage_z_index_offset(value: float) -> int: ##raises larger hits above
 		return 1
 	return 0
 
+func _borrow_text() -> FloatingText: ##returns one reusable floating text, expanding only when every pooled label is active
+	while not _pool.is_empty():
+		var text: Variant = _pool.pop_back()
+		if is_instance_valid(text):
+			return text as FloatingText
+
+	return _create_new_text()
+
 func _create_new_text() -> FloatingText:
 	var t = text_scene.instantiate() as FloatingText
 	t.visible = false
@@ -338,9 +338,14 @@ func _create_new_text() -> FloatingText:
 	return t
 
 func return_text(text: FloatingText) -> void:
+	if not is_instance_valid(text):
+		return
+	if _pool.has(text):
+		return
+
 	_clear_damage_text_tracking(text)
 	_pool.append(text)
-	_active_count -= 1
+	_active_count = maxi(_active_count - 1, 0)
 
 func _clear_damage_text_tracking(text: FloatingText) -> void: ##removes owner bookkeeping when a coalesced damage label returns to the pool
 	if not is_instance_valid(text):

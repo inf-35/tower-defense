@@ -28,6 +28,7 @@ func set_fullscreen_enabled(is_enabled: bool) -> void: ##applies the persistent 
 		window.mode = Window.MODE_WINDOWED
 		_windowed_size = _get_default_windowed_size()
 		_restore_windowed_layout()
+	_refresh_mouse_after_window_mode_change.call_deferred()
 
 	fullscreen_changed.emit(is_enabled)
 
@@ -65,3 +66,8 @@ func _get_default_windowed_size() -> Vector2i: ##derives the default desktop sta
 
 func _is_fullscreen_mode(mode: int) -> bool:
 	return mode == Window.MODE_FULLSCREEN or mode == Window.MODE_EXCLUSIVE_FULLSCREEN
+
+func _refresh_mouse_after_window_mode_change() -> void:
+	await get_tree().process_frame
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	ClickHandler.refresh_custom_cursors()

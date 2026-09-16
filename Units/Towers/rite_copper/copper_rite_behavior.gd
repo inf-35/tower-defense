@@ -31,7 +31,7 @@ func detach() -> void:
 	_active_status_windows.clear()
 	clear_tower_influences()
 
-func _on_adjacency_updated(_adj_map: Dictionary[Vector2i, Tower]) -> void:
+func _on_adjacency_updated(_adjacency_data: AdjacencyReportData) -> void:
 	sync_tower_influences()
 	_refresh_connections()
 

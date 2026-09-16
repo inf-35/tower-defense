@@ -228,6 +228,7 @@ func _get_initial_test_tower_types() -> Array[Towers.Type]: ##returns buildable 
 		Towers.Type.CANNON,
 		Towers.Type.OUTPOST,
 		Towers.Type.RESONATOR,
+		Towers.Type.BLOOD_ALTAR,
 	]
 
 func _get_initial_test_rite_types() -> Array[Towers.Type]: ##returns learned rites that exercise current status, chain, refresh, and spatial effect work
@@ -236,6 +237,7 @@ func _get_initial_test_rite_types() -> Array[Towers.Type]: ##returns learned rit
 		Towers.Type.RITE_CURSES,
 		Towers.Type.RITE_DRUMS,
 		Towers.Type.RITE_RAMPAGE,
+		Towers.Type.RITE_SACRIFICE,
 	]
 
 func _get_initial_test_relics() -> Array[RelicData]: ##returns reward-accessible relics that should be active in debug test starts

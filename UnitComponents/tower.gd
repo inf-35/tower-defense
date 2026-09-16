@@ -1,7 +1,7 @@
 extends Unit
 class_name Tower
 
-signal adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) #Island fires this for us
+signal adjacency_updated(adjacency_data: AdjacencyReportData) #Island fires this for us
 
 @export var type: Towers.Type
 @export var blocking: bool = true ##does this tower block enemy units from passing through?
@@ -242,11 +242,7 @@ func _ready() -> void:
 	components_ready.emit()
 	behavior.initialise(self)
 
-	adjacency_updated.connect(func(new_adjacencies: Dictionary[Vector2i, Tower]): #receive data from Island
-		var adjacency_data := AdjacencyReportData.new() #broadcast into effects system
-		adjacency_data.adjacent_towers = new_adjacencies
-		adjacency_data.pivot = self
-
+	adjacency_updated.connect(func(adjacency_data: AdjacencyReportData): #receive data from Island
 		var event := GameEvent.new()
 		event.event_type = GameEvent.EventType.ADJACENCY_UPDATED
 		event.data = adjacency_data

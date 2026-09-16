@@ -49,6 +49,8 @@ const FATIGUE_WINDOW_SECONDS: float = 0.8
 const FATIGUE_FREE_CALLS: float = 2.0
 const FATIGUE_SATURATED_CALLS: float = 10.0
 const FATIGUE_MAX_ATTENUATION_DB: float = -6.0
+const SFX_PITCH_LAYER_SCALE: float = 2.0
+const SFX_PITCH_LAYER_VOLUME_PROPORTION: float = 0.9
 
 var _sfx_player_pool: Array[AudioStreamPlayer2D] = []
 var _audio_player_tweens: Dictionary[AudioStreamPlayer2D, Array] = {} ##audiostreamplayer2d -> array[tween]
@@ -71,7 +73,7 @@ func _ready() -> void:
 	var audio_ambience := AudioAmbience.new()
 	add_child(audio_ambience)
 
-func play_sound(sound_name: StringName, volume: float = 0.0, position: Vector2 = Vector2.ZERO, is_sfx: bool = true) -> AudioStreamPlayer2D: ##plays one positional sound id, applying centralized repeat-call fatigue before playback
+func play_sound(sound_name: StringName, volume: float = 0.0, position: Vector2 = Vector2.ZERO, is_sfx: bool = true, sfx_overtone_multiplier: float = 1.0) -> AudioStreamPlayer2D: ##plays one positional sound id, applying centralized repeat-call fatigue before playback
 	if sound_name == &"":
 		return null
 
@@ -114,7 +116,33 @@ func play_sound(sound_name: StringName, volume: float = 0.0, position: Vector2 =
 		player.pitch_scale = randf_range(0.6, 1.2)
 	_connect_finished_once(player)
 	player.play()
+	if is_sfx:
+		_play_sfx_pitch_layer(player.stream, player.volume_db, player.global_position, player.pitch_scale, sfx_overtone_multiplier)
 	return player
+
+func _play_sfx_pitch_layer(stream: AudioStream, base_volume_db: float, position: Vector2, base_pitch_scale: float, local_multiplier: float) -> void: ##adds a quiet pitched duplicate for ordinary sfx without changing the caller-owned player
+	var overtone_proportion: float = SFX_PITCH_LAYER_VOLUME_PROPORTION * maxf(local_multiplier, 0.0)
+	if overtone_proportion <= 0.0:
+		return
+	if SFX_PITCH_LAYER_SCALE <= 0.0:
+		return
+	if not is_instance_valid(stream):
+		return
+
+	if _sfx_player_pool.is_empty():
+		var new_player := AudioStreamPlayer2D.new()
+		add_child(new_player)
+		new_player.bus = &"SFX"
+		_sfx_player_pool.append(new_player)
+
+	var pitch_player: AudioStreamPlayer2D = _sfx_player_pool.pop_front()
+	pitch_player.stream = stream
+	pitch_player.global_position = position
+	pitch_player.bus = &"SFX"
+	pitch_player.volume_db = base_volume_db + linear_to_db(overtone_proportion)
+	pitch_player.pitch_scale = base_pitch_scale * SFX_PITCH_LAYER_SCALE
+	_connect_finished_once(pitch_player)
+	pitch_player.play()
 
 func create_registered_audio_tween(audio_stream_player: AudioStreamPlayer2D) -> Tween:
 	var tween: Tween = create_tween()

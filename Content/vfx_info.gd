@@ -39,10 +39,16 @@ enum VFXType { TEXTURE, CIRCLE, RECTANGLE, GPU_PARTICLES, LINE }
 @export var projectile_trail_max_points: int = 10 ##maximum sampled positions retained for the ribbon path
 @export var projectile_trail_sample_distance: float = 2.0 ##minimum world-space movement before recording another trail sample
 @export var projectile_trail_smooth_steps: int = 3 ##catmull-rom subdivisions between recorded samples
+@export var projectile_trail_head_extension: float = 6.0 ##world-space distance the ribbon continues past the projectile head before fading out
+@export_range(1, 8, 1) var projectile_trail_head_extension_steps: int = 3 ##number of extra samples used to soften the projectile-end cutoff
 @export var projectile_trail_outer_width: float = 1.2 ##soft outer ribbon width at the projectile head
 @export var projectile_trail_inner_width: float = 0.4 ##bright inner ribbon width at the projectile head
 @export var projectile_trail_outer_color: Color = Color(1.0, 1.0, 1.0, 0.62) ##outer ribbon color before lighting compensation
 @export var projectile_trail_inner_color: Color = Color(1.0, 1.0, 1.0, 1.0) ##inner ribbon color before lighting compensation
+
+@export_group("Projectile Night Chroma")
+@export_range(0.0, 4.0, 0.01) var projectile_chroma_strength: float = 1.0 ##per-vfx multiplier for the exempt projectile chroma pass; 0 keeps only the un-darkened base projectile
+@export_range(0.0, 4.0, 0.01) var projectile_trail_chroma_strength: float = 0.85 ##per-vfx multiplier for the exempt projectile-trail chroma pass
 
 @export_group("Swirl Line")
 @export var swirl_particle_texture: Texture2D = preload("res://Assets/particle_whirl.png") ##sprite used by authored swirl-line effects when no bespoke texture is supplied

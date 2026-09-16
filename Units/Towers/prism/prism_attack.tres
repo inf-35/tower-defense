@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_27ydr"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_l1orb"]
 
-[sub_resource type="Resource" id="Resource_27ydr"]
+[sub_resource type="Resource" id="Resource_me6f3"]
 script = ExtResource("3_l1orb")
 type = 1
 cooldown = 2.0
@@ -14,6 +14,6 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 script = ExtResource("2_27ydr")
 cooldown = 0.333333
 damage = 0.2
-status_effects = Array[ExtResource("3_l1orb")]([SubResource("Resource_27ydr")])
+status_effects = Array[ExtResource("3_l1orb")]([SubResource("Resource_me6f3")])
 projectile_speed = 80.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

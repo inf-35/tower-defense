@@ -22,7 +22,9 @@ func detach() -> void:
 
 func attach() -> void:
 	attached = true
-	_on_adjacency_updated(unit.get_adjacent_towers())
+	var tower: Tower = unit as Tower
+	if is_instance_valid(tower) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		_on_adjacency_updated(Run.references.island.topology_service.get_adjacency_report(tower))
 
 #called by the unit chassis after all components are ready.
 func start() -> void:
@@ -42,7 +44,7 @@ func start() -> void:
 	attach()
 
 #this is the main logic, triggered whenever the host tower's neighbors change.
-func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void:
+func _on_adjacency_updated(adjacency_data: AdjacencyReportData) -> void:
 	if not attached:
 		return
 	sync_tower_influences()
@@ -51,7 +53,9 @@ func _on_adjacency_updated(new_adjacencies: Dictionary[Vector2i, Tower]) -> void
 		_clear_all_modifiers() #clear any existing effects and stop
 		return
 
-	var current_adjacent_towers: Array[Tower] = new_adjacencies.values()
+	var current_adjacent_towers: Array[Tower] = []
+	if adjacency_data != null:
+		current_adjacent_towers.assign(adjacency_data.unique_towers)
 
 	#--- 1. remove modifiers from towers that are no longer adjacent ---
 	var towers_to_unmodify: Array[Tower]

@@ -2,7 +2,7 @@ extends Area2D
 class_name PrismLaser
 
 @export var collision_shape: CollisionShape2D
-@export var beam_color: Color = Color(1.0, 0.864, 0.32, 0.702) ##tint for the soft particle beam between linked prisms
+@export var beam_color: Color = Color(1.0, 0.864, 0.32, 0.459) ##tint for the soft particle beam between linked prisms
 @export var beam_width: float = 9.0 ##world-space thickness of the particle cloud around the prism link
 @export var particle_lifetime: float = 0.8 ##seconds each beam particle stays visible before fading out
 @export var particles_per_tile: float = 2.5 ##particle density along the beam measured per island tile

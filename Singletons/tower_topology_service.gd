@@ -85,6 +85,17 @@ func query(pivot: Tower, query_data: Query) -> Report: ##core function
 		report.unique_towers.append(tower)
 	return report
 
+func get_adjacency_report(pivot: Tower) -> AdjacencyReportData: ##builds the compatibility adjacency payload from the canonical topology query
+	var topology_report: Report = query(pivot, _legacy_query)
+	var adjacency_data := AdjacencyReportData.new()
+	adjacency_data.pivot = topology_report.pivot
+	for offset: Vector2i in topology_report.cells:
+		adjacency_data.cells[offset] = topology_report.cells[offset]
+	for offset: Vector2i in topology_report.towers_by_local_offset:
+		adjacency_data.adjacent_towers[offset] = topology_report.towers_by_local_offset[offset]
+	adjacency_data.unique_towers.assign(topology_report.unique_towers)
+	return adjacency_data
+
 func subscribe(owner: Object, pivot: Tower, query_data: Query, callback: Callable, emit_immediately: bool = true) -> int:
 	var id := _next_subscription_id
 	_next_subscription_id += 1
@@ -95,7 +106,7 @@ func subscribe(owner: Object, pivot: Tower, query_data: Query, callback: Callabl
 		"callback": callback,
 		"signature": "",
 	}
-	var pivot_id := pivot.unit_id
+	var pivot_id := pivot.get_instance_id()
 	if not _subscriptions_by_pivot.has(pivot_id):
 		_subscriptions_by_pivot[pivot_id] = []
 	_subscriptions_by_pivot[pivot_id].append(id)
@@ -129,12 +140,12 @@ func notify_tower_changed(changed_tower: Tower) -> void:
 func _emit_legacy_adjacency(pivot: Tower) -> void:
 	if not is_instance_valid(pivot):
 		return
-	pivot.adjacency_updated.emit(query(pivot, _legacy_query).towers_by_local_offset)
+	pivot.adjacency_updated.emit(get_adjacency_report(pivot))
 
 func _emit_subscriptions_for_pivot(pivot: Tower) -> void:
 	if not is_instance_valid(pivot):
 		return
-	var pivot_id := pivot.unit_id
+	var pivot_id := pivot.get_instance_id()
 	if not _subscriptions_by_pivot.has(pivot_id):
 		return
 	for id: int in (_subscriptions_by_pivot[pivot_id] as Array):
@@ -163,7 +174,7 @@ func _remove_subscription(id: int) -> void:
 		return
 	var pivot: Tower = record["pivot"] as Tower
 	if is_instance_valid(pivot):
-		var pivot_id := pivot.unit_id
+		var pivot_id := pivot.get_instance_id()
 		if _subscriptions_by_pivot.has(pivot_id):
 			(_subscriptions_by_pivot[pivot_id] as Array).erase(id)
 			if (_subscriptions_by_pivot[pivot_id] as Array).is_empty():

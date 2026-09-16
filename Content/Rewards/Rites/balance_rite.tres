@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://c4cxc6jjcs557"]
 
-[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="1_jmbfj"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_jmbfj"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_b500v"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="3_ightt"]
 
 [resource]
 script = ExtResource("1_jmbfj")
@@ -8,4 +10,4 @@ id_name = "balance_rite"
 description = "rite reward"
 type = 3
 rite_type = 67
-
+base_rarity = 3

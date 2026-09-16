@@ -58,6 +58,9 @@ var disabled: bool:
 	set(nd):
 		disabled = nd
 		set_process(not disabled or _DEBUG_DRAW)
+		if self is Tower:
+			for child: Node in find_children("*", "ShadowComponent", true, false):
+				child.visible = not disabled
 		if disabled:
 			set_tint_layer(TintService.LAYER_DISABLED, Color(0.0, 0.0, 0.0, 0.3), 1.0, true)
 		else:

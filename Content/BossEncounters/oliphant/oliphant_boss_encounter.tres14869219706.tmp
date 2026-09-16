@@ -1,0 +1,88 @@
+[gd_resource type="Resource" script_class="BossEncounterData" format=3 uid="uid://bx7wh7dhu0h6r"]
+
+[ext_resource type="Script" uid="uid://y71hsxvnlj7x" path="res://Content/BossEncounters/boss_encounter_data.gd" id="1_encounter"]
+[ext_resource type="Script" uid="uid://bnmayjaxhop78" path="res://Content/BossEncounters/boss_subwave_data.gd" id="2_subwave"]
+[ext_resource type="Script" uid="uid://b2f8lp4xl1hei" path="res://Content/BossEncounters/boss_enemy_stack_data.gd" id="3_stack"]
+[ext_resource type="Script" uid="uid://pj2awlo0pysr" path="res://Content/BossEncounters/oliphant_encounter_logic.gd" id="4_logic"]
+
+[sub_resource type="Resource" id="Stack_sprinter_1"]
+script = ExtResource("3_stack")
+unit_type = 8
+count = 6
+
+[sub_resource type="Resource" id="Stack_warrior_1"]
+script = ExtResource("3_stack")
+unit_type = 21
+count = 6
+
+[sub_resource type="Resource" id="Stack_healer_1"]
+script = ExtResource("3_stack")
+unit_type = 23
+
+[sub_resource type="Resource" id="Subwave_1"]
+script = ExtResource("2_subwave")
+enemy_stacks = Array[ExtResource("3_stack")]([SubResource("Stack_sprinter_1"), SubResource("Stack_warrior_1"), SubResource("Stack_healer_1")])
+
+[sub_resource type="Resource" id="Stack_sprinter_2"]
+script = ExtResource("3_stack")
+unit_type = 8
+count = 10
+
+[sub_resource type="Resource" id="Stack_warrior_2"]
+script = ExtResource("3_stack")
+unit_type = 21
+count = 10
+
+[sub_resource type="Resource" id="Stack_cleric_2"]
+script = ExtResource("3_stack")
+unit_type = 22
+
+[sub_resource type="Resource" id="Stack_healer_2"]
+script = ExtResource("3_stack")
+unit_type = 23
+count = 2
+
+[sub_resource type="Resource" id="Subwave_2"]
+script = ExtResource("2_subwave")
+mandatory_duration = 22.0
+enemy_stacks = Array[ExtResource("3_stack")]([SubResource("Stack_sprinter_2"), SubResource("Stack_warrior_2"), SubResource("Stack_cleric_2"), SubResource("Stack_healer_2")])
+
+[sub_resource type="Resource" id="Stack_hulk_3"]
+script = ExtResource("3_stack")
+unit_type = 19
+
+[sub_resource type="Resource" id="Stack_giant_3"]
+script = ExtResource("3_stack")
+unit_type = 17
+
+[sub_resource type="Resource" id="Stack_troll_3"]
+script = ExtResource("3_stack")
+unit_type = 20
+
+[sub_resource type="Resource" id="Stack_sprinter_3"]
+script = ExtResource("3_stack")
+unit_type = 8
+count = 14
+
+[sub_resource type="Resource" id="Stack_warrior_3"]
+script = ExtResource("3_stack")
+unit_type = 21
+count = 14
+
+[sub_resource type="Resource" id="Stack_healer_3"]
+script = ExtResource("3_stack")
+unit_type = 23
+count = 2
+
+[sub_resource type="Resource" id="Subwave_3"]
+script = ExtResource("2_subwave")
+mandatory_duration = 24.0
+enemy_stacks = Array[ExtResource("3_stack")]([SubResource("Stack_hulk_3"), SubResource("Stack_giant_3"), SubResource("Stack_troll_3"), SubResource("Stack_sprinter_3"), SubResource("Stack_warrior_3"), SubResource("Stack_healer_3")])
+
+[resource]
+script = ExtResource("1_encounter")
+title = "Oliphant"
+boss_type = 24
+subwaves = Array[ExtResource("2_subwave")]([SubResource("Subwave_1"), SubResource("Subwave_2"), SubResource("Subwave_3")])
+logic_script = ExtResource("4_logic")
+metadata/_custom_type_script = "uid://y71hsxvnlj7x"

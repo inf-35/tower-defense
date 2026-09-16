@@ -27,7 +27,8 @@ func start() -> void:
 
 	var tower: Tower = unit as Tower
 	tower.adjacency_updated.connect(_on_my_adjacency_updated)
-	_on_my_adjacency_updated(tower.get_adjacent_towers())
+	if is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		_on_my_adjacency_updated(Run.references.island.topology_service.get_adjacency_report(tower))
 	Run.references.island.island_changed.connect(_recalculate_target)
 	set_process(true)
 	_recalculate_target()
@@ -43,13 +44,16 @@ func detach() -> void:
 func _process(_delta: float) -> void:
 	_refresh_passive_beam()
 
-func _on_my_adjacency_updated(adj_map: Dictionary) -> void:
+func _on_my_adjacency_updated(adjacency_data: AdjacencyReportData) -> void:
 	var tower: Tower = unit as Tower
 	var back_direction: Vector2i = -tower.get_forward_direction()
 	var current_neighbors: Dictionary[Tower, bool] = {}
 
-	for offset: Vector2i in adj_map:
-		var neighbor: Tower = adj_map[offset]
+	if adjacency_data == null:
+		return
+
+	for offset: Vector2i in adjacency_data.adjacent_towers:
+		var neighbor: Tower = adjacency_data.adjacent_towers[offset]
 		if not is_instance_valid(neighbor) or neighbor == unit or neighbor == _target_tower:
 			continue
 		if Tower.get_side_from_offset(tower.size, offset) != Tower.get_side_from_offset(tower.size, back_direction):
@@ -189,7 +193,7 @@ func _exit_tree() -> void:
 
 func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes rear command inputs and the forward output lane through one shared spatial model
 	var tower: Tower = unit as Tower
-	if not is_instance_valid(tower) or tower.disabled:
+	if not is_instance_valid(tower) or (tower.disabled and not tower.abstractive):
 		return []
 
 	var back_direction: Vector2i = -tower.get_forward_direction()

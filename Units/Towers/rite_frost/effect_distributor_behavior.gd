@@ -19,7 +19,9 @@ func detach() -> void:
 
 func attach() -> void:
 	attached = true
-	_on_adjacency_updated(unit.get_adjacent_towers())
+	var tower: Tower = unit as Tower
+	if is_instance_valid(tower) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
+		_on_adjacency_updated(Run.references.island.topology_service.get_adjacency_report(tower))
 
 func start() -> void:
 	if not buff_effect:
@@ -33,20 +35,22 @@ func start() -> void:
 	attach()
 
 #logic to sync buffs with current grid state
-func _on_adjacency_updated(adj_map: Dictionary[Vector2i, Tower]) -> void:
+func _on_adjacency_updated(adjacency_data: AdjacencyReportData) -> void:
 	if not attached:
 		return
 	sync_tower_influences()
+	if adjacency_data == null:
+		return
 
 	var current_neighbors: Array[Tower] = []
 	var host_tower: Tower = unit as Tower
 
 	#identify valid neighbours
-	for adjacency: Vector2i in adj_map:
+	for adjacency: Vector2i in adjacency_data.adjacent_towers:
 		if not _is_local_direction_allowed(host_tower.facing, adjacency):
 			continue #reject invalid directions
 
-		var tower: Tower = adj_map[adjacency]
+		var tower: Tower = adjacency_data.adjacent_towers[adjacency]
 		if is_instance_valid(tower) and not tower.is_queued_for_deletion(): #ignore towers which are in the process of exiting
 			current_neighbors.append(tower)
 

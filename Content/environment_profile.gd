@@ -42,6 +42,11 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var night_dark_pixel_response: float = 0.08 ##minimum local-light response retained by dark ink pixels
 @export_range(0.1, 4.0, 0.05) var night_luminance_power: float = 0.65 ##shapes how strongly pale surfaces respond relative to dark linework
 @export_range(0.0, 1.0, 0.01) var night_ui_tint_strength: float = 0.22 ##portion of the combat-night hue applied to run ui surfaces
+@export_range(0.0, 4.0, 0.01) var night_projectile_chroma_multiplier: float = 0.8 ##global multiplier for exempt projectile and trail chroma during combat night
+@export_range(0.0, 1.0, 0.01) var night_projectile_chroma_alpha: float = 0.1 ##base opacity of additive projectile chroma on the exempt pass
+@export_range(1.0, 4.0, 0.01) var night_projectile_chroma_scale: float = 1.85 ##maximum scale target for projectile chroma footprints
+@export_range(0.0, 2.0, 0.01) var night_projectile_chroma_boost: float = 0.75 ##saturation lift applied before projectile chroma is drawn
+@export_range(0.0, 1.0, 0.01) var night_projectile_shading_fraction: float = 0.35 ##fraction of combat-night ambient reapplied to otherwise exempt projectile visuals
 @export_group("Terrain Paint")
 @export_range(0.0, 1.0, 0.01) var terrain_noise_strength: float = 0.2 ##amount of broad watercolor variation within painted terrain
 @export_range(0.25, 6.0, 0.05) var terrain_noise_scale: float = 1.0 ##spatial frequency of pigment variation inside the painted terrain

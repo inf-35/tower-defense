@@ -16,8 +16,11 @@ var vertical_gravity: float = 0.0
 var arcing: bool = false
 var scale: Vector2 = Vector2.ONE #overall scale
 var is_projectile: bool = false
+var uses_projectile_texture_multimesh: bool = false
 var projectile_tints: Array[Color] = []
 var projectile_tint_lifetime: float = -1.0
+var projectile_chroma_strength: float = 0.0
+var projectile_trail_chroma_strength: float = 0.0
 
 var age: float = 0.0      #current time since creation.
 var lifetime: float = 0.00

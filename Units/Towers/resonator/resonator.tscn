@@ -31,7 +31,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 
 [node name="ResonatorBehavior" type="Node" parent="." unique_id=1339536219]
 script = ExtResource("4_behavior")
-max_resonances_per_second = 5.0
+max_resonances_per_second = 20.0
 icon = ExtResource("5_graphics")
 metadata/_custom_type_script = "uid://bam3thfei3wm0"
 
@@ -46,7 +46,6 @@ health_data = SubResource("Resource_health")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1787182419]
-rotation = 1.5707964
 scale = Vector2(0.065, 0.065)
 texture = ExtResource("5_graphics")
 

@@ -1,10 +1,23 @@
 [gd_resource type="Resource" script_class="ChainLightningEffect" format=3 uid="uid://dopk0o68jwkr8"]
 
 [ext_resource type="Script" uid="uid://bqevvdjq5qm6s" path="res://Content/Effects/_chain_lightning.gd" id="1_chain"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="2_oyojp"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="2_vfx"]
+
+[sub_resource type="Resource" id="Resource_arc_swirl_warm"]
+script = ExtResource("2_vfx")
+swirl_color = Color(1, 0.9125, 0.25, 0.6431373)
+swirl_width = 7.0
+swirl_particles_per_tile = 10.0
+swirl_drift_speed_max = 14.0
+lifetime = 0.36
+metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [resource]
 script = ExtResource("1_chain")
 jump_radius = 25.0
 damage_falloff_multiplier = 0.5
 status_cooldown_falloff_multiplier = 0.5
-jump_feedback_width = 2.0
+jump_feedback_color = Color(1, 0.9626667, 0.68, 0.8666667)
+jump_feedback_width = 1.5
+jump_particle_swirls = Array[ExtResource("2_vfx")]([SubResource("Resource_arc_swirl_warm")])

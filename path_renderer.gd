@@ -24,6 +24,9 @@ var _time_accumulator: float
 
 var _time_from_last_step: float = 0.0
 const _TIMESTEP: float = 0.2
+const ROUTE_INDICATOR_OPACITY_REFERENCE_COUNT: float = 2.0
+const ROUTE_INDICATOR_OPACITY_DENSITY_EXPONENT: float = 0.35
+const ROUTE_INDICATOR_OPACITY_MIN_SCALE: float = 0.38
 
 class PathRender:
 	var start_cell: Vector2i ##breach where route begins
@@ -173,8 +176,13 @@ func _refresh_path_wash() -> void: ##publishes only valid non-phasing routes to 
 
 	path_wash_layer.set_paths(wash_paths, _get_route_opacity_scale(wash_paths.size()))
 
-func _get_route_opacity_scale(route_count: int) -> float: ##square-root compresses route density so minor branches remain legible beside heavily shared paths
+func _get_route_opacity_scale(route_count: int) -> float: ##keeps the existing square-root density scale for the watercolor route wash
 	return 1.0 / sqrt(maxf(1.0, float(route_count) * 0.5))
+
+func _get_route_indicator_opacity_scale(route_count: int) -> float: ##softly compresses route density so low-weight dashed branches fade without disappearing
+	var density: float = maxf(1.0, float(route_count))
+	var opacity_scale: float = pow(ROUTE_INDICATOR_OPACITY_REFERENCE_COUNT / density, ROUTE_INDICATOR_OPACITY_DENSITY_EXPONENT)
+	return maxf(opacity_scale, ROUTE_INDICATOR_OPACITY_MIN_SCALE)
 
 func _refresh_obstruction_warnings() -> void: ##classifies route-obstructing cells by whether normal or only wall-ignoring enemies cross them
 	if not is_instance_valid(obstruction_warning_renderer):
@@ -340,7 +348,7 @@ func _draw() -> void:
 			elif data.is_phasing:
 				draw_color = phasing_color
 
-		draw_color.a *= _get_route_opacity_scale(list_to_draw.size())
+		draw_color.a *= _get_route_indicator_opacity_scale(list_to_draw.size())
 		if data.is_phasing and data.route_mode != NavigationComponent.RouteMode.RAIDER_CHAIN:
 			draw_color.a *= 3.0
 		_draw_stamped_path(data.points, draw_color)

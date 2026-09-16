@@ -57,25 +57,4 @@ func _spawn_cleanse_vfx(target: Unit) -> void:
 	tween.tween_property(target, "scale", Vector2.ONE, 0.1)
 
 func _spawn_pulse_vfx() -> void:
-	if not is_instance_valid(unit):
-		return
-
-	var pulse: Line2D = Line2D.new()
-	pulse.width = 2.0
-	pulse.default_color = PULSE_COLOR
-	pulse.closed = true
-
-	var points: PackedVector2Array = []
-	var steps: int = 16
-	for i: int in range(steps):
-		var angle: float = (float(i) / steps) * TAU
-		points.append(Vector2(cos(angle), sin(angle)) * 10.0)
-	pulse.points = points
-
-	unit.add_child(pulse)
-
-	var tween: Tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(pulse, "scale", Vector2.ONE * (heal_range / 10.0), 0.5).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
-	tween.tween_property(pulse, "modulate:a", 0.0, 0.5)
-	tween.tween_callback(pulse.queue_free).set_delay(0.5)
+	_spawn_aura_ring_pulse(PULSE_COLOR)

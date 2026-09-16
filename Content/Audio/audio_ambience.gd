@@ -5,8 +5,8 @@ const BIRDSONG_DELAY_RANGE: Vector2 = Vector2(6.0, 15.0)
 const WOODS_DELAY_RANGE: Vector2 = Vector2(3.0, 7.0)
 const COMBAT_LOOP_START_VOLUME_DB: float = -50.0
 const COMBAT_LOOP_TARGET_VOLUME_DB: float = -2.0
-const AMBIENCE_BIRDSONG_VOLUME_RANGE: Vector2 = Vector2(-16.0, -12.0)
-const AMBIENCE_WOODS_VOLUME_RANGE: Vector2 = Vector2(-12.0, -7.0)
+const AMBIENCE_BIRDSONG_VOLUME_RANGE: Vector2 = Vector2(-18.0, -16.0)
+const AMBIENCE_WOODS_VOLUME_RANGE: Vector2 = Vector2(-16.0, -12.0)
 const FADE_DURATION: float = 1.0
 
 var combat_loop_stream: AudioStreamPlayer2D

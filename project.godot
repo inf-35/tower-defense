@@ -62,6 +62,7 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/stretch/scale=1.2
 window/vsync/vsync_mode=0
+mouse_cursor/custom_image="uid://bxhy6dut1ksw6"
 
 [editor]
 

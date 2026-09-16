@@ -113,7 +113,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"CURSED": {
 		"title": "Cursed",
 		"display": "",
-		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 25% more damage per stack of curse.",
+		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 33% more damage per stack of curse.",
 		"icon": preload("res://Assets/cursed_icon.png")
 	},
 	"POISON": {

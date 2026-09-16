@@ -14,7 +14,7 @@ cost = 3.5
 required_capacity = 0.6
 element = 5
 tower_name = "Farm"
-tower_description = "Earns 0.6 {GOLD}, plus 0.3 {GOLD} for each adjacent {T_FARM|label=Farm}, at the end of each wave if it survives. Must be placed adjacent to another friendly structure."
+tower_description = "Earns 0.8 {GOLD}, plus 0.2 {GOLD} for each adjacent {T_FARM|label=Farm}, at the end of each wave if it survives. Must be placed adjacent to another friendly structure."
 icon = ExtResource("1_a7kqt")
 preview = ExtResource("1_a7kqt")
 tower_scene = ExtResource("6_65vao")

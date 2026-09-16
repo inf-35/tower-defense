@@ -207,7 +207,7 @@ func _create_particle(direction: Vector2, normal: Vector2) -> ParticleSpec: ##cr
 	var t: float = randf()
 	var line_position: Vector2 = _start_position.lerp(_end_position, t)
 	var lateral_offset: float = randf_range(-_width * 0.5, _width * 0.5)
-	particle.position = line_position + normal * lateral_offset - global_position
+	particle.position = line_position + normal * lateral_offset
 	particle.scale = randf_range(_scale_min, _scale_max)
 	particle.rotation = randf() * TAU
 	particle.angular_velocity = deg_to_rad(randf_range(-55.0, 55.0))

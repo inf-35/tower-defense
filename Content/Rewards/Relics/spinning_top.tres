@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://c3kvs610y4sfn"]
 
-[ext_resource type="Resource" path="res://Content/Relics/spinning_top/spinning_top.tres" id="1_ou5kd"]
-[ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="2_7mp23"]
+[ext_resource type="Resource" uid="uid://ubyaif5hyw5" path="res://Content/Relics/spinning_top/spinning_top.tres" id="1_ou5kd"]
+[ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="2_7mp23"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="3_wxbpe"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="4_hgfoq"]
 
 [resource]
 script = ExtResource("2_7mp23")
@@ -9,4 +11,3 @@ id_name = "spinning_top"
 description = "relic reward"
 type = 2
 relic_data = ExtResource("1_ou5kd")
-

@@ -31,8 +31,8 @@
 [ext_resource type="Texture2D" uid="uid://lcppqflnka8m" path="res://Assets/blank_grid.png" id="28_blank_grid"]
 [ext_resource type="Texture2D" uid="uid://cxfg7msvaqb2y" path="res://Assets/sword_grid.png" id="29_sword_grid"]
 [ext_resource type="Texture2D" uid="uid://dxdbwljncyu70" path="res://Assets/bad_grid.png" id="30_bad_grid"]
-[ext_resource type="Script" path="res://UI/ui_visibility_toggle.gd" id="31_ui_visibility"]
-[ext_resource type="Shader" path="res://Shaders/paper_grain.gdshader" id="32_paper_grain"]
+[ext_resource type="Script" uid="uid://kify44v4y7h2" path="res://UI/ui_visibility_toggle.gd" id="31_ui_visibility"]
+[ext_resource type="Shader" uid="uid://csfc27ytdb7qi" path="res://Shaders/paper_grain.gdshader" id="32_paper_grain"]
 [ext_resource type="Script" uid="uid://ccjlpbls3vyv1" path="res://Scene Elements/path_wash_layer.gd" id="33_path_wash"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q2og1"]
@@ -51,14 +51,15 @@ frequency = 0.35
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_paper_grain"]
 width = 256
 height = 256
-seamless = true
 noise = SubResource("FastNoiseLite_paper_grain")
+seamless = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_paper_grain"]
 shader = ExtResource("32_paper_grain")
+shader_parameter/grain_color = Color(0.34, 0.3, 0.23, 1)
 shader_parameter/grain_strength = 0.0
 shader_parameter/grain_scale = 1.0
-shader_parameter/grain_color = Color(0.34, 0.3, 0.23, 1)
+shader_parameter/brush_strength = 0.0
 shader_parameter/grain_texture = SubResource("NoiseTexture2D_paper_grain")
 
 [node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer", "lake_preview_renderer")]
@@ -71,18 +72,18 @@ lake_preview_renderer = NodePath("LakePreviewRenderer")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1723399969]
 zoom = Vector2(12, 12)
 script = ExtResource("2_04hb4")
-minimum_player_zoom = 8.0
+minimum_player_zoom = 6.0
 
 [node name="AudioListener2D" type="AudioListener2D" parent="Camera2D" unique_id=107970021]
 current = true
 
 [node name="UI" parent="." unique_id=1683695170 instance=ExtResource("2_hdtfb")]
 
-[node name="UIVisibilityToggle" type="Node" parent="." node_paths=PackedStringArray("canvas_layers", "canvas_items")]
+[node name="UIVisibilityToggle" type="Node" parent="." unique_id=556804507 node_paths=PackedStringArray("canvas_layers", "canvas_items")]
 process_mode = 3
 script = ExtResource("31_ui_visibility")
-canvas_layers = Array[NodePath]([NodePath("../UI"), NodePath("../UI/TutorialManager"), NodePath("../Tooltips")])
-canvas_items = Array[NodePath]([NodePath("../ObstructionWarnings")])
+canvas_layers = [NodePath("../UI"), NodePath("../UI/TutorialManager"), NodePath("../Tooltips")]
+canvas_items = [NodePath("../ObstructionWarnings")]
 
 [node name="BoilOverlay" type="CanvasLayer" parent="." unique_id=1253245311]
 process_mode = 3
@@ -154,8 +155,8 @@ paper_grain_rect = NodePath("paper_rect2")
 color_rect = NodePath("color_rect")
 
 [node name="paper_rect2" type="TextureRect" parent="TerrainRenderer" unique_id=1632982907]
-material = SubResource("ShaderMaterial_paper_grain")
 z_as_relative = false
+material = SubResource("ShaderMaterial_paper_grain")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -198,8 +199,7 @@ scale = Vector2(0.08, 0.08)
 mouse_filter = 2
 color = Color(0.99215686, 0.9372549, 0.84705883, 1)
 
-[node name="PathWashLayer" type="Node2D" parent="."]
-z_index = 0
+[node name="PathWashLayer" type="Node2D" parent="." unique_id=507856348]
 z_as_relative = false
 script = ExtResource("33_path_wash")
 

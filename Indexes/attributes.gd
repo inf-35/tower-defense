@@ -85,30 +85,30 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 			StatusAttributeData.new(id.COOLDOWN, 0.0, 1.0 / 0.66),
 		],
 		true,
-		Color(0, 0, 1, 0.5)
+		Color(0, 0, 1, 0.333)
 	),
 	Status.BURN: StatusEffectData.new(
 		[StatusAttributeData.new(id.REGENERATION, -1, 1.0)],
 		true,
-		Color(1.0, 0.65, 0.0, 0.502) #-1 hp every second
+		Color(1.0, 0.65, 0.0, 0.335) #-1 hp every second
 	),
 	Status.POISON: StatusEffectData.new(
 		[StatusAttributeData.new(id.REGEN_REMAINDER_PERCENT, -0.05, 1.0)],
 		true,
-		Color(0, 1, 0, 0.5) #-5% remaining hp per second (capped at 2/s/stack)
+		Color(0, 1, 0, 0.333) #-5% remaining hp per second (capped at 2/s/stack)
 	),
 	Status.HEAT: StatusEffectData.new(
 		[]  #this effect does nothing by itself, but reacts with FROST
 	),
 	Status.CURSED: StatusEffectData.new(
-		[StatusAttributeData.new(id.DAMAGE_TAKEN, 0.0, 1.25)],
+		[StatusAttributeData.new(id.DAMAGE_TAKEN, 0.0, 1.33)],
 		true,
-		Color(0.446, 0.002, 0.768, 0.5)
+		Color(0.446, 0.002, 0.768, 0.333)
 	),
 	Status.BLEED: StatusEffectData.new(
 		[StatusAttributeData.new(id.FLAT_DAMAGE_TAKEN, 0.5, 1.0)],
 		true,
-		Color(1,0,0,0.5),
+		Color(1,0,0,0.333),
 	),
 	Status.STUN: StatusEffectData.new(
 		[StatusAttributeData.new(id.MAX_SPEED, 0.0, 0.2),
@@ -120,7 +120,7 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 	Status.CLEANSE: StatusEffectData.new(
 		[],
 		false,
-		Color(0.35, 0.65, 1.0, 0.35)
+		Color(0.35, 0.65, 1.0, 0.233)
 	)
 }
 

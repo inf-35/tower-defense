@@ -6,11 +6,11 @@ const LINK_WISP_PROJECTILE_SPEED: float = 120.0
 const LINK_WISP_GRAVITY: float = 400.0
 const LINK_WISP_MINIMUM_FLIGHT_TIME: float = 0.16
 const LINK_WISP_MAXIMUM_FLIGHT_TIME: float = 0.48
-const BONUS_TEXT_COLOR: Color = Color(0.7, 0.641, 0.196, 1.0)
+const BONUS_TEXT_COLOR: Color = Color(0.44, 0.405, 0.136, 1.0)
 const ACTIVATION_OVERLAY_COLOR: Color = Color(1.381, 0.972, 0.0, 1.0)
 const BONUS_TEXT_PEAK_ALPHA: float = 1.00
-const BONUS_TEXT_RAMP_UP_RATIO: float = 0.75
-const BONUS_TEXT_FADE_OUT_RATIO: float = 0.25
+const BONUS_TEXT_RAMP_UP_RATIO: float = 0.1
+const BONUS_TEXT_FADE_OUT_RATIO: float = 0.3
 const ACTIVATION_OVERLAY_PEAK_STRENGTH: float = 0.55
 const ACTIVATION_RAMP_IN_DURATION: float = 0.5
 const ACTIVATION_FADE_OUT_DURATION: float = 0.1
@@ -39,8 +39,9 @@ func show_bonus_text(world_pos: Vector2, text_override: String = "") -> void: ##
 		BONUS_TEXT_PEAK_ALPHA,
 		BONUS_TEXT_RAMP_UP_RATIO,
 		BONUS_TEXT_FADE_OUT_RATIO,
-		1.2,
-		true
+		1.0,
+		true,
+		0.5,
 	)
 
 func activate_new_link(target: Tower, show_link_wisp: bool = true) -> void: ##plays first-link feedback and optionally carries its source-to-target relationship through a wisp

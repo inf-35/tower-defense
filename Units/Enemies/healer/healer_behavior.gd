@@ -1,6 +1,11 @@
 extends Behavior
 class_name HealerBehavior
 
+const AURA_RING_TEXTURE: Texture2D = preload("res://Assets/enemy_aura_ring.png")
+const AURA_RING_COLOR: Color = Color(0.2, 1.0, 0.4, 0.8)
+const AURA_RING_START_RADIUS: float = 10.0
+const AURA_RING_PULSE_DURATION: float = 0.5
+
 #--- configuration ---
 @export var heal_amount: float = 0.0 ##amount of hp points
 @export var heal_interval: float = 3.0 ##interval (in seconds) between heals
@@ -114,34 +119,41 @@ func _spawn_heal_vfx(target: Unit) -> void:
 	if not is_instance_valid(target.graphics):
 		return
 
-	var tween = create_tween()
+	var tween: Tween = create_tween()
 	tween.tween_property(target, "scale", Vector2(1.2, 1.2), 0.1)
 	tween.tween_property(target, "scale", Vector2(1.0, 1.0), 0.1)
 
 func _spawn_pulse_vfx() -> void:
-	#create a temporary expanding circle to visualize the aura
-	if not is_instance_valid(unit): return
+	_spawn_aura_ring_pulse(AURA_RING_COLOR)
 
-	var pulse = Line2D.new()
-	pulse.width = 2.0
-	pulse.default_color = Color(0.2, 1.0, 0.4, 0.8)
-	pulse.closed = true
+func _spawn_aura_ring_pulse(pulse_color: Color) -> void:
+	if not is_instance_valid(unit):
+		return
 
-	#generate circle points
-	var points: PackedVector2Array = []
-	var steps: int = 16
-	for i in range(steps):
-		var angle = (float(i) / steps) * TAU
-		points.append(Vector2(cos(angle), sin(angle)) * 10.0) #start small
-	pulse.points = points
+	var texture_size: Vector2 = AURA_RING_TEXTURE.get_size()
+	if texture_size.x <= 0.0 or texture_size.y <= 0.0:
+		return
+
+	var pulse: Sprite2D = Sprite2D.new()
+	pulse.texture = AURA_RING_TEXTURE
+	pulse.modulate = pulse_color
+	pulse.scale = _get_aura_ring_scale(AURA_RING_START_RADIUS, texture_size)
 
 	unit.add_child(pulse)
 
-	var tween = create_tween()
+	var tween: Tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(pulse, "scale", Vector2.ONE * (heal_range / 10.0), 0.5).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
-	tween.tween_property(pulse, "modulate:a", 0.0, 0.5)
-	tween.tween_callback(pulse.queue_free).set_delay(0.5)
+	tween.tween_property(
+		pulse,
+		"scale",
+		_get_aura_ring_scale(heal_range, texture_size),
+		AURA_RING_PULSE_DURATION
+	).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tween.tween_property(pulse, "modulate:a", 0.0, AURA_RING_PULSE_DURATION)
+	tween.tween_callback(pulse.queue_free).set_delay(AURA_RING_PULSE_DURATION)
+
+func _get_aura_ring_scale(radius: float, texture_size: Vector2) -> Vector2:
+	return Vector2(radius * 2.0 / maxf(texture_size.x, 1.0), radius * 2.0 / maxf(texture_size.y, 1.0))
 
 #override get_display_data to allow ui to show heal stats
 func get_display_data() -> Dictionary:
