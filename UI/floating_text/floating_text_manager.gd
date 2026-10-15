@@ -22,6 +22,10 @@ class DamageTextStyle extends RefCounted:
 @export var text_scene: PackedScene
 @export var initial_pool_size: int = 20
 
+@export_group("Text Presentation")
+@export var ink_outline_color: Color = Color(0.41568628, 0.3764706, 0.29803923, 1.0) ##dark watercolor ink used to separate bright authored fills from the board
+@export_range(1.0, 4.0, 0.25) var ink_outline_width_multiplier: float = 2.0 ##width applied over the ordinary popup outline so bright fills remain legible
+
 @export_group("Damage Presentation")
 @export var damage_scale_minimum: float = 1.0 ##smallest automatic damage-number scale before caller scale modifiers are applied
 @export var damage_scale_log_base: float = 2.0 ##logarithm base for damage-number size growth
@@ -136,6 +140,22 @@ func show_text(text: String, world_pos: Vector2, color: Color, ignore_pause: boo
 	if DebugAssistant.disable_floating_text:
 		return
 	_spawn_text(text, world_pos, color, 1.0, 1.0, 0.0, 0.3, ignore_pause)
+
+func show_ink_outlined_text(
+	text: String,
+	world_pos: Vector2,
+	fill_color: Color,
+	ignore_pause: bool = false,
+	custom_time: float = -1.0
+) -> void: ##shows bright text with the shared dark ink outline while preserving ordinary popup styling
+	if DebugAssistant.perf_instrumentation_active:
+		DebugAssistant.record_perf_event(&"floating_text_text_requests")
+	if DebugAssistant.disable_floating_text:
+		return
+	var instance: FloatingText = _spawn_text(text, world_pos, fill_color, 1.0, 1.0, 0.0, 0.3, ignore_pause, custom_time)
+	if is_instance_valid(instance):
+		instance.set_text_outline_color(ink_outline_color)
+		instance.set_text_outline_size(roundi(instance.get_theme_constant(&"outline_size") * ink_outline_width_multiplier))
 
 func show_text_with_profile(
 	text: String,

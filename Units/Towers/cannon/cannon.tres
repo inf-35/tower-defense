@@ -11,10 +11,11 @@
 [resource]
 script = ExtResource("1_dhi2e")
 id = 4
+size = Vector2i(2, 2)
 required_capacity = 2.0
 tags = Array[int]([7])
 tower_name = "Cannon"
-tower_description = "Slow heavy hitter."
+tower_description = "Slow heavy hitter. Gains +6 {UNIT_RANGE} and +0.05 {UNIT_HITRATE} for each adjacent {T_PALISADE|label=Palisade}."
 icon = ExtResource("1_vcib8")
 preview = ExtResource("5_prod2")
 tower_scene = ExtResource("2_gll86")

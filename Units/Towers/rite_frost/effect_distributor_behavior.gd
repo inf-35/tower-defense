@@ -4,62 +4,71 @@ class_name EffectDistributorBehavior
 const INFLUENCE_KEY: StringName = &"distributed_effect"
 
 @export var buff_effect: EffectPrototype ##effect to be distributed to adjacencies
-@export_flags("Up", "Right", "Down", "Left") var active_directions: int = 0b1111 ##bitmask to configure adjacencies
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology receiving the distributed effect; defaults to one-cell cardinal adjacency
 
 var _buffed_neighbors: Array[Tower] = []
+var _subscription_id: int = -1
+var _last_report: TowerTopologyService.Report = null
 var attached: bool = false
 
-func detach() -> void:
+func detach() -> void: ##unsubscribes and revokes this distributor's stack from every previous topology target
 	attached = false
-	#revoke our contribution from all current neighbors
-	for t in _buffed_neighbors:
-		_modify_stack(t, -1)
+	_unsubscribe()
+	for tower: Tower in _buffed_neighbors:
+		_modify_stack(tower, -1)
 	_buffed_neighbors.clear()
 	clear_tower_influences()
 
-func attach() -> void:
+func attach() -> void: ##subscribes the active tower to its authored topology
 	attached = true
-	var tower: Tower = unit as Tower
-	if is_instance_valid(tower) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
-		_on_adjacency_updated(Run.references.island.topology_service.get_adjacency_report(tower))
+	_subscribe()
 
-func start() -> void:
+func start() -> void: ##validates configuration and starts live topology-driven distribution
 	if not buff_effect:
 		push_warning(self, " - EffectDistributorBehavior: No effect assigned!")
 		return
-
-	var tower: Tower = unit as Tower
-	tower.adjacency_updated.connect(_on_adjacency_updated)
-	tower.tree_exiting.connect(_on_exit)
-
 	attach()
 
-#logic to sync buffs with current grid state
-func _on_adjacency_updated(adjacency_data: AdjacencyReportData) -> void:
+func _subscribe() -> void: ##registers one topology subscription and requests an immediate initial report
+	if _subscription_id != -1 or not attached:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return
+	_subscription_id = topology_service.subscribe(self, tower, _make_query(), _on_topology_updated, true)
+
+func _unsubscribe() -> void: ##removes the live query without assuming the island still exists
+	if _subscription_id == -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if topology_service != null:
+		topology_service.unsubscribe(self, _subscription_id)
+	_subscription_id = -1
+	_last_report = null
+
+func _make_query() -> TowerTopologyService.Query: ##builds the configured topology or the cardinal-adjacency default
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
+
+func _on_topology_updated(report: TowerTopologyService.Report) -> void: ##reconciles distributed stacks against the latest deduplicated topology targets
 	if not attached:
 		return
+	_last_report = report
 	sync_tower_influences()
-	if adjacency_data == null:
+	if report == null:
 		return
 
 	var current_neighbors: Array[Tower] = []
-	var host_tower: Tower = unit as Tower
-
-	#identify valid neighbours
-	for adjacency: Vector2i in adjacency_data.adjacent_towers:
-		if not _is_local_direction_allowed(host_tower.facing, adjacency):
-			continue #reject invalid directions
-
-		var tower: Tower = adjacency_data.adjacent_towers[adjacency]
-		if is_instance_valid(tower) and not tower.is_queued_for_deletion(): #ignore towers which are in the process of exiting
+	for tower: Tower in report.unique_towers:
+		if tower != unit and is_instance_valid(tower) and not tower.is_queued_for_deletion():
 			current_neighbors.append(tower)
 
-	#handle lost neighbours (revoke effects)
 	for old_tower: Tower in _buffed_neighbors:
 		if not current_neighbors.has(old_tower):
 			_modify_stack(old_tower, -1)
 
-	#handle new neighbours (add buffs)
 	for new_tower: Tower in current_neighbors:
 		if not _buffed_neighbors.has(new_tower):
 			_modify_stack(new_tower, 1)
@@ -68,21 +77,7 @@ func _on_adjacency_updated(adjacency_data: AdjacencyReportData) -> void:
 
 	_buffed_neighbors = current_neighbors
 
-func _is_local_direction_allowed(host_facing: Tower.Facing, grid_dir: Vector2i) -> bool:
-	var grid_idx: Tower.Facing
-	grid_idx = Tower.get_side_from_offset(unit.size, grid_dir)
-
-	#calculate local index relative to facing
-	var local_idx: int = (grid_idx - host_facing + 4) % 4
-
-	#check bitmask
-	#we shift 1 by the local index to match the @export_flags order
-	var mask_bit: int = 1 << local_idx
-
-	return (active_directions & mask_bit) != 0
-
-#helper to add/remove stacks safely
-func _modify_stack(target: Tower, amount: int) -> void:
+func _modify_stack(target: Tower, amount: int) -> void: ##changes only this distributor's contribution to the target effect stack
 	if not is_instance_valid(target):
 		return
 
@@ -90,25 +85,28 @@ func _modify_stack(target: Tower, amount: int) -> void:
 	if effect_instance:
 		effect_instance.source = unit
 
-#cleanup: when this tower is sold/destroyed/upgraded
-func _on_exit(_hit_report_data: HitReportData = null) -> void:
-	#detach is called when the tower dies by default
-	var tower: Tower = unit as Tower
-	tower.adjacency_updated.disconnect(_on_adjacency_updated)
-	tower.tree_exiting.disconnect(_on_exit)
-	clear_tower_influences()
+func _exit_tree() -> void:
+	detach()
 
-func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes the same facing-relative adjacent cells used by live effect distribution
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes the exact configured topology used by live effect distribution
 	var influences: Array[TowerInfluence] = []
 	var host_tower: Tower = unit as Tower
 	if not is_instance_valid(host_tower):
 		return influences
 	if not is_instance_valid(buff_effect):
 		return influences
-	var cells: Array[Vector2i] = []
-	for cell: Vector2i in host_tower.get_adjacent_cells():
-		var offset: Vector2i = cell - host_tower.tower_position
-		if _is_local_direction_allowed(host_tower.facing, offset):
-			cells.append(cell)
-	influences.append(TowerInfluence.for_cells(INFLUENCE_KEY, TowerInfluence.Kind.EFFECT, cells, buff_effect))
+	var report: TowerTopologyService.Report = _last_report
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if report == null and topology_service != null:
+		report = topology_service.query(host_tower, _make_query())
+	if report == null:
+		return influences
+	influences.append(TowerInfluence.for_cells(INFLUENCE_KEY, TowerInfluence.Kind.EFFECT, _get_report_cells(report), buff_effect))
 	return influences
+
+func _get_topology_service() -> TowerTopologyService: ##resolves the run-owned topology service shared by live subscriptions and preview queries
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return null
+	if not is_instance_valid(Run.references.island.topology_service):
+		return null
+	return Run.references.island.topology_service

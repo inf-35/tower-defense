@@ -38,9 +38,11 @@ var physics_game_delta: float = 0.0 ##physics dT, adjusted for game speed
 
 #--- private state ---
 var _active_timers: Array[GameTimer] = []
+var _timer_generation: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	Run.run_ending.connect(_clear_timers)
 	UI.gamespeed_toggled.connect(func(gamespeed: GameSpeed):
 		match gamespeed:
 			GameSpeed.PAUSE:
@@ -76,6 +78,7 @@ func _advance_timers(delta: float) -> void: ##advances custom game-time timers a
 	if _active_timers.is_empty():
 		return
 
+	var timer_generation: int = _timer_generation
 	for i: int in range(_active_timers.size() - 1, -1, -1):
 		var timer: GameTimer = _active_timers[i]
 		if not timer.is_active:
@@ -95,6 +98,9 @@ func _advance_timers(delta: float) -> void: ##advances custom game-time timers a
 			DebugAssistant.record_perf_event(&"clock_timers_expired")
 		_remove_timer_at(i)
 		timer.timeout.emit()
+		#timeout callbacks can end the run or restart the clock synchronously
+		if timer_generation != _timer_generation:
+			return
 
 func _remove_timer_at(index: int) -> void: ##removes a timer without shifting the rest of the array on every expired entry
 	var last_index: int = _active_timers.size() - 1
@@ -102,7 +108,8 @@ func _remove_timer_at(index: int) -> void: ##removes a timer without shifting th
 		_active_timers[index] = _active_timers[last_index]
 	_active_timers.pop_back()
 
-func _clear_timers() -> void: ##drops timers from the previous run/session when the game clock is restarted
+func _clear_timers() -> void: ##cancels pending game-time work before run teardown or a clock restart without emitting timeout
+	_timer_generation += 1
 	for timer: GameTimer in _active_timers:
 		timer.is_active = false
 	_active_timers.clear()

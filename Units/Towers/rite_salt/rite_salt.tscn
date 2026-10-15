@@ -12,6 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://dttxn8ufglhqc" path="res://Assets/rite_salt_icon.png" id="10_lbj88"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_h5317"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_q7tqo"]
+[ext_resource type="Script" uid="uid://cb8tlxrimtfn1" path="res://Content/tower_topology_config.gd" id="13_topology"]
+
+[sub_resource type="Resource" id="Resource_topology"]
+script = ExtResource("13_topology")
+query_kind = 1
 
 [sub_resource type="Resource" id="Resource_1p4ur"]
 script = ExtResource("5_lcwwx")
@@ -42,6 +47,7 @@ movement_component = NodePath("MovementComponent")
 script = ExtResource("4_qmbet")
 damage_modifier = SubResource("Resource_1p4ur")
 attack_rate_modifier = SubResource("Resource_f00g0")
+topology = SubResource("Resource_topology")
 
 [node name="MovementComponent" type="Node" parent="." unique_id=883355453]
 script = ExtResource("6_fh85p")

@@ -1,27 +1,29 @@
 extends Behavior
 class_name CopperRiteBehavior
 
-const INFLUENCE_KEY: StringName = &"copper_pair"
+const INFLUENCE_KEY: StringName = &"copper_group"
 
 @export var buff_duration: float = 3.0 ##game-time duration of each copied-status attack window
 @export var status_feedback_delay: float = 0.1 ##game-time spacing between copied-status feedback popups from one hit
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology whose towers share statuses; defaults to cardinal adjacency
 
 var _connected_towers: Dictionary[Tower, bool] = {}
 var _active_status_windows: Dictionary[int, Array] = {}
+var _seen_attack_ids: Dictionary[int, bool] = {}
+var _subscription_id: int = -1
+var _last_report: TowerTopologyService.Report = null
 
 class StatusWindow extends RefCounted:
 	var payload: Dictionary[Attributes.Status, Vector2] = {}
 
 func start() -> void:
-	var tower: Tower = unit as Tower
-	tower.adjacency_updated.connect(_on_adjacency_updated)
 	attach()
 
 func attach() -> void:
-	sync_tower_influences()
-	_refresh_connections()
+	_subscribe()
 
 func detach() -> void:
+	_unsubscribe()
 	var connected_towers: Array[Tower] = []
 	connected_towers.assign(_connected_towers.keys())
 	for tower: Tower in connected_towers:
@@ -29,24 +31,48 @@ func detach() -> void:
 
 	_connected_towers.clear()
 	_active_status_windows.clear()
+	_seen_attack_ids.clear()
 	clear_tower_influences()
 
-func _on_adjacency_updated(_adjacency_data: AdjacencyReportData) -> void:
+func _subscribe() -> void: ##subscribes copper to its authored sharing topology
+	if _subscription_id != -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return
+	_subscription_id = topology_service.subscribe(self, tower, _make_query(), _on_topology_updated, true)
+
+func _unsubscribe() -> void: ##removes the live sharing query without depending on island teardown order
+	if _subscription_id == -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if topology_service != null:
+		topology_service.unsubscribe(self, _subscription_id)
+	_subscription_id = -1
+	_last_report = null
+
+func _make_query() -> TowerTopologyService.Query: ##builds the configured topology or cardinal-adjacency default
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
+
+func _on_topology_updated(report: TowerTopologyService.Report) -> void:
+	_last_report = report
 	sync_tower_influences()
 	_refresh_connections()
 
-func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes copper's two world-vertical status-sharing endpoints
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes every tower participating in copper's status-sharing group
 	var rite_tower: Tower = unit as Tower
 	if not is_instance_valid(rite_tower):
 		return []
-	var cells: Array[Vector2i] = [
-		rite_tower.tower_position + Vector2i.UP,
-		rite_tower.tower_position + Vector2i.DOWN,
-	]
+	var report: TowerTopologyService.Report = _get_current_report()
+	if report == null:
+		return []
 	return [TowerInfluence.for_cells(
 		INFLUENCE_KEY,
 		TowerInfluence.Kind.LINK,
-		cells
+		_get_report_cells(report)
 	)]
 
 func _refresh_connections() -> void:
@@ -77,8 +103,8 @@ func _refresh_connections() -> void:
 func _on_linked_tower_pre_hit(event: GameEvent) -> void: ##adds live copied-status windows to a linked tower's routed primary attack
 	_apply_active_status_windows(event.unit as Tower, event.data as HitData)
 
-func _on_linked_tower_hit_dealt(event: GameEvent) -> void: ##copies statuses applied by one linked tower into a window on its counterpart
-	_add_status_window_to_counterpart(event.unit as Tower, event.data as HitReportData)
+func _on_linked_tower_hit_dealt(event: GameEvent) -> void: ##copies statuses applied by one linked tower to every other linked tower
+	_broadcast_status_window(event.unit as Tower, event.data as HitReportData)
 
 func _apply_active_status_windows(source_tower: Tower, hit_data: HitData) -> void: ##merges every live copied-status window into each primary attack from the receiving tower
 	if not is_instance_valid(source_tower) or not is_instance_valid(hit_data):
@@ -98,28 +124,38 @@ func _apply_active_status_windows(source_tower: Tower, hit_data: HitData) -> voi
 		_merge_status_payload_max_independent(hit_data.status_effects, window.payload)
 	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
-func _add_status_window_to_counterpart(source_tower: Tower, report: HitReportData) -> void: ##stores statuses applied by one linked tower as a timed infusion window on the other linked tower
+func _broadcast_status_window(source_tower: Tower, report: HitReportData) -> void: ##stores one applied-status payload as a timed infusion window on every other linked tower
 	if not is_instance_valid(source_tower) or report == null:
+		return
+	if not _connected_towers.has(source_tower):
 		return
 	if report.source != source_tower or report.statuses_applied.is_empty():
 		return
-
-	var counterpart: Tower = _get_counterpart(source_tower)
-	if not is_instance_valid(counterpart):
+	if report.attack_id > 0 and not HitReportData.consume_attack_id(report, _seen_attack_ids):
 		return
 
-	var window := StatusWindow.new()
-	_merge_status_payload_max_independent(window.payload, report.statuses_applied)
-	if window.payload.is_empty():
-		return
+	var recipients: Array[Tower] = []
+	recipients.assign(_connected_towers.keys())
+	var granted_any: bool = false
+	for recipient: Tower in recipients:
+		if recipient == source_tower or not is_instance_valid(recipient):
+			continue
 
-	var tower_id: int = counterpart.unit_id
-	if not _active_status_windows.has(tower_id):
-		_active_status_windows[tower_id] = []
-	_active_status_windows[tower_id].append(window)
-	_expire_status_window_after_delay(tower_id, window)
-	_show_status_feedback_sequence(counterpart, window.payload)
-	unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
+		var window := StatusWindow.new()
+		_merge_status_payload_max_independent(window.payload, report.statuses_applied)
+		if window.payload.is_empty():
+			continue
+
+		var tower_id: int = recipient.unit_id
+		if not _active_status_windows.has(tower_id):
+			_active_status_windows[tower_id] = []
+		_active_status_windows[tower_id].append(window)
+		_expire_status_window_after_delay(tower_id, window)
+		_show_status_feedback_sequence(recipient, window.payload)
+		granted_any = true
+
+	if granted_any:
+		unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
 
 func _show_status_feedback_sequence(target: Tower, payload: Dictionary[Attributes.Status, Vector2]) -> void: ##plays one yellow copied-status popup per status so multi-status hits read as several grants
 	if not is_instance_valid(target) or payload.is_empty():
@@ -178,29 +214,13 @@ func _merge_status_payload_max_independent(target_payload: Dictionary, incoming_
 
 func _get_linked_towers() -> Array[Tower]:
 	var linked_towers: Array[Tower] = []
-	var top_tower: Tower = _get_tower_at_global_offset(Vector2i.UP)
-	var bottom_tower: Tower = _get_tower_at_global_offset(Vector2i.DOWN)
-	if is_instance_valid(top_tower):
-		linked_towers.append(top_tower)
-	if is_instance_valid(bottom_tower) and bottom_tower != top_tower:
-		linked_towers.append(bottom_tower)
+	var report: TowerTopologyService.Report = _get_current_report()
+	if report == null:
+		return linked_towers
+	for tower: Tower in report.unique_towers:
+		if tower != unit and is_instance_valid(tower):
+			linked_towers.append(tower)
 	return linked_towers
-
-func _get_counterpart(source_tower: Tower) -> Tower:
-	var top_tower: Tower = _get_tower_at_global_offset(Vector2i.UP)
-	var bottom_tower: Tower = _get_tower_at_global_offset(Vector2i.DOWN)
-	if source_tower == top_tower:
-		return bottom_tower
-	if source_tower == bottom_tower:
-		return top_tower
-	return null
-
-func _get_tower_at_global_offset(offset: Vector2i) -> Tower:
-	var rite_tower: Tower = unit as Tower
-	var island: Island = Run.references.island
-	if not is_instance_valid(rite_tower) or not is_instance_valid(island):
-		return null
-	return island.get_tower_on_tile(rite_tower.tower_position + offset)
 
 func _disconnect_tower(tower: Tower) -> void:
 	if not is_instance_valid(tower) or not _connected_towers.has(tower):
@@ -208,3 +228,22 @@ func _disconnect_tower(tower: Tower) -> void:
 
 	tower.unsubscribe_event(GameEvent.EventType.PRE_HIT_DEALT, _on_linked_tower_pre_hit)
 	tower.unsubscribe_event(GameEvent.EventType.HIT_DEALT, _on_linked_tower_hit_dealt)
+
+func _get_current_report() -> TowerTopologyService.Report: ##returns the subscribed report or performs the same query for previews and callbacks
+	if _last_report != null:
+		return _last_report
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return null
+	return topology_service.query(tower, _make_query())
+
+func _get_topology_service() -> TowerTopologyService: ##resolves the island topology service shared by tracking and previews
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return null
+	if not is_instance_valid(Run.references.island.topology_service):
+		return null
+	return Run.references.island.topology_service
+
+func _exit_tree() -> void:
+	detach()

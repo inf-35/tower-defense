@@ -83,7 +83,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"UNIT_ARMOR": {
 		"title": "Armor",
 		"display": "",
-		"description": "A flat reduction on damage taken by this unit",
+		"description": "A flat reduction on damage taken by this unit (does not affect {STATUS|label=Status Effects}).",
 		"icon": preload("res://Assets/armor_icon.png"),
 	},
 	"FROST": {
@@ -131,13 +131,13 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"STATUS": {
 		"title": "Status",
 		"display": "Status",
-		"description": "A temporary modifier that affects a unit or tower's stats i.e. {BLEED} or {POISON}. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
+		"description": "A temporary modifier that affects a unit or tower's stats i.e. {BLEED} or {POISON}. When statuses of the same type overlap, the highest stack count and highest duration win out.",
 		"icon": null,
 	},
 	"STATUS_EFFECT_LABEL": {
 		"title": "Status",
 		"display": "[Status]",
-		"description": "A temporary modifier that affects a unit or tower's stats. Statuses do not stack cumulatively, instead, the highest stack count and highest duration win out.",
+		"description": "A temporary modifier that affects a unit or tower's stats i.e. {BLEED} or {POISON}. When statuses of the same type overlap, the highest stack count and highest duration win out.",
 		"icon": null,
 	},
 	"RITE_LABEL": {
@@ -149,7 +149,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 	"KEYWORD_TUTORIAL": {
 		"title": "Keyword",
 		"display": "keywords",
-		"description": "Like this one!",
+		"description": "Like this one! You can even hover on {KEYWORD_TUTORIAL|label=Keywords} in keywords.",
 		"icon": null,
 	},
 	"SETTLEMENT": {

@@ -25,6 +25,9 @@ func on_boss_resumed_for_combat(_context: BossEncounterContext) -> void: ##calle
 func on_boss_died(_context: BossEncounterContext) -> void: ##called when the persistent boss dies and the encounter ends
 	pass
 
+func get_preview_enemy_stacks(_subwave_index: int) -> Array[Array]: ##returns encounter-owned enemies for existing wave and breach previews
+	return []
+
 func get_save_data() -> Dictionary: ##returns bespoke runtime state that should persist through boss prep saves
 	return {}
 

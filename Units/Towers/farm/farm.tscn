@@ -32,6 +32,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="FarmBehavior" type="Node" parent="." unique_id=966735356]
 script = ExtResource("4_7c8ug")
 adjacent_farm_income_bonus = 0.2
+payout_text_lifetime_multiplier = 2.0
 metadata/_custom_type_script = "uid://djqe37wfw77og"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1023761601]

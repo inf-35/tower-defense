@@ -115,7 +115,7 @@ var tower_prototypes: Dictionary[Type, Tower] = {} #prototypical towers created 
 
 const TOWER_COST_BASE_SCALING: float = 0.0 ##default per-copy cost growth; individual tower resources may override this
 const TOWER_COST_INCREMENT: float = 0.05  ##smallest increment to which tower price values will snap to
-const PERMANENT_RITE_COST: float = 5.0
+const PERMANENT_RITE_COST: float = 7.0
 const PERMANENT_RITE_CAPACITY: float = 0.0
 
 const VERBOSE: bool = false

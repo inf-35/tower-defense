@@ -1,6 +1,12 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://hllqksk7k3ka"]
 
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_xj00k"]
+[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="2_status_rule"]
+
+[sub_resource type="Resource" id="Resource_require_status_source"]
+script = ExtResource("2_status_rule")
+tower_types = Array[int]([3, 14, 16, 18, 20, 21, 23, 24, 25, 28, 29, 30, 31, 34, 38, 39, 40, 41, 42, 43, 46, 47, 72, 73, 76])
+operation = 1
 
 [resource]
 script = ExtResource("1_xj00k")
@@ -8,4 +14,6 @@ id_name = "fist_rite"
 description = "rite reward"
 type = 3
 rite_type = 33
+base_rarity = 0
+tower_rules = Array[ExtResource("2_status_rule")]([SubResource("Resource_require_status_source")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

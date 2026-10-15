@@ -6,6 +6,7 @@ const ATTACK_RATE_INFLUENCE_KEY: StringName = &"salt_attack_rate"
 
 @export var damage_modifier: ModifierDataPrototype
 @export var attack_rate_modifier: ModifierDataPrototype
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology whose vertical and horizontal targets receive their respective modifiers
 
 class AppliedModifierState extends RefCounted:
 	var tower_ref: WeakRef
@@ -59,14 +60,9 @@ func _unsubscribe() -> void:
 	_last_report = null
 
 func _make_query() -> TowerTopologyService.Query:
-	return TowerTopologyService.Query.new(
-		TowerTopologyService.QueryKind.AXIAL_LINE,
-		1,
-		1,
-		TowerTopologyService.ALL_DIRECTIONS,
-		[],
-		TowerTopologyService.AxisSpace.WORLD
-	)
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
 
 func _on_topology_updated(report: TowerTopologyService.Report) -> void:
 	_last_report = report

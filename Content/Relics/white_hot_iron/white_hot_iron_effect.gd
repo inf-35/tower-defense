@@ -4,37 +4,37 @@ class_name WhiteHotIronEffect
 @export var damage_threshold: float = 6.0 ##damage threshold (in a single hit) needed to trigger the effect
 @export var spark_count: int = 3 ##number of sparks fired
 @export var stack_transfer_ratio: float = 0.5 ##50% transfer
+@export var effect_duration: float = 3.0
 @export var search_radius: float = 20.0 ##maximum distance at which units will be sparked upon
 @export var required_status: Attributes.Status = Attributes.Status.BURN
 @export var spark_attack_data: AttackData ##defines the spark projectile
 
-const RECURSION_BLOCK_TIME: float = 0.15 ##when units trigger this effect, they are blocked for this amount of time from retriggering it (to prevent recursion)
+@export var max_chain_count: int = 4 ##maximum number of white-hot-iron procs allowed in one recursive lineage
 
-class WhiteHotIronState extends RefCounted:
-	var cooldown: Dictionary[Unit, float] = {}
-
-#cooldown state blocks immediate retriggers and keeps this effect from recursing into itself
-func _init() -> void:
+func _init() -> void: ##registers white-hot iron as a global reaction to incoming hits
 	event_hooks = [GameEvent.EventType.HIT_RECEIVED]
 	global = true
 
-func create_instance() -> EffectInstance:
+func create_instance() -> EffectInstance: ##creates a stateless global effect instance
 	var instance := EffectInstance.new()
 	apply_generics(instance)
-	instance.state = WhiteHotIronState.new()
 	return instance
 
-func _handle_attach(_i: EffectInstance) -> void: pass
-func _handle_detach(instance: EffectInstance) -> void:
-	var state: WhiteHotIronState = instance.state as WhiteHotIronState
-	state.cooldown.clear()
+func _handle_attach(_instance: EffectInstance) -> void:
+	pass
 
-func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
+func _handle_detach(_instance: EffectInstance) -> void:
+	pass
+
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##releases sparks from sufficiently strong hits against burning enemies
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
 
 	var hit_data: HitData = event.data as HitData
 	if not hit_data or not is_instance_valid(hit_data.target):
+		return
+	var safe_chain_count: int = maxi(max_chain_count, 1)
+	if hit_data.get_lineage_producer_count(instance) >= safe_chain_count:
 		return
 
 	if hit_data.damage < damage_threshold:
@@ -64,18 +64,12 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	if stacks_to_apply < 0.4:
 		return #dont bother applying if stacks < 0.4.
-	_spawn_sparks(instance, stacks_to_apply, current_duration, hit_data)
+	_spawn_sparks(instance, stacks_to_apply, effect_duration, hit_data)
 
-	#apply cooldown (bar this unit from retriggering the effect temporarily)
-	var state: WhiteHotIronState = instance.state as WhiteHotIronState
-	state.cooldown[victim] = RECURSION_BLOCK_TIME
-	victim.tree_exiting.connect(func():
-		state.cooldown.erase(victim),
-		CONNECT_ONE_SHOT
-	)
-
-func _spawn_sparks(instance: EffectInstance, stacks: int, duration: float, original_hit_data: HitData) -> void:
-	if spark_attack_data == null: return
+func _spawn_sparks(instance: EffectInstance, stacks: float, duration: float, original_hit_data: HitData) -> void: ##derives each spark from the triggering hit while preserving the authored repeat limit
+	if spark_attack_data == null:
+		push_warning("WhiteHotIronEffect: triggered but no spark_attack_data assigned.")
+		return
 
 	var victim: Unit = original_hit_data.target
 	var source: Unit = original_hit_data.source
@@ -96,7 +90,7 @@ func _spawn_sparks(instance: EffectInstance, stacks: int, duration: float, origi
 		var target_unit: Unit = potential_targets[i]
 
 		var hit_data := spark_attack_data.generate_generic_hit_data()
-		if not hit_data.derive_lineage_from(original_hit_data, instance):
+		if not hit_data.derive_lineage_from(original_hit_data, instance, max_chain_count):
 			continue
 		hit_data.source = original_hit_data.get_source_unit(source)
 		hit_data.target = target_unit
@@ -112,10 +106,3 @@ func _spawn_sparks(instance: EffectInstance, stacks: int, duration: float, origi
 		delivery.intercept_position = target_unit.global_position
 
 		CombatManager.resolve_hit(hit_data, delivery)
-
-func on_tick(instance: EffectInstance, delta: float) -> void:
-	var state: WhiteHotIronState = instance.state as WhiteHotIronState
-	for unit: Unit in state.cooldown:
-		state.cooldown[unit] -= delta
-		if state.cooldown[unit] <= 0.0:
-			state.cooldown.erase(unit)

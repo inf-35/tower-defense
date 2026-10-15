@@ -10,6 +10,7 @@ var _has_gold: bool = true
 
 func setup(reward: Reward, index: int) -> void: ##binds one shop reward and keeps its affordability display synced to the player's current gold
 	_reward_data = reward
+	_display_index = index
 	#apply data
 	_apply_visuals(reward)
 	if not UI.update_flux.is_connected(_refresh_affordability):

@@ -124,6 +124,10 @@ func _render_live_stats() -> void: #for standard stat displays
 		for display_info: StatDisplayInfo in current_unit.stat_displays:
 			var value: Variant = get_stat_value_from_instance(current_unit, display_info)
 			if value == null: continue
+			if display_info.special_modifier == DisplayStatModifier.BREACH_WAVE_PREVIEW:
+				stats.columns = 1
+				if str(value).is_empty():
+					continue
 
 			value = apply_display_modifiers(value, display_info) #format
 			var text: String = str(value) + display_info.suffix

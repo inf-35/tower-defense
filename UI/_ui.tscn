@@ -25,8 +25,8 @@
 [ext_resource type="Texture2D" uid="uid://dnbhfdu0a4g3p" path="res://Assets/play_icon.png" id="14_m8qfw"]
 [ext_resource type="Texture2D" uid="uid://iooil5qk2j5k" path="res://Assets/double_time_icon.png" id="15_aasu8"]
 [ext_resource type="Texture2D" uid="uid://dnvbyvrkef00w" path="res://Assets/timeline_pip_holder.png" id="16_aasu8"]
+[ext_resource type="PackedScene" uid="uid://n6t4t5ajkdxd" path="res://UI/tutorial/tutorial_pointer.tscn" id="18_omfan"]
 [ext_resource type="Script" uid="uid://ddlb750e0o03a" path="res://UI/tutorial/tutorial_manager.gd" id="21_7qncy"]
-[ext_resource type="Shader" uid="uid://filx1mvi3oje" path="res://Shaders/tutorial_spotlight.gdshader" id="22_b47fn"]
 [ext_resource type="PackedScene" uid="uid://cbdyajq0i6jec" path="res://UI/cursor_info/cursor_info.tscn" id="23_vlen6"]
 [ext_resource type="PackedScene" uid="uid://wv1a4nst6xfl" path="res://UI/loading_screen/loading_screen.tscn" id="24_1"]
 [ext_resource type="Script" uid="uid://bv8bb3j1duuj6" path="res://UI/ui_panel_motion_controller.gd" id="25_panel_motion"]
@@ -35,15 +35,6 @@
 [ext_resource type="Shader" uid="uid://cdnu76alxvtkf" path="res://Shaders/player_damage_vignette.gdshader" id="28_damage_vignette"]
 [ext_resource type="PackedScene" path="res://UI/boss_health_bar/boss_health_bar.tscn" id="29_boss_bar"]
 [ext_resource type="Material" path="res://UI/ui_color_replace.tres" id="30_ui_color_replace"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_vlen6"]
-shader = ExtResource("22_b47fn")
-shader_parameter/color = Color(0, 0, 0, 0.1764706)
-shader_parameter/spotlight_center = Vector2(0.5, 0.5)
-shader_parameter/spotlight_size = Vector2(0.1, 0.1)
-shader_parameter/spotlight_center_2 = Vector2(0.5, 0.5)
-shader_parameter/spotlight_size_2 = Vector2(0, 0)
-shader_parameter/is_active = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_damage_vignette"]
 shader = ExtResource("28_damage_vignette")
@@ -57,29 +48,23 @@ shader_parameter/center = Vector2(0.5, 0.5)
 process_mode = 3
 script = ExtResource("1_8wg1j")
 
-[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("overlay_color_rect", "instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor", "time_controls_anchor", "trade_anchor")]
+[node name="TutorialManager" type="CanvasLayer" parent="." unique_id=864767807 node_paths=PackedStringArray("instruction_panel", "central_anchor", "tower_bar_anchor", "player_stats_anchor", "timeline_anchor", "start_wave_anchor", "trade_anchor", "towers_pointer_objects", "information_pointer_objects", "start_wave_pointer_objects", "rite_pointer_objects", "ruins_pointer_objects", "shop_open_pointer_objects")]
 layer = 3
 script = ExtResource("21_7qncy")
-overlay_color_rect = NodePath("ColorRect")
 instruction_panel = NodePath("../Margin/ui_space/tutorial_anchors/tutorial_panel")
 central_anchor = NodePath("../Margin/ui_space/tutorial_anchors/central_anchor")
 tower_bar_anchor = NodePath("../Margin/ui_space/tutorial_anchors/tower_bar_anchor")
 player_stats_anchor = NodePath("../Margin/ui_space/tutorial_anchors/stats_anchor")
 timeline_anchor = NodePath("../Margin/ui_space/tutorial_anchors/timeline_anchor")
 start_wave_anchor = NodePath("../Margin/ui_space/tutorial_anchors/start_wave_anchor")
-time_controls_anchor = NodePath("../Margin/ui_space/tutorial_anchors/time_controls_anchor")
 trade_anchor = NodePath("../Margin/ui_space/tutorial_anchors/trade_anchor")
+towers_pointer_objects = [NodePath("../Margin/ui_space/building_bar/building_bar_pointer")]
+information_pointer_objects = [NodePath("../Margin/ui_space/Stats/player_stats_pointer"), NodePath("../Margin/ui_space/TimeControls/wave_stats_pointer")]
+start_wave_pointer_objects = [NodePath("../Margin/ui_space/TimeControls/BattleButtonPanel/battle_button_pointer")]
+rite_pointer_objects = [NodePath("../Margin/ui_space/Inspector/inspector_excavate_pointer")]
+ruins_pointer_objects = [NodePath("../Margin/ui_space/Inspector/inspector_excavate_pointer")]
+shop_open_pointer_objects = [NodePath("../Margin/ui_space/building_bar/shop_pointer")]
 metadata/_custom_type_script = "uid://ddlb750e0o03a"
-
-[node name="ColorRect" type="ColorRect" parent="TutorialManager" unique_id=177295535]
-visible = false
-material = SubResource("ShaderMaterial_vlen6")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
 
 [node name="CursorInfo" parent="." unique_id=442512609 instance=ExtResource("23_vlen6")]
 visible = false
@@ -122,7 +107,6 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Trade" parent="." unique_id=987399773 instance=ExtResource("6_gphxq")]
-visible = false
 z_index = 0
 material = ExtResource("30_ui_color_replace")
 use_parent_material = false
@@ -141,177 +125,6 @@ theme_type_variation = &"MarginMinor"
 [node name="ui_space" type="Control" parent="Margin" unique_id=1725694392]
 use_parent_material = true
 layout_mode = 2
-mouse_filter = 2
-
-[node name="tutorial_anchors" type="Control" parent="Margin/ui_space" unique_id=1028206979]
-z_index = 600
-z_as_relative = false
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="tutorial_panel" type="PanelContainer" parent="Margin/ui_space/tutorial_anchors" unique_id=1280998084 node_paths=PackedStringArray("header_label", "checklist_container", "paragraph_label", "footer_label")]
-use_parent_material = true
-layout_mode = 0
-offset_left = 210.0
-offset_top = 227.0
-offset_right = 251.0
-offset_bottom = 377.0
-script = ExtResource("5_npsim")
-header_label = NodePath("MarginContainer/VBoxContainer/header_label")
-checklist_container = NodePath("MarginContainer/VBoxContainer/checklist")
-paragraph_label = NodePath("MarginContainer/VBoxContainer/paragraph_label")
-footer_label = NodePath("MarginContainer/VBoxContainer/footer_label")
-
-[node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel" unique_id=1118652707]
-use_parent_material = true
-layout_mode = 2
-theme_type_variation = &"MarginMinor"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer" unique_id=1200001001]
-use_parent_material = true
-layout_mode = 2
-theme_type_variation = &"vbox_5"
-
-[node name="header_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001002]
-visible = false
-use_parent_material = true
-clip_contents = false
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-theme_type_variation = &"rt_s20"
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("5_x42ai")
-metadata/_custom_type_script = "uid://bf2quvi78ybbq"
-
-[node name="checklist" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001003]
-visible = false
-use_parent_material = true
-layout_mode = 2
-theme_type_variation = &"vbox_5"
-
-[node name="paragraph_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=872103735]
-use_parent_material = true
-clip_contents = false
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-theme_type_variation = &"rt_s20_descriptive"
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("5_x42ai")
-metadata/_custom_type_script = "uid://bf2quvi78ybbq"
-
-[node name="footer_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=1200001004]
-visible = false
-use_parent_material = true
-clip_contents = false
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-theme_type_variation = &"rt_s20_descriptive"
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("5_x42ai")
-metadata/_custom_type_script = "uid://bf2quvi78ybbq"
-
-[node name="central_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=231738217]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -300.0
-offset_top = -820.0
-offset_right = 300.0
-offset_bottom = -570.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-
-[node name="tower_bar_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1679238732]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 0
-offset_left = 14.0
-offset_top = 47.0
-offset_right = 878.0
-offset_bottom = 504.0
-mouse_filter = 2
-
-[node name="trade_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1027622576]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 0
-offset_left = 523.0
-offset_top = 544.0
-offset_right = 895.0
-offset_bottom = 679.0
-mouse_filter = 2
-
-[node name="start_wave_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=445037132]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -790.0
-offset_top = 165.0
-offset_right = -290.0
-offset_bottom = 395.0
-grow_horizontal = 0
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="stats_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1340884095]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 0
-offset_left = 515.0
-offset_top = 169.0
-offset_right = 1082.0
-offset_bottom = 386.0
-mouse_filter = 2
-
-[node name="timeline_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=48694761]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -876.0
-offset_top = 159.0
-offset_right = -307.0
-offset_bottom = 347.0
-grow_horizontal = 0
-mouse_filter = 2
-
-[node name="time_controls_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=200914322]
-use_parent_material = true
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -710.0
-offset_top = 160.0
-offset_right = -269.0
-offset_bottom = 294.0
-grow_horizontal = 0
 mouse_filter = 2
 
 [node name="game_over_screen" type="Control" parent="Margin/ui_space" unique_id=346739799 node_paths=PackedStringArray("title_label", "wave_label", "relic_container", "tower_container", "restart_button", "feedback_button", "quit_button")]
@@ -531,6 +344,20 @@ offset_bottom = 662.0
 grow_vertical = 2
 size_flags_horizontal = 0
 
+[node name="building_bar_pointer" parent="Margin/ui_space/building_bar" unique_id=12577927 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = 459.0
+offset_top = 262.0
+offset_right = 490.0
+offset_bottom = 304.625
+
+[node name="shop_pointer" parent="Margin/ui_space/building_bar" unique_id=1094709823 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = 453.0
+offset_top = 73.0
+offset_right = 484.0
+offset_bottom = 115.625
+
 [node name="Stats" type="Control" parent="Margin/ui_space" unique_id=1363415251]
 use_parent_material = true
 layout_mode = 1
@@ -572,6 +399,13 @@ fit_content = true
 vertical_alignment = 1
 script = ExtResource("3_aw3sh")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="player_stats_pointer" parent="Margin/ui_space/Stats" unique_id=1774927075 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = 459.0
+offset_top = 101.0
+offset_right = 490.0
+offset_bottom = 143.625
 
 [node name="DamageTrackerPanel" parent="Margin/ui_space" unique_id=412024282 instance=ExtResource("26_damage_tracker")]
 layout_mode = 1
@@ -715,6 +549,14 @@ text = "Battle (Space)"
 autowrap_mode = 2
 script = ExtResource("11_gdbfk")
 metadata/_custom_type_script = "uid://dmty142sb38lp"
+
+[node name="battle_button_pointer" parent="Margin/ui_space/TimeControls/BattleButtonPanel" unique_id=137630800 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = -5.0
+offset_top = 89.0
+offset_right = 26.0
+offset_bottom = 131.625
+flip_h = true
 
 [node name="TimeControlButtons" type="HBoxContainer" parent="Margin/ui_space/TimeControls" unique_id=1604513753 node_paths=PackedStringArray("battle_button", "pause_button", "base_button", "fast_forward_button")]
 use_parent_material = true
@@ -879,9 +721,25 @@ vertical_alignment = 1
 script = ExtResource("5_x42ai")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
+[node name="wave_stats_pointer" parent="Margin/ui_space/TimeControls" unique_id=883340627 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = -121.0
+offset_top = 69.0
+offset_right = -90.0
+offset_bottom = 111.625
+flip_h = true
+
 [node name="Inspector" parent="Margin/ui_space" unique_id=2009911858 instance=ExtResource("3_rmtg4")]
 layout_mode = 1
 size_flags_vertical = 8
+
+[node name="inspector_excavate_pointer" parent="Margin/ui_space/Inspector" unique_id=2036853337 instance=ExtResource("18_omfan")]
+layout_mode = 0
+offset_left = 1089.0
+offset_top = -123.0
+offset_right = 1120.0
+offset_bottom = -80.375
+flip_v = true
 
 [node name="PanelMotionController" type="Node" parent="Margin/ui_space" unique_id=1534411001 node_paths=PackedStringArray("sidebar_panel", "stats_panel", "damage_tracker_panel", "time_controls_panel", "battle_button_panel", "time_control_buttons_panel", "inspector_panel")]
 script = ExtResource("25_panel_motion")
@@ -906,6 +764,124 @@ script = ExtResource("12_reward_pickup")
 relic_target = NodePath("../Stats/RelicDisplay")
 tower_target = NodePath("../building_bar/HBoxContainer/Panel")
 metadata/_edit_lock_ = true
+
+[node name="tutorial_anchors" type="Control" parent="Margin/ui_space" unique_id=1028206979]
+z_index = 600
+z_as_relative = false
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="tutorial_panel" type="PanelContainer" parent="Margin/ui_space/tutorial_anchors" unique_id=1280998084 node_paths=PackedStringArray("paragraph_label")]
+use_parent_material = true
+layout_mode = 0
+offset_left = 210.0
+offset_top = 227.0
+offset_right = 251.0
+offset_bottom = 377.0
+script = ExtResource("5_npsim")
+paragraph_label = NodePath("MarginContainer/VBoxContainer/paragraph_label")
+
+[node name="MarginContainer" type="MarginContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel" unique_id=1118652707]
+use_parent_material = true
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer" unique_id=1200001001]
+use_parent_material = true
+layout_mode = 2
+theme_type_variation = &"vbox_5"
+
+[node name="paragraph_label" type="RichTextLabel" parent="Margin/ui_space/tutorial_anchors/tutorial_panel/MarginContainer/VBoxContainer" unique_id=872103735]
+use_parent_material = true
+clip_contents = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_type_variation = &"rt_s20_descriptive"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_x42ai")
+metadata/_custom_type_script = "uid://bf2quvi78ybbq"
+
+[node name="central_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=231738217]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -820.0
+offset_right = 300.0
+offset_bottom = -570.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="tower_bar_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1679238732]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 14.0
+offset_top = 47.0
+offset_right = 878.0
+offset_bottom = 504.0
+mouse_filter = 2
+
+[node name="trade_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1027622576]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 523.0
+offset_top = 544.0
+offset_right = 895.0
+offset_bottom = 679.0
+mouse_filter = 2
+
+[node name="start_wave_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=445037132]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -889.0
+offset_top = 395.0
+offset_right = -440.0
+offset_bottom = 618.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="stats_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=1340884095]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 569.0
+offset_top = 482.0
+offset_right = 1108.0
+offset_bottom = 855.0
+mouse_filter = 2
+
+[node name="timeline_anchor" type="Control" parent="Margin/ui_space/tutorial_anchors" unique_id=48694761]
+use_parent_material = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -876.0
+offset_top = 478.0
+offset_right = -366.0
+offset_bottom = 666.0
+grow_horizontal = 0
+mouse_filter = 2
 
 [node name="Expansion" type="Panel" parent="." unique_id=1600268793 node_paths=PackedStringArray("_vbox")]
 visible = false

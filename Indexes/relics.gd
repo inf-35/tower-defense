@@ -40,5 +40,6 @@ static var HEARTH: RelicData = load("res://Content/Relics/hearth/hearth.tres")
 static var BASTION: RelicData = load("res://Content/Relics/bastion/bastion.tres")
 static var EDELWEISS: RelicData = load("res://Content/Relics/edelweiss/edelweiss.tres")
 static var SPRINKLERHEAD: RelicData = load("res://Content/Relics/sprinklerhead/sprinklerhead.tres")
+static var SPARE_SUPPLIES: RelicData = load("res://Content/Relics/spare_supplies/spare_supplies.tres")
 
-static var relics: Dictionary[RelicData.Type, RelicData] = {} ##relics indexed by type, loaded by reward_service
+static var relics: Dictionary[RelicData.Type, RelicData] = {RelicData.Type.SPARE_SUPPLIES: SPARE_SUPPLIES} ##guild-only relics are registered here; reward_service adds reward relics

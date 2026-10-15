@@ -12,10 +12,12 @@ var _material: ShaderMaterial
 var _last_hp: float = 0.0
 var _has_last_hp: bool = false
 var _fade_tween: Tween
+var _damage_vignette_color: Color
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_material = overlay_rect.material as ShaderMaterial
+	_damage_vignette_color = _material.get_shader_parameter(&"vignette_color")
 	_material.set_shader_parameter(&"intensity", 0.0)
 	UI.update_health.connect(_on_health_updated)
 
@@ -40,12 +42,16 @@ func _on_health_updated(hp: float) -> void:
 
 func _flash_vignette(damage_taken: float) -> void:
 	var target_intensity: float = minf(peak_intensity, damage_taken * intensity_per_damage)
+	flash_vignette(_damage_vignette_color, target_intensity, fade_duration)
+
+func flash_vignette(color: Color, intensity: float, duration: float) -> void: ##plays a color-authored screen-edge flash without damage sound or camera shake
 	if is_instance_valid(_fade_tween):
 		_fade_tween.kill()
 
-	_material.set_shader_parameter(&"intensity", target_intensity)
+	_material.set_shader_parameter(&"vignette_color", color)
+	_material.set_shader_parameter(&"intensity", maxf(intensity, 0.0))
 	_fade_tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	_fade_tween.tween_method(_set_intensity, target_intensity, 0.0, fade_duration)
+	_fade_tween.tween_method(_set_intensity, maxf(intensity, 0.0), 0.0, maxf(duration, 0.001))
 
 func _set_intensity(value: float) -> void:
 	_material.set_shader_parameter(&"intensity", value)

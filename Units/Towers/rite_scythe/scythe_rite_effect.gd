@@ -1,6 +1,8 @@
 extends EffectPrototype
 class_name ScytheRiteEffect
 
+#deprecated: retained so older authored resources can still load; scythe now uses amplifier modifiers.
+
 @export var negated_attacks_required: int = 2 ##base number of attacks banked before the payout attack
 @export var payout_multiplier: float = 4.5 ##base multiplier applied to cumulative banked damage on the payout attack
 

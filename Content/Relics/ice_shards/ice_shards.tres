@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="RelicData" load_steps=14 format=3 uid="uid://debfwlmcaoe8a"]
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://debfwlmcaoe8a"]
 
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="2_h2x6u"]
-[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="2_jshgk"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_5watt"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_6csym"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="4_g17n0"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_q83lv"]
 [ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="4_spi7d"]
 [ext_resource type="Script" uid="uid://3lu2wbjjq6fd" path="res://Content/Relics/ice_shards/ice_shards_effect.gd" id="4_ts0q3"]
-[ext_resource type="Texture2D" uid="uid://1ax7iqf5xmrn" path="res://Assets/arrow.png" id="5_q83lv"]
+[ext_resource type="Texture2D" uid="uid://x83acidif7xw" path="res://Assets/ice_shard_projectile.png" id="6_0t730"]
 [ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="8_g17n0"]
 
 [sub_resource type="Resource" id="Resource_0t730"]
@@ -17,13 +17,19 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 
 [sub_resource type="Resource" id="Resource_ktemv"]
 script = ExtResource("4_g17n0")
-texture = ExtResource("5_q83lv")
-scale = 0.05
+texture = ExtResource("6_0t730")
+projectile_trail_max_points = 6
+projectile_trail_outer_width = 1.8
+projectile_trail_inner_width = 0.6
+projectile_trail_outer_color = Color(0.5803922, 0.8980392, 1, 0.48)
+projectile_trail_inner_color = Color(0.8627451, 0.972549, 1, 0.9)
+scale = 0.06
 rotation_mode = 1
 metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 
 [sub_resource type="Resource" id="Resource_g17n0"]
 script = ExtResource("2_h2x6u")
+delivery_method = 2
 status_effects = Array[ExtResource("3_6csym")]([SubResource("Resource_0t730")])
 vfx_on_spawn = SubResource("Resource_ktemv")
 projectile_speed = 80.0
@@ -41,5 +47,6 @@ script = ExtResource("4_spi7d")
 type = 20
 global_effect = SubResource("Resource_q83lv")
 title = "Ice Shards"
-description = "When a {FROST}Frozen enemy dies, it shatters into a spray of three ice shards that deal damage (10% of the dead enemy's {UNIT_HP})  and 1 stack of {FROST} each."
+description = "When a {FROST}Frozen enemy dies, it shatters into three ice shards. Each deals 10% of the dead enemy's maximum {UNIT_HP} and inflicts 1 stack of {FROST}."
+icon = ExtResource("6_0t730")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

@@ -14,12 +14,13 @@
 [ext_resource type="Texture2D" uid="uid://hgq763rjsuls" path="res://Assets/town_floor.png" id="11_hfdks"]
 [ext_resource type="Script" uid="uid://tg7juyavf2t2" path="res://Content/CommonVisuals/tower_combat_light.gd" id="13_hfdks"]
 
-[node name="Town" type="Node2D" unique_id=608355952 node_paths=PackedStringArray("graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Town" type="Node2D" unique_id=608355952 node_paths=PackedStringArray("graphics", "combat_light", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_ein27")
 type = 5
 stat_displays = Array[ExtResource("2_v8yu7")]([ExtResource("3_iwloq")])
 graphics = NodePath("Graphics")
+combat_light = NodePath("TowerCombatLight")
 modifiers_component = NodePath("ModifiersComponent")
 health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")

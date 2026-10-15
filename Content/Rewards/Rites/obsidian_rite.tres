@@ -1,6 +1,12 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3]
 
 [ext_resource type="Script" path="res://Content/_reward_prototype.gd" id="1_hy4f2"]
+[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_tag_rule"]
+
+[sub_resource type="Resource" id="Resource_require_flame"]
+script = ExtResource("2_tag_rule")
+tags = Array[int]([2])
+operation = 1
 
 [resource]
 script = ExtResource("1_hy4f2")
@@ -8,4 +14,6 @@ id_name = "obsidian_rite"
 description = "rite reward"
 type = 3
 rite_type = 68
+base_rarity = 0
+tag_rules = Array[ExtResource("2_tag_rule")]([SubResource("Resource_require_flame")])
 

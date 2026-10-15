@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://bmceqlnltqotx"]
+
+[ext_resource type="Script" uid="uid://cv4ytdq1187pu" path="res://UnitComponents/unit.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://covwti10fyhl4" path="res://UnitComponents/navigation_component.gd" id="2_navigation"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="3_movement"]
+[ext_resource type="Script" uid="uid://dvwvd5jmjtk10" path="res://Content/movement_data.gd" id="4_movement_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="5_health"]
+[ext_resource type="Resource" path="res://Units/Enemies/war_balloon/war_balloon_hp.tres" id="6_health_data"]
+[ext_resource type="Texture2D" uid="uid://d1s8i0h67ty6q" path="res://Assets/troll.png" id="7_texture"]
+[ext_resource type="Script" uid="uid://clft1opmwpvj0" path="res://UnitComponents/contact_shadow.gd" id="8_shadow"]
+[ext_resource type="Script" uid="uid://bennrfodsxygn" path="res://UnitComponents/hitbox.gd" id="9_hitbox"]
+[ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
+[ext_resource type="Script" uid="uid://bkf1ak1pxhk0i" path="res://Content/Behaviors/_default_behavior.gd" id="11_behavior"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_attack_component"]
+[ext_resource type="Resource" uid="uid://bsava714nypxj" path="res://Units/Enemies/war_balloon/war_balloon_attack.tres" id="13_attack_data"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="14_range"]
+
+[sub_resource type="Resource" id="MovementData_war_balloon"]
+script = ExtResource("4_movement_data")
+max_speed = 2.0
+acceleration = 200.0
+turn_speed = 1000.0
+
+[sub_resource type="RectangleShape2D" id="HitboxShape_war_balloon"]
+size = Vector2(120, 122.8)
+
+[node name="WarBalloon" type="Node2D" unique_id=1965492761 node_paths=PackedStringArray("behavior", "graphics", "hitbox", "modifiers_component", "health_component", "movement_component", "navigation_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_unit")
+hostile = true
+attack_only_when_blocked = true
+behavior = NodePath("DefaultBehavior")
+graphics = NodePath("Graphics")
+hitbox = NodePath("Hitbox")
+modifiers_component = NodePath("ModifiersComponent")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+navigation_component = NodePath("NavigationComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+
+[node name="NavigationComponent" type="Node" parent="." unique_id=2082308425]
+script = ExtResource("2_navigation")
+ignore_walls = true
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1474321458]
+script = ExtResource("3_movement")
+face_towards_movement = false
+movement_data = SubResource("MovementData_war_balloon")
+jiggle_speed = 4.0
+jiggle_angle = 6.0
+
+[node name="HealthComponent" type="Node" parent="." unique_id=278623292]
+script = ExtResource("5_health")
+health_data = ExtResource("6_health_data")
+
+[node name="ContactShadow" type="Node2D" parent="." unique_id=1045125384]
+z_index = 10
+z_as_relative = false
+position = Vector2(0, 1)
+script = ExtResource("8_shadow")
+shadow_size = Vector2(9.6, 4.2)
+color = Color(0.17647, 0.192157, 0.278431, 0.341176)
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1036846787]
+modulate = Color(0.92, 0.66, 0.66, 1)
+position = Vector2(1, -5)
+scale = Vector2(0.1152, 0.1152)
+texture = ExtResource("7_texture")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1885597098]
+visible = false
+scale = Vector2(0.1, 0.1)
+collision_mask = 0
+script = ExtResource("9_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=2008868713]
+position = Vector2(10, -30)
+shape = SubResource("HitboxShape_war_balloon")
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1863345892]
+script = ExtResource("10_modifiers")
+
+[node name="DefaultBehavior" type="Node" parent="." unique_id=289422360]
+script = ExtResource("11_behavior")
+
+[node name="AttackComponent" type="Node" parent="." unique_id=1668204127]
+script = ExtResource("12_attack_component")
+attack_data = ExtResource("13_attack_data")
+
+[node name="RangeComponent" type="Node" parent="." unique_id=1873412642]
+script = ExtResource("14_range")

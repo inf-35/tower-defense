@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://Content/unit_data..gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://Assets/troll.png" id="2_icon"]
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="3_display"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_health.tres" id="4_health"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/max_speed.tres" id="5_speed"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/damage.tres" id="6_damage"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/hitrate.tres" id="7_hitrate"]
+[ext_resource type="Resource" path="res://Content/StatDisplays/range.tres" id="8_range"]
+[ext_resource type="PackedScene" path="res://Units/Enemies/war_balloon/war_balloon.tscn" id="9_scene"]
+
+[resource]
+script = ExtResource("1_data")
+title = "The War Balloon"
+icon = ExtResource("2_icon")
+description = "A slow siege balloon that crushes blocked towers with a two-cell blast. At the start of every subwave, it drops a squad of 30 warriors."
+stat_displays = Array[ExtResource("3_display")]([ExtResource("4_health"), ExtResource("5_speed"), ExtResource("6_damage"), ExtResource("7_hitrate"), ExtResource("8_range")])
+important = true
+unit_scene = ExtResource("9_scene")
+flux_value = 4.0
+strength_value = 8.0

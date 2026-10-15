@@ -23,6 +23,8 @@ const ENEMY_CORRECTION_TINT_STRENGTH: float = 0.22
 const ENEMY_BRIGHTNESS_LIFT: float = 0.3
 const ENEMY_CHROMA_SCALE: float = 1.6
 
+static var _shared_unit_effects_material: ShaderMaterial
+
 var _owner: Node
 var _root_graphics: Sprite2D
 var _base_graphics_modulate: Color = Color.WHITE
@@ -44,6 +46,8 @@ func initialise(owner: Node, root_graphics: Sprite2D) -> void: ##binds the servi
 		return
 
 	_base_graphics_modulate = _root_graphics.modulate
+	_attach_unit_lighting_material()
+	_bind_descendant_materials(_root_graphics)
 	_apply_tints()
 
 func set_tint_layer(layer: int, color: Color, strength: float = 1.0, affect_alpha: bool = false, blend_mode: int = BlendMode.MODULATE) -> void: ##sets one fixed tint layer and immediately recomposes the unit graphics through either the modulate or shader-overlay path
@@ -292,12 +296,37 @@ func _ensure_unit_effects_material() -> ShaderMaterial: ##returns a local unit-e
 	_root_graphics.material = material
 	return material
 
-func _clear_shader_overlay() -> void: ##removes the overlay shader when it would sample identically to the plain sprite draw path
+func _clear_shader_overlay() -> void: ##returns an uncorrected unit to the shared lighting material after local tint state ends
 	if not is_instance_valid(_root_graphics):
 		return
 	if not _uses_unit_effects_shader():
 		return
-	_root_graphics.material = null
+	_root_graphics.material = _get_shared_unit_effects_material()
+
+func _attach_unit_lighting_material() -> void: ##ensures every unit graphics root receives the shared light response without replacing bespoke shaders
+	if not is_instance_valid(_root_graphics):
+		return
+	if _root_graphics.material == null:
+		_root_graphics.material = _get_shared_unit_effects_material()
+		return
+	if not _uses_unit_effects_shader():
+		push_warning("TintService: unit graphics uses a bespoke shader and cannot receive shared unit lighting")
+
+func _bind_descendant_materials(parent: Node) -> void: ##inherits the unit material through multipart graphics while leaving authored shadow shaders independent
+	for child: Node in parent.get_children():
+		if child is ShadowComponent:
+			continue
+		if child is CanvasItem:
+			var canvas_item := child as CanvasItem
+			if canvas_item.material == null:
+				canvas_item.use_parent_material = true
+		_bind_descendant_materials(child)
+
+static func _get_shared_unit_effects_material() -> ShaderMaterial: ##reuses one neutral material across units that do not currently need private tint uniforms
+	if not is_instance_valid(_shared_unit_effects_material):
+		_shared_unit_effects_material = ShaderMaterial.new()
+		_shared_unit_effects_material.shader = UNIT_EFFECTS_SHADER
+	return _shared_unit_effects_material
 
 func _get_color_correction_state() -> Dictionary[StringName, Variant]: ##returns the persistent presentation correction applied to broad unit families
 	if _is_hostile_owner():

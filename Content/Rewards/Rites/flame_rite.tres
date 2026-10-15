@@ -1,19 +1,11 @@
 [gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://dn47xbawa8ja7"]
 
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_5iwkm"]
-[ext_resource type="Script" uid="uid://p5rqqytmyp6u" path="res://Content/reward_tag_rule.gd" id="2_tk4on"]
-[ext_resource type="Script" uid="uid://ck75ahps4pnl0" path="res://Content/reward_tower_rule.gd" id="3_w5hk0"]
-
-[sub_resource type="Resource" id="Resource_require_flame"]
-script = ExtResource("2_tk4on")
-tags = Array[int]([2])
-operation = 1
-
 [resource]
 script = ExtResource("1_5iwkm")
 id_name = "flame_rite"
 description = "this is a relic reward description"
 type = 3
 rite_type = 31
-tag_rules = Array[ExtResource("2_tk4on")]([SubResource("Resource_require_flame")])
+base_rarity = 0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

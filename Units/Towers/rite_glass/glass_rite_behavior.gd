@@ -3,7 +3,7 @@ class_name GlassRiteBehavior
 
 const INFLUENCE_KEY: StringName = &"glass_modifiers"
 
-@export var range_tiles: int = 2
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology receiving both glass modifiers
 @export var attack_rate_modifier: ModifierDataPrototype
 @export var max_health_modifier: ModifierDataPrototype
 
@@ -51,32 +51,9 @@ func _unsubscribe() -> void:
 	_last_report = null
 
 func _make_query() -> TowerTopologyService.Query:
-	return TowerTopologyService.Query.new(
-		TowerTopologyService.QueryKind.CARDINAL_RING,
-		1,
-		range_tiles,
-		TowerTopologyService.ALL_DIRECTIONS,
-		[],
-		TowerTopologyService.AxisSpace.WORLD
-	)
-
-func _is_inside_footprint(offset: Vector2i, host_size: Vector2i) -> bool:
-	return offset.x >= 0 and offset.x < host_size.x and offset.y >= 0 and offset.y < host_size.y
-
-func _distance_to_footprint(offset: Vector2i, host_size: Vector2i) -> int:
-	var dx: int = 0
-	if offset.x < 0:
-		dx = -offset.x
-	elif offset.x >= host_size.x:
-		dx = offset.x - host_size.x + 1
-
-	var dy: int = 0
-	if offset.y < 0:
-		dy = -offset.y
-	elif offset.y >= host_size.y:
-		dy = offset.y - host_size.y + 1
-
-	return maxi(dx, dy)
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
 
 func _on_topology_updated(report: TowerTopologyService.Report) -> void:
 	_last_report = report

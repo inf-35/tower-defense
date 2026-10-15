@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Flame Rite"
 rite_short_name = "flame"
-tower_description = "{RITE_LABEL}. Adjacent towers inflict 1 stack of {BURN}, lasting 2 seconds."
+tower_description = "{RITE_LABEL}. Towers within 2 tiles inflict 1 stack of {BURN}, lasting 2 seconds."
 icon = ExtResource("1_2p0vd")
 preview = ExtResource("1_2p0vd")
 inspector_actions = Array[ExtResource("2_wao5w")]([ExtResource("3_c8csk")])

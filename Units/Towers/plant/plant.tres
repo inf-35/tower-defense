@@ -17,7 +17,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tags = Array[int]([3])
 tower_name = "Plant"
-tower_description = "Wild flora domesticated into killing machine. Within 3 cardinal tiles, gains +1 {UNIT_DAMAGE} per nearby {T_PLANT} and +0.25 per nearby {T_FOREST}."
+tower_description = "Forms a network of adjacent contiguous {T_PLANT|label=Plants} and {T_FOREST|label=Forests}. Gains +0.15 {UNIT_HITRATE} for each other Plant or Forest in its network."
 icon = ExtResource("5_50urh")
 preview = ExtResource("5_50urh")
 tower_scene = ExtResource("3_huqpa")

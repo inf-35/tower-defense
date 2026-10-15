@@ -34,6 +34,7 @@ const FINAL_WAVE: int = 24
 const DEBUG_PRINT_REPORTS: bool = true
 const TOWER_REWARD_START_WAVE: int = 2
 const TOWER_REWARD_INTERVAL: int = 4
+const WAR_BALLOON_WAVE: int = 20
 
 class Wave: ##internal data container for a specific wave's configuration
 	var day_events: Array[DayEvent] = []
@@ -88,7 +89,6 @@ func start_game(progress_callback: Callable = Callable()) -> void:
 		return
 
 	await begin_new_game(progress_callback)
-	Run.player.begin_new_game()
 
 func begin_new_game(progress_callback: Callable = Callable()) -> void:
 	_report_loading(progress_callback, "Loading profile...", 0.62)
@@ -101,6 +101,7 @@ func begin_new_game(progress_callback: Callable = Callable()) -> void:
 	choice_queue.clear()
 	is_game_over = false
 
+	Run.player.begin_new_game()
 	_report("New game: Starting game flow.")
 	_generate_wave_plan()
 	Run.tutorials.begin_new_game()
@@ -123,9 +124,7 @@ func _generate_wave_plan() -> void:
 		if wave.day_events.is_empty():
 			wave.day_events.append(DayEvent.NONE)
 
-		if i == 20 or i == 40:
-			wave.combat_variant = CombatVariant.BOSS
-		elif i in [7, 13, 19]:
+		if i in [7, 13, 19]:
 			wave.combat_variant = CombatVariant.SURGE
 		else:
 			wave.combat_variant = CombatVariant.NORMAL
@@ -396,6 +395,7 @@ func load_save_data(data: Dictionary) -> void:
 			new_data.day_events.append(int(evt))
 		wave_plan[wave_num] = new_data
 
+	_disable_war_balloon_wave()
 	_disable_oliphant_test_wave()
 	_start_building_phase()
 	if current_phase != GamePhase.BUILDING:
@@ -403,6 +403,13 @@ func load_save_data(data: Dictionary) -> void:
 
 	UI.update_wave_schedule.emit()
 	UI.start_wave.emit(current_wave_number)
+
+func _disable_war_balloon_wave() -> void: ##restores the ordinary wave-20 roster when loading older boss schedules
+	var wave: Wave = wave_plan.get(WAR_BALLOON_WAVE)
+	if wave == null:
+		return
+	wave.combat_variant = CombatVariant.NORMAL
+	wave.boss_encounter_type = BossEncounters.Type.NONE
 
 func _report(str: String) -> void:
 	if not DEBUG_PRINT_REPORTS:

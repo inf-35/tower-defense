@@ -27,7 +27,7 @@ metadata/_custom_type_script = "uid://dvwvd5jmjtk10"
 
 [sub_resource type="Resource" id="Resource_d3klt"]
 script = ExtResource("5_lj1uh")
-max_health = 9.6
+max_health = 12.0
 flat_damage_taken = -0.5
 metadata/_custom_type_script = "uid://bxb1t1jy3gjrq"
 
@@ -39,6 +39,8 @@ shader_parameter/correction_tint = Color(1, 1, 1, 1)
 shader_parameter/correction_tint_strength = 0.0
 shader_parameter/brightness_lift = 0.0
 shader_parameter/chroma_scale = 1.0
+shader_parameter/light_chroma_scale = 1.9
+shader_parameter/dark_pixel_light_floor = 0.08
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n0rgw"]
 size = Vector2(70, 85)

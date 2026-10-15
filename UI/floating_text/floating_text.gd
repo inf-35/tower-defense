@@ -14,9 +14,13 @@ var _peak_alpha: float = 1.0
 var _ramp_up_ratio: float = 0.0
 var _fade_out_ratio: float = 0.3
 var _ignore_pause: bool = false
+var _default_outline_color: Color = Color.WHITE
+var _default_outline_size: int = 0
 
 func _ready() -> void:
 	_base_z_index = z_index
+	_default_outline_color = get_theme_color(&"font_outline_color")
+	_default_outline_size = get_theme_constant(&"outline_size")
 	add_to_group(DebugAssistant.GROUP_FLOATING_TEXTS)
 
 func setup(
@@ -36,6 +40,8 @@ func setup(
 	text = text_val
 	position = pos
 	_apply_text_fill_color(color)
+	set_text_outline_color(_default_outline_color)
+	set_text_outline_size(_default_outline_size)
 	modulate = Color.WHITE
 	modulate.a = 0.0 if ramp_up_ratio > 0.0 else peak_alpha
 	z_index = _base_z_index
@@ -89,6 +95,12 @@ func merge_text(text_val: String, pos: Vector2, color: Color, scale_override: Ve
 
 func set_z_index_offset(offset: int) -> void: ##raises important pooled labels relative to ordinary floating text without changing their parent layer
 	z_index = _base_z_index + offset
+
+func set_text_outline_color(color: Color) -> void: ##overrides the glyph outline independently of fill color for this pooled use
+	add_theme_color_override(&"font_outline_color", color)
+
+func set_text_outline_size(size: int) -> void: ##overrides outline width for this pooled use without leaking it into later popups
+	add_theme_constant_override(&"outline_size", maxi(size, 0))
 
 func _apply_text_fill_color(color: Color) -> void: ##tints only the label glyph fill so the existing outline remains stable
 	if color.a <= 0.0:

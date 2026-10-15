@@ -6,19 +6,20 @@ const OUTPUT_INFLUENCE_KEY: StringName = &"iron_output"
 
 @export var overkill_transfer_ratio: float = 2.0 ##portion of front-tower overkill added to the back tower's attacks
 @export var buff_duration: float = 2.0 ##game-time duration of each independent overkill damage window
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored facing-relative topology containing the input and output towers
 
 var _connected_towers: Dictionary[Tower, bool] = {}
+var _subscription_id: int = -1
+var _last_report: TowerTopologyService.Report = null
 
 func start() -> void:
-	var tower: Tower = unit as Tower
-	tower.adjacency_updated.connect(_on_adjacency_updated)
 	attach()
 
 func attach() -> void:
-	sync_tower_influences()
-	_refresh_connections()
+	_subscribe()
 
 func detach() -> void:
+	_unsubscribe()
 	var connected_towers: Array[Tower] = []
 	connected_towers.assign(_connected_towers.keys())
 	for tower: Tower in connected_towers:
@@ -27,7 +28,31 @@ func detach() -> void:
 	_connected_towers.clear()
 	clear_tower_influences()
 
-func _on_adjacency_updated(_adjacency_data: AdjacencyReportData) -> void:
+func _subscribe() -> void: ##subscribes iron to its authored input/output topology
+	if _subscription_id != -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return
+	_subscription_id = topology_service.subscribe(self, tower, _make_query(), _on_topology_updated, true)
+
+func _unsubscribe() -> void: ##removes the live endpoint query without depending on island teardown order
+	if _subscription_id == -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if topology_service != null:
+		topology_service.unsubscribe(self, _subscription_id)
+	_subscription_id = -1
+	_last_report = null
+
+func _make_query() -> TowerTopologyService.Query: ##builds the configured endpoint topology or cardinal-adjacency default
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
+
+func _on_topology_updated(report: TowerTopologyService.Report) -> void:
+	_last_report = report
 	sync_tower_influences()
 	_refresh_connections()
 
@@ -35,8 +60,16 @@ func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##
 	var rite_tower: Tower = unit as Tower
 	if not is_instance_valid(rite_tower):
 		return []
-	var front_cells: Array[Vector2i] = [rite_tower.tower_position + rite_tower.get_forward_direction()]
-	var back_cells: Array[Vector2i] = [rite_tower.tower_position - rite_tower.get_forward_direction()]
+	var report: TowerTopologyService.Report = _get_current_report()
+	if report == null:
+		return []
+	var forward_offset: Vector2i = rite_tower.get_forward_direction()
+	var front_cells: Array[Vector2i] = []
+	var back_cells: Array[Vector2i] = []
+	if report.cells.has(forward_offset):
+		front_cells.append(report.cells[forward_offset])
+	if report.cells.has(-forward_offset):
+		back_cells.append(report.cells[-forward_offset])
 	return [
 		TowerInfluence.for_cells(INPUT_INFLUENCE_KEY, TowerInfluence.Kind.INPUT, front_cells),
 		TowerInfluence.for_cells(OUTPUT_INFLUENCE_KEY, TowerInfluence.Kind.OUTPUT, back_cells),
@@ -116,23 +149,41 @@ func _get_front_tower() -> Tower:
 	var rite_tower: Tower = unit as Tower
 	if not is_instance_valid(rite_tower):
 		return null
-	return _get_tower_at_offset(rite_tower.get_forward_direction())
+	var report: TowerTopologyService.Report = _get_current_report()
+	if report == null:
+		return null
+	return report.towers_by_local_offset.get(rite_tower.get_forward_direction()) as Tower
 
 func _get_back_tower() -> Tower:
 	var rite_tower: Tower = unit as Tower
 	if not is_instance_valid(rite_tower):
 		return null
-	return _get_tower_at_offset(-rite_tower.get_forward_direction())
-
-func _get_tower_at_offset(offset: Vector2i) -> Tower:
-	var rite_tower: Tower = unit as Tower
-	var island: Island = Run.references.island
-	if not is_instance_valid(rite_tower) or not is_instance_valid(island):
+	var report: TowerTopologyService.Report = _get_current_report()
+	if report == null:
 		return null
-	return island.get_tower_on_tile(rite_tower.tower_position + offset)
+	return report.towers_by_local_offset.get(-rite_tower.get_forward_direction()) as Tower
 
 func _disconnect_tower(tower: Tower) -> void:
 	if not is_instance_valid(tower) or not _connected_towers.has(tower):
 		return
 
 	tower.unsubscribe_event(GameEvent.EventType.HIT_DEALT, _on_linked_tower_event)
+
+func _get_current_report() -> TowerTopologyService.Report: ##returns the subscribed report or performs the same query for previews and event callbacks
+	if _last_report != null:
+		return _last_report
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return null
+	return topology_service.query(tower, _make_query())
+
+func _get_topology_service() -> TowerTopologyService: ##resolves the island topology service shared by endpoint tracking and previews
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return null
+	if not is_instance_valid(Run.references.island.topology_service):
+		return null
+	return Run.references.island.topology_service
+
+func _exit_tree() -> void:
+	detach()

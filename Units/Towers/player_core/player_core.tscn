@@ -16,11 +16,12 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_6akvo"]
 radius = 7.0
 
-[node name="PlayerCore" type="Node2D" unique_id=460087004 node_paths=PackedStringArray("graphics", "modifiers_component", "movement_component")]
+[node name="PlayerCore" type="Node2D" unique_id=460087004 node_paths=PackedStringArray("combat_light", "graphics", "modifiers_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_2li7g")
 type = 1
 blocking = false
+combat_light = NodePath("TowerCombatLight")
 stat_displays = Array[ExtResource("2_yq3fw")]([ExtResource("3_ok6e0")])
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -41,6 +42,7 @@ texture = ExtResource("8_cg3ju")
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1972879861]
 script = ExtResource("9_ok6e0")
 height_multiplier = 2.0
+night_light_vertical_offset = 10.0
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
 [node name="CoreHitbox" type="Area2D" parent="." unique_id=1329949009]

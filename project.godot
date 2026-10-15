@@ -52,7 +52,6 @@ WindowSettings="*res://Singletons/window_settings.gd"
 Pause="*res://Singletons/pause.gd"
 SaveLoad="*res://Singletons/save_load.gd"
 Analytics="*res://Singletons/analytics.tscn"
-GlobalContrast="*res://Content/CommonVisuals/global_contrast.tscn"
 
 [display]
 

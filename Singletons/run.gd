@@ -20,6 +20,7 @@ const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
 const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
 const TUTORIAL_DIRECTOR_SCRIPT := preload("res://Singletons/tutorial_director.gd")
 const ENVIRONMENT_DATABASE: EnvironmentDatabase = preload("res://Indexes/default_environments.tres")
+const DEFAULT_GUILD: GuildData = preload("res://Content/Guilds/testers.tres")
 
 var _run_root: Node
 var _run_owner: Island
@@ -31,6 +32,8 @@ var pending_game_environment: GameEnvironment = GameEnvironment.WOODS
 var current_game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 var current_game_scaling: float = 1.0
 var current_game_environment: GameEnvironment = GameEnvironment.WOODS
+var pending_guild: GuildData = DEFAULT_GUILD
+var current_guild: GuildData = DEFAULT_GUILD
 
 var references: References
 var player: Player
@@ -82,6 +85,7 @@ func begin_run(island: Island) -> void:
 	current_game_difficulty = pending_game_difficulty
 	current_game_scaling = 1.0
 	current_game_environment = pending_game_environment
+	current_guild = pending_guild
 
 	island.tree_exited.connect(_on_run_owner_tree_exited.bind(_run_generation), CONNECT_ONE_SHOT)
 	_prime_run_references.call_deferred(island, _run_generation)
@@ -124,10 +128,14 @@ func get_save_data() -> Dictionary:
 		"current_game_difficulty": int(current_game_difficulty),
 		"current_game_scaling": current_game_scaling,
 		"current_game_environment": int(current_game_environment),
+		"guild_path": current_guild.resource_path,
 		"tutorials": tutorials.get_save_data() if is_instance_valid(tutorials) else {},
 	}
 
 func load_save_data(data: Dictionary) -> void:
+	current_guild = load(str(data.get("guild_path", DEFAULT_GUILD.resource_path))) as GuildData
+	if current_guild == null:
+		current_guild = DEFAULT_GUILD
 	pending_game_difficulty = int(data.get("pending_game_difficulty", GameDifficulty.NORMAL))
 	pending_game_environment = int(data.get("pending_game_environment", GameEnvironment.WOODS))
 	current_game_difficulty = int(data.get("current_game_difficulty", pending_game_difficulty))

@@ -48,18 +48,22 @@ extends Resource
 @export_range(0.0, 2.0, 0.01) var night_projectile_chroma_boost: float = 0.75 ##saturation lift applied before projectile chroma is drawn
 @export_range(0.0, 1.0, 0.01) var night_projectile_shading_fraction: float = 0.35 ##fraction of combat-night ambient reapplied to otherwise exempt projectile visuals
 @export_group("Terrain Paint")
-@export_range(0.0, 0.5, 0.01) var terrain_cut_threshold: float = 0.2 ##pure-wash depth measured inward from the island boundary
-@export_range(0.0, 2.0, 0.01) var terrain_edge_softness: float = 1.0 ##distance over which wash transitions into body pigment
-@export_range(0.1, 5.0, 0.01) var terrain_center_falloff: float = 2.0 ##shape of the wash-to-pigment transition
-@export_range(0.0, 1.0, 0.01) var terrain_brush_strength: float = 0.3 ##amount of dry-brush breakup exposing the pale wash
-@export_range(0.0, 1.0, 0.01) var terrain_min_paint_coverage: float = 0.5 ##minimum brush coverage retained in gaps between stamped paint marks
-@export_range(0.0, 1.0, 0.01) var terrain_color_strength: float = 1.0 ##strength of authored terrain body colours over their washes
-@export_range(0.0, 12.0, 0.1) var terrain_warp_strength: float = 8.0 ##world-space wobble applied to terrain-family ownership
-@export var terrain_coastline_color: Color = Color(0.3, 0.28, 0.22, 1.0) ##ink colour used for the optional outer island contour
-@export_range(0.0, 1.0, 0.01) var terrain_coastline_strength: float = 0.0 ##opacity of the outer island contour
-@export_range(0.01, 1.0, 0.01) var terrain_coastline_width: float = 0.2 ##contour width measured inward in recovered tile-distance units
-@export_range(0.0, 1.0, 0.01) var terrain_waterline_strength: float = 0.0 ##opacity of pencil contours between water and neighboring terrain
-@export_range(0.005, 0.25, 0.005) var terrain_waterline_width: float = 0.03 ##half-width of water contours in terrain-control units
+@export_range(0.0, 0.5, 0.01) var terrain_cut_threshold: float = 0.2 ##pure-wash depth inside the island edge; higher values leave a wider pale, watery margin before solid pigment appears
+@export_range(0.0, 2.0, 0.01) var terrain_edge_softness: float = 1.0 ##distance over which wash becomes body pigment; higher values feel diffuse and cloudlike, lower values feel crisp and inked
+@export_range(0.1, 5.0, 0.01) var terrain_center_falloff: float = 2.0 ##curve of the wash-to-pigment buildup; higher values hold pale wash longer before pigment gathers sharply toward the interior
+@export_range(0.0, 1.0, 0.01) var terrain_brush_strength: float = 0.3 ##amount of stamped-mask breakup exposing pale wash; higher values feel drier, patchier, and more visibly hand-brushed
+@export_range(0.0, 1.0, 0.01) var terrain_min_paint_coverage: float = 0.5 ##floor retained in sparse brush-mask regions; higher values fill holes and make paint feel denser and more continuous
+@export_range(0.0, 1.0, 0.01) var terrain_color_strength: float = 1.0 ##body-color influence over the local wash; higher values produce clearer terrain identities and stronger saturation
+@export_range(0.0, 1.0, 0.01) var terrain_transition_softness: float = 0.15 ##width of handoff between neighboring terrain families; higher values blend broadly while lower values preserve tile-like color boundaries
+@export_range(0.0, 12.0, 0.1) var terrain_warp_strength: float = 8.0 ##world-space wobble of terrain-family ownership; higher values make borders meander and bleed like uneven wet paint
+@export_range(0.0, 1.0, 0.01) var terrain_posterization_strength: float = 0.5 ##blend from continuous pigment buildup to stepped pigment-density regions
+@export_range(2, 32, 1) var terrain_posterization_levels: int = 4 ##number of pigment-density bands; lower values make broader, more graphic watercolor pools
+@export var terrain_coastline_color: Color = Color(0.3, 0.28, 0.22, 1.0) ##ink color around the island silhouette; dark neutrals resemble pencil while saturated colors feel outlined or illustrated
+@export_range(0.0, 1.0, 0.01) var terrain_coastline_strength: float = 0.0 ##visibility of the outer contour; higher values make the island read as a firmly drawn shape instead of a loose wash
+@export_range(0.01, 1.0, 0.01) var terrain_coastline_width: float = 0.2 ##half-width of the outer contour in terrain-distance units; larger values feel marker-like rather than pencil-thin
+@export_range(0.0, 1.0, 0.01) var terrain_waterline_strength: float = 0.0 ##visibility of contours between waterlike and neighboring terrain; higher values separate lakes more decisively from land
+@export_range(0.005, 0.25, 0.005) var terrain_waterline_width: float = 0.03 ##half-width of water contours in dominance units; larger values create broader shoreline bands
+@export_range(-1.0, 0.5, 0.001) var terrain_waterline_level: float = -1.0 ##dominance value traced by the shoreline; negative derives it from open water while higher values pull the line toward stronger water ownership
 @export_group("")
 @export var terrain_base_overrides: Dictionary[int, TerrainBaseStat] = {} ##full terrain stat overrides keyed by terrain base id
 @export var placement_count_multipliers: Dictionary[int, float] = {} ##per-feature count scalars keyed by tower type

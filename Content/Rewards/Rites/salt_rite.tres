@@ -8,4 +8,5 @@ id_name = "salt_rite"
 description = "rite reward"
 type = 3
 rite_type = 70
+base_rarity = 0
 

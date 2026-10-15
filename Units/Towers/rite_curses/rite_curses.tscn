@@ -12,6 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://dgjwrg2hlraqj" path="res://Assets/curses_rite.png" id="9_q48re"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_303l3"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_heoxi"]
+[ext_resource type="Script" uid="uid://cb8tlxrimtfn1" path="res://Content/tower_topology_config.gd" id="11_topology"]
+
+[sub_resource type="Resource" id="Resource_topology"]
+script = ExtResource("11_topology")
+max_range = 2
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_yftrj")
@@ -105,6 +110,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="EffectDistributorBehavior" type="Node" parent="." unique_id=318035469]
 script = ExtResource("3_jdk5o")
 buff_effect = SubResource("Resource_owejg")
+topology = SubResource("Resource_topology")
 metadata/_custom_type_script = "uid://dnjc1qtsra5h2"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=333546115]

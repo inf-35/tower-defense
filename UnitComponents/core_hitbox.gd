@@ -11,6 +11,8 @@ func _ready() -> void: ##registers the inherited debug hitbox group before wirin
 
 		if area.unit == null:
 			return
+		if area.unit.is_queued_for_deletion():
+			return
 
 		if not area.unit.hostile:
 			return
@@ -22,7 +24,13 @@ func _ready() -> void: ##registers the inherited debug hitbox group before wirin
 			Run.boss_encounters.fail_boss_reached_keep()
 			return
 
-		Run.player.hp -= 1
-
-		area.unit.died.emit.call_deferred(HitReportData.new())
+		var enemy: Unit = area.unit
+		#health-loss effects can clear the wave; resolve outside the physics collision flush.
+		var resolve_keep_damage: Callable = func() -> void:
+			if not Run.has_active_run() or not is_instance_valid(enemy) or enemy.is_queued_for_deletion():
+				return
+			Run.player.hp -= 1
+			if Run.has_active_run() and is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
+				enemy.died.emit(HitReportData.new())
+		resolve_keep_damage.call_deferred()
 	)

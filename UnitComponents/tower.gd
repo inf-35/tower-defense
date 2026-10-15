@@ -9,6 +9,7 @@ signal adjacency_updated(adjacency_data: AdjacencyReportData) #Island fires this
 @export var environmental: bool = false ##is this tower generated as part of the environment
 
 @export var turret: Node2D ##this is the part of the turret that turns to face and shoot
+@export var combat_light: TowerCombatLight ##optional local light commanded directly by this tower's lifecycle
 #global configuration
 const REFUND_PROPORTION: float = 0.5 ##proportion of tower value refunded upon sale
 
@@ -102,6 +103,8 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 		return
 
 	current_state = State.RUINED
+	if is_instance_valid(combat_light):
+		combat_light.available = false
 
 	disabled = true
 	graphics.visible = false
@@ -149,6 +152,8 @@ func enter_active_state() -> void:
 	if current_state == State.ACTIVE:
 		return
 	current_state = State.ACTIVE
+	if is_instance_valid(combat_light):
+		combat_light.available = not abstractive and not environmental and not hostile
 	#restore visuals
 	disabled = false
 	graphics.visible = true
@@ -227,6 +232,8 @@ func _configure_hitbox() -> void: ##reuses the unit-owned hitbox and sizes its c
 func _ready() -> void:
 	name = name + " " + str(unit_id)
 	level = 1
+	if is_instance_valid(combat_light):
+		combat_light.available = not abstractive and not environmental and not hostile and current_state == State.ACTIVE
 
 	_setup_event_bus()
 	_attach_intrinsic_effects()
@@ -477,4 +484,6 @@ func load_save_data(save_data: Dictionary) -> void:
 	blocking = save_data.blocking
 	hostile = save_data.hostile
 	abstractive = save_data.abstractive
+	if is_instance_valid(combat_light):
+		combat_light.available = not abstractive and not environmental and not hostile and current_state == State.ACTIVE
 	behavior.load_save_data(save_data.behavior)

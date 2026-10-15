@@ -1,0 +1,86 @@
+Godot Engine v4.6.1.stable.official.14d19694e - https://godotengine.org
+
+WARNING: res://Content/Environmental/ruins/default_ruins_data.tres:4 - ext_resource, invalid UID: uid://c6owa14a0qtd5 - using text path instead: res://Content/Environmental/ruins/default_ruins_choices.tres
+   at: load (scene/resources/resource_format_text.cpp:500)
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+RewardService: Loading rewards from res://Content/Rewards/
+WARNING: res://Content/Rewards/Relics/magic_beans.tres:3 - ext_resource, invalid UID: uid://i24p4rdp4qj0 - using text path instead: res://Content/Relics/magic_beans/magic_beans.tres
+   at: load (scene/resources/resource_format_text.cpp:500)
+   GDScript backtrace (most recent call first):
+       [0] _scan_directory_recursive (res://Singletons/reward_service.gd:64)
+       [1] _scan_directory_recursive (res://Singletons/reward_service.gd:60)
+       [2] _load_all_rewards (res://Singletons/reward_service.gd:36)
+       [3] _ready (res://Singletons/reward_service.gd:30)
+WARNING: res://Content/Rewards/Relics/permafrost.tres:3 - ext_resource, invalid UID: uid://dltjtjlwmwdxw - using text path instead: res://Content/Relics/permafrost/permafrost.tres
+   at: load (scene/resources/resource_format_text.cpp:500)
+   GDScript backtrace (most recent call first):
+       [0] _scan_directory_recursive (res://Singletons/reward_service.gd:64)
+       [1] _scan_directory_recursive (res://Singletons/reward_service.gd:60)
+       [2] _load_all_rewards (res://Singletons/reward_service.gd:36)
+       [3] _ready (res://Singletons/reward_service.gd:30)
+WARNING: res://Content/Rewards/Relics/sapphire_idol.tres:3 - ext_resource, invalid UID: uid://cydfumv526gqn - using text path instead: res://Content/Relics/sapphire_idol/sapphire_idol.tres
+   at: load (scene/resources/resource_format_text.cpp:500)
+   GDScript backtrace (most recent call first):
+       [0] _scan_directory_recursive (res://Singletons/reward_service.gd:64)
+       [1] _scan_directory_recursive (res://Singletons/reward_service.gd:60)
+       [2] _load_all_rewards (res://Singletons/reward_service.gd:36)
+       [3] _ready (res://Singletons/reward_service.gd:30)
+WARNING: res://Content/Rewards/Relics/trance.tres:3 - ext_resource, invalid UID: uid://btl4nmbq6m5dc - using text path instead: res://Content/Relics/trance/trance.tres
+   at: load (scene/resources/resource_format_text.cpp:500)
+   GDScript backtrace (most recent call first):
+       [0] _scan_directory_recursive (res://Singletons/reward_service.gd:64)
+       [1] _scan_directory_recursive (res://Singletons/reward_service.gd:60)
+       [2] _load_all_rewards (res://Singletons/reward_service.gd:36)
+       [3] _ready (res://Singletons/reward_service.gd:30)
+RewardService: Loaded 99 rewards.
+SaveLoad: Starting Load profile Process...
+SaveLoad: No save file found.
+Analytics: sending analytics payload
+{"build_version":"0.0.3d","event_id":"session_1790223641_1256623290_session_summary_1790223641_1","event_type":"session_summary","game_name":"keepguard","payload":{"active_run_id":"","session_duration_seconds":0,"session_runs_completed":0,"session_runs_resumed":0,"session_runs_started":0,"snapshot_reason":"app_close"},"secret":"keepguard_analytics","sent_at_unix":1790223641,"session_id":"session_1790223641_1256623290"}
+ERROR: Condition "!is_inside_tree()" is true. Returning: ERR_UNCONFIGURED
+   at: request_raw (scene/main/http_request.cpp:119)
+   GDScript backtrace (most recent call first):
+       [0] _try_send_next (res://Singletons/analytics.gd:279)
+       [1] _enqueue_event (res://Singletons/analytics.gd:253)
+       [2] _queue_session_snapshot (res://Singletons/analytics.gd:220)
+       [3] _queue_session_end_once (res://Singletons/analytics.gd:226)
+       [4] _exit_tree (res://Singletons/analytics.gd:120)
+ERROR: Unable to start the timer because it's not inside the scene tree. Either add it or set autostart to true.
+   at: start (scene/main/timer.cpp:119)
+   GDScript backtrace (most recent call first):
+       [0] _schedule_retry (res://Singletons/analytics.gd:393)
+       [1] _try_send_next (res://Singletons/analytics.gd:286)
+       [2] _enqueue_event (res://Singletons/analytics.gd:253)
+       [3] _queue_session_snapshot (res://Singletons/analytics.gd:220)
+       [4] _queue_session_end_once (res://Singletons/analytics.gd:226)
+       [5] _exit_tree (res://Singletons/analytics.gd:120)
+Analytics: queued analytics retry in 12.0 seconds
+Analytics: request start failed: 3
+Analytics: sending analytics payload
+{"build_version":"0.0.3d","event_id":"session_1790223641_1256623290_session_summary_1790223641_1","event_type":"session_summary","game_name":"keepguard","payload":{"active_run_id":"","session_duration_seconds":0,"session_runs_completed":0,"session_runs_resumed":0,"session_runs_started":0,"snapshot_reason":"app_close"},"secret":"keepguard_analytics","sent_at_unix":1790223641,"session_id":"session_1790223641_1256623290"}
+ERROR: Condition "!is_inside_tree()" is true. Returning: ERR_UNCONFIGURED
+   at: request_raw (scene/main/http_request.cpp:119)
+   GDScript backtrace (most recent call first):
+       [0] _try_send_next (res://Singletons/analytics.gd:279)
+       [1] _queue_session_end_once (res://Singletons/analytics.gd:227)
+       [2] _exit_tree (res://Singletons/analytics.gd:120)
+ERROR: Unable to start the timer because it's not inside the scene tree. Either add it or set autostart to true.
+   at: start (scene/main/timer.cpp:119)
+   GDScript backtrace (most recent call first):
+       [0] _schedule_retry (res://Singletons/analytics.gd:393)
+       [1] _try_send_next (res://Singletons/analytics.gd:286)
+       [2] _queue_session_end_once (res://Singletons/analytics.gd:227)
+       [3] _exit_tree (res://Singletons/analytics.gd:120)
+Analytics: queued analytics retry in 12.0 seconds
+Analytics: request start failed: 3
+WARNING: 1 RID of type "Canvas" was leaked.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2690)
+ERROR: 1 RID allocations of type 'N16RendererViewport8ViewportE' were leaked at exit.
+ERROR: 3 RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N17RendererSceneCull8ScenarioE' were leaked at exit.
+ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2641)
+ERROR: 2 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:810)

@@ -13,6 +13,11 @@
 [ext_resource type="Texture2D" uid="uid://dyhhg5lvq7fy6" path="res://Assets/rite_sacrifice_icon.png" id="8_xbf12"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="9_mmpsi"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_dqkf0"]
+[ext_resource type="Script" uid="uid://cb8tlxrimtfn1" path="res://Content/tower_topology_config.gd" id="11_topology"]
+
+[sub_resource type="Resource" id="Resource_topology"]
+script = ExtResource("11_topology")
+max_range = 2
 
 [sub_resource type="Resource" id="Resource_2p8tk"]
 script = ExtResource("5_dvfm2")
@@ -106,6 +111,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 script = ExtResource("4_m2ysj")
 buff_icon = ExtResource("5_2kpwh")
 buff_modifier = SubResource("Resource_2p8tk")
+topology = SubResource("Resource_topology")
 metadata/_custom_type_script = "uid://up5t71sldt7h"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=545623640]

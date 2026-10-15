@@ -82,6 +82,8 @@ func _ready() -> void:
 
 func _boot_game() -> void:
 	await Run.phases.start_game(_set_loading_status)
+	_set_loading_status("Preparing lighting...", 0.98)
+	await combat_lighting_service.warm_up_shaders()
 	await Run.finalize_run_setup()
 	_hide_loading()
 
@@ -141,13 +143,12 @@ func _set_loading_status(message: String, progress: float = -1.0) -> void:
 func _setup_preview_renderer() -> void:
 	preview_renderer.cell_size = CELL_SIZE
 	preview_renderer.max_gradient_depth = 3.0 #tighter gradient for previews
-	preview_renderer.draw_background = false #we just want the outline overlay
 
 	#add to scene (z-index higher so it draws on top)
 	preview_renderer.z_index = 10
 
 	preview_renderer.start()
-	preview_renderer._terrain_rect.material = _create_terrain_outline_material(
+	_configure_terrain_outline_material(
 		preview_renderer,
 		Color(1.0, 1.0, 1.0, 0.2)
 	)
@@ -157,7 +158,6 @@ func _setup_lake_preview_renderer() -> void:
 		return
 	lake_preview_renderer.cell_size = CELL_SIZE
 	lake_preview_renderer.max_gradient_depth = 2.5
-	lake_preview_renderer.draw_background = false
 	lake_preview_renderer.z_index = Layers.FLOATING_UI
 	lake_preview_renderer.start()
 
@@ -167,22 +167,24 @@ func _setup_lake_preview_renderer() -> void:
 	if profile != null:
 		fill_color = profile.lake_preview_fill_color
 		outline_strength = profile.lake_preview_outline_strength
-	lake_preview_renderer._terrain_rect.material = _create_terrain_outline_material(
+	_configure_terrain_outline_material(
 		lake_preview_renderer,
 		fill_color,
 		outline_strength
 	)
 
-func _create_terrain_outline_material(renderer: TerrainRenderer, fill_color: Color, outline_strength: float = 1.0) -> ShaderMaterial: ##builds transient terrain surfaces with the main terrain's authored pencil contour
-	var material := ShaderMaterial.new()
-	material.shader = preload("res://Shaders/sketch_terrain.gdshader")
+func _configure_terrain_outline_material(renderer: TerrainRenderer, fill_color: Color, outline_strength: float = 1.0) -> void: ##configures an authored preview surface to match the main terrain's pencil contour
+	var material: ShaderMaterial = renderer.terrain_rect.material as ShaderMaterial
+	if material == null:
+		push_error("terrain preview surface requires an authored ShaderMaterial")
+		return
 	material.set_shader_parameter(&"grid_data_texture", renderer._grid_texture)
 	material.set_shader_parameter(&"fill_color", fill_color)
 	material.set_shader_parameter(&"distance_field_step", 1.0 / maxf(renderer.max_gradient_depth, 0.001))
-	material.set_shader_parameter(&"region_pixel_offset", renderer._terrain_rect.position)
-	material.set_shader_parameter(&"region_pixel_size", renderer._terrain_rect.size)
+	material.set_shader_parameter(&"region_pixel_offset", renderer.terrain_rect.position)
+	material.set_shader_parameter(&"region_pixel_size", renderer.terrain_rect.size)
 
-	var terrain_material: ShaderMaterial = terrain_renderer._terrain_rect.material as ShaderMaterial
+	var terrain_material: ShaderMaterial = terrain_renderer.terrain_rect.material as ShaderMaterial
 	if terrain_material != null:
 		material.set_shader_parameter(&"distortion_texture", terrain_material.get_shader_parameter(&"distortion_texture"))
 		material.set_shader_parameter(&"noise_texture", terrain_material.get_shader_parameter(&"noise_texture"))
@@ -195,7 +197,6 @@ func _create_terrain_outline_material(renderer: TerrainRenderer, fill_color: Col
 		outline_color.a *= profile.terrain_coastline_strength * outline_strength
 		material.set_shader_parameter(&"outline_color", outline_color)
 		material.set_shader_parameter(&"outline_width", profile.terrain_coastline_width)
-	return material
 
 #--- public api / request handlers ---
 #this is the main entry point for player actions like building or selling
@@ -528,9 +529,6 @@ func _choice_land_cells(choice: ExpansionChoice) -> Array[Vector2i]:
 
 #signal handlers
 func _on_tower_destroyed(tower: Tower) -> void:
-	if game_ending:
-		return
-
 	var cell: Vector2i = tower.tower_position
 	#clear tower grid
 	for local_cell: Vector2i in tower.get_occupied_cells():
@@ -539,12 +537,15 @@ func _on_tower_destroyed(tower: Tower) -> void:
 		if not tower_grid[local_cell] == tower: #dont clear other towers' cells (i.e. upgrades)
 			continue
 		tower_grid.erase(local_cell)
+	if _towers_by_type.has(tower.type):
+		_towers_by_type[tower.type].erase(tower)
+	if game_ending:
+		return
+
 	update_adjacencies_around_tower(tower)
 	#update capacity, caches, navigation
 	Run.player.remove_from_used_capacity(Towers.get_tower_capacity(tower.type), "destroy %s@%s" % [tower.name, str(cell)])
 	update_navigation_grid()
-	if _towers_by_type.has(tower.type):
-		_towers_by_type[tower.type].erase(tower)
 	tower_changed.emit(cell)
 	UI.update_tower_counts.emit()
 

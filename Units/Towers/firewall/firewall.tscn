@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bn051b65hjvrv" path="res://Units/Towers/firewall/firewall_behavior.gd" id="3_tds48"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_owxfk"]
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_w76k3"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_mi2ft"]
 [ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="5_nim3f"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_qsd2p"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_sa5r4"]
@@ -93,7 +94,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_mpu13")
 type = 23
-stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_nim3f")])
+stat_displays = Array[ExtResource("2_b88dd")]([ExtResource("3_nim3f"), ExtResource("4_w76k3"), ExtResource("5_mi2ft"), ExtResource("5_nim3f")])
 behavior = NodePath("FirewallBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")

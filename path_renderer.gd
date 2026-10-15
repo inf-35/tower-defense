@@ -140,12 +140,9 @@ func _rebuild_committed_paths() -> void:
 	_path_cache_by_key.clear()
 	_path_cell_set.clear()
 
-	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	var route_variants: Array[Dictionary] = _get_current_wave_variants()
-
-	for start_cell: Vector2i in spawn_points:
-		for variant: Dictionary in route_variants:
-			_store_committed_path(_build_path_render(start_cell, bool(variant.ignore_walls), int(variant.route_mode)))
+	for breach: Tower in SpawnPointService.get_active_breaches():
+		for variant: Dictionary in _get_current_wave_variants(breach):
+			_store_committed_path(_build_path_render(breach.tower_position, bool(variant.ignore_walls), int(variant.route_mode)))
 
 func _store_committed_path(path_render: PathRender) -> void:
 	_path_cache_by_key[_make_path_key(path_render.start_cell, path_render.is_phasing, path_render.route_mode)] = path_render
@@ -228,12 +225,9 @@ func _get_sorted_cells(cell_set: Dictionary[Vector2i, bool]) -> Array[Vector2i]:
 func _rebuild_preview_paths() -> void:
 	_preview_path_cache.clear()
 
-	var spawn_points: Array[Vector2i] = SpawnPointService.get_spawn_points()
-	var route_variants: Array[Dictionary] = _get_current_wave_variants()
-
-	for start_cell: Vector2i in spawn_points:
-		for variant: Dictionary in route_variants:
-			_preview_path_cache.append(_build_preview_path_render(start_cell, bool(variant.ignore_walls), int(variant.route_mode)))
+	for breach: Tower in SpawnPointService.get_active_breaches():
+		for variant: Dictionary in _get_current_wave_variants(breach):
+			_preview_path_cache.append(_build_preview_path_render(breach.tower_position, bool(variant.ignore_walls), int(variant.route_mode)))
 
 func _build_preview_path_render(start_cell: Vector2i, ignore_walls: bool, route_mode: int) -> PathRender:
 	var key: int = _make_path_key(start_cell, ignore_walls, route_mode)
@@ -245,22 +239,35 @@ func _build_preview_path_render(start_cell: Vector2i, ignore_walls: bool, route_
 
 	return _build_path_render(start_cell, ignore_walls, route_mode, _preview_blockers)
 
-func _get_current_wave_variants() -> Array[Dictionary]:
+func _get_current_wave_variants(breach: Tower) -> Array[Dictionary]: ##keeps ordinary routes while restricting special navigation variants to enemies assigned to this breach
 	var variants: Array[Dictionary] = []
 	var seen_variant_keys: Dictionary[int, bool] = {}
 
 	if Run.phases.current_wave_number <= 0:
 		return [{"route_mode": NavigationComponent.RouteMode.DIRECT_TO_GOAL, "ignore_walls": false}]
 
-	var enemies = WaveEnemies.get_enemies_for_wave(Run.phases.current_wave_number)
+	var enemies: Array[Array] = Run.waves.get_planned_enemies_for_wave(Run.phases.current_wave_number)
 	if enemies.is_empty():
 		return [{"route_mode": NavigationComponent.RouteMode.DIRECT_TO_GOAL, "ignore_walls": false}]
 
-	for stack in enemies:
+	var assigned_variant_keys: Dictionary[int, bool] = {}
+	for stack: Array in Run.waves.get_planned_enemies_for_breach(breach):
+		if int(stack[1]) <= 0:
+			continue
+		var unit_type: Units.Type = stack[0]
+		var route_mode: int = Units.get_unit_route_mode(unit_type)
+		var ignore_walls: bool = Units.get_unit_ignore_walls(unit_type)
+		assigned_variant_keys[(route_mode << 1) | int(ignore_walls)] = true
+
+	for stack: Array in enemies:
+		if int(stack[1]) <= 0:
+			continue
 		var type: Units.Type = stack[0]
 		var route_mode: int = Units.get_unit_route_mode(type)
 		var ignore_walls: bool = Units.get_unit_ignore_walls(type)
 		var variant_key: int = (route_mode << 1) | int(ignore_walls)
+		if (ignore_walls or route_mode == NavigationComponent.RouteMode.RAIDER_CHAIN) and not assigned_variant_keys.has(variant_key):
+			continue
 		if seen_variant_keys.has(variant_key):
 			continue
 		seen_variant_keys[variant_key] = true

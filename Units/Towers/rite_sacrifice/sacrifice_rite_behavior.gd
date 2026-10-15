@@ -4,9 +4,7 @@ class_name SacrificeRiteBehavior
 const INFLUENCE_KEY: StringName = &"watched_towers"
 
 @export var buff_modifier: ModifierDataPrototype ##modifier granted to watched towers when any watched tower is damaged
-@export var query_kind: TowerTopologyService.QueryKind = TowerTopologyService.QueryKind.CARDINAL_RING ##topology query used to find watched towers
-@export var max_range: int = 2 ##maximum range for watched tower links
-@export_flags("Up", "Right", "Down", "Left") var active_directions: int = 0b1111 ##world directions included in the watched tower query
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology containing watched and buffed towers
 
 var _subscription_id: int = -1
 var _tracked_callbacks: Dictionary[int, Callable] = {} ##int: tower instance id, callable: bound tower damage listener
@@ -32,14 +30,9 @@ func _connect_wave_end() -> void:
 		Run.phases.wave_ended.connect(_on_wave_ended)
 
 func _make_query() -> TowerTopologyService.Query:
-	return TowerTopologyService.Query.new(
-		query_kind,
-		1,
-		max_range,
-		active_directions,
-		[],
-		TowerTopologyService.AxisSpace.WORLD
-	)
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
 
 func _subscribe() -> void:
 	if _subscription_id != -1:

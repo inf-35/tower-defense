@@ -14,7 +14,11 @@ func _perform_heal_pulse() -> bool:
 			valid_allies.append(ally)
 	_allies_in_range = valid_allies
 
-	for ally: Unit in _allies_in_range:
+	var cleanse_targets: Array[Unit] = valid_allies.duplicate()
+	if is_instance_valid(unit) and is_instance_valid(unit.modifiers_component):
+		cleanse_targets.append(unit)
+
+	for ally: Unit in cleanse_targets:
 		var statuslikes: Dictionary = ally.get_statuslikes()
 		var statuses: Array[StatusEffect]
 		statuses.assign(statuslikes.get(&"statuses", []))

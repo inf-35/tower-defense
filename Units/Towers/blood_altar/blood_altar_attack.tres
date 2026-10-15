@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="2_j4lpn"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_jwymb"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_jwymb"]
-[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="6_jwymb"]
+[ext_resource type="Texture2D" uid="uid://bhckdfimslslh" path="res://Assets/blood_bolt.png" id="6_jwymb"]
 
 [sub_resource type="Resource" id="Resource_jwymb"]
 script = ExtResource("3_jwymb")
@@ -32,7 +32,13 @@ metadata/_custom_type_script = "uid://bflbkh7hshl8l"
 script = ExtResource("2_j4lpn")
 texture = ExtResource("6_jwymb")
 radius = 2.0
-scale = 0.1
+projectile_trail_max_points = 5
+projectile_trail_head_extension = 2.0
+projectile_trail_outer_width = 0.8
+projectile_trail_inner_width = 0.2
+projectile_trail_outer_color = Color(1, 0.26999998, 0.26999998, 0.61960787)
+projectile_trail_inner_color = Color(1, 0.27999997, 0.27999997, 1)
+scale = 0.08
 rotation_mode = 1
 
 [resource]

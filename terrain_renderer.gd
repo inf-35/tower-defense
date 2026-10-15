@@ -3,28 +3,25 @@ class_name TerrainRenderer
 
 @export var is_main_terrain_renderer: bool = false
 #config
-@export var shader: Shader
 @export var max_gradient_depth: float = 5.0
 @export var show_debug_texture: bool = false
-@export var draw_background: bool = true
+@export var apply_environment_material_overrides: bool = false ##allows environment-profile paint values to replace the authored terrain material when explicitly enabled
 
-@export var background_stain_color: Color
 @export var brush_textures: Array[Texture2D]
 
+@export_group("Surfaces")
+@export var terrain_rect: ColorRect ##authored shader surface receiving generated terrain textures and runtime bounds
+@export var background_stain_rect: ColorRect ##authored brush-mask surface resized around the terrain bounds
+@export var decoration_container: Node2D ##authored world-space parent for terrain stamps and placement previews
 @export var paper_rect: TextureRect
 @export var paper_grain_rect: TextureRect
 @export var color_rect: ColorRect
+@export_group("")
 
 var cell_size: float = Island.CELL_SIZE
 
 #references
 var _brush_viewport: Viewport
-
-#visual components
-var _terrain_rect: ColorRect
-var _bg_rect: ColorRect
-var _bg_stain_rect: ColorRect
-var _decoration_container: Node2D ##container for stamped sprites
 
 var _grid_image: Image
 var _grid_texture: ImageTexture
@@ -34,8 +31,6 @@ var _terrain_wash_image: Image
 var _terrain_wash_texture: ImageTexture
 var _terrain_control_image: Image
 var _terrain_control_texture: ImageTexture
-var _terrain_dominance_image: Image
-var _terrain_dominance_texture: ImageTexture
 var _grid_data: Dictionary = {} #stores vector2i -> terrain.base
 #visual state trackers
 var _active_decorations: Dictionary[Vector2i, Sprite2D] = {} #stores vector2i -> sprite2d
@@ -92,6 +87,9 @@ func _configure_paper_layers(profile: EnvironmentProfile) -> void: ##separates b
 	grain_material.set_shader_parameter(&"brush_strength", profile.paper_brush_strength)
 
 func _setup_visuals() -> void:
+	if not _validate_authored_surfaces():
+		return
+
 	#initialize with a small empty grid
 	_grid_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_grid_texture = ImageTexture.create_from_image(_grid_image)
@@ -104,9 +102,6 @@ func _setup_visuals() -> void:
 	_terrain_control_image = Image.create(1, 1, false, Image.FORMAT_L8)
 	_terrain_control_image.fill(Color.BLACK)
 	_terrain_control_texture = ImageTexture.create_from_image(_terrain_control_image)
-	_terrain_dominance_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
-	_terrain_dominance_image.fill(Color.TRANSPARENT)
-	_terrain_dominance_texture = ImageTexture.create_from_image(_terrain_dominance_image)
 	_brush_viewport = SubViewport.new()
 	_brush_viewport.name = "BrushMaskViewport"
 	_brush_viewport.disable_3d = true
@@ -114,75 +109,46 @@ func _setup_visuals() -> void:
 	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(_brush_viewport)
 
-	if draw_background:
-		_bg_rect = ColorRect.new()
-		var profile: EnvironmentProfile = Run.get_environment_profile()
-		_bg_rect.color = profile.paper_background_color if profile != null else Color(1.0, 0.976, 0.941, 1.0)
-		_bg_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_bg_rect.size = Vector2(10000,10000)
-		_bg_rect.position = Vector2(-5000,-5000)
-		add_child(_bg_rect)
+	var stain_material: ShaderMaterial = background_stain_rect.material.duplicate() as ShaderMaterial
+	background_stain_rect.material = stain_material
+	stain_material.set_shader_parameter(&"mask_texture", _brush_viewport.get_texture())
 
-	_bg_stain_rect = ColorRect.new()
-	_bg_stain_rect.name = "BackgroundStain"
-	_bg_stain_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	var bg_stain_mat = ShaderMaterial.new()
-	bg_stain_mat.shader = preload("res://Shaders/simple_mix_mask.gdshader")
-	bg_stain_mat.set_shader_parameter("mask_texture", _brush_viewport.get_texture())
-	bg_stain_mat.set_shader_parameter("tint_color", background_stain_color)
-	_bg_stain_rect.material = bg_stain_mat
-	add_child(_bg_stain_rect)
-
-	_terrain_rect = ColorRect.new()
-	_terrain_rect.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
-
-	var mat := ShaderMaterial.new()
-	mat.shader = shader
-
-	#noise setup
-	var noise := FastNoiseLite.new()
-	noise.frequency = 0.01
-	var noise_tex := NoiseTexture2D.new()
-	noise_tex.width = 512
-	noise_tex.height = 512
-	noise_tex.noise = noise
-	noise_tex.seamless = true
-
-	var watercolor_tex: NoiseTexture2D = noise_tex.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_ALL)
-	watercolor_tex.noise.frequency = 0.005
+	var mat: ShaderMaterial = terrain_rect.material.duplicate() as ShaderMaterial
+	terrain_rect.material = mat
 
 	mat.set_shader_parameter("grid_data_texture", _grid_texture)
 	mat.set_shader_parameter("terrain_color_texture", _terrain_color_texture)
 	mat.set_shader_parameter("terrain_wash_texture", _terrain_wash_texture)
 	mat.set_shader_parameter("terrain_control_texture", _terrain_control_texture)
-	mat.set_shader_parameter("terrain_dominance_texture", _terrain_dominance_texture)
-	mat.set_shader_parameter("distortion_texture", noise_tex)
-	mat.set_shader_parameter("noise_texture", watercolor_tex)
 	mat.set_shader_parameter("distance_field_step", 1.0 / maxf(max_gradient_depth, 0.001))
-	_apply_environment_shader_configuration(mat)
-
-	#placeholder paper (replace with load("res://...") if you have one)
-	var paper_img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
-	paper_img.fill(Color(0.95, 0.95, 0.922, 1.0))
-	var paper_tex = ImageTexture.create_from_image(paper_img)
-	mat.set_shader_parameter("paper_texture", paper_tex)
+	if is_main_terrain_renderer:
+		_bind_terrain_paper_grain_texture(mat)
+	if apply_environment_material_overrides:
+		_apply_environment_shader_configuration(mat)
 
 	#pass the viewport's texture to the shader
 	#note: viewport textures are dynamic and update with viewport contents
 	mat.set_shader_parameter("brush_mask_texture", _brush_viewport.get_texture())
 
-	_terrain_rect.material = mat
-	_terrain_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_terrain_rect)
-
-	#decorations sit on top of the paint
-	_decoration_container = Node2D.new()
-	_decoration_container.name = "DecorationContainer"
-	_decoration_container.y_sort_enabled = false #usually terrain stamps are flat, but set true if using upright trees
-	add_child(_decoration_container)
-
 	_update_rect_transform()
+
+func _validate_authored_surfaces() -> bool: ##requires inspector-authored draw surfaces so their materials and ordering remain directly editable
+	if not is_instance_valid(terrain_rect):
+		push_error("TerrainRenderer requires an authored terrain_rect ColorRect")
+		return false
+	if not terrain_rect.material is ShaderMaterial:
+		push_error("TerrainRenderer terrain_rect requires a ShaderMaterial")
+		return false
+	if not is_instance_valid(background_stain_rect):
+		push_error("TerrainRenderer requires an authored background_stain_rect ColorRect")
+		return false
+	if not background_stain_rect.material is ShaderMaterial:
+		push_error("TerrainRenderer background_stain_rect requires a ShaderMaterial")
+		return false
+	if not is_instance_valid(decoration_container):
+		push_error("TerrainRenderer requires an authored decoration_container Node2D")
+		return false
+	return true
 
 func _apply_environment_shader_configuration(material: ShaderMaterial) -> void: ##applies environment-authored paint controls only to the main watercolor terrain surface
 	if not is_main_terrain_renderer:
@@ -198,16 +164,39 @@ func _apply_environment_shader_configuration(material: ShaderMaterial) -> void: 
 	material.set_shader_parameter(&"brush_strength", profile.terrain_brush_strength)
 	material.set_shader_parameter(&"min_paint_coverage", profile.terrain_min_paint_coverage)
 	material.set_shader_parameter(&"terrain_color_strength", profile.terrain_color_strength)
+	material.set_shader_parameter(&"terrain_transition_softness", profile.terrain_transition_softness)
 	material.set_shader_parameter(&"terrain_warp_strength", profile.terrain_warp_strength)
+	material.set_shader_parameter(&"paper_grain_strength", profile.paper_grain_strength)
+	material.set_shader_parameter(&"paper_grain_scale", profile.paper_grain_scale)
+	material.set_shader_parameter(&"posterization_strength", profile.terrain_posterization_strength)
+	material.set_shader_parameter(&"posterization_levels", profile.terrain_posterization_levels)
 	material.set_shader_parameter(&"coastline_color", profile.terrain_coastline_color)
 	material.set_shader_parameter(&"coastline_strength", profile.terrain_coastline_strength)
 	material.set_shader_parameter(&"coastline_width", profile.terrain_coastline_width)
 	material.set_shader_parameter(&"waterline_strength", profile.terrain_waterline_strength)
 	material.set_shader_parameter(&"waterline_width", profile.terrain_waterline_width)
-	var open_water_base: Terrain.Base = profile.get_open_water_base()
-	var water_base_stat: TerrainBaseStat = Terrain.get_base_stat(open_water_base)
-	var waterline_level: float = water_base_stat.dominance_strength * water_base_stat.color.a * 0.5
+	var waterline_level: float = profile.terrain_waterline_level
+	if waterline_level < 0.0:
+		var open_water_base: Terrain.Base = profile.get_open_water_base()
+		var water_base_stat: TerrainBaseStat = Terrain.get_base_stat(open_water_base)
+		waterline_level = water_base_stat.dominance_strength * water_base_stat.color.a * 0.5
 	material.set_shader_parameter(&"waterline_level", waterline_level)
+
+func _bind_terrain_paper_grain_texture(material: ShaderMaterial) -> void: ##binds the fine-grain layer's seamless noise while preserving inspector-authored strength and world-space addressing
+	if not is_instance_valid(paper_grain_rect):
+		push_warning("TerrainRenderer requires paper_grain_rect to texture watercolor pigment")
+		return
+
+	var grain_material: ShaderMaterial = paper_grain_rect.material as ShaderMaterial
+	if grain_material == null:
+		push_warning("TerrainRenderer paper_grain_rect requires a ShaderMaterial")
+		return
+	var grain_texture: Texture2D = grain_material.get_shader_parameter(&"grain_texture") as Texture2D
+	if grain_texture == null:
+		push_warning("TerrainRenderer paper grain material requires grain_texture")
+		return
+
+	material.set_shader_parameter(&"paper_grain_texture", grain_texture)
 
 #accepts a list of tiles to add/remove to minimize resize operations
 #changes: dictionary of { vector2i cell: terrain.base terrain }, or false to remove
@@ -287,7 +276,7 @@ func update_decoration(cell: Vector2i, type: Terrain.Base) -> void:
 	#slight transparency to blend with the watercolor
 	sprite.modulate.a = 1.0
 
-	_decoration_container.add_child(sprite)
+	decoration_container.add_child(sprite)
 	_active_decorations[cell] = sprite
 
 #clears all current sprites (both terrain decorations and feature previews)
@@ -328,7 +317,7 @@ func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
 	sprite.position = center_pos
 
 	#add to the existing decoration container so it sits on top of the terrain/sketch
-	_decoration_container.add_child(sprite)
+	decoration_container.add_child(sprite)
 	_active_previews[cell] = sprite
 
 #completely clears and replaces the terrain with the new set of tiles
@@ -340,7 +329,6 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 	_terrain_color_image.fill(Color.TRANSPARENT)
 	_terrain_wash_image.fill(Color.TRANSPARENT)
 	_terrain_control_image.fill(Color.BLACK)
-	_terrain_dominance_image.fill(Color.TRANSPARENT)
 
 	#if input is empty, just update texture and return
 	if new_land_tiles.is_empty():
@@ -348,7 +336,6 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 		_terrain_color_texture.set_image(_terrain_color_image)
 		_terrain_wash_texture.set_image(_terrain_wash_image)
 		_terrain_control_texture.set_image(_terrain_control_image)
-		_terrain_dominance_texture.set_image(_terrain_dominance_image)
 		return
 
 	#calculate new bounds
@@ -377,7 +364,7 @@ func reset_grid(new_land_tiles: Array[Vector2i], terrain_by_cell: Dictionary = {
 
 #helper to modify shader parameters dynamically
 func set_color_param(param_name: String, value: Color) -> void:
-	(_terrain_rect.material as ShaderMaterial).set_shader_parameter(param_name, value)
+	(terrain_rect.material as ShaderMaterial).set_shader_parameter(param_name, value)
 
 #--- internal logic ---
 func _spawn_brush_stroke(cell: Vector2i) -> void:
@@ -399,7 +386,7 @@ func _spawn_brush_stroke(cell: Vector2i) -> void:
 
 	#since the viewport moves with the grid logic (via _update_rect_transform logic below),
 	#we can just set positions relative to the grid origin if we structure it right.
-	#however, simplest way: the viewport covers the exact same rect as _terrain_rect.
+	#however, simplest way: the viewport covers the exact same rect as terrain_rect.
 	#so coordinates should be relative to _min_coord.
 
 	var local_pos: Vector2 = cell_center - Vector2(_min_coord * cell_size)
@@ -425,18 +412,15 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 	var new_color_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	var new_wash_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	var new_control_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_L8)
-	var new_dominance_img = Image.create(new_size.x, new_size.y, false, Image.FORMAT_RGBA8)
 	new_color_img.fill(Color.TRANSPARENT)
 	new_wash_img.fill(Color.TRANSPARENT)
 	new_control_img.fill(Color.BLACK)
-	new_dominance_img.fill(Color.TRANSPARENT)
 
 	#update state
 	_grid_image = new_img
 	_terrain_color_image = new_color_img
 	_terrain_wash_image = new_wash_img
 	_terrain_control_image = new_control_img
-	_terrain_dominance_image = new_dominance_img
 	_min_coord = new_origin
 	_size_cells = new_size
 	#update visual rect
@@ -444,30 +428,30 @@ func _resize_grid(new_origin: Vector2i, new_size: Vector2i) -> void:
 
 func _update_rect_transform() -> void:
 	#place the rect in the world
-	_terrain_rect.position = Vector2(_min_coord * cell_size)
-	_terrain_rect.size = Vector2(_size_cells * cell_size)
+	terrain_rect.position = Vector2(_min_coord * cell_size)
+	terrain_rect.size = Vector2(_size_cells * cell_size)
 
-	var MARGIN: float = _terrain_rect.size.x + 5.0
-	_bg_stain_rect.position = _terrain_rect.position - Vector2.ONE * MARGIN
-	_bg_stain_rect.size = _terrain_rect.size + Vector2.ONE * MARGIN * 2
+	var margin: float = terrain_rect.size.x + 5.0
+	background_stain_rect.position = terrain_rect.position - Vector2.ONE * margin
+	background_stain_rect.size = terrain_rect.size + Vector2.ONE * margin * 2
 
 	#adjust brush viewport size
-	if _brush_viewport.size != Vector2i(_terrain_rect.size):
-		_brush_viewport.size = Vector2i(_terrain_rect.size)
+	if _brush_viewport.size != Vector2i(terrain_rect.size):
+		_brush_viewport.size = Vector2i(terrain_rect.size)
 
 	#when _min_coord changes, the "local" position of existing brushes shifts.
 	#we need to re-align existing brushes.
 	for cell: Vector2i in _active_brush_strokes:
 		var sprite: Sprite2D = _active_brush_strokes[cell]
 		var cell_center_world = (Vector2(cell) * cell_size) + (Vector2.ONE * cell_size * 0.5)
-		var local_pos = cell_center_world - _terrain_rect.position
+		var local_pos = cell_center_world - terrain_rect.position
 		sprite.position = local_pos
 	_brush_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 	#pass world info to shader
-	var mat = _terrain_rect.material as ShaderMaterial
-	mat.set_shader_parameter("region_pixel_offset", _terrain_rect.position)
-	mat.set_shader_parameter("region_pixel_size", _terrain_rect.size)
+	var mat = terrain_rect.material as ShaderMaterial
+	mat.set_shader_parameter("region_pixel_offset", terrain_rect.position)
+	mat.set_shader_parameter("region_pixel_size", terrain_rect.size)
 	mat.set_shader_parameter("terrain_color_texture_size", Vector2(_size_cells))
 
 func _update_distance_field() -> void:
@@ -476,25 +460,20 @@ func _update_distance_field() -> void:
 
 
 	#initialize bfs seeds (land tiles)
-	#we do multi-source bfs from land outwards?
-	#actually for watercolor gradient usually we want dist from water into land.
-	#so water is 0, land starts at 1.
-
 	#simpler approach: fill image with 0.
 	#set all land pixels to -1 (unvisited).
 	#find all land pixels next to water -> queue.
 
-	#1. map global _grid_data to local image pixels
+	#map global _grid_data to local image pixels
 	for global_pos in _grid_data:
 		var local_pos = global_pos - _min_coord
 		if local_pos.x >= 0 and local_pos.y >= 0 and local_pos.x < _size_cells.x and local_pos.y < _size_cells.y:
 			#temporary marker for land
 			_grid_image.set_pixelv(local_pos, Color(1, 1, 1, 1))
 
-	#2. build bfs for gradient
+	#build bfs for gradient
 	#this is computationally heavy for huge maps.
-	#optimization: only iterate pixels inside the dirty rect?
-	#for now, we do full rebuild for correctness.
+	#for now, do full rebuild for correctness.
 
 	var local_queue: Array[Vector2i] = []
 	var visited := {}
@@ -550,7 +529,6 @@ func _update_terrain_color_map() -> void:
 	_terrain_color_image.fill(Color.TRANSPARENT)
 	_terrain_wash_image.fill(Color.TRANSPARENT)
 	_terrain_control_image.fill(Color.BLACK)
-	_terrain_dominance_image.fill(Color.TRANSPARENT)
 	for global_pos: Vector2i in _grid_data:
 		var local_pos: Vector2i = global_pos - _min_coord
 		if local_pos.x < 0 or local_pos.y < 0 or local_pos.x >= _size_cells.x or local_pos.y >= _size_cells.y:
@@ -559,26 +537,16 @@ func _update_terrain_color_map() -> void:
 		var terrain_type: Terrain.Base = _grid_data[global_pos]
 		var terrain_color := Terrain.get_color(terrain_type)
 		terrain_color.a = clamp(terrain_color.a, 0.0, 1.0)
-		_terrain_color_image.set_pixelv(local_pos, _premultiply_color(terrain_color))
+		_terrain_color_image.set_pixelv(local_pos, terrain_color)
 		var wash_color := Terrain.get_wash_color(terrain_type)
 		wash_color.a = clamp(wash_color.a, 0.0, 1.0)
-		_terrain_wash_image.set_pixelv(local_pos, _premultiply_color(wash_color))
-		var dominance := clampf(Terrain.get_dominance_strength(terrain_type) * terrain_color.a, 0.0, 1.0)
+		_terrain_wash_image.set_pixelv(local_pos, wash_color)
+		var dominance := Terrain.get_dominance_strength(terrain_type) * terrain_color.a
 		_terrain_control_image.set_pixelv(local_pos, Color(dominance, dominance, dominance))
-		_terrain_dominance_image.set_pixelv(local_pos, Color(
-			terrain_color.r * dominance,
-			terrain_color.g * dominance,
-			terrain_color.b * dominance,
-			dominance
-		))
 
 	_terrain_color_texture.set_image(_terrain_color_image)
 	_terrain_wash_texture.set_image(_terrain_wash_image)
 	_terrain_control_texture.set_image(_terrain_control_image)
-	_terrain_dominance_texture.set_image(_terrain_dominance_image)
-
-func _premultiply_color(color: Color) -> Color: ##packs filtered terrain maps so transparent neighbors do not darken blended color
-	return Color(color.r * color.a, color.g * color.a, color.b * color.a, color.a)
 
 func _terrain_type_from_change(change) -> Terrain.Base:
 	if change is int:

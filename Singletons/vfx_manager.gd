@@ -287,6 +287,7 @@ func _draw_vfx() -> void: ##redraws all procedural vfx plus one shared projectil
 		current_scale_val *= info.scale
 		var current_color = Color.WHITE if not info.color_over_lifetime else info.color_over_lifetime.sample(normalized_lifetime)
 		current_color *= _get_projectile_tint(vfx.projectile_tints, vfx.age, vfx.projectile_tint_lifetime)
+		current_color = _apply_vfx_color_override(current_color, vfx.color_override)
 		if vfx.is_projectile:
 			current_color = _push_projectile_white(current_color)
 			current_color = _apply_projectile_night_shading(current_color)
@@ -423,8 +424,10 @@ func _draw_projectile_trails() -> void: ##draws projectile trails as centralized
 		var centerline: PackedVector2Array = _build_smoothed_trail_centerline(vfx)
 		var head_index: int = centerline.size() - 1
 		centerline = _extend_projectile_trail_head(vfx, centerline)
-		var outer_color: Color = _apply_projectile_night_shading(vfx.vfx_info.projectile_trail_outer_color)
-		var inner_color: Color = _apply_projectile_night_shading(vfx.vfx_info.projectile_trail_inner_color)
+		var outer_color: Color = _apply_vfx_color_override(vfx.vfx_info.projectile_trail_outer_color, vfx.color_override)
+		var inner_color: Color = _apply_vfx_color_override(vfx.vfx_info.projectile_trail_inner_color, vfx.color_override)
+		outer_color = _apply_projectile_night_shading(outer_color)
+		inner_color = _apply_projectile_night_shading(inner_color)
 		_draw_projectile_trail_chroma(vfx, centerline, head_index, outer_color, inner_color)
 		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, head_index, vfx.vfx_info.projectile_trail_outer_width, outer_color)
 		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, head_index, vfx.vfx_info.projectile_trail_inner_width, inner_color)
@@ -588,6 +591,17 @@ func _is_projectile_trail_enabled(vfx: VFXInstance) -> bool: ##checks the projec
 func _push_projectile_white(color: Color) -> Color: ##brightens projectile visuals while preserving their current opacity
 	var white_target: Color = Color(1.0, 1.0, 1.0, color.a)
 	return color.lerp(white_target, PROJECTILE_WHITE_PUSH)
+
+func _apply_vfx_color_override(base_color: Color, color_override: Color) -> Color: ##replaces hue per instance while retaining the resource's brightness shaping and alpha
+	if color_override.a <= 0.0:
+		return base_color
+	var authored_intensity: float = maxf(base_color.r, maxf(base_color.g, base_color.b))
+	return Color(
+		color_override.r * authored_intensity,
+		color_override.g * authored_intensity,
+		color_override.b * authored_intensity,
+		base_color.a * color_override.a
+	)
 
 func _apply_projectile_night_shading(color: Color) -> Color: ##reapplies an authored fraction of combat-night tint to exempt projectile visuals
 	if not _is_combat_night_active():
@@ -773,7 +787,8 @@ func play_ballistic_vfx(
 	minimum_flight_time: float = 0.0,
 	maximum_flight_time: float = INF,
 	scale: Vector2 = Vector2.ONE,
-	is_projectile: bool = false
+	is_projectile: bool = false,
+	color_override: Color = Color.TRANSPARENT
 ) -> Variant: ##launches a purely cosmetic vfx along a point-to-point pseudovertical arc without creating a combat resolver
 	if not is_instance_valid(info):
 		return null
@@ -791,7 +806,7 @@ func play_ballistic_vfx(
 
 	var velocity: Vector2 = (end_position - start_position) / flight_time
 	var starting_vertical_velocity: float = -0.5 * vertical_gravity * flight_time
-	return play_vfx(
+	var vfx_instance: Variant = play_vfx(
 		info,
 		start_position,
 		velocity,
@@ -805,6 +820,9 @@ func play_ballistic_vfx(
 		is_projectile,
 		vertical_gravity
 	)
+	if vfx_instance is VFXInstance:
+		(vfx_instance as VFXInstance).color_override = color_override
+	return vfx_instance
 
 func sync_projectile_vfx(vfx_instance: Variant, position: Vector2, visual_velocity: Vector2) -> void: ##updates externally simulated projectile visuals while preserving their sampled trail history
 	if not is_instance_valid(vfx_instance):
@@ -829,7 +847,8 @@ func play_aoe_field(
 	position: Vector2,
 	radius: float,
 	cone_angle_deg: float = 360.0,
-	aim_direction: Vector2 = Vector2.RIGHT
+	aim_direction: Vector2 = Vector2.RIGHT,
+	alpha_multiplier: float = 1.0
 ) -> AoeParticleFieldVFX: ##spawns a dense marker field for circular or cone aoes using the per-resource authored particle settings
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"aoe_field_requests")
@@ -855,7 +874,7 @@ func play_aoe_field(
 			DebugAssistant.record_perf_event(&"vfx_suppressed")
 		return null
 
-	field.setup_from_info(info, radius, cone_angle_deg, aim_direction)
+	field.setup_from_info(info, radius, cone_angle_deg, aim_direction, alpha_multiplier)
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"aoe_field_instances_created")
 	return field

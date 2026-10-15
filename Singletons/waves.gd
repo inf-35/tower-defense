@@ -6,6 +6,7 @@ const BossEncounters := preload("res://Indexes/boss_encounters.gd")
 
 signal wave_started(wave_number_int: int)
 signal wave_ended(wave_number_int: int)
+signal enemy_spawned(unit: Unit) ##announces a newly created enemy before its deferred scene insertion
 
 #--- state ---
 var current_combat_wave_number: int = 0
@@ -15,6 +16,7 @@ var _total_enemies_planned: int = 0:
 var _enemies_spawned: int = 0
 var _enemies_killed: int = 0
 var _enemies_planned: Array[Array] = []
+var _spawn_generation: int = 0
 var _wave_enemy_preview_cache: Dictionary[int, Array] = {}
 var _breach_enemy_assignments: Dictionary[int, Array] = {}
 var _frozen_raider_waypoints: Dictionary[int, Array] = {}
@@ -88,11 +90,14 @@ func get_planned_enemies_for_wave(wave: int) -> Array[Array]: ##returns the stab
 
 	return WaveEnemies.get_enemies_for_wave(wave)
 
-func get_breach_wave_preview(breach: Tower) -> String: ##returns one compact comma-delimited preview of the next wave roster assigned to this active breach
+func get_planned_enemies_for_breach(breach: Tower) -> Array[Array]: ##returns a copy of the assigned roster shared by breach hover text and route previews
 	if not is_instance_valid(breach):
-		return ""
-
+		return []
 	var assigned_stacks: Array[Array] = _breach_enemy_assignments.get(breach.unit_id, [])
+	return assigned_stacks.duplicate(true)
+
+func get_breach_wave_preview(breach: Tower) -> String: ##returns one compact comma-delimited preview of the next wave roster assigned to this active breach
+	var assigned_stacks: Array[Array] = get_planned_enemies_for_breach(breach)
 	if assigned_stacks.is_empty():
 		return ""
 
@@ -109,7 +114,7 @@ func get_breach_wave_preview(breach: Tower) -> String: ##returns one compact com
 
 		parts.append("{U_%s} x%d" % [Units.Type.keys()[unit_type], unit_count])
 
-	return "\n" + ", ".join(parts)
+	return ", ".join(parts)
 
 #main function called by phases.gd to start a combat wave
 func start_combat_wave(wave_num_to_spawn: int) -> void:
@@ -121,6 +126,7 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 		return
 
 	current_combat_wave_number = wave_num_to_spawn
+	_spawn_generation += 1
 
 	#reset all counters for the new wave
 	_cache_wave_enemy_plan(current_combat_wave_number)
@@ -136,12 +142,12 @@ func start_combat_wave(wave_num_to_spawn: int) -> void:
 	wave_started.emit(current_combat_wave_number)
 
 	if _total_enemies_planned > 0:
-		_spawn_enemies_for_current_wave()
+		_spawn_enemies_for_current_wave(_spawn_generation)
 	else:
 		#if no enemies are planned, end the wave immediately
 		_end_combat_wave()
 
-func _spawn_enemies_for_current_wave() -> void:
+func _spawn_enemies_for_current_wave(spawn_generation: int) -> void:
 	var enemy_stagger: float = 5.0 / _total_enemies_planned
 	var spawn_sequence_index: int = 0
 
@@ -151,7 +157,7 @@ func _spawn_enemies_for_current_wave() -> void:
 
 		for _stack_index: int in range(unit_stack_count):
 			#if a new wave has started while we were spawning, abort
-			if current_combat_wave_number == 0:
+			if current_combat_wave_number == 0 or spawn_generation != _spawn_generation:
 				return
 
 			var breach: Tower = get_breach_for_spawn_index(spawn_sequence_index)
@@ -163,7 +169,7 @@ func _spawn_enemies_for_current_wave() -> void:
 			spawn_enemy(unit_type, Island.cell_to_position(breach.tower_position))
 			spawn_sequence_index += 1
 
-			await Clock.await_game_time(enemy_stagger * 0.6)
+			await Clock.await_game_time(enemy_stagger * 0.4)
 
 		await Clock.await_game_time(enemy_stagger * 0.8)
 
@@ -177,20 +183,24 @@ func _spawn_enemy_internal(unit_type: Units.Type, position: Vector2, wave_tracke
 	var unit: Unit = Units.create_unit(unit_type)
 	unit.add_to_group(ENEMY_GROUP)
 	if wave_tracked:
-		unit.ready.connect(_register_enemy_death_tracking.bind(unit), CONNECT_ONE_SHOT)
+		unit.ready.connect(func() -> void:
+			unit.died.connect(func(_hit_report_data: HitReportData) -> void: _on_enemy_died(unit), CONNECT_ONE_SHOT)
+		, CONNECT_ONE_SHOT)
 	Run.references.island.add_child.call_deferred(unit)
 	unit.movement_component.set_deferred(&"position", position)
 
 	#increment the spawned counter only after the unit is created
 	if wave_tracked:
 		_enemies_spawned += 1
+	enemy_spawned.emit(unit)
 	return unit
 
-func _register_enemy_death_tracking(unit: Unit) -> void:
-	if not is_instance_valid(unit):
-		return
-
-	unit.died.connect(func(_hit_report_data: HitReportData): _on_enemy_died(unit), CONNECT_ONE_SHOT)
+func stop_combat_wave() -> int: ##cancels spawning and retires wave state; the caller owns cleanup and the completion notification
+	var ended_wave: int = current_combat_wave_number
+	current_combat_wave_number = 0
+	_spawn_generation += 1
+	_frozen_raider_waypoints.clear()
+	return ended_wave
 
 func _on_wave_cycle_started(wave_number: int) -> void: ##seeds a stable roster for the newly prepared wave and rebuilds any per-breach previews against it
 	_cache_wave_enemy_plan(wave_number)
@@ -378,11 +388,10 @@ func _end_combat_wave() -> void:
 		return
 
 	print("Waves: All enemies cleared for combat wave ", current_combat_wave_number, ". Emitting wave_ended.")
+	var ended_wave: int = stop_combat_wave()
 
 	#clear any remaining enemies from the group in case reconciliation hasn't run
 	for enemy: Node in get_tree().get_nodes_in_group(ENEMY_GROUP):
 		enemy.queue_free()
 
-	wave_ended.emit(current_combat_wave_number)
-	_frozen_raider_waypoints.clear()
-	current_combat_wave_number = 0
+	wave_ended.emit(ended_wave)

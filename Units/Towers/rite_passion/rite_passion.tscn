@@ -3,11 +3,11 @@
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
 [ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="2_distributor"]
 [ext_resource type="Script" uid="uid://ccmw0hvofgwpy" path="res://Units/Towers/rite_passion/passion_rite_effect.gd" id="3_passion_effect"]
-[ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="4_rite_icon"]
 [ext_resource type="Texture2D" uid="uid://8pct63uq5iqc" path="res://Assets/rite_flame_sigil.png" id="5_effect_icon"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_movement"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_movement_data"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_health"]
+[ext_resource type="Texture2D" uid="uid://qn1l2npfwuiy" path="res://Assets/rite_passion.png" id="9_0ypjm"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="9_health_data"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="10_modifiers"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_shadow"]
@@ -47,7 +47,7 @@ health_data = SubResource("Resource_health")
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1752655820]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("4_rite_icon")
+texture = ExtResource("9_0ypjm")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1608237157]
 script = ExtResource("11_shadow")

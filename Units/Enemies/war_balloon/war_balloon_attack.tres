@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://bsava714nypxj"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_attack"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_j5d6c"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="3_4j4i6"]
+
+[resource]
+script = ExtResource("1_attack")
+delivery_method = 1
+range = 10.0
+cooldown = 3.0
+radius = 15.0
+damage = 10.0
+breaking = true
+projectile_speed = 1000.0
+arcing = false

@@ -15,5 +15,5 @@ id_name = "amethyst_skull"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("1_relic")
-base_rarity = 0
+base_rarity = 1
 tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_rule")])

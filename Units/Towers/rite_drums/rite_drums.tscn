@@ -13,11 +13,16 @@
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="8_fs5jb"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_h6xm1"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_p7vby"]
+[ext_resource type="Script" uid="uid://cb8tlxrimtfn1" path="res://Content/tower_topology_config.gd" id="12_topology"]
 
 [sub_resource type="Resource" id="Resource_drums_marker"]
 resource_local_to_scene = true
 script = ExtResource("4_marker")
 icon = ExtResource("5_r4fv5")
+
+[sub_resource type="Resource" id="Resource_topology"]
+script = ExtResource("12_topology")
+max_range = 2
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("8_fs5jb")
@@ -105,6 +110,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="DrumRiteBehavior" type="Node" parent="." unique_id=939343812]
 script = ExtResource("3_167qi")
 rite_marker_effect = SubResource("Resource_drums_marker")
+topology = SubResource("Resource_topology")
 metadata/_custom_type_script = "uid://dkhofkopi0n6x"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1257848227]

@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_2st4k"]
 script = ExtResource("2_2st4k")
 color = Color(0.67208064, 0.79125, 0.6721125, 0.6675)
-wash_color = Color(0.82041377, 0.87, 0.758525, 0.13441177)
+wash_color = Color(0.743785, 0.79, 0.6873, 0.13333334)
 navigable = true
 constructable = true
 metadata/_custom_type_script = "uid://dk1gy0e6eorr2"

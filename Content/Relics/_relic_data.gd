@@ -62,6 +62,7 @@ enum Type {
 	BASTION,
 	EDELWEISS,
 	SPRINKLERHEAD,
+	SPARE_SUPPLIES,
 }
 
 @export var type: Type

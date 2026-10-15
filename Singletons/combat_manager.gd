@@ -4,6 +4,9 @@ const _DEBUG: bool = false
 const _DEFAULT_AOE_FIELD_COLOR: Color = Color(0.58, 0.62, 0.6, 0.26)
 const _DEFAULT_AOE_FIELD_PARTICLES_PER_CELL: float = 3.5
 const _DEFAULT_AOE_FIELD_LIFETIME: float = 0.38
+const _AOE_FIELD_FULL_ALPHA_RADIUS_TILES: float = 3.0
+const _AOE_FIELD_MIN_ALPHA_RADIUS_TILES: float = 7.0
+const _AOE_FIELD_MIN_ALPHA_MULTIPLIER: float = 0.25
 
 const PSEUDOVERTICAL_RATIO: float = 1.0 ##how many +y units per pseudo "+z units" for pseudoverticality
 const PSEUDOVERTICAL_GRAVITY: float = 200.0 ##how strong gravity is
@@ -12,6 +15,14 @@ static var _default_aoe_field_vfx_info: VFXInfo
 
 func _ready() -> void: ##keeps the simulated projectile tick loop asleep until the first projectile is registered
 	set_process(false)
+	Run.run_ending.connect(_on_run_ending)
+
+func _on_run_ending() -> void: ##retires run-owned projectiles before their world references are cleared
+	set_process(false)
+	_projectile_generation += 1
+	for projectile: ProjectileSimulatedResolver in simulated_projectiles.duplicate():
+		projectile._on_destruct()
+	simulated_projectiles.clear()
 
 class ProjectileAbstractResolver extends RefCounted: #fire and forget delegate for ProjectileAbstract (see resolve_hit)
 	const ERROR_TOLERANCE : float = 30.0 #error tolerance for no AOE projectiles.
@@ -101,6 +112,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 	var projectile_age: float
 
 	var _current_pierces_left: int = 0
+	var _is_destroyed: bool = false
 	var _exclude_colliders: Array[RID] = [] #tracks what we've already hit to prevent double collision
 
 	var vfx_instance: Variant
@@ -157,6 +169,8 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 			vfx_instance.rotation = initial_velocity.angle()
 
 	func tick(delta: float) -> void:
+		if _is_destroyed:
+			return
 		if DebugAssistant.perf_instrumentation_active:
 			DebugAssistant.record_perf_event(&"simulated_projectile_ticks")
 		projectile_age += delta
@@ -199,7 +213,7 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 				remaining_delta -= (remaining_delta * fraction)
 				#process the collision
 				var stop_processing: bool = _handle_collision(collider, hit_pos)
-				if stop_processing:
+				if stop_processing or _is_destroyed:
 					return #projectile destroyed
 				#if continuing (pierce), we must exclude this collider and nudge forward
 				_exclude_colliders.append(result.rid)
@@ -322,11 +336,16 @@ class ProjectileSimulatedResolver extends RefCounted: #fire and forget delegate 
 					CombatManager._play_hit_sound_set(aoe_hit, impact_pos)
 					hit_sound_played = true
 				hit_unit.take_hit(aoe_hit)
+				if _is_destroyed:
+					return
 
 	func _apply_impact_vfx(pos: Vector2) -> void:
 		CombatManager._play_impact_vfx_set(hit_data, pos)
 
-	func _on_destruct(target: Unit = null) -> void:
+	func _on_destruct(target: Unit = null) -> void: ##retires gameplay, visuals, and reserved damage once, including cancellation during a hit callback
+		if _is_destroyed:
+			return
+		_is_destroyed = true
 		CombatManager.simulated_projectiles.erase(self)
 		if CombatManager.simulated_projectiles.is_empty():
 			CombatManager.set_process(false)
@@ -503,7 +522,25 @@ static func _play_aoe_field_vfx_set(
 
 	var aoe_info: VFXInfo = _get_aoe_field_vfx_info(hit_data, include_base)
 	if is_instance_valid(aoe_info):
-		VFXManager.play_aoe_field(aoe_info, position, radius, cone_angle_deg, aim_direction)
+		var radius_tiles: float = radius / maxf(Island.CELL_SIZE, 1.0)
+		var fade_weight: float = inverse_lerp(
+			_AOE_FIELD_FULL_ALPHA_RADIUS_TILES,
+			_AOE_FIELD_MIN_ALPHA_RADIUS_TILES,
+			radius_tiles
+		)
+		var alpha_multiplier: float = lerpf(
+			1.0,
+			_AOE_FIELD_MIN_ALPHA_MULTIPLIER,
+			clampf(fade_weight, 0.0, 1.0)
+		)
+		VFXManager.play_aoe_field(
+			aoe_info,
+			position,
+			radius,
+			cone_angle_deg,
+			aim_direction,
+			alpha_multiplier
+		)
 
 static func _get_aoe_field_vfx_info(hit_data: HitData, include_base: bool) -> VFXInfo:
 	if include_base and _has_aoe_particles(hit_data.vfx_on_spawn):
@@ -538,10 +575,19 @@ static func _get_default_aoe_field_vfx_info() -> VFXInfo:
 	return _default_aoe_field_vfx_info
 
 var simulated_projectiles: Array[ProjectileSimulatedResolver] = [] #projectileresolvers will automatically add and remove themselves as necessary
+var _projectile_generation: int = 0
 func _process(_delta: float) -> void: ##ticks only currently alive simulated projectiles while at least one exists
 	var delta: float = Clock.game_delta
-	for simulated_projectile: ProjectileSimulatedResolver in simulated_projectiles:
+	var projectile_generation: int = _projectile_generation
+	var projectile_index: int = 0
+	while projectile_index < simulated_projectiles.size():
+		var simulated_projectile: ProjectileSimulatedResolver = simulated_projectiles[projectile_index]
 		simulated_projectile.tick(delta)
+		if projectile_generation != _projectile_generation:
+			return
+		#retiring the current projectile shifts the next one into the same slot
+		if projectile_index < simulated_projectiles.size() and simulated_projectiles[projectile_index] == simulated_projectile:
+			projectile_index += 1
 
 func _visualize_shape_for_debug(shape: Shape2D, transform: Transform2D, duration: float, color: Color = Color.RED) -> void:
 	#we need a canvas item to draw on. the root viewport is a good choice.

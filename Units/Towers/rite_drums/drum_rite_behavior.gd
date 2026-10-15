@@ -2,20 +2,22 @@ extends Behavior
 class_name DrumRiteBehavior
 
 const INFLUENCE_KEY: StringName = &"drum_trigger_group"
+const LINEAGE_LABEL: StringName = &"drum_rite_behavior"
 
-@export var attacks_required: int = 4 ##unique adjacent tower attacks needed before the drum commands follow-up attacks
 @export var rite_marker_effect: EffectPrototype ##hidden marker used by shared rite-affinity systems such as night lily
+@export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology whose towers can trigger and receive echoed attacks
+@export var echo_bolt_color: Color = Color(0.24, 0.56, 1.0, 1.0) ##blue hue applied to the source-to-target command bolt
 
 var _connected_neighbors: Dictionary[Tower, bool] = {}
 var _seen_attack_ids: Dictionary[int, bool] = {}
-var _attack_counter: int = 0
+var _subscription_id: int = -1
+var _last_report: TowerTopologyService.Report = null
 
 func start() -> void:
-	var tower: Tower = unit as Tower
-	tower.adjacency_updated.connect(_refresh_connections)
 	attach()
 
 func detach() -> void:
+	_unsubscribe()
 	var to_remove: Array[Tower] = []
 	var connected_towers: Array[Tower] = []
 	connected_towers.assign(_connected_neighbors.keys())
@@ -26,22 +28,44 @@ func detach() -> void:
 	for tower: Tower in to_remove:
 		_connected_neighbors.erase(tower)
 
-	_attack_counter = 0
 	_seen_attack_ids.clear()
 	clear_tower_influences()
 
 func attach() -> void:
-	var tower: Tower = unit as Tower
-	if is_instance_valid(tower) and is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
-		_refresh_connections(Run.references.island.topology_service.get_adjacency_report(tower))
+	_subscribe()
 
-func _refresh_connections(adjacency_data: AdjacencyReportData) -> void:
+func _subscribe() -> void: ##subscribes the drum to its authored trigger topology
+	if _subscription_id != -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	var tower: Tower = unit as Tower
+	if topology_service == null or not is_instance_valid(tower):
+		return
+	_subscription_id = topology_service.subscribe(self, tower, _make_query(), _refresh_connections, true)
+
+func _unsubscribe() -> void: ##removes the live trigger query without depending on island teardown order
+	if _subscription_id == -1:
+		return
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if topology_service != null:
+		topology_service.unsubscribe(self, _subscription_id)
+	_subscription_id = -1
+	_last_report = null
+
+func _make_query() -> TowerTopologyService.Query: ##builds the configured topology or cardinal-adjacency default
+	if is_instance_valid(topology):
+		return topology.build_query()
+	return TowerTopologyService.Query.new()
+
+func _refresh_connections(report: TowerTopologyService.Report) -> void:
+	_last_report = report
 	sync_tower_influences()
-	if adjacency_data == null:
+	if report == null:
 		return
 	var current_set: Dictionary[Tower, bool] = {}
 	var adjacent_towers: Array[Tower] = []
-	adjacent_towers.assign(adjacency_data.unique_towers)
+	adjacent_towers.assign(report.unique_towers)
+	adjacent_towers.erase(unit as Tower)
 
 	for neighbor: Tower in adjacent_towers:
 		if not is_instance_valid(neighbor):
@@ -67,48 +91,60 @@ func _refresh_connections(adjacency_data: AdjacencyReportData) -> void:
 	for tower: Tower in to_remove:
 		_connected_neighbors.erase(tower)
 
-func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes every adjacent slot participating in the rite's shared attack counter
+func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##describes every authored topology slot participating in the rite's random attack echo
 	var rite_tower: Tower = unit as Tower
 	if not is_instance_valid(rite_tower):
+		return []
+	var report: TowerTopologyService.Report = _last_report
+	var topology_service: TowerTopologyService = _get_topology_service()
+	if report == null and topology_service != null:
+		report = topology_service.query(rite_tower, _make_query())
+	if report == null:
 		return []
 	return [TowerInfluence.for_cells(
 		INFLUENCE_KEY,
 		TowerInfluence.Kind.TRIGGER,
-		rite_tower.get_adjacent_cells(),
+		_get_report_cells(report),
 		rite_marker_effect,
 	)]
 
-func _on_neighbor_event(event: GameEvent) -> void: ##applies this rite's primary-attack rhythm only to currently linked neighboring towers
+func _on_neighbor_event(event: GameEvent) -> void: ##echoes each eligible primary attack through one different random affected tower
 	var hit_data: HitData = event.data as HitData
 	if not is_instance_valid(hit_data) or not hit_data.primary:
+		return
+	if hit_data.has_lineage_producer_label(LINEAGE_LABEL):
+		return
+
+	var source_tower: Tower = event.unit as Tower
+	if not is_instance_valid(source_tower) or not _connected_neighbors.has(source_tower):
 		return
 
 	if not HitData.consume_attack_id(hit_data, _seen_attack_ids):
 		return
 
-	_attack_counter += 1
-	if _attack_counter < maxi(attacks_required, 1):
-		return
-
-	_attack_counter = 0
-	if _trigger_all_except(event.unit as Tower, hit_data):
+	var target_tower: Tower = _pick_echo_target(source_tower)
+	if is_instance_valid(target_tower):
+		target_tower.attack_component.queue_next_attack_context(hit_data, self)
+		target_tower.attack_component.current_cooldown = 0.0
 		unit.play_action_squash_stretch(Vector2(0.82, 1.2), Vector2(1.04, 0.98), 0.04, 0.08)
+		BuffComponent.play_link_wisp(source_tower, target_tower, echo_bolt_color)
+		if is_instance_valid(unit.buff_component):
+			unit.buff_component.activate_target(target_tower, "", null, false)
 
-func _trigger_all_except(exception: Tower, parent_data: EventData) -> bool: ##arms neighboring towers so their forced follow-up attack derives from the triggering attack rather than restarting a fresh branch
-	var triggered_any: bool = false
+func _pick_echo_target(source_tower: Tower) -> Tower: ##chooses one other active affected attacker without creating a command when no alternative exists
+	var candidates: Array[Tower] = []
 	var connected_towers: Array[Tower] = []
 	connected_towers.assign(_connected_neighbors.keys())
 	for tower: Tower in connected_towers:
-		if tower == exception:
+		if tower == source_tower:
 			continue
-		if is_instance_valid(tower) and is_instance_valid(tower.attack_component):
-			tower.attack_component.queue_next_attack_context(parent_data, self)
-			tower.attack_component.current_cooldown = 0.0
-			if is_instance_valid(unit.buff_component):
-				var feedback_icon: Texture2D = rite_marker_effect.icon if is_instance_valid(rite_marker_effect) else null
-				unit.buff_component.activate_target(tower, "", feedback_icon)
-			triggered_any = true
-	return triggered_any
+		if not is_instance_valid(tower) or tower.disabled or tower.current_state != Tower.State.ACTIVE:
+			continue
+		if not is_instance_valid(tower.attack_component):
+			continue
+		candidates.append(tower)
+
+	return candidates.pick_random() if not candidates.is_empty() else null
 
 func _disconnect_neighbor(tower: Tower) -> void:
 	if not is_instance_valid(tower):
@@ -126,3 +162,13 @@ func _modify_marker_stack(target: Tower, amount: int) -> void:
 	var effect_instance: EffectInstance = target.apply_effect(rite_marker_effect, amount)
 	if is_instance_valid(effect_instance):
 		effect_instance.source = unit
+
+func _exit_tree() -> void:
+	detach()
+
+func _get_topology_service() -> TowerTopologyService: ##resolves the run-owned topology service used by tracking and previews
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return null
+	if not is_instance_valid(Run.references.island.topology_service):
+		return null
+	return Run.references.island.topology_service

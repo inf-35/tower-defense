@@ -33,7 +33,7 @@ func _ready() -> void:
 
 func refresh_custom_cursors() -> void: ##reapplies cursor textures after display mode changes recreate the native cursor state
 	Input.set_custom_mouse_cursor(ARROW_CURSOR, Input.CursorShape.CURSOR_ARROW, CURSOR_HOTSPOT)
-	Input.set_custom_mouse_cursor(HAND_CURSOR, Input.CursorShape.CURSOR_POINTING_HAND, CURSOR_HOTSPOT)
+	Input.set_custom_mouse_cursor(HAND_CURSOR, Input.CursorShape.CURSOR_POINTING_HAND, CURSOR_HOTSPOT + Vector2(6,2))
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 func start() -> void:
@@ -397,7 +397,7 @@ func _update_preview_visuals() -> void:
 	if current_state != State.PREVIEWING:
 		return
 
-	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -16.0, preview_tower_position)
+	Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -8.0, preview_tower_position)
 	preview_tower_prototype.tower_position = preview_tower_position
 	preview_tower_prototype.facing = preview_tower_facing
 	preview_tower_prototype.size = Tower.get_rotated_size(Towers.get_tower_size(preview_tower_prototype.type), preview_tower_prototype.facing)

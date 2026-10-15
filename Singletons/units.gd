@@ -25,7 +25,8 @@ enum Type {
 	WARRIOR_PLUS,
 	CLERIC,
 	HEALER_PLUS,
-	OLIPHANT
+	OLIPHANT,
+	WAR_BALLOON
 }
 
 var unit_stats: Dictionary[Type, UnitData] = {}

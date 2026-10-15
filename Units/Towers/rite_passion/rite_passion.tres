@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://b3umv0714n0fl"]
 
-[ext_resource type="Texture2D" uid="uid://cperhhcwd4b2j" path="res://Assets/fire_rite.png" id="1_icon"]
+[ext_resource type="Texture2D" uid="uid://qn1l2npfwuiy" path="res://Assets/rite_passion.png" id="1_2xl40"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_action_script"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_destroy"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_tower_data"]
@@ -20,7 +20,7 @@ tags = Array[int]([2])
 tower_name = "Rite of Passion"
 rite_short_name = "passion"
 tower_description = "{RITE_LABEL}. Adjacent towers deal 50% less {UNIT_DAMAGE} to enemies without {BURN}, but gain +150% {UNIT_DAMAGE} per {BURN} stack on burning enemies."
-icon = ExtResource("1_icon")
-preview = ExtResource("1_icon")
+icon = ExtResource("1_2xl40")
+preview = ExtResource("1_2xl40")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])
 tower_scene = ExtResource("5_scene")

@@ -14,4 +14,5 @@ id_name = "iron_rite"
 description = "rite reward"
 type = 3
 rite_type = 75
+base_rarity = 2
 tower_rules = Array[ExtResource("2_tower_rule")]([SubResource("Resource_require_overkill_source")])

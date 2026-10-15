@@ -5,12 +5,11 @@
 
 [resource]
 script = ExtResource("3_kwgy3")
-id_name = "broken_mirror"
+id_name = "macuahuitl"
 description = "this is a relic reward description"
 type = 2
 relic_data = ExtResource("2_i50j0")
-base_rarity = 1
-weight_scale = 1.5
+base_rarity = 0
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"
 
 

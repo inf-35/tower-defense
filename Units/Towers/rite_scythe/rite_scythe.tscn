@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://3hds44r7wpbg"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_33cm1"]
-[ext_resource type="Script" uid="uid://dnjc1qtsra5h2" path="res://Units/Towers/rite_frost/effect_distributor_behavior.gd" id="4_b7cx4"]
-[ext_resource type="Script" uid="uid://nuyx87xgxcsr" path="res://Units/Towers/rite_scythe/scythe_rite_effect.gd" id="5_0lfu2"]
+[ext_resource type="Script" uid="uid://bdhsnunw7upow" path="res://Content/Behaviors/amplifier_behavior.gd" id="4_b7cx4"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="5_0lfu2"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="6_td1ja"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="7_8mrvk"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="8_qbt5v"]
@@ -12,11 +12,17 @@
 [ext_resource type="Texture2D" uid="uid://cc8qfopysnwr8" path="res://Assets/rite_scythe.png" id="12_l77yx"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_lbqiq"]
 
-[sub_resource type="Resource" id="Resource_a7ure"]
+[sub_resource type="Resource" id="Resource_scythe_hitrate"]
 script = ExtResource("5_0lfu2")
-payout_multiplier = 4.5
-schedule = 1
-metadata/_custom_type_script = "uid://nuyx87xgxcsr"
+attribute = 8
+multiplicative = 2.9411764705882355
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
+
+[sub_resource type="Resource" id="Resource_scythe_damage"]
+script = ExtResource("5_0lfu2")
+attribute = 6
+multiplicative = 5.0
+metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_1dhlk"]
 script = ExtResource("9_022sf")
@@ -92,7 +98,7 @@ _data = {
 z_index = 100
 script = ExtResource("1_33cm1")
 type = 57
-behavior = NodePath("EffectDistributorBehavior")
+behavior = NodePath("AmplifierBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
 modifiers_component = NodePath("ModifiersComponent")
@@ -100,10 +106,10 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="EffectDistributorBehavior" type="Node" parent="." unique_id=465742457]
+[node name="AmplifierBehavior" type="Node" parent="." unique_id=465742457]
 script = ExtResource("4_b7cx4")
-buff_effect = SubResource("Resource_a7ure")
-metadata/_custom_type_script = "uid://dnjc1qtsra5h2"
+modifier_prototypes = Array[ExtResource("5_0lfu2")]([SubResource("Resource_scythe_hitrate"), SubResource("Resource_scythe_damage")])
+metadata/_custom_type_script = "uid://bdhsnunw7upow"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=1696405103]
 script = ExtResource("6_td1ja")

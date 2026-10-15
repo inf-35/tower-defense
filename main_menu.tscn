@@ -5,20 +5,27 @@
 [ext_resource type="Texture2D" uid="uid://pvyutr4ju2ce" path="res://Assets/Marketing/itch_background.png" id="3_glbon"]
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
+[ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="5_animatable"]
+[ext_resource type="Resource" uid="uid://d4im80a5on0lt" path="res://Content/Guilds/testers.tres" id="6_testers"]
+[ext_resource type="Resource" uid="uid://bk7dgodpk2tik" path="res://Content/Guilds/pioneers.tres" id="7_pioneers"]
 
-[node name="MainMenu" type="Node2D" unique_id=565802774 node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "deeps_environment", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[node name="MainMenu" type="Node2D" unique_id=565802774 node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "guild_panel", "testers_button", "pioneers_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
 continue_button = NodePath("UI/MarginContainer/Control/VBoxContainer/continue")
 feedback_button = NodePath("UI/MarginContainer/Control/VBoxContainer/feedback")
 environment_panel = NodePath("UI/MarginContainer/Control/environment_panel")
-woods_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods")
-winter_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter")
-deeps_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/deeps")
+woods_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods_motion/woods")
+winter_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter_motion/winter")
+guild_panel = NodePath("UI/MarginContainer/Control/guild_panel")
+testers_button = NodePath("UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/testers_motion/testers")
+pioneers_button = NodePath("UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/pioneers_motion/pioneers")
+testers_guild = ExtResource("6_testers")
+pioneers_guild = ExtResource("7_pioneers")
 difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
-normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal")
-hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard")
+normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal_motion/normal")
+hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard_motion/hard")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=855020591]
 
@@ -112,22 +119,113 @@ layout_mode = 2
 text = "Choose an environment"
 horizontal_alignment = 1
 
-[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=1721808762]
+[node name="woods_motion" type="Control" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=20829866 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
+script = ExtResource("5_animatable")
+content = NodePath("woods")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+hover_enabled = false
+
+[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods_motion" unique_id=1721808762]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Woods"
 script = ExtResource("4_jix8l")
 
-[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=731609570]
+[node name="winter_motion" type="Control" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=594039286 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
+script = ExtResource("5_animatable")
+content = NodePath("winter")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+entrance_delay = 0.08
+hover_enabled = false
+
+[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter_motion" unique_id=731609570]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Winter"
 script = ExtResource("4_jix8l")
 
-[node name="deeps" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=590733693]
+[node name="guild_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=1341131659]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0833
+offset_top = -221.0
+offset_right = 320.0833
+offset_bottom = 221.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/guild_panel" unique_id=276157230]
+layout_mode = 2
+theme_type_variation = &"MarginSuper"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/guild_panel/MarginContainer" unique_id=1720583313]
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+
+[node name="Label" type="Label" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=1691602898]
+layout_mode = 2
+text = "Choose a guild"
+horizontal_alignment = 1
+
+[node name="testers_motion" type="Control" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=1694864953 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
-text = "The Deeps"
+script = ExtResource("5_animatable")
+content = NodePath("testers")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+hover_enabled = false
+
+[node name="testers" type="Button" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/testers_motion" unique_id=1739619991]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Testers"
+script = ExtResource("4_jix8l")
+
+[node name="pioneers_motion" type="Control" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=315663131 node_paths=PackedStringArray("content")]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+script = ExtResource("5_animatable")
+content = NodePath("pioneers")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+entrance_delay = 0.08
+hover_enabled = false
+
+[node name="pioneers" type="Button" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/pioneers_motion" unique_id=1844316406]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Pioneers"
 script = ExtResource("4_jix8l")
 
 [node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=948902790]
@@ -158,15 +256,44 @@ layout_mode = 2
 text = "Choose a difficulty"
 horizontal_alignment = 1
 
-[node name="normal" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=494658812]
+[node name="normal_motion" type="Control" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=162151210 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
+script = ExtResource("5_animatable")
+content = NodePath("normal")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+hover_enabled = false
+
+[node name="normal" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal_motion" unique_id=494658812]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Normal"
 script = ExtResource("4_jix8l")
 
-[node name="hard" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=471109702]
+[node name="hard_motion" type="Control" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=793836847 node_paths=PackedStringArray("content")]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
+script = ExtResource("5_animatable")
+content = NodePath("hard")
+slide_offset = Vector2(0, -48)
+entrance_duration = 0.32
+entrance_delay = 0.08
+hover_enabled = false
+
+[node name="hard" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard_motion" unique_id=471109702]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Hard"
 script = ExtResource("4_jix8l")
 
@@ -190,6 +317,7 @@ anchor_bottom = 1.0
 offset_top = 700.0
 offset_bottom = 760.0
 grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.21176471, 0.21176471, 0.21176471, 0.88)
 theme_override_font_sizes/font_size = 22
 text = "This game records anonymous session and run analytics to help guide balance and development."

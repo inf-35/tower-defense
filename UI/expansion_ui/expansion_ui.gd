@@ -2,6 +2,10 @@ extends Panel
 
 @export var _vbox: VBoxContainer
 
+const OPTION_ENTRANCE_OFFSET: Vector2 = Vector2(0, -48)
+const OPTION_ENTRANCE_DURATION: float = 0.48
+const OPTION_ENTRANCE_STAGGER: float = 0.08
+
 #--- configuration ---
 @export_group("Info Display Settings")
 @export var show_tile_count: bool = false
@@ -72,7 +76,7 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 		btn.mouse_entered.connect(_on_choice_hovered.bind(i))
 		btn.mouse_exited.connect(_on_choice_unhovered.bind(i))
 
-		_vbox.add_child(btn)
+		_add_animated_button(btn, float(i) * OPTION_ENTRANCE_STAGGER)
 		option_buttons.append(btn)
 
 	_confirmation_button = Button.new()
@@ -80,7 +84,7 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 	_confirmation_button.text = "Apply expansion."
 	_confirmation_button.pressed.connect(_on_confirmation_pressed)
 	_confirmation_button.disabled = true
-	_vbox.add_child(_confirmation_button)
+	_add_animated_button(_confirmation_button, float(data.size()) * OPTION_ENTRANCE_STAGGER)
 
 	_finish_button = Button.new()
 	_finish_button.use_parent_material = true
@@ -88,6 +92,20 @@ func _populate_buttons(data: Array[ExpansionChoice]) -> void:
 	_finish_button.pressed.connect(_on_finish_pressed)
 	_finish_button.disabled = true
 	_vbox.add_child(_finish_button)
+
+func _add_animated_button(button: Control, delay: float) -> void: ##wraps a dynamic expansion button and starts its staggered entrance
+	var animation: AnimatableUI = AnimatableUI.new()
+	animation.content = button
+	animation.custom_minimum_size = button.custom_minimum_size
+	animation.use_parent_material = true
+	animation.slide_offset = OPTION_ENTRANCE_OFFSET
+	animation.entrance_duration = OPTION_ENTRANCE_DURATION
+	animation.entrance_delay = delay
+	animation.hover_enabled = false
+	animation.add_child(button)
+	_vbox.add_child(animation)
+	animation.custom_minimum_size = button.get_combined_minimum_size()
+	animation.animate_entrance()
 
 func _generate_button_text(_index: int, choice: ExpansionChoice) -> String:
 	if choice.block_data.is_empty():

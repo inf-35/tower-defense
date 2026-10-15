@@ -32,8 +32,21 @@ var flux: float = 200.0:
 
 var hp: float:
 	set(value):
+		var health_loss: PlayerHealthLossData = null
+		if value < hp:
+			health_loss = PlayerHealthLossData.new()
+			health_loss.health_before = hp
+			health_loss.health_after = value
+			var event := GameEvent.new()
+			event.event_type = GameEvent.EventType.PLAYER_HEALTH_LOSS
+			event.data = health_loss
+			publish_event(null, event)
+			value = health_loss.health_after
+
 		hp = value
 		hp_changed.emit(hp)
+		if health_loss != null:
+			health_loss.resolved.emit()
 		if hp < 0.0 or is_zero_approx(hp):
 			if not Run.phases.is_game_over:
 				Run.phases.start_game_over(false)
@@ -66,19 +79,15 @@ var relic_slot_capacity: int = BASE_RELIC_SLOTS:
 
 #tutorial
 enum TutorialFlag {
-	MAIN,
-	PAUSE,
-	TROLL,
-	TOWER_DESTROYED,
-	RUINS,
-	RITE,
-	ONBOARDING,
-	SHOP,
+	TROLL = 2,
+	TOWER_DESTROYED = 3,
+	RUINS = 4,
+	RITE = 5,
+	ONBOARDING = 6,
+	SHOP = 7,
 }
 
 var completed_tutorials: Dictionary[TutorialFlag, bool] = {
-	TutorialFlag.MAIN: false,
-	TutorialFlag.PAUSE: false,
 	TutorialFlag.TROLL: false,
 	TutorialFlag.TOWER_DESTROYED: false,
 	TutorialFlag.RUINS: false,
@@ -187,20 +196,23 @@ func is_subscribed_to_event(event_type: GameEvent.EventType, callback: Callable)
 	return is_instance_valid(global_event_service) and global_event_service.is_subscribed(event_type, callback)
 
 
-func begin_new_game() -> void:
-	#initial state setup
-	self.unlocked_towers = {
-		Towers.Type.TURRET: true,
-		Towers.Type.PALISADE: true,
-		Towers.Type.FARM: true,
-		Towers.Type.GENERATOR: true,
-	}
+func begin_new_game() -> void: ##applies the selected guild once after island generation and before the first wave cycle
+	var guild: GuildData = Run.current_guild
+	flux = DEBUG_TEST_FLUX if DEBUG_GRANT_TEST_CONTENT else 30.0
+	hp = 20.0
+	self.unlocked_towers = {}
+	for tower_type: Towers.Type in guild.starting_buildings:
+		if Towers.is_tower_rite(tower_type):
+			add_rite(tower_type, 1)
+		else:
+			unlock_tower(tower_type)
+
+	relic_slot_capacity = maxi(relic_slot_capacity, guild.starting_relics.size())
+	for relic: RelicData in guild.starting_relics:
+		add_relic(relic)
 
 	if DEBUG_GRANT_TEST_CONTENT:
 		_grant_initial_test_content()
-
-	flux = DEBUG_TEST_FLUX if DEBUG_GRANT_TEST_CONTENT else 30.0
-	hp = 20.0
 
 	trader_service.start_game()
 
@@ -563,6 +575,7 @@ func load_save_data(save_data: Dictionary) -> void:
 
 	if save_data.has("trader"):
 		trader_service.load_save_data(save_data.trader)
+	trader_service.start_game()
 
 	UI.queue_update_relics()
 	UI.queue_update_flux(flux)
@@ -587,6 +600,6 @@ func get_profile() -> Dictionary:
 func load_profile(profile_data: Dictionary) -> void:
 	var saved_tutorials: Dictionary = profile_data.get("completed_tutorials", {})
 	for tutorial_key: String in saved_tutorials:
-		completed_tutorials[int(tutorial_key)] = saved_tutorials[tutorial_key]
-	if not saved_tutorials.has(str(TutorialFlag.ONBOARDING)) and not saved_tutorials.has(TutorialFlag.ONBOARDING):
-		completed_tutorials[TutorialFlag.ONBOARDING] = completed_tutorials[TutorialFlag.MAIN] and completed_tutorials[TutorialFlag.PAUSE] and completed_tutorials[TutorialFlag.RITE]
+		var tutorial_flag: int = int(tutorial_key)
+		if completed_tutorials.has(tutorial_flag):
+			completed_tutorials[tutorial_flag] = saved_tutorials[tutorial_key]

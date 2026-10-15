@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="11_attack"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="12_vfx"]
 [ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="13_poison_icon"]
+[ext_resource type="Texture2D" uid="uid://3kc7rmumtsjp" path="res://Assets/rite_plagues.png" id="15_j8r1l"]
 
 [sub_resource type="Resource" id="Resource_plague_projectile_vfx"]
 script = ExtResource("12_vfx")
@@ -140,7 +141,7 @@ texture = SubResource("PlaceholderTexture2D_p6ncc")
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1980848356]
 scale = Vector2(0.06, 0.06)
-texture = ExtResource("9_ttmr5")
+texture = ExtResource("15_j8r1l")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=318411879]
 script = ExtResource("10_msd7q")

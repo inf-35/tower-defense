@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Scythe Rite"
 rite_short_name = "scythe"
-tower_description = "{RITE_LABEL}. Adjacent towers' next 2 attacks are negated. The following attack deals its damage plus 4.5x the banked damage. Stacked rites exponentially increase both values."
+tower_description = "{RITE_LABEL}. Adjacent towers have -66% {UNIT_HITRATE} and +400% {UNIT_DAMAGE}. Stacked rites multiply both effects."
 icon = ExtResource("1_i3722")
 preview = ExtResource("1_i3722")
 inspector_actions = Array[ExtResource("2_enere")]([ExtResource("3_qpsoe")])

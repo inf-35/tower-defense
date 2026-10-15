@@ -96,9 +96,9 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="ClericBehavior" type="Node" parent="." unique_id=85477706]
 script = ExtResource("11_behavior")
-cleanse_duration = 1.0
-heal_interval = 1.5
-heal_range = 25.0
+cleanse_duration = 1.2
+heal_interval = 1.2
+heal_range = 35.0
 
 [node name="RangeComponent" type="Node" parent="." unique_id=1580744416]
 script = ExtResource("12_range")

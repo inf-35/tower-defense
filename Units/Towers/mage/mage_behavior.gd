@@ -2,11 +2,14 @@ extends Behavior
 class_name MageBehavior
 
 const NETWORK_INFLUENCE_KEY: StringName = &"mage_network"
+const NETWORK_UPDATE_VISUAL_STEP_SECONDS: float = 0.05
 
 @export var network_tint: Color = Color(0.9, 0.7, 1.0, 1.0) ##tint applied to palisades currently linked into the mage network
 @export var pulse_vfx_scene: PackedScene = preload("res://Units/Towers/mage/mage_pulse.tscn") ##optional retained pulse scene for linked palisades
 @export var network_damage_bonus_per_wall: float = 0.1 ##multiplicative damage bonus gained for each palisade in the connected network
 @export var network_hitrate_bonus_per_wall: float = 0.1 ##multiplicative hitrate bonus gained for each palisade in the connected network
+@export_range(0.0, 2.0, 0.01) var pulse_propagation_cooldown_fraction: float = 0.25 ##fraction of the modified cooldown used for the wall pulse to travel from the nearest to furthest stage
+@export_range(0.0, 2.0, 0.01) var pulse_propagation_max_duration: float = 0.5 ##maximum game-time duration of one outward wall pulse
 
 var _connected_palisades: Array[Tower] = [] ##the list of palisades this specific Mage is currently powering
 var _network_rebuild_queued: bool = false
@@ -14,6 +17,8 @@ var _is_listening_for_network_events: bool = false
 var _is_listening_for_island_events: bool = false
 var _network_damage_modifier: Modifier
 var _network_cooldown_modifier: Modifier
+var _pulse_cast_id: int = 0
+var _network_visual_id: int = 0
 
 const NETWORK_EVENT_TYPES: Array[GameEvent.EventType] = [
 	GameEvent.EventType.TOWER_BUILT,
@@ -29,6 +34,7 @@ func attach() -> void: ##subscribes to relevant tower-change events and builds t
 	_recalculate_network()
 
 func detach() -> void: ##disconnects cache invalidation and clears the palisade visuals when the mage leaves play
+	_pulse_cast_id += 1
 	_disconnect_network_events()
 	_disconnect_island_events()
 	_network_rebuild_queued = false
@@ -40,10 +46,16 @@ func update(_delta: float) -> void: ##pulses every connected palisade as one log
 
 func _pulse_network() -> void: ##reuses one attack context across every emitted palisade pulse in this cast
 	attack_component.refresh_cooldown()
+	_pulse_cast_id += 1
+	var pulse_cast_id: int = _pulse_cast_id
 	#pre-calculate the mage's stats (damage, range, statuses)
 	#relics applied to the mage will buff these values here!
 	var dmg: float = attack_component.damage
 	var radius: float = attack_component.radius
+	var propagation_duration: float = minf(
+		attack_component.current_cooldown * pulse_propagation_cooldown_fraction,
+		pulse_propagation_max_duration
+	)
 
 	#todo: visual feedback on the mage itself
 	if is_instance_valid(animation_player):
@@ -73,41 +85,71 @@ func _pulse_network() -> void: ##reuses one attack context across every emitted 
 	signal_event.unit = unit
 	unit.publish_event(signal_event)
 
-	#command connected palisades to attack
+	var mage_cell: Vector2i = (unit as Tower).tower_position
+	var walls_by_distance: Dictionary[int, Array] = {}
+	var pulse_distances: Array[int] = []
 	for palisade: Tower in _connected_palisades:
 		if not _is_active_network_wall(palisade):
 			continue
+		var cell_delta: Vector2i = palisade.tower_position - mage_cell
+		var manhattan_distance: int = absi(cell_delta.x) + absi(cell_delta.y)
+		if not walls_by_distance.has(manhattan_distance):
+			walls_by_distance[manhattan_distance] = []
+			pulse_distances.append(manhattan_distance)
+		walls_by_distance[manhattan_distance].append(palisade)
 
-		var hit_data: HitData = attack_component.attack_data.generate_generic_hit_data()
-		hit_data.source = unit #mage gets credit
-		hit_data.target = null #untargeted aoe
-		hit_data.target_affiliation = true
-		hit_data.damage = dmg
-		hit_data.radius = radius
-		hit_data.attack_id = attack_id
-		hit_data.primary = false
-		if not attack_component.apply_attack_context(hit_data, attack_context):
-			continue
+	if pulse_distances.is_empty():
+		return
+	pulse_distances.sort()
+	var total_steps: int = pulse_distances[-1] - pulse_distances[0]
+	var stage_stagger: float = propagation_duration / float(total_steps) if total_steps > 0 else 0.0
+	var previous_distance: int = pulse_distances[0]
 
-		var delivery := DeliveryData.new()
-		delivery.delivery_method = DeliveryData.DeliveryMethod.CONE_AOE
-		delivery.use_source_position_override = true
-		delivery.source_position = palisade.global_position
-		delivery.cone_angle = 360.0
+	for stage_index: int in pulse_distances.size():
+		var pulse_distance: int = pulse_distances[stage_index]
+		if stage_index > 0:
+			var stage_steps: int = pulse_distance - previous_distance
+			await Clock.create_game_timer(stage_stagger * float(stage_steps)).timeout
+		previous_distance = pulse_distance
 
-		unit.deal_hit(hit_data, delivery)
+		if pulse_cast_id != _pulse_cast_id or not is_instance_valid(unit) or unit.disabled:
+			return
 
-		#trigger the retained vfx
-		if palisade.has_meta("mage_pulse_vfx"):
-			var pulse = palisade.get_meta("mage_pulse_vfx") as RadialPulseVFX
-			if is_instance_valid(pulse):
-				pulse.start_radius = radius * 0.75
-				pulse.max_radius = radius #update dynamically in case relics buffed range
-				pulse.reset()
-				pulse.start()
-		#play the VFX defined in the Mage's attack data on the palisade
-		if hit_data.vfx_on_spawn:
-			VFXManager.play_vfx(hit_data.vfx_on_spawn, palisade.global_position, Vector2.UP)
+		for palisade: Tower in walls_by_distance[pulse_distance]:
+			if not _connected_palisades.has(palisade) or not _is_active_network_wall(palisade):
+				continue
+
+			var hit_data: HitData = attack_component.attack_data.generate_generic_hit_data()
+			hit_data.source = unit #mage gets credit
+			hit_data.target = null #untargeted aoe
+			hit_data.target_affiliation = true
+			hit_data.damage = dmg
+			hit_data.radius = radius
+			hit_data.attack_id = attack_id
+			hit_data.primary = false
+			if not attack_component.apply_attack_context(hit_data, attack_context):
+				continue
+			palisade.play_action_squash_stretch(Vector2(0.8, 1.2), Vector2(1.03, 0.98), 0.04, 0.07)
+
+			var delivery := DeliveryData.new()
+			delivery.delivery_method = DeliveryData.DeliveryMethod.CONE_AOE
+			delivery.use_source_position_override = true
+			delivery.source_position = palisade.global_position
+			delivery.cone_angle = 360.0
+
+			unit.deal_hit(hit_data, delivery)
+
+			#trigger the retained vfx
+			if palisade.has_meta("mage_pulse_vfx"):
+				var pulse = palisade.get_meta("mage_pulse_vfx") as RadialPulseVFX
+				if is_instance_valid(pulse):
+					pulse.start_radius = radius * 0.75
+					pulse.max_radius = radius #update dynamically in case relics buffed range
+					pulse.reset()
+					pulse.start()
+			#play the VFX defined in the Mage's attack data on the palisade
+			if hit_data.vfx_on_spawn:
+				VFXManager.play_vfx(hit_data.vfx_on_spawn, palisade.global_position, Vector2.UP)
 
 #network management
 func _connect_network_events() -> void: ##connects once to the global and island event buses used to invalidate palisade network caches
@@ -201,6 +243,12 @@ func _recalculate_network() -> void: ##diffs the new contiguous palisade set aga
 		_clear_connected_palisades()
 		return
 	var new_network: Array[Tower] = _calculate_contiguous_palisades((unit as Tower).tower_position)
+	var network_changed: bool = new_network.size() != _connected_palisades.size()
+	if not network_changed:
+		for palisade: Tower in new_network:
+			if not _connected_palisades.has(palisade):
+				network_changed = true
+				break
 	#--- apply diff for tinting ---
 
 	#1. remove tint from disconnected palisades
@@ -215,12 +263,65 @@ func _recalculate_network() -> void: ##diffs the new contiguous palisade set aga
 
 	_connected_palisades = new_network
 	_refresh_network_stat_modifiers(_connected_palisades.size())
+	if network_changed:
+		if _connected_palisades.is_empty():
+			_network_visual_id += 1
+		else:
+			_play_network_buff_visuals()
 
 func _clear_connected_palisades() -> void: ##removes this mage's contribution from every currently cached palisade
+	_network_visual_id += 1
 	for palisade: Tower in _connected_palisades:
 		_set_palisade_tint(palisade, false)
 	_connected_palisades.clear()
 	_clear_network_stat_modifiers()
+
+func _play_network_buff_visuals() -> void: ##replays the linked-wall buff outward from the mage at a fixed delay per Manhattan step
+	_network_visual_id += 1
+	var network_visual_id: int = _network_visual_id
+	var mage_cell: Vector2i = (unit as Tower).tower_position
+	var walls_by_distance: Dictionary[int, Array] = {}
+	var visual_distances: Array[int] = []
+
+	for palisade: Tower in _connected_palisades:
+		if not _is_active_network_wall(palisade):
+			continue
+		var cell_delta: Vector2i = palisade.tower_position - mage_cell
+		var manhattan_distance: int = absi(cell_delta.x) + absi(cell_delta.y)
+		if not walls_by_distance.has(manhattan_distance):
+			walls_by_distance[manhattan_distance] = []
+			visual_distances.append(manhattan_distance)
+		walls_by_distance[manhattan_distance].append(palisade)
+
+	if visual_distances.is_empty():
+		return
+	visual_distances.sort()
+	var previous_distance: int = visual_distances[0]
+	for stage_index: int in visual_distances.size():
+		var visual_distance: int = visual_distances[stage_index]
+		if stage_index > 0:
+			var stage_steps: int = visual_distance - previous_distance
+			await Clock.create_game_timer(NETWORK_UPDATE_VISUAL_STEP_SECONDS * float(stage_steps)).timeout
+		previous_distance = visual_distance
+
+		if network_visual_id != _network_visual_id or not is_instance_valid(unit) or unit.disabled:
+			return
+
+		for palisade: Tower in walls_by_distance[visual_distance]:
+			if not _connected_palisades.has(palisade) or not _is_active_network_wall(palisade):
+				continue
+			palisade.play_action_squash_stretch(Vector2(0.7, 1.3), Vector2(1.3, 0.7), 0.04, 0.07)
+			palisade.pulse_tint_layer(
+				TintService.LAYER_RITE_PULSE,
+				BuffComponent.ACTIVATION_OVERLAY_COLOR,
+				BuffComponent.ACTIVATION_OVERLAY_PEAK_STRENGTH,
+				BuffComponent.ACTIVATION_RAMP_IN_DURATION,
+				BuffComponent.ACTIVATION_FADE_OUT_DURATION,
+				false,
+				Tween.TRANS_QUAD,
+				Tween.EASE_OUT,
+				true
+			)
 
 func _refresh_network_stat_modifiers(wall_count: int) -> void: ##updates the mage's self-buffs from the current connected wall count
 	if not is_instance_valid(modifiers_component):
@@ -261,7 +362,7 @@ func _calculate_contiguous_palisades(start_cell: Vector2i) -> Array[Tower]: ##fl
 	var island = Run.references.island
 	if not is_instance_valid(island): return []
 	if not is_instance_valid(unit): return []
-	if unit.disabled: return []
+	if unit.disabled and not unit.abstractive: return []
 
 	var network: Array[Tower] = []
 	var visited_cells: Dictionary = {}
@@ -336,6 +437,8 @@ func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##
 		if not is_instance_valid(palisade):
 			continue
 		cells.append_array(palisade.get_occupied_cells())
+	if cells.is_empty():
+		return []
 	return [TowerInfluence.for_cells(
 		NETWORK_INFLUENCE_KEY,
 		TowerInfluence.Kind.LINK,
@@ -343,5 +446,6 @@ func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##
 		null,
 		[],
 		false,
-		TowerInfluence.Scope.WORLD
+		TowerInfluence.Scope.WORLD,
+		TowerInfluence.VisualRole.HIGHLIGHT
 	)]

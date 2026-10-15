@@ -25,7 +25,6 @@ var _has_unseen_stock: bool = false:
 		UI.trader_unseen_stock_changed.emit(_has_unseen_stock)
 
 var _menu_open: bool = false
-var _tutorial_next_manual_restock_stock: Array[Reward] = []
 
 func _ready() -> void:
 	set_process(false)
@@ -49,9 +48,6 @@ func initialise() -> void:
 	if not UI.trader_force_restock_requested.is_connected(force_restock):
 		UI.trader_force_restock_requested.connect(force_restock)
 
-	if _current_stock.is_empty():
-		_generate_stock(false)
-
 func start_game() -> void:
 	_menu_open = false
 	if _current_stock.is_empty():
@@ -63,8 +59,6 @@ func start_game() -> void:
 #--- public api ---
 
 func open_menu() -> void:
-	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_open_trader():
-		return
 	_open_menu()
 
 func _open_menu() -> void: ##opens the trader and clears the unseen-restock marker once the player has viewed it
@@ -73,8 +67,6 @@ func _open_menu() -> void: ##opens the trader and clears the unseen-restock mark
 	UI.trader_open.emit()
 
 func close_menu() -> void:
-	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_close_trader():
-		return
 	_menu_open = false
 	UI.trader_close.emit()
 
@@ -98,8 +90,6 @@ func purchase_item(slot_index: int) -> bool:
 	var item = _current_stock[slot_index]
 	if item == null:
 		return false #already exhausted
-	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_purchase_trader_reward(item):
-		return false
 
 	if Run.player.flux < item.price:
 		return false
@@ -119,30 +109,14 @@ func purchase_item(slot_index: int) -> bool:
 	return true
 
 func force_restock() -> bool:
-	if is_instance_valid(Run.tutorials) and not Run.tutorials.can_force_restock():
-		return false
 	if Run.player.flux < get_restock_cost():
 		return false
 
 	Run.player.flux -= get_restock_cost()
 	_manual_restocks += 1
-	if _tutorial_next_manual_restock_stock.is_empty():
-		_generate_stock(false)
-	else:
-		_set_stock(_tutorial_next_manual_restock_stock, false)
-		_tutorial_next_manual_restock_stock.clear()
+	_generate_stock(false)
 	stock_restocked.emit(true)
 	return true
-
-func set_tutorial_stock(rewards: Array[Reward], mark_unseen: bool) -> void: ##replaces the live trader stock with a fixed scripted set without touching the normal reward pool
-	_set_stock(rewards, mark_unseen)
-
-func set_tutorial_next_manual_restock_stock(rewards: Array[Reward]) -> void: ##queues one scripted stock result for the next manual restock, after which normal stock generation resumes
-	_tutorial_next_manual_restock_stock.clear()
-	for reward: Reward in rewards:
-		if not is_instance_valid(reward):
-			continue
-		_tutorial_next_manual_restock_stock.append(reward)
 
 #--- logic ---
 

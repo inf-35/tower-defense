@@ -6,7 +6,7 @@ signal expansion_process_complete
 #configuration
 const OVERVIEW_ISLAND_OFFSET: float = 0.0 #determines how offset the island is from the centre of the screen during overviews
 const GENERATION_ATTEMPTS: int = 20
-const EXPANSION_SIZE: int = 18
+const EXPANSION_SIZE: int = 16
 const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
 const FRONTIER_EVENING_BIAS: float = 1.125
@@ -161,8 +161,6 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	_trigger_camera_overview(island) #initial overview of all choices
 
 func _pick_random_rite_type() -> Towers.Type:
-	if is_instance_valid(Run.tutorials) and Run.tutorials.should_force_basic_tutorial_rites():
-		return Run.tutorials.pick_basic_tutorial_rite_type()
 	var rewards: Array[Reward] = RewardService.get_rewards(1, [Reward.Type.ADD_RITE])
 	if rewards.is_empty():
 		return Towers.Type.VOID

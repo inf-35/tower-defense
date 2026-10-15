@@ -44,21 +44,25 @@ func show_bonus_text(world_pos: Vector2, text_override: String = "") -> void: ##
 		0.5,
 	)
 
-func activate_new_link(target: Tower, show_link_wisp: bool = true) -> void: ##plays first-link feedback and optionally carries its source-to-target relationship through a wisp
-	activate_target(target, "", null, show_link_wisp)
+func activate_new_link(target: Tower, show_link_wisp: bool = true, link_wisp_color: Color = Color.TRANSPARENT) -> void: ##plays first-link feedback with an optional per-bolt color override
+	activate_target(target, "", null, show_link_wisp, link_wisp_color)
 
-func activate_target(target: Tower, text_override: String = "", icon_override: Texture2D = null, show_link_wisp: bool = true) -> void: ##plays shared yellow buff feedback on a target with optional icon, text, and causal link wisp
+func activate_target(target: Tower, text_override: String = "", icon_override: Texture2D = null, show_link_wisp: bool = true, link_wisp_color: Color = Color.TRANSPARENT) -> void: ##plays shared buff feedback with optional icon, text, causal wisp, and wisp color
 	if not is_instance_valid(target):
 		return
 
 	if show_link_wisp:
-		play_link_wisp(unit, target)
+		play_link_wisp(unit, target, link_wisp_color)
 
 	if is_instance_valid(icon_override) and is_instance_valid(UI.floating_text_manager):
 		UI.floating_text_manager.show_icon(icon_override, target.global_position)
 
 	show_bonus_text(target.global_position, text_override)
+	pulse_target_glow(target)
 
+static func pulse_target_glow(target: Tower) -> void: ##plays only the shared golden target pulse without spawning a wisp, icon, or popup
+	if not is_instance_valid(target):
+		return
 	target.pulse_tint_layer(
 		TintService.LAYER_RITE_PULSE,
 		ACTIVATION_OVERLAY_COLOR,
@@ -71,17 +75,17 @@ func activate_target(target: Tower, text_override: String = "", icon_override: T
 		true
 	)
 
-static func play_link_wisp(source: Unit, target: Unit) -> void: ##launches the shared buff wisp from one live unit to another without involving combat delivery
+static func play_link_wisp(source: Unit, target: Unit, color_override: Color = Color.TRANSPARENT) -> void: ##launches the shared buff wisp with an optional per-instance color override
 	if not is_instance_valid(source):
 		return
-	play_link_wisp_from_position(source.global_position, target)
+	play_link_wisp_from_position(source.global_position, target, color_override)
 
-static func play_link_wisp_from_position(source_position: Vector2, target: Unit) -> void: ##launches from a captured position so dead or transient causes remain representable
+static func play_link_wisp_from_position(source_position: Vector2, target: Unit, color_override: Color = Color.TRANSPARENT) -> void: ##launches from a captured position with an optional per-instance color override
 	if not is_instance_valid(target):
 		return
-	play_link_wisp_between_positions(source_position, target.global_position)
+	play_link_wisp_between_positions(source_position, target.global_position, color_override)
 
-static func play_link_wisp_between_positions(source_position: Vector2, target_position: Vector2) -> void: ##delegates the buff-owned profile to the generic point-to-point vfx launcher
+static func play_link_wisp_between_positions(source_position: Vector2, target_position: Vector2, color_override: Color = Color.TRANSPARENT) -> void: ##delegates the buff-owned profile and optional color to the generic point-to-point launcher
 	VFXManager.play_ballistic_vfx(
 		LINK_WISP_VFX,
 		source_position,
@@ -91,7 +95,8 @@ static func play_link_wisp_between_positions(source_position: Vector2, target_po
 		LINK_WISP_MINIMUM_FLIGHT_TIME,
 		LINK_WISP_MAXIMUM_FLIGHT_TIME,
 		Vector2.ONE,
-		true
+		true,
+		color_override
 	)
 
 func get_save_data() -> Dictionary:

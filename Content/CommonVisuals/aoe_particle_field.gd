@@ -18,9 +18,10 @@ var _lifetime: float = 0.35
 var _age: float = 0.0
 var _particles: Array[ParticleSpec] = []
 
-func setup_from_info(info: VFXInfo, radius: float, cone_angle_deg: float = 360.0, aim_direction: Vector2 = Vector2.RIGHT) -> void: ##copies one resource's authored particle-field settings onto this runtime marker and rebuilds the particle layout
+func setup_from_info(info: VFXInfo, radius: float, cone_angle_deg: float = 360.0, aim_direction: Vector2 = Vector2.RIGHT, alpha_multiplier: float = 1.0) -> void: ##copies one resource's authored particle-field settings onto this runtime marker and rebuilds the particle layout
 	_texture = info.aoe_particle_texture
 	_base_color = info.aoe_particle_color
+	_base_color.a *= maxf(alpha_multiplier, 0.0)
 	_lifetime = info.aoe_particle_lifetime
 	_particles = _generate_particles(info, radius, cone_angle_deg, aim_direction)
 	z_as_relative = false

@@ -14,7 +14,7 @@
 
 [sub_resource type="Resource" id="Resource_pitchfork_effect"]
 script = ExtResource("3_effect")
-max_bonus_multiplier = 2.0
+max_bonus_multiplier = 1.2
 schedule = 1
 
 [sub_resource type="Resource" id="Resource_health"]

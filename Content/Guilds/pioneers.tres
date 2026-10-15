@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GuildData" format=3 uid="uid://bk7dgodpk2tik"]
+
+[ext_resource type="Script" uid="uid://ceq64w4b51rhw" path="res://Content/Guilds/_guild_data.gd" id="1_2dmvw"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_brlti"]
+[ext_resource type="Resource" path="res://Content/Relics/spare_supplies/spare_supplies.tres" id="3_brlti"]
+
+[resource]
+script = ExtResource("1_2dmvw")
+title = "Pioneers"
+description = "Start with Spare Supplies: survive one lethal health loss, restore 6 HP, and clear all non-boss enemies."
+starting_buildings = Array[int]([2, 6, 53, 5])
+starting_relics = Array[ExtResource("2_brlti")]([ExtResource("3_brlti")])
+metadata/_custom_type_script = "uid://ceq64w4b51rhw"

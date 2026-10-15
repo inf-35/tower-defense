@@ -8,12 +8,11 @@ enum Fact {
 	TURRET_PLACED,
 	PLAYER_STATS_HOVERED,
 	WAVE_TIMELINE_HOVERED,
-	WAVE_STARTED,
-	FARM_PLACED,
+	FARM_PLACED = 7,
+	TRADE_OPENED = 8,
 }
 
 enum Element {
-	NONE,
 	TOWER_BAR,
 	PLAYER_STATS,
 	WAVE_TIMELINE,
@@ -28,7 +27,7 @@ enum Anchor {
 	PLAYER_STATS,
 	TIMELINE,
 	START_WAVE,
-	TIME_CONTROLS,
+	TRADE,
 	TARGET_OFFSET,
 }
 
@@ -47,12 +46,15 @@ class Chapter extends RefCounted:
 	var paragraph_text: String = ""
 	var footer_text: String = ""
 	var hover_targets: Dictionary[int, int] = {}
-	var highlight_element: int = Element.NONE
 	var highlight_elements: Array[int] = []
 	var start_wave_locked: bool = true
 	var auto_advance: bool = true
+	var auto_advance_delay: float = 0.8
+	var allow_manual_continue: bool = false
+	var pause_clock: bool = false
+	var target_offset: Vector2 = Vector2.ZERO
 
-	func get_required_facts() -> Array[int]:
+	func get_required_facts() -> Array[int]: ##returns the facts that must be complete before this chapter can advance
 		var facts: Array[int] = []
 		for item: ChecklistItem in checklist_items:
 			facts.append(item.fact)

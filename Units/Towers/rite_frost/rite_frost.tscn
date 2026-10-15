@@ -13,6 +13,11 @@
 [ext_resource type="Script" uid="uid://rx7tx05s7xq8" path="res://Units/Towers/rite_frost/frost_rite_effect.gd" id="10_v7esy"]
 [ext_resource type="Script" uid="uid://ctf5rqdaiem4s" path="res://Units/Towers/rite_frost/brittle_effect.gd" id="11_brittle"]
 [ext_resource type="Script" uid="uid://c0tqsk2lv2qho" path="res://Units/Towers/rite_frost/status_infusion_effect.gd" id="12_status"]
+[ext_resource type="Script" uid="uid://cb8tlxrimtfn1" path="res://Content/tower_topology_config.gd" id="13_topology"]
+
+[sub_resource type="Resource" id="Resource_topology"]
+script = ExtResource("13_topology")
+max_range = 2
 
 [sub_resource type="Resource" id="Resource_brittle"]
 script = ExtResource("11_brittle")
@@ -110,6 +115,7 @@ metadata/_custom_type_script = "uid://glk50fqtygyn"
 [node name="EffectDistributorBehavior" type="Node" parent="." unique_id=1985270377]
 script = ExtResource("9_sa6kb")
 buff_effect = SubResource("Resource_owejg")
+topology = SubResource("Resource_topology")
 metadata/_custom_type_script = "uid://dnjc1qtsra5h2"
 
 [node name="MovementComponent" type="Node" parent="." unique_id=837325414]

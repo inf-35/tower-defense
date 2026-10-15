@@ -23,6 +23,7 @@ enum EventType {
 	TOWER_BUILT, ##for when a tower is first built (attached with BuildTowerData)
 
 	NONE, ##for effects with no hooks
+	PLAYER_HEALTH_LOSS, ##mutable player health loss, dispatched before health is committed or death is checked
 }
 
 var event_type: EventType

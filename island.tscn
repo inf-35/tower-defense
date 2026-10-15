@@ -34,6 +34,8 @@
 [ext_resource type="Script" uid="uid://kify44v4y7h2" path="res://UI/ui_visibility_toggle.gd" id="31_ui_visibility"]
 [ext_resource type="Shader" uid="uid://csfc27ytdb7qi" path="res://Shaders/paper_grain.gdshader" id="32_paper_grain"]
 [ext_resource type="Script" uid="uid://ccjlpbls3vyv1" path="res://Scene Elements/path_wash_layer.gd" id="33_path_wash"]
+[ext_resource type="Shader" uid="uid://mieee0e0cjm6" path="res://Shaders/path_wash_posterization.gdshader" id="34_path_posterization"]
+[ext_resource type="Shader" uid="uid://dc8bswvlyokra" path="res://Shaders/simple_mix_mask.gdshader" id="35_stain"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q2og1"]
 
@@ -43,6 +45,49 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_q2og1")
 shader_parameter/boil_speed = 3.30800015713
 shader_parameter/boil_strength = 0.0010000000475
 shader_parameter/noise_scale = 5.60000026274012
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_terrain_stain"]
+shader = ExtResource("35_stain")
+shader_parameter/tint_color = Color(0, 0, 0, 0)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_terrain_distortion"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_terrain_distortion"]
+noise = SubResource("FastNoiseLite_terrain_distortion")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_terrain_pencil"]
+frequency = 0.005
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_terrain_pencil"]
+noise = SubResource("FastNoiseLite_terrain_pencil")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_preview_terrain"]
+shader = ExtResource("8_c7iw8")
+shader_parameter/distortion_texture = SubResource("NoiseTexture2D_terrain_distortion")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_terrain_pencil")
+shader_parameter/outline_color = Color(0, 0, 0, 0.8)
+shader_parameter/fill_color = Color(1, 1, 1, 0.1)
+shader_parameter/region_pixel_offset = Vector2(0, 0)
+shader_parameter/region_pixel_size = Vector2(1, 1)
+shader_parameter/distortion_strength = 5.0
+shader_parameter/distortion_scale = 0.01
+shader_parameter/distance_field_step = 1.0
+shader_parameter/outline_width = 0.018
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lake_preview_terrain"]
+shader = ExtResource("8_c7iw8")
+shader_parameter/distortion_texture = SubResource("NoiseTexture2D_terrain_distortion")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_terrain_pencil")
+shader_parameter/outline_color = Color(0, 0, 0, 0.8)
+shader_parameter/fill_color = Color(1, 1, 1, 0.1)
+shader_parameter/region_pixel_offset = Vector2(0, 0)
+shader_parameter/region_pixel_size = Vector2(1, 1)
+shader_parameter/distortion_strength = 5.0
+shader_parameter/distortion_scale = 0.01
+shader_parameter/distance_field_step = 1.0
+shader_parameter/outline_width = 0.018
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_paper_grain"]
 seed = 1837
@@ -61,6 +106,42 @@ shader_parameter/grain_strength = 0.0
 shader_parameter/grain_scale = 1.0
 shader_parameter/brush_strength = 0.0
 shader_parameter/grain_texture = SubResource("NoiseTexture2D_paper_grain")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_watercolor_terrain"]
+shader = ExtResource("9_8ervs")
+shader_parameter/distortion_texture = SubResource("NoiseTexture2D_terrain_distortion")
+shader_parameter/paper_noise_texture = SubResource("NoiseTexture2D_terrain_pencil")
+shader_parameter/paper_grain_world_origin = Vector2(0, 0)
+shader_parameter/paper_grain_world_uv_scale = Vector2(0.1, 0.1)
+shader_parameter/paper_grain_strength = 0.400000019
+shader_parameter/paper_grain_scale = 0.00999999977648
+shader_parameter/posterization_strength = 0.499999988824
+shader_parameter/posterization_levels = 3
+shader_parameter/region_pixel_offset = Vector2(0, 0)
+shader_parameter/region_pixel_size = Vector2(0, 0)
+shader_parameter/terrain_color_texture_size = Vector2(1, 1)
+shader_parameter/distortion_strength = 5.0
+shader_parameter/distortion_scale = 0.01
+shader_parameter/cut_threshold = 0.10000000475
+shader_parameter/edge_softness = 1.0000000475
+shader_parameter/distance_field_step = 1.0
+shader_parameter/center_falloff = 3.0
+shader_parameter/brush_strength = 0.3
+shader_parameter/min_paint_coverage = 0.50000002375
+shader_parameter/terrain_color_strength = 1.0
+shader_parameter/terrain_transition_softness = 0.15
+shader_parameter/terrain_warp_strength = 8.0
+shader_parameter/coastline_color = Color(0.22, 0.205, 0.17, 1)
+shader_parameter/coastline_strength = 1.0
+shader_parameter/coastline_width = 0.02000000025148
+shader_parameter/waterline_strength = 0.72
+shader_parameter/waterline_width = 0.0125
+shader_parameter/waterline_level = 0.2225
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7fk8d"]
+shader = ExtResource("34_path_posterization")
+shader_parameter/posterization_strength = 0.5
+shader_parameter/alpha_levels = 6
 
 [node name="Island" type="Node2D" unique_id=883621194 node_paths=PackedStringArray("terrain_renderer", "preview_renderer", "lake_preview_renderer")]
 y_sort_enabled = true
@@ -118,7 +199,7 @@ script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
 corner_texture = ExtResource("8_aibdv")
 obstruction_warning_renderer = NodePath("../ObstructionWarnings")
-path_wash_layer = NodePath("../PathWashLayer")
+path_wash_layer = NodePath("../PathWashRoot/PathWashLayer")
 flow_speed = 3.0
 metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 
@@ -129,34 +210,77 @@ script = ExtResource("25_obstruction_warning_renderer")
 warning_texture = ExtResource("26_obstruction_warning")
 intermediate_warning_texture = ExtResource("27_obstruction_warning_intermediate")
 
-[node name="PreviewRenderer" type="Node2D" parent="." unique_id=1992026522]
+[node name="PreviewRenderer" type="Node2D" parent="." unique_id=1992026522 node_paths=PackedStringArray("terrain_rect", "background_stain_rect", "decoration_container")]
 z_index = 250
 script = ExtResource("7_b4opu")
-shader = ExtResource("8_c7iw8")
 max_gradient_depth = 3.0
+terrain_rect = NodePath("TerrainRect")
+background_stain_rect = NodePath("BackgroundStain")
+decoration_container = NodePath("DecorationContainer")
 
-[node name="LakePreviewRenderer" type="Node2D" parent="." unique_id=322664427]
+[node name="BackgroundStain" type="ColorRect" parent="PreviewRenderer" unique_id=263686220]
+material = SubResource("ShaderMaterial_terrain_stain")
+mouse_filter = 2
+
+[node name="TerrainRect" type="ColorRect" parent="PreviewRenderer" unique_id=470513901]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_preview_terrain")
+mouse_filter = 2
+
+[node name="DecorationContainer" type="Node2D" parent="PreviewRenderer" unique_id=102098407]
+
+[node name="LakePreviewRenderer" type="Node2D" parent="." unique_id=322664427 node_paths=PackedStringArray("terrain_rect", "background_stain_rect", "decoration_container")]
 z_index = 9
 script = ExtResource("7_b4opu")
-shader = ExtResource("8_c7iw8")
 max_gradient_depth = 2.5
-draw_background = false
+terrain_rect = NodePath("TerrainRect")
+background_stain_rect = NodePath("BackgroundStain")
+decoration_container = NodePath("DecorationContainer")
 
-[node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("paper_rect", "paper_grain_rect", "color_rect")]
+[node name="BackgroundStain" type="ColorRect" parent="LakePreviewRenderer" unique_id=1269498057]
+material = SubResource("ShaderMaterial_terrain_stain")
+mouse_filter = 2
+
+[node name="TerrainRect" type="ColorRect" parent="LakePreviewRenderer" unique_id=1686728987]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_lake_preview_terrain")
+mouse_filter = 2
+
+[node name="DecorationContainer" type="Node2D" parent="LakePreviewRenderer" unique_id=77274802]
+
+[node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("terrain_rect", "background_stain_rect", "decoration_container", "paper_rect", "paper_grain_rect", "color_rect")]
+z_index = -100
+z_as_relative = false
 script = ExtResource("7_b4opu")
 is_main_terrain_renderer = true
-shader = ExtResource("9_8ervs")
-max_gradient_depth = 1.5
-draw_background = false
-background_stain_color = Color(0, 0, 0, 0)
+max_gradient_depth = 3.0
 brush_textures = Array[Texture2D]([ExtResource("10_8ervs"), ExtResource("11_1y0xo"), ExtResource("12_kjlm2"), ExtResource("13_ad6l7"), ExtResource("14_cj5nf")])
+terrain_rect = NodePath("TerrainRect")
+background_stain_rect = NodePath("BackgroundStain")
+decoration_container = NodePath("DecorationContainer")
 paper_rect = NodePath("paper_rect")
 paper_grain_rect = NodePath("paper_rect2")
 color_rect = NodePath("color_rect")
 
 [node name="paper_rect2" type="TextureRect" parent="TerrainRenderer" unique_id=1632982907]
-z_as_relative = false
 material = SubResource("ShaderMaterial_paper_grain")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2073.6
+offset_top = -1166.4
+offset_right = 50588.9
+offset_bottom = 27408.6
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.06, 0.06)
+mouse_filter = 2
+texture = ExtResource("21_sunp3")
+stretch_mode = 1
+
+[node name="paper_rect2" type="TextureRect" parent="TerrainRenderer/paper_rect2" unique_id=999314507]
+material = SubResource("ShaderMaterial_paper_grain")
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -173,7 +297,6 @@ stretch_mode = 1
 
 [node name="paper_rect" type="TextureRect" parent="TerrainRenderer" unique_id=9571044]
 modulate = Color(1, 1, 1, 0.30588236)
-z_as_relative = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -190,7 +313,6 @@ stretch_mode = 1
 
 [node name="color_rect" type="ColorRect" parent="TerrainRenderer" unique_id=385445106]
 z_index = -1
-z_as_relative = false
 offset_left = -2829.0
 offset_top = -1417.0
 offset_right = 67746.0
@@ -199,9 +321,25 @@ scale = Vector2(0.08, 0.08)
 mouse_filter = 2
 color = Color(0.99215686, 0.9372549, 0.84705883, 1)
 
-[node name="PathWashLayer" type="Node2D" parent="." unique_id=507856348]
+[node name="BackgroundStain" type="ColorRect" parent="TerrainRenderer" unique_id=955053271]
+material = SubResource("ShaderMaterial_terrain_stain")
+mouse_filter = 2
+
+[node name="TerrainRect" type="ColorRect" parent="TerrainRenderer" unique_id=740425574]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_watercolor_terrain")
+mouse_filter = 2
+
+[node name="DecorationContainer" type="Node2D" parent="TerrainRenderer" unique_id=2119788114]
+
+[node name="PathWashRoot" type="Node2D" parent="." unique_id=1954066317]
+z_index = 5
 z_as_relative = false
+
+[node name="PathWashLayer" type="Node2D" parent="PathWashRoot" unique_id=507856348]
+material = SubResource("ShaderMaterial_7fk8d")
 script = ExtResource("33_path_wash")
+wash_color = Color(0.98, 0.9408, 0.82320005, 0.8117647)
 
 [node name="NavigationDebugger" type="Node2D" parent="." unique_id=1062625785]
 visible = false

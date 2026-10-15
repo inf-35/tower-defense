@@ -21,6 +21,7 @@ var projectile_tints: Array[Color] = []
 var projectile_tint_lifetime: float = -1.0
 var projectile_chroma_strength: float = 0.0
 var projectile_trail_chroma_strength: float = 0.0
+var color_override: Color = Color.TRANSPARENT ##optional runtime hue replacement that preserves authored intensity and opacity
 
 var age: float = 0.0      #current time since creation.
 var lifetime: float = 0.00

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RelicData" format=3 uid="uid://dc332eqgbucsf"]
+
+[ext_resource type="Script" uid="uid://ceq3t6jd8rvqs" path="res://Content/Relics/spare_supplies/spare_supplies_effect.gd" id="1_effect"]
+[ext_resource type="PackedScene" uid="uid://dyu6j5s42ufk4" path="res://Content/Relics/spare_supplies/spare_supplies_activation.tscn" id="1_mdm1b"]
+[ext_resource type="Texture2D" uid="uid://ddvnt278gnlct" path="res://Assets/magic_beans.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://cyc5vw8sicomn" path="res://Content/global_modifier_prototype.gd" id="3_5jols"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("1_effect")
+icon = ExtResource("2_icon")
+
+[resource]
+script = ExtResource("3_data")
+type = 49
+global_effect = SubResource("Resource_effect")
+title = "Spare Supplies"
+description = "When you would die, kill all non-boss enemies, ending the wave, and restore 6 {PLAYER_HP}.  Destroys itself on activation."
+icon = ExtResource("2_icon")

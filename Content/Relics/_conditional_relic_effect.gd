@@ -10,6 +10,7 @@ enum ConditionKind {
 	AFFECTING_RITES,
 	HOST_TERRAIN,
 	ADJACENT_EMPTY_CELLS,
+	CONTIGUOUS_TYPES,
 }
 
 ##which spatial/counting rule this relic uses when evaluating each host tower
@@ -18,6 +19,8 @@ enum ConditionKind {
 @export var host_tower_types: Array[Towers.Type] = []
 ##reference tower types counted by the condition; some modes instead reuse the host tower type
 @export var reference_tower_types: Array[Towers.Type] = []
+##tower types allowed to bridge a contiguous network; contributors are still filtered by reference_tower_types
+@export var contiguous_bridge_tower_types: Array[Towers.Type] = []
 ##reference terrain types counted by terrain-based neighborhood conditions
 @export var reference_terrain_types: Array[Terrain.Base] = []
 ##maximum search distance for range-based conditions
@@ -45,7 +48,8 @@ class ConditionalRelicState extends RefCounted:
 	var active_effects: Dictionary[int, bool] = {}
 	var active_counts: Dictionary[int, int] = {}
 	var attached_host_only: bool = false ##whether this instance was attached intrinsically instead of registered as a global relic
-	#tower lifetime is owned elsewhere, so the relic only keeps weak refs for later cleanup/removal
+	#unit ids are restored after scene readiness, so runtime bookkeeping keys use stable node instance ids
+	#weak refs leave tower lifetime owned by the island while retaining cleanup access
 	var tower_refs: Dictionary[int, WeakRef] = {}
 	#the island signal outlives individual effect instances, so the callable must be stored for exact disconnect
 	var island_changed_callback: Callable
@@ -156,7 +160,7 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void: ##applies,
 		_remove_from_tower(state, tower)
 		return
 
-	var tower_id: int = tower.unit_id
+	var tower_id: int = tower.get_instance_id()
 	state.tower_refs[tower_id] = weakref(tower)
 	var count: int = evaluation.get(&"count", 0)
 	var previous_count: int = state.active_counts.get(tower_id, 0)
@@ -178,11 +182,13 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void: ##applies,
 func _play_condition_link_wisps(tower: Tower) -> void: ##visualizes the concrete towers responsible for a newly activated conditional relic grant
 	if not show_condition_link_wisps:
 		return
-	for source_tower: Tower in _get_condition_source_towers(tower):
+	for source_tower: Tower in get_condition_source_towers(tower):
 		BuffComponent.play_link_wisp(source_tower, tower)
 
-func _get_condition_source_towers(tower: Tower) -> Array[Tower]: ##returns live tower contributors for condition kinds that have a meaningful world-space source
+func get_condition_source_towers(tower: Tower) -> Array[Tower]: ##returns live tower contributors for the configured condition without changing runtime state
 	var source_towers: Array[Tower] = []
+	if not _is_valid_host(tower):
+		return source_towers
 	var seen_ids: Dictionary[int, bool] = {}
 	match condition_kind:
 		ConditionKind.ADJACENT_TYPES:
@@ -198,6 +204,8 @@ func _get_condition_source_towers(tower: Tower) -> Array[Tower]: ##returns live 
 			var report: TowerTopologyService.Report = Run.references.island.topology_service.query(tower, query)
 			for candidate: Tower in report.unique_towers:
 				_append_condition_source(source_towers, seen_ids, candidate, tower)
+		ConditionKind.CONTIGUOUS_TYPES:
+			return _get_contiguous_type_sources(tower)
 	return source_towers
 
 func _append_condition_source(sources: Array[Tower], seen_ids: Dictionary[int, bool], candidate: Tower, host_tower: Tower) -> void: ##dedupes multi-tile contributors while applying the same filter used by condition evaluation
@@ -261,6 +269,8 @@ func _count_matches(tower: Tower) -> int: ##normalizes the authored condition ki
 			return int(_matches_host_terrain(tower))
 		ConditionKind.ADJACENT_EMPTY_CELLS:
 			return _count_adjacent_empty_cells(tower)
+		ConditionKind.CONTIGUOUS_TYPES:
+			return _get_contiguous_type_sources(tower).size()
 	return 0
 
 func _count_adjacent_types(tower: Tower) -> int: ##dedupes by tower reference so multi-tile neighbors only contribute once
@@ -311,6 +321,40 @@ func _count_within_range_of_types(tower: Tower) -> int: ##uses topology queries 
 		if _matches_reference_tower(other_tower, tower):
 			count += 1
 	return count
+
+func _get_contiguous_type_sources(tower: Tower) -> Array[Tower]: ##flood-fills cardinally through active authored bridge types and returns matching contributors once each
+	var sources: Array[Tower] = []
+	var island: Island = _get_live_island()
+	if not is_instance_valid(island) or contiguous_bridge_tower_types.is_empty():
+		return sources
+
+	var visited_tower_ids: Dictionary[int, bool] = {tower.unit_id: true}
+	var visited_cells: Dictionary[Vector2i, bool] = {}
+	var queued_cells: Array[Vector2i] = tower.get_adjacent_cells()
+	var queue_index: int = 0
+	while queue_index < queued_cells.size():
+		var cell: Vector2i = queued_cells[queue_index]
+		queue_index += 1
+		if visited_cells.has(cell):
+			continue
+		visited_cells[cell] = true
+
+		var candidate: Tower = island.get_tower_on_tile(cell)
+		if not _is_valid_host_candidate(candidate, tower):
+			continue
+		if not contiguous_bridge_tower_types.has(candidate.type):
+			continue
+		if visited_tower_ids.has(candidate.unit_id):
+			continue
+
+		visited_tower_ids[candidate.unit_id] = true
+		if _matches_reference_tower(candidate, tower):
+			sources.append(candidate)
+		for adjacent_cell: Vector2i in candidate.get_adjacent_cells():
+			if not visited_cells.has(adjacent_cell):
+				queued_cells.append(adjacent_cell)
+
+	return sources
 
 func _has_global_types_on_both_sides(tower: Tower, horizontal: bool) -> bool: ##answers the bookends-style "something exists on both sides" condition without constructing a full path/query object
 	var matching_types: Array = []
@@ -412,7 +456,7 @@ func _apply_modifiers(state: ConditionalRelicState, tower: Tower, count: int) ->
 	if modifier_prototypes.is_empty() or not is_instance_valid(tower.modifiers_component):
 		return
 
-	var tower_id: int = tower.unit_id
+	var tower_id: int = tower.get_instance_id()
 	if not state.active_modifiers.has(tower_id):
 		var new_modifiers: Array[Modifier] = []
 		for modifier_prototype: ModifierDataPrototype in modifier_prototypes:
@@ -437,7 +481,7 @@ func _apply_scaled_values(modifier: Modifier, modifier_prototype: ModifierDataPr
 	modifier_prototype.apply_single_source_stacks(modifier, count)
 
 func _apply_granted_effect(state: ConditionalRelicState, tower: Tower) -> void: ##grants the optional local effect at most once per tower and tracks that fact separately from stat modifiers
-	var tower_id: int = tower.unit_id
+	var tower_id: int = tower.get_instance_id()
 	if not is_instance_valid(granted_effect):
 		return
 
@@ -456,7 +500,7 @@ func _apply_granted_effect(state: ConditionalRelicState, tower: Tower) -> void: 
 	state.active_effects[tower_id] = true
 
 func _remove_from_tower(state: ConditionalRelicState, tower: Tower) -> void: ##central teardown path for one tower, used both when conditions fail and when hosts become invalid
-	var tower_id: int = tower.unit_id
+	var tower_id: int = tower.get_instance_id()
 	state.active_counts.erase(tower_id)
 
 	if state.active_modifiers.has(tower_id):

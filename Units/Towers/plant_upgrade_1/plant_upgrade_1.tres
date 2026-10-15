@@ -12,7 +12,7 @@ cost = 0.0
 element = 3
 is_upgrade = true
 tower_name = "Upgraded Plant"
-tower_description = "Hardier killing flora. Within 3 cardinal tiles, gains +1 {UNIT_DAMAGE} per nearby {T_PLANT} and +0.25 per nearby {T_FOREST}."
+tower_description = "Forms a network of adjacent contiguous {T_PLANT|label=Plants} and {T_FOREST|label=Forests}. Gains +0.15 {UNIT_HITRATE} for each other Plant or Forest in its network."
 icon = ExtResource("1_a3n2r")
 tower_scene = ExtResource("4_tvtun")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

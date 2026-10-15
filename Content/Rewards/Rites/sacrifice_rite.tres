@@ -7,6 +7,7 @@
 [sub_resource type="Resource" id="Resource_self_damage_rule"]
 script = ExtResource("2_rule")
 tags = Array[int]([8])
+value = 4.0
 
 [resource]
 script = ExtResource("1_proto")
@@ -15,5 +16,6 @@ title = "Rite of Sacrifice"
 description = "rite reward"
 type = 3
 rite_type = 62
+base_rarity = 2
 tag_rules = Array[ExtResource("2_rule")]([SubResource("Resource_self_damage_rule")])
 metadata/_custom_type_script = "uid://dvfm5ntqw5j3e"

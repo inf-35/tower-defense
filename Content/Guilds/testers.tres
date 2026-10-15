@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GuildData" format=3 uid="uid://d4im80a5on0lt"]
+
+[ext_resource type="Script" uid="uid://ceq64w4b51rhw" path="res://Content/Guilds/_guild_data.gd" id="1_s4ayc"]
+[ext_resource type="Script" uid="uid://bdmptskvnyn3g" path="res://Content/Relics/_relic_data.gd" id="2_r4rp4"]
+
+[resource]
+script = ExtResource("1_s4ayc")
+title = "Testers"
+description = "testing purposes"
+starting_buildings = Array[int]([2, 6, 53, 5])
+metadata/_custom_type_script = "uid://ceq64w4b51rhw"

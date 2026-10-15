@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://bu6ws8p1g2ye2"]
 
-[ext_resource type="Texture2D" uid="uid://bhw12bw4eotj4" path="res://Assets/rite_iron.png" id="1_icon"]
+[ext_resource type="Texture2D" uid="uid://ct3vgw3tqm8a3" path="res://Assets/rite_lodestone.png" id="1_n6u0j"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_action_script"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_destroy"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="4_tower_data"]
@@ -19,7 +19,7 @@ upgrades_into = Dictionary[int, float]({
 tower_name = "Rite of Lodestone"
 rite_short_name = "lodestone"
 tower_description = "{RITE_LABEL}. Adjacent towers split each attack into 4 parts, each with 50% {UNIT_DAMAGE}."
-icon = ExtResource("1_icon")
-preview = ExtResource("1_icon")
+icon = ExtResource("1_n6u0j")
+preview = ExtResource("1_n6u0j")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])
 tower_scene = ExtResource("5_scene")

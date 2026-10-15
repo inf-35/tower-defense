@@ -18,7 +18,7 @@ upgrades_into = Dictionary[int, float]({
 })
 tower_name = "Rite of Copper"
 rite_short_name = "copper"
-tower_description = "{RITE_LABEL}. Affects the towers above and below this rite. When either affected tower applies {STATUS|label=Statuses}, those statuses are added to the other affected tower's attacks for the next 3 seconds."
+tower_description = "{RITE_LABEL}. When an adjacent tower applies {STATUS|label=Statuses}, every other adjacent tower adds those statuses to its attacks for the next 3 seconds."
 icon = ExtResource("1_aqavb")
 preview = ExtResource("1_aqavb")
 inspector_actions = Array[ExtResource("2_action_script")]([ExtResource("3_destroy")])

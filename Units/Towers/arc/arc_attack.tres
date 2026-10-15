@@ -13,9 +13,9 @@ metadata/_custom_type_script = "uid://c1jdwykpk8uvi"
 [resource]
 script = ExtResource("2_rfh0l")
 delivery_method = 1
-range = 45.0
+range = 40.0
 cooldown = 2.5
-damage = 5.0
+damage = 2.5
 status_effects = Array[ExtResource("3_itmld")]([SubResource("Resource_2yfpx")])
 projectile_speed = 200.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

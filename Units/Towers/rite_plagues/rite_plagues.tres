@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://7doleorjm0kp"]
 
-[ext_resource type="Texture2D" uid="uid://bve6w360ouk63" path="res://Assets/poison_rite.png" id="1_47pug"]
+[ext_resource type="Texture2D" uid="uid://3kc7rmumtsjp" path="res://Assets/rite_plagues.png" id="1_ecem6"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_0b6ek"]
 [ext_resource type="Resource" uid="uid://dqfraqb7purj7" path="res://Content/InspectorActions/destroy.tres" id="3_b1ovi"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_pdx2k"]
@@ -20,8 +20,8 @@ tags = Array[int]([0])
 tower_name = "Rite of Plagues"
 rite_short_name = "plagues"
 tower_description = "{RITE_LABEL}. Adjacent towers prioritize poisoned enemies. Attacks against poisoned enemies send 4 venom bolts carrying their {POISON} stacks to nearby unpoisoned enemies."
-icon = ExtResource("1_47pug")
-preview = ExtResource("1_47pug")
+icon = ExtResource("1_ecem6")
+preview = ExtResource("1_ecem6")
 inspector_actions = Array[ExtResource("2_0b6ek")]([ExtResource("3_b1ovi")])
 tower_scene = ExtResource("4_0yfmt")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

@@ -14,18 +14,134 @@
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_g6leu"]
 [ext_resource type="Resource" uid="uid://b14iw05wpe1g5" path="res://Units/Towers/venom/venom_attack.tres" id="9_pnk15"]
 [ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="10_8y7nu"]
-[ext_resource type="Texture2D" uid="uid://co8no1mocxejn" path="res://Assets/ballista_turret_base.png" id="11_ptbb3"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="12_13fi5"]
-[ext_resource type="Texture2D" uid="uid://4smmqg2tegf8" path="res://Assets/ballista_turret_bow.png" id="13_fgqcp"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="14_jq1xm"]
 [ext_resource type="Script" uid="uid://cvqwjq7kfsrua" path="res://Content/effect_prototype.gd" id="15_effect_base"]
 [ext_resource type="Script" uid="uid://d0eysadgnt3r6" path="res://Units/Towers/venom/venom_damage_poison_effect.gd" id="16_venom_effect"]
+[ext_resource type="Texture2D" uid="uid://dqaedqopy1egw" path="res://Assets/venom_turret_base.png" id="17_7xd5n"]
+[ext_resource type="Texture2D" uid="uid://o7esok1icd8i" path="res://Assets/venom_bow.png" id="18_mf2g5"]
 
 [sub_resource type="Resource" id="Resource_venom_damage_poison"]
 script = ExtResource("16_venom_effect")
 base_poison_stacks = 1.0
 damage_per_poison_stack = 1.0
 poison_duration = 1.5
+
+[sub_resource type="Animation" id="Animation_venom_reset"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.15, 0, 0.15, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:x")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics:position:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_venom_attack"]
+resource_name = "attack"
+length = 0.25
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(2.9802322e-08, 0.05000004, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.25, 0.7), Vector2(0.5, 1.2), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_venom_attack_windup"]
+resource_name = "attack_windup"
+length = 0.3
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/Bow:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.049999997, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.3, 0.8), Vector2(1.25, 0.7)]
+}
+
+[sub_resource type="Animation" id="Animation_venom_hit"]
+resource_name = "hit"
+length = 0.3
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0.4, 0, 0, 0, 0, -0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -0.4, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.06666667, 0.2, 0.3)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_venom"]
+_data = {
+&"RESET": SubResource("Animation_venom_reset"),
+&"attack": SubResource("Animation_venom_attack"),
+&"attack_windup": SubResource("Animation_venom_attack_windup"),
+&"hit": SubResource("Animation_venom_hit")
+}
 
 [node name="Venom" type="Node2D" unique_id=940353005 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
@@ -69,17 +185,19 @@ muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
 [node name="Graphics" type="Sprite2D" parent="." unique_id=1341314714]
-modulate = Color(0.8366667, 1, 0.8, 1)
+modulate = Color(0.9265, 1, 0.90999997, 1)
+self_modulate = Color(0.94283336, 1, 0.93, 1)
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("10_8y7nu")
 
 [node name="TurretFrame" type="Node2D" parent="Graphics" unique_id=599746218]
 z_index = 1
 use_parent_material = true
+scale = Vector2(1.2, 1.2)
 
 [node name="Base" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=845561567]
 use_parent_material = true
-texture = ExtResource("11_ptbb3")
+texture = ExtResource("17_7xd5n")
 
 [node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=2087648781]
 use_parent_material = true
@@ -89,7 +207,7 @@ scale = Vector2(1.3162339, 0.769)
 [node name="Bow" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=1844138296]
 use_parent_material = true
 position = Vector2(28.571423, 0)
-texture = ExtResource("13_fgqcp")
+texture = ExtResource("18_mf2g5")
 offset = Vector2(-30, 0)
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=466698493]
@@ -101,3 +219,5 @@ script = ExtResource("12_13fi5")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=188208225]
+root_motion_local = true
+libraries/ = SubResource("AnimationLibrary_venom")

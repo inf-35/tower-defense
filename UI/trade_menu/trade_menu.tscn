@@ -5,10 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://daqxrw1i4lig0" path="res://UI/trade_menu/shop_option_card.tscn" id="4_egd4h"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_xhnm1"]
 
-[node name="Trade" type="Panel" node_paths=PackedStringArray("wave_text", "exit_button", "card_list", "reroll_button")]
-use_parent_material = true
+[node name="Trade" type="Panel" unique_id=1432365353 node_paths=PackedStringArray("wave_text", "exit_button", "card_list", "reroll_button")]
 self_modulate = Color(1, 1, 1, 0)
 z_index = 1
+use_parent_material = true
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -22,7 +22,7 @@ card_list = NodePath("CenterContainer/main_container/card_list")
 card_scene = ExtResource("4_egd4h")
 reroll_button = NodePath("CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer/reroll")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=1313325641]
 use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
@@ -31,7 +31,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1531185930]
 use_parent_material = true
 layout_mode = 1
 anchors_preset = 15
@@ -40,13 +40,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="main_container" type="VBoxContainer" parent="CenterContainer"]
+[node name="main_container" type="VBoxContainer" parent="CenterContainer" unique_id=1378810749]
 use_parent_material = true
 custom_minimum_size = Vector2(1200, 0)
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
-[node name="title" type="RichTextLabel" parent="CenterContainer/main_container"]
+[node name="title" type="RichTextLabel" parent="CenterContainer/main_container" unique_id=2088517585]
 use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"rt_s20"
@@ -58,29 +58,33 @@ horizontal_alignment = 1
 script = ExtResource("3_xhnm1")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="card_list" type="VBoxContainer" parent="CenterContainer/main_container"]
+[node name="title_center" type="CenterContainer" parent="CenterContainer/main_container" unique_id=1577792167]
+use_parent_material = true
+layout_mode = 2
+
+[node name="card_list" type="VBoxContainer" parent="CenterContainer/main_container" unique_id=746742921]
 use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"vbox_20"
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer/main_container"]
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer/main_container" unique_id=518632651]
 use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"simple_panel"
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/main_container/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/main_container/PanelContainer" unique_id=1538607994]
 use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginMinor"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/main_container/PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/main_container/PanelContainer/MarginContainer" unique_id=1408805264]
 use_parent_material = true
 custom_minimum_size = Vector2(1200, 0)
 layout_mode = 2
 theme_type_variation = &"hbox_5"
 alignment = 2
 
-[node name="exit" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="exit" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer" unique_id=243163341]
 use_parent_material = true
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
@@ -88,7 +92,7 @@ size_flags_horizontal = 8
 text = "Exit"
 script = ExtResource("4_xhnm1")
 
-[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="InteractiveRichTextLabel" type="RichTextLabel" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer" unique_id=2009242413]
 use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -100,7 +104,7 @@ vertical_alignment = 1
 script = ExtResource("3_xhnm1")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="reroll" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="reroll" type="Button" parent="CenterContainer/main_container/PanelContainer/MarginContainer/HBoxContainer" unique_id=878783394]
 use_parent_material = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2

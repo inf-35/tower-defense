@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("2_chpw6")
-id_name = "blood_rite"
+id_name = "haste_rite"
 description = "this is a relic reward description"
 type = 3
 rite_type = 61

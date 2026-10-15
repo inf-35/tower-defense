@@ -17,6 +17,7 @@ var _encounter_data: BossEncounterData
 var _logic: BossEncounterLogic
 var _context: BossEncounterContext
 var _boss: Unit
+var _boss_spawn_position: Vector2 = Vector2.ZERO
 var _active_minions: Array[Unit] = []
 var _subwave_index: int = 0
 var _subwave_elapsed: float = 0.0
@@ -97,6 +98,11 @@ func fail_boss_reached_keep() -> void: ##ends the run immediately when the activ
 	_ending_encounter = true
 	if is_instance_valid(Run.phases):
 		Run.phases.start_game_over(false)
+
+func end_current_subwave() -> void: ##allows a rescue to skip remaining spawns and mandatory time without killing the persistent boss
+	if not _subwave_active or _ending_encounter:
+		return
+	_clear_current_subwave()
 
 func get_save_data() -> Dictionary: ##serializes prep-safe boss encounter state for save/load
 	if not has_active_encounter() or not is_instance_valid(_boss):
@@ -183,6 +189,7 @@ func _begin_encounter(wave_number: int, encounter_type: BossEncounters.Type) -> 
 		_logic.on_encounter_started(_context)
 
 func _spawn_boss(position: Vector2) -> void: ##spawns the persistent boss on normal enemy hitbox layers while exempting it from wave counters
+	_boss_spawn_position = position
 	_boss = Run.waves.spawn_enemy(_encounter_data.boss_type, position, false)
 	if not is_instance_valid(_boss):
 		push_error("BossEncounterService: Failed to spawn boss.")
@@ -196,6 +203,9 @@ func _spawn_boss(position: Vector2) -> void: ##spawns the persistent boss on nor
 func _on_boss_ready() -> void: ##binds healthbar updates once the boss components have entered the tree
 	if not is_instance_valid(_boss):
 		return
+	if is_instance_valid(_boss.movement_component):
+		_boss.movement_component.position = _boss_spawn_position
+		_boss.movement_component.cell_position = Island.position_to_cell(_boss_spawn_position)
 
 	if not _boss.died.is_connected(_on_boss_died):
 		_boss.died.connect(_on_boss_died, CONNECT_ONE_SHOT)
@@ -269,11 +279,12 @@ func _spawn_minions_for_subwave(subwave: BossSubwaveData, spawn_generation: int)
 
 		await Clock.await_game_time(enemy_stagger * 0.8)
 
-	_planned_minions_spawned = true
-	_check_subwave_clear()
+	if spawn_generation == _spawn_generation and _subwave_active and not _ending_encounter:
+		_planned_minions_spawned = true
+		_check_subwave_clear()
 
 func _track_minion(minion: Unit) -> void: ##registers one spawned boss minion against the current subwave clear condition
-	if not is_instance_valid(minion):
+	if not is_instance_valid(minion) or minion.is_queued_for_deletion():
 		return
 
 	_active_minions.append(minion)
@@ -418,6 +429,7 @@ func _clear_runtime_state() -> void: ##drops all local references without mutati
 	_logic = null
 	_context = null
 	_boss = null
+	_boss_spawn_position = Vector2.ZERO
 	_active_minions.clear()
 	_subwave_index = 0
 	_subwave_elapsed = 0.0

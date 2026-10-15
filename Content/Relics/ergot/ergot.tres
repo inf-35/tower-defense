@@ -10,7 +10,7 @@
 [sub_resource type="Resource" id="Resource_status"]
 script = ExtResource("1_status")
 status = 2
-bonus_stacks = 2.0
+bonus_stacks = 1.0
 bonus_time = 0.6
 projectile_tint = Color(0.54648, 0.81, 0.3159, 1)
 
@@ -27,5 +27,5 @@ type = 44
 global_effect = SubResource("Resource_effect")
 reward_tags = Array[int]([0])
 title = "Ergot"
-description = "Towers adjacent to 2 or more {T_FARM|label=Farms} inflict 2 stacks of {POISON}, lasting 0.6 seconds."
+description = "Towers adjacent to 2 or more {T_FARM|label=Farms} inflict 1 stack of {POISON}, lasting 0.6 seconds."
 icon = ExtResource("2_8tt7c")

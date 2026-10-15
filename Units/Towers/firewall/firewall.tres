@@ -11,15 +11,14 @@
 [resource]
 script = ExtResource("3_h0mnq")
 id = 23
-tags = Array[int]([2])
 size = Vector2i(3, 1)
-cost = 11.0
+cost = 12.0
 required_capacity = 2.0
 element = 2
+tags = Array[int]([2])
 tower_name = "Firewall"
 tower_description = "Sets alight enemies passing through the middle, briefly inflicting severe {BURN|label=Burn}."
 icon = ExtResource("5_a5i7e")
 preview = ExtResource("1_j2xu8")
 tower_scene = ExtResource("4_wrccv")
 metadata/_custom_type_script = "uid://dplrswcru72f4"
-

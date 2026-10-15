@@ -15,4 +15,5 @@ id_name = "passion_rite"
 description = "rite reward"
 type = 3
 rite_type = 73
+base_rarity = 0
 tag_rules = Array[ExtResource("2_tag_rule")]([SubResource("Resource_require_flame")])

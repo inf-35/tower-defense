@@ -10,8 +10,8 @@
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="7_ee5lu"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="7_qr74s"]
 [ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="8_0ifh0"]
-[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="8_i5fy8"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="9_taum7"]
+[ext_resource type="Texture2D" uid="uid://vfv6t5mgbplc" path="res://Assets/yellow_bolt.png" id="10_o37yk"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="10_qn8yx"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="11_xsfg1"]
 [ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="12_h4lng"]
@@ -21,9 +21,9 @@
 
 [sub_resource type="Resource" id="Resource_2s24f"]
 script = ExtResource("7_ee5lu")
-texture = ExtResource("8_i5fy8")
+texture = ExtResource("10_o37yk")
 radius = 1.5
-scale = 0.15
+scale = 0.08
 rotation_mode = 1
 
 [sub_resource type="Resource" id="Resource_e0edi"]

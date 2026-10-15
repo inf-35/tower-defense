@@ -5,6 +5,7 @@ const FARM_INCOME_KEY: StringName = &"farm_income_per_wave"
 
 @export var income_per_wave: float = 0.8 ##base gold earned each wave before farm-neighbor bonuses and relic modifiers
 @export var adjacent_farm_income_bonus: float = 0.4 ##additional base gold earned for each adjacent active farm
+@export_range(1.0, 8.0, 0.25) var payout_text_lifetime_multiplier: float = 4.0 ##display-time multiplier that keeps the dawn gold payout readable
 
 static func _static_init() -> void:
 	ModifiersComponent.register_dynamic_attribute(FARM_INCOME_KEY)
@@ -82,7 +83,8 @@ func _on_wave_ended(_wave: int) -> void:
 	Run.player.flux += total
 
 	if is_instance_valid(UI.floating_text_manager):
-		UI.floating_text_manager.show_text("+%.2f" % total, unit.global_position, Color.GOLD)
+		var popup_lifetime: float = UI.floating_text_manager.default_lifetime * payout_text_lifetime_multiplier
+		UI.floating_text_manager.show_ink_outlined_text("+%.2f" % total, unit.global_position, Color.GOLD, false, popup_lifetime)
 
 func get_display_data() -> Dictionary: ##reports the authored base income value for inspector/tooltip formatting
 	return {
