@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("4_1jlla")
+indexable = false
 id = 38
 cost = 22.5
 element = 2

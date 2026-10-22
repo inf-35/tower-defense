@@ -7,6 +7,7 @@ signal blocked_by_tower(tower: Tower)
 var movement_component: MovementComponent
 var goal: Vector2i = Vector2i.ZERO
 @export var ignore_walls: bool = false
+var _island: Island
 
 enum RouteMode {
 	DIRECT_TO_GOAL,
@@ -44,10 +45,32 @@ func inject_components(movement: MovementComponent) -> void:
 	movement_component = movement
 
 func _ready() -> void:
+	if not is_instance_valid(unit) or unit.abstractive:
+		set_process(false)
+		return
+	if not is_instance_valid(Run.references):
+		set_process(false)
+		return
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
+		set_process(false)
+		return
+	_island = island
 	#listen for global path updates (e.g. maze changed)
-	Run.references.island.navigation_grid_updated.connect(update_path)
-	Run.references.island.navigation_grid_soft_updated.connect(mark_path_dirty)
+	if not _island.navigation_grid_updated.is_connected(update_path):
+		_island.navigation_grid_updated.connect(update_path)
+	if not _island.navigation_grid_soft_updated.is_connected(mark_path_dirty):
+		_island.navigation_grid_soft_updated.connect(mark_path_dirty)
 	_navigation_update_accumulator = randf() * NAVIGATION_UPDATE_INTERVAL
+
+func _exit_tree() -> void:
+	if not is_instance_valid(_island):
+		return
+	if _island.navigation_grid_updated.is_connected(update_path):
+		_island.navigation_grid_updated.disconnect(update_path)
+	if _island.navigation_grid_soft_updated.is_connected(mark_path_dirty):
+		_island.navigation_grid_soft_updated.disconnect(mark_path_dirty)
+	_island = null
 
 func _process(delta: float) -> void:
 	if not Run.is_run_ready():

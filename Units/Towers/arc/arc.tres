@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cpmj7uy4t08x8"]
 
-[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="1_2fh55"]
-[ext_resource type="Texture2D" uid="uid://dgxexilx3w5jo" path="res://Assets/magic_missile.png" id="1_4usks"]
+[ext_resource type="Texture2D" uid="uid://duuwp2w2tyxpt" path="res://Assets/arc_icon.png" id="1_ukn7v"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="2_hqu0w"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_tq6l5"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_gfvjv"]
@@ -21,9 +20,9 @@ upgrades_into = Dictionary[int, float]({
 45: 25.0
 })
 tower_name = "Arc"
-tower_description = "Fires a bolt that chains through nearby enemies, {STUN|label=Stunning} them briefly. {UNIT_DAMAGE} and status duration diminish by 50% each enemy of the chain."
-icon = ExtResource("1_4usks")
-preview = ExtResource("1_2fh55")
+tower_description = "Fires a bolt that briefly {STUN|label=Stuns} enemies and chains through up to 3 other enemies. Jumps retain 50% of the triggering shot's {UNIT_DAMAGE} and timed status duration. Damaging split shots and overkill bolts can each chain once from their own payload; chain hits cannot start new chains."
+icon = ExtResource("1_ukn7v")
+preview = ExtResource("1_ukn7v")
 inspector_actions = Array[ExtResource("2_tq6l5")]([ExtResource("3_gfvjv"), ExtResource("4_o5d7s"), ExtResource("5_2fh55")])
 tower_scene = ExtResource("3_guccp")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

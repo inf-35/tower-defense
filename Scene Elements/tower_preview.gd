@@ -2,6 +2,8 @@
 extends Node2D
 class_name TowerPreview
 
+@export var preview_material: ShaderMaterial = preload("res://Content/CommonVisuals/placement_preview_material.tres") ##sketch recoloring applied before the existing placement tint and opacity
+
 #get a reference to the child sprite2d node
 var tower_sprite: Sprite2D
 var tower_type: Towers.Type
@@ -13,6 +15,7 @@ const BASE_PREVIEW_SCALE = 0.06
 
 func _ready() -> void:
 	tower_sprite = Sprite2D.new()
+	tower_sprite.material = preview_material
 	tower_sprite.scale = Vector2.ONE * BASE_PREVIEW_SCALE
 	add_child(tower_sprite)
 

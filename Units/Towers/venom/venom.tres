@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://xknv7mr16sw8"]
 
-[ext_resource type="Texture2D" uid="uid://cpkgwlj46017x" path="res://Assets/ballista_whole.png" id="1_26xvn"]
-[ext_resource type="Texture2D" uid="uid://ciwy6qntvxxcl" path="res://Assets/turret_icon.png" id="2_limp5"]
+[ext_resource type="Texture2D" uid="uid://c2wlxashf3lff" path="res://Assets/venom_icon.png" id="1_oguku"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_reeyc"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_qbrgi"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_vx6c2"]
@@ -16,7 +15,7 @@ element = 3
 tags = Array[int]([0, 3])
 tower_name = "Venom"
 tower_description = "Fires venom bolts. Hits inflict an additional stack of {POISON} for each 1 damage dealt, up to 8 stacks in total."
-icon = ExtResource("1_26xvn")
-preview = ExtResource("2_limp5")
+icon = ExtResource("1_oguku")
+preview = ExtResource("1_oguku")
 tower_scene = ExtResource("4_tqxgy")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

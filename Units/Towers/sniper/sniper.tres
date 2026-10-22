@@ -7,6 +7,7 @@
 
 [resource]
 script = ExtResource("2_k7tn8")
+indexable = false
 id = 13
 size = Vector2i(2, 2)
 cost = 15.0

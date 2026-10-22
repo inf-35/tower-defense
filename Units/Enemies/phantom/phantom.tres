@@ -12,6 +12,7 @@ script = ExtResource("1_juj3o")
 title = "Phantom"
 icon = ExtResource("2_icon")
 description = "Flickers forward along the path, punishing single chokepoints."
+indexable = false
 stat_displays = Array[ExtResource("3_stat")]([ExtResource("4_hp"), ExtResource("5_speed")])
 unit_scene = ExtResource("2_phe1k")
 flux_value = 0.4

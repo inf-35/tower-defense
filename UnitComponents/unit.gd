@@ -45,7 +45,7 @@ var effects: Dictionary[EffectPrototype.Schedule, Dictionary] = { ##2d table, [x
 }
 var _event_subscribers: Dictionary[GameEvent.EventType, Array] = {}
 #unit state
-var unit_id: int = Run.references.assign_unit_id()
+var unit_id: int = -get_instance_id() #prototype identities never consume run-owned ids
 var enemy_type: Units.Type ##assigned by Units.create_unit
 var blocked: bool #whether this unit is currently blocked by a tower
 
@@ -82,7 +82,9 @@ const GLOBAL_WAVE_EVENT_TYPES: Array[GameEvent.EventType] = [
 var behavior_stagger: int = 0
 
 func _ready() -> void:
-	add_to_group(DebugAssistant.GROUP_UNITS)
+	if not abstractive:
+		unit_id = Run.references.assign_unit_id()
+		add_to_group(DebugAssistant.GROUP_UNITS)
 	behavior_stagger = randi_range(0, BEHAVIOR_CYCLE)
 	name = name + " " + str(unit_id)
 	_setup_event_bus()
@@ -122,7 +124,10 @@ func _create_components() -> void:
 		hitbox = Hitbox.new() #generate range area
 		hitbox.name = "Hitbox"
 		hitbox.unit = self
-		add_child.call_deferred(hitbox)
+		if abstractive:
+			add_child(hitbox)
+		else:
+			add_child.call_deferred(hitbox)
 
 		var shape := RectangleShape2D.new()
 		shape.size = Vector2(Island.CELL_SIZE, Island.CELL_SIZE)
@@ -167,10 +172,9 @@ func _needs_buff_component() -> bool:
 	return self is Tower and Towers.is_tower_buff_source((self as Tower).type)
 
 func _prepare_components() -> void:
-	unit_id = Run.references.assign_unit_id() #assign this unit a unit id
-
 	if is_instance_valid(hitbox) and abstractive:
-		hitbox.monitorable = false #disables the hitbox (if abstractive)
+		hitbox.monitoring = false
+		hitbox.monitorable = false
 
 	died.connect(func(hit_report_data: HitReportData):
 		hit_report_data.flux_value = flux_value #submit base flux value to be modified
@@ -235,7 +239,7 @@ func _prepare_components() -> void:
 	if attack_component != null:
 		attack_component.inject_components(modifiers_component)
 
-	if range_component != null and attack_component.attack_data:
+	if range_component != null and is_instance_valid(attack_component) and attack_component.attack_data:
 		range_component.inject_components(attack_component, modifiers_component)
 
 	for child in get_children(true):
@@ -243,7 +247,7 @@ func _prepare_components() -> void:
 			child.unit = self
 
 func _setup_event_bus() -> void: ##subscribes this unit only to the three global wave events that must enter local effect scope
-	if not is_instance_valid(Run.player):
+	if abstractive or not is_instance_valid(Run.player):
 		return
 	Run.player.subscribe_events(GLOBAL_WAVE_EVENT_TYPES, _on_global_wave_event)
 
@@ -294,7 +298,7 @@ func _dispatch_event(event: GameEvent, propagate_global: bool) -> void: ##preser
 	event.unit = self
 	if event.data.recursion <= EffectInstance.GLOBAL_RECURSION_LIMIT:
 		_dispatch_local_effects(event)
-		if propagate_global and is_instance_valid(Run.player):
+		if propagate_global and not abstractive and is_instance_valid(Run.player):
 			Run.player.publish_event(self, event)
 
 	_dispatch_local_subscribers(event)
@@ -330,6 +334,18 @@ func _dispatch_local_subscribers(event: GameEvent) -> void: ##routes one local e
 func _exit_tree() -> void: ##removes run-owned wave subscriptions while the player service is still available
 	if is_instance_valid(Run.player):
 		Run.player.unsubscribe_events(GLOBAL_WAVE_EVENT_TYPES, _on_global_wave_event)
+	if abstractive:
+		#effect instances are manually owned objects, not children of the cached prototype.
+		var instances: Array[EffectInstance] = []
+		for prototype: EffectPrototype in effect_prototypes:
+			for instance: EffectInstance in get_effect_instances_by_prototype(prototype):
+				if not instances.has(instance):
+					instances.append(instance)
+		for instance: EffectInstance in instances:
+			instance.detach()
+			instance.free()
+		for schedule: EffectPrototype.Schedule in effects:
+			effects[schedule].clear()
 
 func _register_world_ui() -> void: ##registers this unit's health model with the island-owned pooled world-space presenter
 	if abstractive or disabled or has_meta(ID.UnitMeta.IS_BOSS):
@@ -615,6 +631,8 @@ func take_hit(hit: HitData) -> void:
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"hits_received")
 
+	var incoming_damage: float = hit.damage
+	var incoming_status_effects: Dictionary[Attributes.Status, Vector2] = hit.status_effects.duplicate()
 	hit.damage *= get_stat(Attributes.id.DAMAGE_TAKEN) as float
 	hit.damage += _resolve_flat_damage_taken(hit, get_stat(Attributes.id.FLAT_DAMAGE_TAKEN) as float)
 
@@ -641,6 +659,9 @@ func take_hit(hit: HitData) -> void:
 	hit_report.target = self
 	hit_report.attack_id = hit.attack_id
 	hit_report.primary = hit.primary
+	hit_report.incoming_damage = incoming_damage
+	hit_report.incoming_status_effects = incoming_status_effects
+	hit_report.incoming_hit = hit
 	hit_report.velocity = hit.velocity
 	if is_instance_valid(hit.source): hit_report.source = hit.source
 	hit_report.damage_caused = direct_health_damage

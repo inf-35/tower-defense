@@ -16,13 +16,17 @@ class_name SettingsMenu
 
 @export var settings_root: Control #the container to hide/show
 @export var pause_root: Control
+@export var index_root: Control ##shared scene-authored index page used from both the title screen and paused menus
 
 #state
 enum State {
 	PAUSE, #the pause menu that shows up ingame
 	SETTINGS, #the settings menu
+	INDEX,
+	CLOSED,
 }
-var state: State
+var state: State = State.CLOSED
+var _index_return_state: State = State.CLOSED
 
 #--- audio bus indices ---
 var _bus_master: int
@@ -68,17 +72,28 @@ func _ready() -> void:
 	#start hidden
 	visible = false
 
-func open_menu() -> void:
+func open_menu(initial_state: State) -> void: ##captures pause ownership once and treats a directly opened page as returning outside the menu
+	if not visible:
+		_saved_gamespeed = Clock.speed_multiplier
+		Clock.speed_multiplier = 0.0
+	enter_state(initial_state)
 	visible = true
-	_saved_gamespeed = Clock.speed_multiplier
-	Clock.speed_multiplier = 0.0
 
-func close_menu() -> void:
+func close_menu() -> void: ##hides the active page and restores the speed captured when the shared menu opened
+	if not visible:
+		return
+	enter_state(State.CLOSED)
 	visible = false
 	Clock.speed_multiplier = _saved_gamespeed
 	closed.emit()
 
 func back() -> void:
+	if state == State.INDEX:
+		if _index_return_state == State.CLOSED:
+			close_menu()
+		else:
+			enter_state(_index_return_state)
+		return
 	if state == State.SETTINGS and is_instance_valid(Run.phases) and Run.phases.in_game:
 		enter_state(State.PAUSE)
 		return
@@ -87,15 +102,17 @@ func back() -> void:
 
 
 func enter_state(input_state: State) -> void:
-	match input_state:
-		State.SETTINGS:
-			settings_root.visible = true
-			pause_root.visible = false
-		State.PAUSE:
-			settings_root.visible = false
-			pause_root.visible = true
+	if input_state == State.INDEX and state != State.INDEX:
+		_index_return_state = state
+	settings_root.visible = input_state == State.SETTINGS
+	pause_root.visible = input_state == State.PAUSE
+	index_root.visible = input_state == State.INDEX
 
 	state = input_state
+
+func _on_index_pressed() -> void: ##opens the authored index while preserving the menu's existing pause ownership
+	enter_state(State.INDEX)
+
 #--- internal logic ---
 
 func _evaluate_save_validity() -> void:

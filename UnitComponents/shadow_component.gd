@@ -53,8 +53,14 @@ static var _shared_height_material: ShaderMaterial
 
 func _ready() -> void: ##builds the shadow sprites once, then only keeps processing enabled for authored dynamic shadows
 	set_process(is_dynamic)
+	var parent: Node = get_parent()
+	var unit_owner: Node = parent
+	while is_instance_valid(unit_owner) and not unit_owner is Unit:
+		unit_owner = unit_owner.get_parent()
+	if unit_owner is Unit and (unit_owner as Unit).abstractive:
+		return
+
 	#1. find the parent sprite to copy
-	var parent = get_parent()
 	await parent.ready
 	if parent is Sprite2D:
 		parent_sprite = parent

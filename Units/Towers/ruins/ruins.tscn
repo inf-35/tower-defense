@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://UnitComponents/tower.gd" id="1_1"]
 [ext_resource type="Script" path="res://Content/stat_display_info.gd" id="2_2"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" path="res://Assets/ruins.png" id="8_8"]
 [ext_resource type="Script" path="res://UnitComponents/modifiers_component.gd" id="9_9"]
 [ext_resource type="Script" path="res://Units/Towers/ruins/ruins_behavior.gd" id="10_10"]
+[ext_resource type="Resource" path="res://Content/Environmental/ruins/default_ruins_data.tres" id="11_ruins_data"]
 
 [sub_resource type="Resource" id="1"]
 script = ExtResource("7_7")
@@ -76,3 +77,4 @@ libraries = {
 
 [node name="RuinsBehavior" type="Node" parent="."]
 script = ExtResource("10_10")
+ruins_data = ExtResource("11_ruins_data")

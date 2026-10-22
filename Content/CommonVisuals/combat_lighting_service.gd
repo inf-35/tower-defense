@@ -6,6 +6,7 @@ const DEFAULT_NIGHT_COLOR: Color = Color(0.501, 0.589, 0.91, 1.0)
 const DEFAULT_NIGHT_TRANSITION_SECONDS: float = 1.0
 const DEFAULT_UI_NIGHT_TINT_STRENGTH: float = 0.22
 const UNIT_LIGHTING_WARMUP_SHADERS: Array[Shader] = [
+	preload("res://Shaders/combat_light_mix.gdshader"),
 	preload("res://Shaders/unit_effects.gdshader"),
 	preload("res://Shaders/swept_shadow.gdshader"),
 	preload("res://Shaders/silhouette.gdshader"),
@@ -85,7 +86,7 @@ func warm_up_shaders() -> void: ##renders day and night material variants during
 		viewport.add_child(sprite)
 
 	#route strokes use polygon geometry, which needs a separate variant from sprite rectangles.
-	var line_materials: Array[Material] = [null, path_material]
+	var line_materials: Array[Material] = [preload("res://Content/CommonVisuals/combat_light_mix_material.tres"), path_material]
 	for index: int in range(line_materials.size()):
 		var line := Line2D.new()
 		line.material = line_materials[index]
@@ -98,6 +99,7 @@ func warm_up_shaders() -> void: ##renders day and night material variants during
 	light.texture = texture
 	light.texture_scale = 128.0
 	light.position = Vector2(32.0, 32.0)
+	light.blend_mode = Light2D.BLEND_MODE_MIX
 	light.shadow_enabled = false
 	light.enabled = false
 	viewport.add_child(light)

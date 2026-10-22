@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://UI/embark/embark_choice.gd" id="1_choice"]
+[ext_resource type="Script" path="res://UI/_animatable_ui.gd" id="2_motion"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_input"]
+
+[node name="Choice" type="Button" node_paths=PackedStringArray("motion", "caption")]
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 3
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_input")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_input")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_input")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_input")
+script = ExtResource("1_choice")
+motion = NodePath("Motion")
+caption = NodePath("Motion/Paper/Padding/Caption")
+
+[node name="Motion" type="Control" parent="." node_paths=PackedStringArray("content")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_motion")
+content = NodePath("Paper")
+hover_enabled = false
+
+[node name="Paper" type="PanelContainer" parent="Motion"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Padding" type="MarginContainer" parent="Motion/Paper"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="Caption" type="Label" parent="Motion/Paper/Padding"]
+layout_mode = 2
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

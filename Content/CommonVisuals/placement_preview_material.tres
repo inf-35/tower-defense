@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c4oga281li2yg"]
+
+[ext_resource type="Shader" uid="uid://djwf67g1nexs3" path="res://Shaders/placement_preview.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/ink_color = Color(0.30980393, 0.25882354, 0.18823528, 1)
+shader_parameter/paper_color = Color(0.99215686, 0.9529412, 0.89411765, 1)
+shader_parameter/ink_tolerance = 0.499999988824

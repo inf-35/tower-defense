@@ -33,8 +33,8 @@ extends Resource
 @export var night_ambient_color: Color = Color(0.501, 0.589, 0.91, 1.0) ##canvas-wide combat tint applied before local population-building lights
 @export_range(0.01, 2.0, 0.01) var night_transition_seconds: float = 0.5 ##real-time duration of the day-to-night and night-to-day fades
 @export_color_no_alpha var night_light_color: Color = Color(1.0, 0.63, 0.2, 1.0) ##environment-wide hue applied to every local combat light
-@export_range(0.0, 4.0, 0.01) var night_light_energy_multiplier: float = 1.0 ##environment-wide multiplier applied to each light source before pixel-level accumulation and capping
-@export_range(0.0, 1.0, 0.01) var night_max_light_energy: float = 0.42 ##hard cap on accumulated local light at any one screen pixel
+@export_range(0.0, 4.0, 0.01) var night_light_energy_multiplier: float = 1.0 ##scales each native light's target brightness; does not control mix opacity or cap accumulated illumination
+@export_range(0.0, 1.0, 0.01) var night_max_light_energy: float = 0.42 ##additional per-source target-brightness multiplier retained under its existing resource key; not an accumulated-light cap
 @export_range(0.0, 2.0, 0.01) var night_surface_light_strength: float = 1.0 ##rate at which local light restores the underlying paper and paint values
 @export_range(0.0, 1.0, 0.01) var night_surface_tint_strength: float = 0.7 ##amount of authored light hue mixed into restored surfaces
 @export_range(0.0, 2.0, 0.01) var night_lit_chroma_scale: float = 1.0 ##luminance-preserving colour recovery applied only inside local lights

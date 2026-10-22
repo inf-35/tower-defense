@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("4_tl1yj")
+indexable = false
 id = 39
 cost = 21.0
 element = 2

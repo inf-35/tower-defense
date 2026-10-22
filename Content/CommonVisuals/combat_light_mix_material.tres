@@ -1,0 +1,6 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://Shaders/combat_light_mix.gdshader" id="1_light"]
+
+[resource]
+shader = ExtResource("1_light")

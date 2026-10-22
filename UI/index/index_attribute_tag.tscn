@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://42i3ee6gr5g3"]
+
+[ext_resource type="Script" uid="uid://hrplhdo2ew0i" path="res://UI/index/index_attribute_tag.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_theme"]
+
+[node name="IndexAttributeTag" type="MarginContainer" unique_id=270644445 node_paths=PackedStringArray("paper", "paper_frame", "value_label")]
+custom_minimum_size = Vector2(82, 54)
+mouse_filter = 2
+theme = ExtResource("2_theme")
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+script = ExtResource("1_script")
+paper = NodePath("PaperFrame/Paper")
+paper_frame = NodePath("PaperFrame")
+value_label = NodePath("PaperFrame/Paper/Padding/Value")
+
+[node name="PaperFrame" type="Control" parent="." unique_id=1812802575]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Paper" type="PanelContainer" parent="PaperFrame" unique_id=1239122006]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -22.0
+offset_right = 22.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"simple_panel"
+
+[node name="Padding" type="MarginContainer" parent="PaperFrame/Paper" unique_id=682189857]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 5
+
+[node name="Value" type="Label" parent="PaperFrame/Paper/Padding" unique_id=767895735]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Attribute"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -28,8 +28,10 @@ class_name AnimatableUI
 
 #--- state ---
 var _current_tween: Tween
+var _scale_tween: Tween
 var _idle_tween: Tween #track idle separately so entrance/hover don't kill it
 var _is_hovered: bool = false
+var _is_focused: bool = false
 var _is_emphasized: bool = false
 
 func _ready() -> void:
@@ -91,6 +93,7 @@ func animate_entrance(custom_delay: float = -1.0) -> void:
 
 func snap_to_default() -> void:
 	if _current_tween: _current_tween.kill()
+	if _scale_tween: _scale_tween.kill()
 	content.position = Vector2.ZERO
 	content.scale = _get_target_scale()
 	content.rotation = 0.0
@@ -140,6 +143,15 @@ func set_hover_active(is_hovered: bool) -> void: ##lets parent controls drive th
 	_refresh_scale()
 
 
+func set_focus_active(is_focused: bool) -> void: ##lets parent controls drive the enlarged scale from keyboard or programmatic focus
+	if not content:
+		return
+	if _is_focused == is_focused:
+		return
+	_is_focused = is_focused
+	_refresh_scale()
+
+
 func set_emphasized(is_emphasized: bool) -> void: ##pins the content to hover scale without fighting the regular hover tween
 	if _is_emphasized == is_emphasized:
 		return
@@ -147,16 +159,18 @@ func set_emphasized(is_emphasized: bool) -> void: ##pins the content to hover sc
 	_refresh_scale()
 
 
-func _refresh_scale() -> void: ##keeps hover and persistent emphasis on the same scale target
+func _refresh_scale() -> void: ##keeps hover, focus, and persistent emphasis on the same scale target
 	if not content:
 		return
-	var hover_tween: Tween = create_tween()
-	hover_tween.tween_property(content, "scale", _get_target_scale(), hover_duration)\
+	if _scale_tween:
+		_scale_tween.kill()
+	_scale_tween = create_tween()
+	_scale_tween.tween_property(content, "scale", _get_target_scale(), hover_duration)\
 		.set_trans(transition_type).set_ease(ease_type)
 
 
-func _get_target_scale() -> Vector2: ##selected and hovered states intentionally share the same enlarged scale
-	if _is_hovered or _is_emphasized:
+func _get_target_scale() -> Vector2: ##returns the enlarged target when hovered, focused, or emphasized
+	if _is_hovered or _is_focused or _is_emphasized:
 		return hover_scale
 	return Vector2.ONE
 

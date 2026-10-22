@@ -42,22 +42,25 @@ const MAX_ENEMY_PRESENTATION_SCALE: float = 0.9
 const SMALL_ENEMY_VISUAL_EXTENT: float = 6.0
 const LARGE_ENEMY_VISUAL_EXTENT: float = 11.6
 
-func start() -> void:
-	unit_stats.clear()
-	unit_prototypes.clear()
-	#dont clear units modified by difficulty, as unitdatas are persistent
+func _init() -> void:
 	_load_all_unit_stats()
 
-func get_unit_prototype(unit_type: Type) -> Unit:
-	if (not unit_prototypes.has(unit_type)) or (not is_instance_valid(unit_prototypes[unit_type])): #if no prototype
-		unit_prototypes[unit_type] = create_unit(unit_type) #create prototypical unit
-		unit_prototypes[unit_type].abstractive = true #disable all effects and events
-		unit_prototypes[unit_type].visible = false
-		add_child(unit_prototypes[unit_type]) #trigger _ready() calls
+func start() -> void: ##rebuilds enemy previews for this run without reloading shared definitions
+	clear_prototypes()
 
-		unit_prototypes[unit_type].position = Vector2(-2047 * unit_type * unit_prototypes[unit_type].unit_id, -4210 * unit_type * unit_prototypes[unit_type].unit_id) #somewhere extremely far away
+func clear_prototypes() -> void: ##releases cached nodes while their player subscriptions can still be disconnected
+	var prototypes: Array[Unit] = unit_prototypes.values()
+	unit_prototypes.clear()
+	for prototype: Unit in prototypes:
+		if is_instance_valid(prototype):
+			prototype.free()
 
-		#these prototype units provide a "default" baseline to lookup from.
+func get_unit_prototype(unit_type: Type) -> Unit: ##returns the same stat pipeline in the menu or the current run, without enabling simulation
+	if not unit_prototypes.has(unit_type) or not is_instance_valid(unit_prototypes[unit_type]):
+		var prototype: Unit = create_unit(unit_type, true)
+		unit_prototypes[unit_type] = prototype
+		add_child(prototype)
+		prototype.movement_component.position = Vector2(-2047, -4210) * (int(unit_type) + 1)
 	return unit_prototypes[unit_type]
 
 func get_unit_name(unit: Type) -> String:
@@ -105,8 +108,12 @@ func get_enemy_presentation_scale(graphics: Sprite2D) -> float: ##maps the autho
 	var size_class: float = sqrt(smoothstep(SMALL_ENEMY_VISUAL_EXTENT, LARGE_ENEMY_VISUAL_EXTENT, visual_extent))
 	return lerpf(MIN_ENEMY_PRESENTATION_SCALE, MAX_ENEMY_PRESENTATION_SCALE, size_class)
 
-func create_unit(unit_type: Type) -> Unit:
+func create_unit(unit_type: Type, as_prototype: bool = false) -> Unit:
 	var _unit: Unit = get_unit_scene(unit_type).instantiate()
+	if as_prototype:
+		_unit.abstractive = true
+		_unit.visible = false
+		_unit.process_mode = Node.PROCESS_MODE_DISABLED
 	_unit.flux_value = get_unit_flux(unit_type)
 	_unit.strength = get_unit_strength(unit_type)
 	_unit.enemy_type = unit_type
@@ -130,7 +137,7 @@ func create_unit(unit_type: Type) -> Unit:
 		CONNECT_ONE_SHOT
 	)
 
-	if Run.current_game_difficulty == Run.GameDifficulty.NORMAL:
+	if Run.has_active_run() and Run.current_game_difficulty == Run.GameDifficulty.NORMAL:
 		#wait for the unit to enter the tree and call _ready()
 		_unit.ready.connect(func():
 			if not is_instance_valid(_unit.modifiers_component):

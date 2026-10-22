@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode blend_mix;
 
+#include "res://Shaders/combat_light_mix.gdshaderinc"
+
 uniform sampler2D grid_data_texture : filter_linear;
 uniform sampler2D distortion_texture : repeat_enable, filter_linear;
 uniform sampler2D noise_texture : repeat_enable, filter_linear;

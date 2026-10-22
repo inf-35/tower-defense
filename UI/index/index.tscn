@@ -1,9 +1,139 @@
 [gd_scene format=3 uid="uid://7lbbh8ua0yys"]
 
-[node name="Index" type="Control" unique_id=1509876196]
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_theme"]
+[ext_resource type="PackedScene" uid="uid://dhnu4jl86txm" path="res://UI/index/index_slot.tscn" id="2_slot"]
+[ext_resource type="Script" uid="uid://epiqpu6uok5r" path="res://UI/index/index_page.gd" id="3_page"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_sections"]
+
+[node name="Index" type="Control" unique_id=1509876196 node_paths=PackedStringArray("structures_tab", "relics_tab", "enemies_tab", "scroll_container", "entry_grid", "tooltip_host")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("3_page")
+structures_tab = NodePath("MainFrame/MainPanel/Content/Sections/Tabs/Structures")
+relics_tab = NodePath("MainFrame/MainPanel/Content/Sections/Tabs/Relics")
+enemies_tab = NodePath("MainFrame/MainPanel/Content/Sections/Tabs/Enemies")
+scroll_container = NodePath("MainFrame/MainPanel/Content/Sections/Scroll")
+entry_grid = NodePath("MainFrame/MainPanel/Content/Sections/Scroll/Grid")
+index_slot_scene = ExtResource("2_slot")
+tooltip_host = NodePath(".")
+
+[node name="MainFrame" type="Control" parent="." unique_id=990307442]
+layout_mode = 1
+anchor_left = 0.08
+anchor_top = 0.12
+anchor_right = 0.92
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MainPanel" type="PanelContainer" parent="MainFrame" unique_id=1011244070]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 539.8
+offset_top = 40.8
+offset_right = -545.80005
+offset_bottom = -45.200073
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"shopcontainer"
+
+[node name="Content" type="MarginContainer" parent="MainFrame/MainPanel" unique_id=647614621]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 0
+
+[node name="Sections" type="VBoxContainer" parent="MainFrame/MainPanel/Content" unique_id=1424012960]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Tabs" type="HBoxContainer" parent="MainFrame/MainPanel/Content/Sections" unique_id=138875555]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Structures" type="Button" parent="MainFrame/MainPanel/Content/Sections/Tabs" unique_id=603307095]
+custom_minimum_size = Vector2(180, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_sections")
+text = "Structures"
+
+[node name="Relics" type="Button" parent="MainFrame/MainPanel/Content/Sections/Tabs" unique_id=906832485]
+custom_minimum_size = Vector2(180, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+toggle_mode = true
+button_group = SubResource("ButtonGroup_sections")
+text = "Relics"
+
+[node name="Enemies" type="Button" parent="MainFrame/MainPanel/Content/Sections/Tabs" unique_id=1006272489]
+custom_minimum_size = Vector2(180, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+toggle_mode = true
+button_group = SubResource("ButtonGroup_sections")
+text = "Enemies"
+
+[node name="Scroll" type="ScrollContainer" parent="MainFrame/MainPanel/Content/Sections" unique_id=1094681314]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="MainFrame/MainPanel/Content/Sections/Scroll" unique_id=1526977143]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 6
+
+[node name="TitleAnchor" type="Control" parent="MainFrame" unique_id=1158636703]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.0050000004
+offset_left = -145.86462
+offset_right = 117.23047
+offset_bottom = 100.0
+grow_horizontal = 2
+rotation = -0.017453292
+pivot_offset = Vector2(150, 44)
+mouse_filter = 2
+
+[node name="TitlePanel" type="PanelContainer" parent="MainFrame/TitleAnchor" unique_id=411205742]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"simple_panel"
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/TitleAnchor/TitlePanel" unique_id=454905423]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 12
+
+[node name="Title" type="Label" parent="MainFrame/TitleAnchor/TitlePanel/Padding" unique_id=1923584149]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Index"
+horizontal_alignment = 1
+vertical_alignment = 1

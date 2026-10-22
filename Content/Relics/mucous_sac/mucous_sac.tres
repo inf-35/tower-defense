@@ -14,6 +14,7 @@ metadata/_custom_type_script = "uid://crqsbq6q4f12w"
 
 [resource]
 script = ExtResource("3_i5j5g")
+indexable = false
 type = 18
 global_effect = SubResource("Resource_86uia")
 title = "Spore Sac"

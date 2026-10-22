@@ -1,0 +1,331 @@
+[gd_scene format=3 uid="uid://cis162bjkk48y"]
+
+[ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_theme"]
+[ext_resource type="PackedScene" path="res://UI/embark/guild_card.tscn" id="2_card"]
+[ext_resource type="Texture2D" uid="uid://jsvqbu28lwi1" path="res://Assets/shop_frame.png" id="2_f42ql"]
+[ext_resource type="Texture2D" uid="uid://djssw4y7st7r3" path="res://Assets/keep.png" id="3_testers_icon"]
+[ext_resource type="Texture2D" uid="uid://ddvnt278gnlct" path="res://Assets/magic_beans.png" id="4_pioneers_icon"]
+[ext_resource type="Script" uid="uid://cbk56157w1n3u" path="res://UI/embark/embark_loadout.gd" id="5_loadout"]
+[ext_resource type="PackedScene" uid="uid://dhnu4jl86txm" path="res://UI/index/index_slot.tscn" id="6_loadout_card"]
+[ext_resource type="Script" uid="uid://bmbgvhwegnmhk" path="res://UI/embark/embark_page.gd" id="7_page"]
+[ext_resource type="PackedScene" path="res://UI/embark/choice_button.tscn" id="8_choice"]
+[ext_resource type="Resource" uid="uid://d4im80a5on0lt" path="res://Content/Guilds/testers.tres" id="9_testers"]
+[ext_resource type="Resource" uid="uid://bk7dgodpk2tik" path="res://Content/Guilds/pioneers.tres" id="10_pioneers"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hvesx"]
+content_margin_top = 20.0
+content_margin_bottom = 20.0
+texture = ExtResource("2_f42ql")
+texture_margin_left = 190.0
+texture_margin_top = 205.0
+texture_margin_right = 211.0
+texture_margin_bottom = 190.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(0, 0, 600, 600)
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_ixus3"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_44dyd"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_o5r27"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_e6kle"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_x5x47"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_xg4nm"]
+
+[node name="Embark" type="Control" unique_id=973310809 node_paths=PackedStringArray("guild_options", "woods_option", "winter_option", "medium_option", "hard_option", "title_label", "guild_title", "guild_description", "loadout", "embark_button", "cancel_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("7_page")
+guild_options = [NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Testers"), NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers")]
+woods_option = NodePath("MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/Woods")
+winter_option = NodePath("MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/Winter")
+medium_option = NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/DifficultyOptions/Medium")
+hard_option = NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/DifficultyOptions/Hard")
+title_label = NodePath("MainFrame/TitleCenter/TitlePanel/Padding/Title")
+guild_title = NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription/Padding/Content/Title")
+guild_description = NodePath("MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription/Padding/Content/Description")
+loadout = NodePath("MainFrame/MainPanel/Padding/Content/LoadoutBarSpace")
+embark_button = NodePath("MainFrame/EmbarkButton")
+cancel_button = NodePath("MainFrame/CancelButton")
+
+[node name="MainFrame" type="Control" parent="." unique_id=2139114890]
+layout_mode = 1
+anchor_left = 0.08
+anchor_top = 0.12
+anchor_right = 0.92
+anchor_bottom = 0.86
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MainPanel" type="PanelContainer" parent="MainFrame" unique_id=708153969]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"shopcontainer"
+theme_override_styles/panel = SubResource("StyleBoxTexture_hvesx")
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/MainPanel" unique_id=1209648575]
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+theme_override_constants/margin_bottom = 80
+
+[node name="Content" type="VBoxContainer" parent="MainFrame/MainPanel/Padding" unique_id=1535195950]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Columns" type="HBoxContainer" parent="MainFrame/MainPanel/Padding/Content" unique_id=697229431]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 40
+
+[node name="Guilds" type="VBoxContainer" parent="MainFrame/MainPanel/Padding/Content/Columns" unique_id=2132220788]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="GuildScroll" type="ScrollContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds" unique_id=93873906]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+follow_focus = true
+vertical_scroll_mode = 0
+
+[node name="GuildPadding" type="MarginContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll" unique_id=1591539660]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="GuildCards" type="HBoxContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding" unique_id=758958526]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Testers" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards" unique_id=785975889 instance=ExtResource("2_card")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_ixus3")
+guild = ExtResource("9_testers")
+
+[node name="Icon" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Testers/Motion/Paper/Padding/Content" index="0"]
+texture = ExtResource("3_testers_icon")
+
+[node name="Title" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Testers/Motion/Paper/Padding/Content" index="1"]
+text = "Testers"
+
+[node name="Pioneers" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards" unique_id=384665571 instance=ExtResource("2_card")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_44dyd")
+guild = ExtResource("10_pioneers")
+
+[node name="Icon" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers/Motion/Paper/Padding/Content" index="0"]
+texture = ExtResource("4_pioneers_icon")
+
+[node name="Title" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers/Motion/Paper/Padding/Content" index="1"]
+text = "Pioneers"
+
+[node name="DifficultyOptions" type="HBoxContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds" unique_id=1964396519]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Medium" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/DifficultyOptions" unique_id=911562444 instance=ExtResource("8_choice")]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_o5r27")
+title = "Medium"
+
+[node name="Hard" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/DifficultyOptions" unique_id=584201485 instance=ExtResource("8_choice")]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_e6kle")
+title = "Hard"
+
+[node name="GuildDescription" type="PanelContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds" unique_id=1199626274]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription" unique_id=1314196961]
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="Content" type="VBoxContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription/Padding" unique_id=1054670307]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription/Padding/Content" unique_id=2095192177]
+layout_mode = 2
+theme_type_variation = &"LabelInlineheader"
+autowrap_mode = 2
+
+[node name="Description" type="RichTextLabel" parent="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildDescription/Padding/Content" unique_id=1524361398]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 32
+autowrap_mode = 2
+
+[node name="ReservedSpace" type="Control" parent="MainFrame/MainPanel/Padding/Content/Columns" unique_id=1745087494]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="EnvironmentPanel" type="PanelContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace" unique_id=1580536704]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel" unique_id=43777195]
+layout_mode = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="EnvironmentOptions" type="VBoxContainer" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding" unique_id=2056301307]
+layout_mode = 2
+theme_type_variation = &"vbox_20"
+alignment = 1
+
+[node name="Title" type="Label" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions" unique_id=1966121729]
+layout_mode = 2
+text = "Choose an environment"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Woods" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions" unique_id=671541134 instance=ExtResource("8_choice")]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_x5x47")
+title = "Woods"
+
+[node name="Winter" parent="MainFrame/MainPanel/Padding/Content/Columns/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions" unique_id=1550973430 instance=ExtResource("8_choice")]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_xg4nm")
+title = "Winter"
+
+[node name="LoadoutBarSpace" type="Control" parent="MainFrame/MainPanel/Padding/Content" unique_id=67804721 node_paths=PackedStringArray("loadout_hbox", "loadout_scroll", "tooltip_host")]
+custom_minimum_size = Vector2(0, 480)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("5_loadout")
+loadout_hbox = NodePath("LoadoutScroll/LoadoutPadding/LoadoutHBox")
+loadout_scroll = NodePath("LoadoutScroll")
+loadout_card_scene = ExtResource("6_loadout_card")
+tooltip_host = NodePath("../../../../..")
+
+[node name="PanelContainer" type="PanelContainer" parent="MainFrame/MainPanel/Padding/Content/LoadoutBarSpace" unique_id=282007545]
+layout_mode = 0
+offset_left = -48.19995
+offset_top = -17.199951
+offset_right = 430.80005
+offset_bottom = 163.80005
+theme_type_variation = &"fancy_banner"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MainFrame/MainPanel/Padding/Content/LoadoutBarSpace/PanelContainer" unique_id=1455341884]
+layout_mode = 2
+text = "Loadout"
+
+[node name="LoadoutScroll" type="ScrollContainer" parent="MainFrame/MainPanel/Padding/Content/LoadoutBarSpace" unique_id=1295874697]
+custom_minimum_size = Vector2(0, 360)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.800049
+offset_top = 89.80005
+grow_horizontal = 2
+grow_vertical = 2
+vertical_scroll_mode = 0
+
+[node name="LoadoutPadding" type="MarginContainer" parent="MainFrame/MainPanel/Padding/Content/LoadoutBarSpace/LoadoutScroll" unique_id=174232176]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="LoadoutHBox" type="HBoxContainer" parent="MainFrame/MainPanel/Padding/Content/LoadoutBarSpace/LoadoutScroll/LoadoutPadding" unique_id=1240603954]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TitleCenter" type="CenterContainer" parent="MainFrame" unique_id=829727267]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -64.0
+offset_bottom = 32.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="TitlePanel" type="PanelContainer" parent="MainFrame/TitleCenter" unique_id=1541328145]
+custom_minimum_size = Vector2(800, 96)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"simple_panel"
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/TitleCenter/TitlePanel" unique_id=1336344751]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"MarginMinor"
+
+[node name="Title" type="Label" parent="MainFrame/TitleCenter/TitlePanel/Padding" unique_id=195262770]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_type_variation = &"LabelInlineheader"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="EmbarkButton" parent="MainFrame" unique_id=779760855 instance=ExtResource("8_choice")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -556.80005
+offset_top = -67.599976
+offset_right = -240.80005
+offset_bottom = 28.400024
+grow_horizontal = 0
+grow_vertical = 0
+disabled = true
+title = "Embark"
+
+[node name="CancelButton" parent="MainFrame" unique_id=353291505 instance=ExtResource("8_choice")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -67.599976
+offset_right = 280.0
+offset_bottom = 28.400024
+grow_vertical = 0
+title = "Back"
+
+[editable path="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Testers"]
+[editable path="MainFrame/MainPanel/Padding/Content/Columns/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers"]

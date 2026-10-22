@@ -27,7 +27,9 @@ var _current_choice_config: RewardChoiceConfig
 var _owns_choice_signal: bool = false
 
 func _ready() -> void:
+	Relics.ensure_loaded()
 	_load_all_rewards()
+	Run.run_ending.connect(_close_current_choices)
 	set_process(false)
 
 func _load_all_rewards() -> void:
@@ -66,11 +68,6 @@ func _scan_directory_recursive(path: String) -> void: ##loads authored reward pr
 			if resource is RewardPrototype:
 				#convert the resource into the runtime instance and add to pool
 				reward_pool.append(resource.generate_reward())
-
-				if resource.type == Reward.Type.ADD_RELIC:
-					Relics.relics[resource.relic_data.type] = resource.relic_data
-			else:
-				pass
 
 		file_name = dir.get_next()
 
@@ -250,7 +247,7 @@ func _pick_weighted_index(weights: Array[float], total_weight: float) -> int:
 func select_reward(choice_id: int) -> void: #concludes reward phase
 	if not _current_reward_options_by_id.has(choice_id):
 		push_error("RewardService: Invalid choice_id received: " + str(choice_id))
-		_disconnect_owned_choice_signal()
+		_close_current_choices()
 		reward_process_complete.emit()
 		return
 
@@ -258,21 +255,17 @@ func select_reward(choice_id: int) -> void: #concludes reward phase
 	if not apply_reward(chosen_reward):
 		return
 
-	_current_reward_options_by_id.clear()
-	is_choosing_reward = false
-	rerolls_this_phase = 0
-	current_choice_title = DEFAULT_CHOICE_TITLE
-	current_reroll_enabled = true
-	_current_choice_config = null
-	_disconnect_owned_choice_signal()
-
-	UI.hide_reward_choices.emit()
+	_close_current_choices()
 	reward_process_complete.emit()
 
 func skip_current_choices() -> void: ##closes the active reward choice screen without applying a reward
 	if not is_choosing_reward:
 		return
 
+	_close_current_choices()
+	reward_process_complete.emit()
+
+func _close_current_choices() -> void: ##clears the active prompt without treating run teardown as a completed reward
 	_current_reward_options_by_id.clear()
 	is_choosing_reward = false
 	rerolls_this_phase = 0
@@ -282,7 +275,6 @@ func skip_current_choices() -> void: ##closes the active reward choice screen wi
 	_disconnect_owned_choice_signal()
 
 	UI.hide_reward_choices.emit()
-	reward_process_complete.emit()
 
 func apply_reward(reward: Reward) -> bool:
 	if not can_claim_reward(reward):

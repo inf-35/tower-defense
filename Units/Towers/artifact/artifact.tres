@@ -7,10 +7,12 @@
 
 [resource]
 script = ExtResource("4_v48tl")
+indexable = false
 id = 7
 cost = 1.0
 required_capacity = 0.0
 element = 5
+is_environmental = true
 tower_name = "Artifact"
 tower_description = "Ancient relic. Takes one wave to excavate after being found."
 preview = ExtResource("1_ssqom")

@@ -7,6 +7,7 @@
 
 [resource]
 script = ExtResource("3_jbt70")
+indexable = false
 id = 27
 cost = 0.0
 element = 3

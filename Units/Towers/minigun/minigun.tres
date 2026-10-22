@@ -10,6 +10,7 @@
 
 [resource]
 script = ExtResource("2_42dav")
+indexable = false
 id = 11
 cost = 9.0
 tower_name = "Minigun"

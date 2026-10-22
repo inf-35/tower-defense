@@ -12,6 +12,7 @@ var _modifiers: Array[Modifier] = [] #meant for transient effects (all status ef
 var _status_effects: Dictionary[Attributes.Status, StatusEffect] = {}
 #cache of computed effective stats
 var _effective_cache: Dictionary[Attributes.id, float] = {}
+var _relics_player: Player
 
 signal status_changed(type: Attributes.Status, stacks: float, duration: float)
 
@@ -34,8 +35,17 @@ func _ready() -> void:
 	stat_changed.connect(func(_stat): #couple stat changes with ui changes
 		UI.update_unit_state.emit(unit)
 	)
-	Run.player.relics_changed.connect(_on_global_modifiers_changed)
+	_relics_player = Run.player
+	if is_instance_valid(_relics_player) and not _relics_player.relics_changed.is_connected(_on_global_modifiers_changed):
+		_relics_player.relics_changed.connect(_on_global_modifiers_changed)
 	set_process(false)
+
+func _exit_tree() -> void:
+	if not is_instance_valid(_relics_player):
+		return
+	if _relics_player.relics_changed.is_connected(_on_global_modifiers_changed):
+		_relics_player.relics_changed.disconnect(_on_global_modifiers_changed)
+	_relics_player = null
 
 #called by the signal from player (indicating relic/global modifier change)
 func _on_global_modifiers_changed() -> void:
@@ -347,7 +357,7 @@ func pull_stat(attr: Attributes.id) -> Variant:
 
 	#--- stage 3: apply global (relic) modifiers ---
 	var final_value: float = transient_value #start with the result of stage 2
-	var global_modifiers: Array[Modifier] = Run.player.get_modifiers_for_unit(self.unit)
+	var global_modifiers: Array[Modifier] = _get_global_modifiers()
 
 	if not global_modifiers.is_empty():
 		var global_sum_add: float = 0.0
@@ -371,7 +381,7 @@ func _pull_cooldown_stat() -> Variant: ##resolves cooldown in cooldown-space fir
 	if not has_stat(Attributes.id.COOLDOWN):
 		return null
 
-	var global_modifiers: Array[Modifier] = Run.player.get_modifiers_for_unit(self.unit)
+	var global_modifiers: Array[Modifier] = _get_global_modifiers()
 	var cooldown_value: float = base_stats[Attributes.id.COOLDOWN]
 	cooldown_value = _apply_modifier_stage(cooldown_value, Attributes.id.COOLDOWN, _permanent_modifiers)
 	cooldown_value = _apply_modifier_stage(cooldown_value, Attributes.id.COOLDOWN, _modifiers)
@@ -389,7 +399,7 @@ func _pull_cooldown_stat() -> Variant: ##resolves cooldown in cooldown-space fir
 	return final_value
 
 func _pull_attack_rate_stat() -> Variant: ##returns the resolved flat attacks-per-second bonus for debugging and future facade access
-	var global_modifiers: Array[Modifier] = Run.player.get_modifiers_for_unit(self.unit)
+	var global_modifiers: Array[Modifier] = _get_global_modifiers()
 	var attack_rate_bonus: float = 0.0
 	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _permanent_modifiers)
 	attack_rate_bonus = _apply_modifier_stage(attack_rate_bonus, Attributes.id.ATTACK_RATE, _modifiers)
@@ -412,6 +422,13 @@ func _apply_modifier_stage(base_value: float, attr: Attributes.id, modifiers: Ar
 			override = modifier.override
 
 	return base_value * product_mult + sum_add if override == null else override
+
+func _get_global_modifiers() -> Array[Modifier]: ##menu prototypes have no player modifiers; run instances share the existing relic evaluator
+	var modifiers: Array[Modifier] = []
+	var player: Player = Run.player
+	if not is_instance_valid(player):
+		return modifiers
+	return player.get_modifiers_for_unit(unit)
 
 func pull_dynamic_stat(key: StringName) -> Variant:
 	return pull_stat(get_dynamic_id(key))

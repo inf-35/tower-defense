@@ -60,5 +60,5 @@ metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 [node name="TowerCombatLight" type="Node2D" parent="." unique_id=1014923196]
 script = ExtResource("12_hj5o3")
 texture_scale = 1.25
-combat_energy = 0.85
+combat_energy = 0.5
 metadata/_custom_type_script = "uid://tg7juyavf2t2"

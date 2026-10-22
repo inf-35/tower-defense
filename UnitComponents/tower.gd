@@ -44,10 +44,13 @@ var tower_position: Vector2i = Vector2i.ZERO:
 			#return
 		var old_pos := tower_position
 		tower_position = new_pos
-		movement_component.unit = self #evil circular dependency resolution
-		movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
+		if is_instance_valid(movement_component):
+			movement_component.unit = self #placement can precede component tree entry
+			movement_component.position = Island.cell_to_position(tower_position) + Vector2(size) * 0.5 * Island.CELL_SIZE - Vector2(0.5, 0.5) * Island.CELL_SIZE
 
 		if tower_position == old_pos:
+			return
+		if not is_instance_valid(modifiers_component):
 			return
 		#--- apply terrain modifiers ---
 		#after the tower is created and has its components, check the terrain it's on
@@ -55,12 +58,16 @@ var tower_position: Vector2i = Vector2i.ZERO:
 		for terrain_modifier: Modifier in _terrain_modifiers:
 			modifiers_component.remove_modifier(terrain_modifier)
 		_terrain_modifiers.clear()
+		if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+			return
 
 		var total_area: float = float(size.x * size.y)
 		var modifier_counts: Dictionary[ModifierDataPrototype, int] = {}
 		for x: int in size.x:
 			for y: int in size.y:
 				var check_cell: Vector2i = tower_position + Vector2i(x, y)
+				if not Run.references.island.terrain_base_grid.has(check_cell):
+					continue
 
 				#get terrain at this specific tile
 				var terrain_base: Terrain.Base = Run.references.island.get_terrain_base(check_cell)
@@ -126,6 +133,7 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 
 	var rubble := Sprite2D.new()
 	rubble.texture = preload("res://Assets/rubble_grey.png")
+	rubble.material = preload("res://Content/CommonVisuals/combat_light_mix_material.tres")
 	rubble.scale = Vector2(0.06, 0.06) * Vector2(size)
 	rubble.z_as_relative = false
 	rubble.z_index = Layers.TERRAIN_EFFECTS
@@ -133,6 +141,7 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 
 	var outline := Sprite2D.new()
 	outline.texture = Towers.get_tower_preview(type)
+	outline.material = preload("res://Content/CommonVisuals/combat_light_mix_material.tres")
 	outline.scale = Vector2(0.06, 0.06)
 	outline.rotation = graphics.rotation
 	outline.self_modulate = Color(1,1,1,0.4)
@@ -230,6 +239,8 @@ func _configure_hitbox() -> void: ##reuses the unit-owned hitbox and sizes its c
 	hitbox.unit = self
 
 func _ready() -> void:
+	if not abstractive:
+		unit_id = Run.references.assign_unit_id()
 	name = name + " " + str(unit_id)
 	level = 1
 	if is_instance_valid(combat_light):
@@ -248,6 +259,8 @@ func _ready() -> void:
 	is_ready = true
 	components_ready.emit()
 	behavior.initialise(self)
+	if abstractive:
+		return
 
 	adjacency_updated.connect(func(adjacency_data: AdjacencyReportData): #receive data from Island
 		var event := GameEvent.new()
@@ -304,7 +317,7 @@ func scan_direction(direction: Vector2i, max_distance: int = 50) -> ForwardScanR
 	if max_distance <= 0:
 		return result
 
-	var island: Island = Run.references.island
+	var island: Island = Run.references.island if is_instance_valid(Run.references) else null
 	if not is_instance_valid(island):
 		return result
 
@@ -355,6 +368,8 @@ func get_adjacent_cells() -> Array[Vector2i]: ##returns an array of all valid gr
 	return neighbors
 
 func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return {}
 	if behavior.has_method(&"get_adjacent_towers"):
 		return behavior.get_adjacent_towers()
 
@@ -372,6 +387,8 @@ func get_adjacent_towers() -> Dictionary[Vector2i, Tower]:
 	return adjacencies
 
 func get_diagonal_towers() -> Dictionary[Vector2i, Tower]:
+	if not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return {}
 	if is_instance_valid(Run.references.island) and is_instance_valid(Run.references.island.topology_service):
 		var query := TowerTopologyService.Query.new(
 			TowerTopologyService.QueryKind.DIAGONAL_LINE,

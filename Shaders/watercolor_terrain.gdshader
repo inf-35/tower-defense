@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode blend_mix;
 
+#include "res://Shaders/combat_light_mix.gdshaderinc"
+
 // stamped brush coverage inside the terrain silhouette. dense white areas hold
 // solid pigment; sparse marks expose pale wash and create a dry, handmade texture.
 uniform sampler2D brush_mask_texture : filter_linear;

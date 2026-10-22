@@ -136,6 +136,7 @@ func _spawn_aura_ring_pulse(pulse_color: Color) -> void:
 
 	var pulse: Sprite2D = Sprite2D.new()
 	pulse.texture = AURA_RING_TEXTURE
+	pulse.material = preload("res://Content/CommonVisuals/combat_light_mix_material.tres")
 	pulse.modulate = pulse_color
 	pulse.scale = _get_aura_ring_scale(AURA_RING_START_RADIUS, texture_size)
 

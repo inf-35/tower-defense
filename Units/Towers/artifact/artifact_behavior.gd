@@ -11,10 +11,8 @@ var reward: Reward
 #--- internal state ---
 var _waves_passed: int = 0
 
-func _ready() -> void:
-	Run.phases.wave_ended.connect(_on_wave_ended)
-
 func start() -> void:
+	Run.phases.wave_ended.connect(_on_wave_ended)
 	_enter_state(State.UNLOCKING)
 
 func _enter_state(new_state: State) -> void:

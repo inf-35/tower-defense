@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dsiw2ph42seam" path="res://Assets/simple_panel.png" id="1_oj63r"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="4_23p6x"]
 [ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="5_anim"]
+[ext_resource type="Texture2D" uid="uid://bneelctq7hfo2" path="res://Assets/grid_background.png" id="5_rdyqd"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tower_card_warm"]
 content_margin_left = 0.0
@@ -64,6 +65,12 @@ grow_vertical = 2
 mouse_filter = 2
 theme_type_variation = &"simple_panel"
 theme_override_styles/panel = SubResource("StyleBoxTexture_tower_card_warm")
+
+[node name="TextureRect" type="TextureRect" parent="CardMotion/Card" unique_id=1557423948]
+self_modulate = Color(1, 1, 1, 0.11764706)
+layout_mode = 2
+texture = ExtResource("5_rdyqd")
+stretch_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="CardMotion/Card" unique_id=1119537347]
 use_parent_material = true

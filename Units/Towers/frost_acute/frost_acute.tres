@@ -10,6 +10,7 @@
 
 [resource]
 script = ExtResource("6_h0mwa")
+indexable = false
 id = 40
 tags = Array[int]([1])
 cost = 10.0

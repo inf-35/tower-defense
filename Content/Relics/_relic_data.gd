@@ -66,6 +66,7 @@ enum Type {
 }
 
 @export var type: Type
+@export var indexable: bool = true ##lists this relic in the index; disable when no current reward or starting loadout can grant it
 #--- effect data ---
 #each relic contains a modifier prototype that defines its stat changes
 @export var modifier_prototypes: Array[GlobalModifierPrototype] ##modifiers that are applied to all satisfying towers (see specific_tower_type)

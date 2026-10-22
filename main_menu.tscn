@@ -5,27 +5,33 @@
 [ext_resource type="Texture2D" uid="uid://pvyutr4ju2ce" path="res://Assets/Marketing/itch_background.png" id="3_glbon"]
 [ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
-[ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="5_animatable"]
-[ext_resource type="Resource" uid="uid://d4im80a5on0lt" path="res://Content/Guilds/testers.tres" id="6_testers"]
-[ext_resource type="Resource" uid="uid://bk7dgodpk2tik" path="res://Content/Guilds/pioneers.tres" id="7_pioneers"]
+[ext_resource type="Shader" uid="uid://c470efx242vnm" path="res://Shaders/screen_boil.gdshader" id="8_screen_boil"]
+[ext_resource type="PackedScene" path="res://UI/embark/embark.tscn" id="9_embark"]
 
-[node name="MainMenu" type="Node2D" unique_id=565802774 node_paths=PackedStringArray("play_button", "settings_button", "continue_button", "feedback_button", "environment_panel", "woods_environment", "winter_environment", "guild_panel", "testers_button", "pioneers_button", "difficulty_panel", "normal_difficulty", "hard_difficulty")]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_menu_boil"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_menu_boil"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_menu_boil")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_menu_boil"]
+shader = ExtResource("8_screen_boil")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_menu_boil")
+shader_parameter/boil_speed = 3.30800015713
+shader_parameter/boil_strength = 0.0010000000475
+shader_parameter/noise_scale = 5.60000026274012
+
+[node name="MainMenu" type="Node2D" unique_id=565802774 node_paths=PackedStringArray("play_button", "settings_button", "index_button", "continue_button", "feedback_button", "embark_page", "title_content")]
 script = ExtResource("1_06t4h")
 play_button = NodePath("UI/MarginContainer/Control/VBoxContainer/new_game")
 settings_button = NodePath("UI/MarginContainer/Control/VBoxContainer/settings")
+index_button = NodePath("UI/MarginContainer/Control/VBoxContainer/index")
 continue_button = NodePath("UI/MarginContainer/Control/VBoxContainer/continue")
 feedback_button = NodePath("UI/MarginContainer/Control/VBoxContainer/feedback")
-environment_panel = NodePath("UI/MarginContainer/Control/environment_panel")
-woods_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods_motion/woods")
-winter_environment = NodePath("UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter_motion/winter")
-guild_panel = NodePath("UI/MarginContainer/Control/guild_panel")
-testers_button = NodePath("UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/testers_motion/testers")
-pioneers_button = NodePath("UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/pioneers_motion/pioneers")
-testers_guild = ExtResource("6_testers")
-pioneers_guild = ExtResource("7_pioneers")
-difficulty_panel = NodePath("UI/MarginContainer/Control/difficulty_panel")
-normal_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal_motion/normal")
-hard_difficulty = NodePath("UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard_motion/hard")
+embark_page = NodePath("UI/EmbarkPage")
+title_content = NodePath("UI/MarginContainer")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=855020591]
 
@@ -49,9 +55,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -347.0
-offset_top = -239.5
+offset_top = -280.0
 offset_right = 347.0
-offset_bottom = 239.5
+offset_bottom = 480.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"vbox_20"
@@ -79,6 +85,13 @@ theme_override_font_sizes/font_size = 60
 text = "Settings"
 script = ExtResource("4_jix8l")
 
+[node name="index" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=408750855]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 60
+text = "Index"
+script = ExtResource("4_jix8l")
+
 [node name="feedback" type="Button" parent="UI/MarginContainer/Control/VBoxContainer" unique_id=2143961620]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
@@ -89,212 +102,6 @@ theme_override_colors/font_hover_color = Color(0.14799999, 0.32559997, 0.74, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.14799999, 0.32559997, 0.74, 1)
 theme_override_font_sizes/font_size = 60
 text = "Feedback"
-script = ExtResource("4_jix8l")
-
-[node name="environment_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=635979494]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0833
-offset_top = -221.0
-offset_right = 320.0833
-offset_bottom = 221.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/environment_panel" unique_id=477318061]
-layout_mode = 2
-theme_type_variation = &"MarginSuper"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/environment_panel/MarginContainer" unique_id=173141132]
-layout_mode = 2
-theme_type_variation = &"vbox_20"
-
-[node name="Label" type="Label" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=1466698759]
-layout_mode = 2
-text = "Choose an environment"
-horizontal_alignment = 1
-
-[node name="woods_motion" type="Control" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=20829866 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("woods")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-hover_enabled = false
-
-[node name="woods" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/woods_motion" unique_id=1721808762]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Woods"
-script = ExtResource("4_jix8l")
-
-[node name="winter_motion" type="Control" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer" unique_id=594039286 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("winter")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-entrance_delay = 0.08
-hover_enabled = false
-
-[node name="winter" type="Button" parent="UI/MarginContainer/Control/environment_panel/MarginContainer/VBoxContainer/winter_motion" unique_id=731609570]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Winter"
-script = ExtResource("4_jix8l")
-
-[node name="guild_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=1341131659]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0833
-offset_top = -221.0
-offset_right = 320.0833
-offset_bottom = 221.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/guild_panel" unique_id=276157230]
-layout_mode = 2
-theme_type_variation = &"MarginSuper"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/guild_panel/MarginContainer" unique_id=1720583313]
-layout_mode = 2
-theme_type_variation = &"vbox_20"
-
-[node name="Label" type="Label" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=1691602898]
-layout_mode = 2
-text = "Choose a guild"
-horizontal_alignment = 1
-
-[node name="testers_motion" type="Control" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=1694864953 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("testers")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-hover_enabled = false
-
-[node name="testers" type="Button" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/testers_motion" unique_id=1739619991]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Testers"
-script = ExtResource("4_jix8l")
-
-[node name="pioneers_motion" type="Control" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer" unique_id=315663131 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("pioneers")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-entrance_delay = 0.08
-hover_enabled = false
-
-[node name="pioneers" type="Button" parent="UI/MarginContainer/Control/guild_panel/MarginContainer/VBoxContainer/pioneers_motion" unique_id=1844316406]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Pioneers"
-script = ExtResource("4_jix8l")
-
-[node name="difficulty_panel" type="PanelContainer" parent="UI/MarginContainer/Control" unique_id=948902790]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0833
-offset_top = -221.0
-offset_right = 320.0833
-offset_bottom = 221.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/Control/difficulty_panel" unique_id=1985579830]
-layout_mode = 2
-theme_type_variation = &"MarginSuper"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer" unique_id=47655096]
-layout_mode = 2
-theme_type_variation = &"vbox_20"
-
-[node name="Label" type="Label" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=272690617]
-layout_mode = 2
-text = "Choose a difficulty"
-horizontal_alignment = 1
-
-[node name="normal_motion" type="Control" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=162151210 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("normal")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-hover_enabled = false
-
-[node name="normal" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/normal_motion" unique_id=494658812]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Normal"
-script = ExtResource("4_jix8l")
-
-[node name="hard_motion" type="Control" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer" unique_id=793836847 node_paths=PackedStringArray("content")]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 2
-script = ExtResource("5_animatable")
-content = NodePath("hard")
-slide_offset = Vector2(0, -48)
-entrance_duration = 0.32
-entrance_delay = 0.08
-hover_enabled = false
-
-[node name="hard" type="Button" parent="UI/MarginContainer/Control/difficulty_panel/MarginContainer/VBoxContainer/hard_motion" unique_id=471109702]
-custom_minimum_size = Vector2(400, 100)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Hard"
 script = ExtResource("4_jix8l")
 
 [node name="TextureRect" type="TextureRect" parent="UI/MarginContainer/Control" unique_id=1755269779]
@@ -325,6 +132,9 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
+[node name="EmbarkPage" parent="UI" instance=ExtResource("9_embark")]
+visible = false
+
 [node name="AudioListener2D" type="AudioListener2D" parent="." unique_id=1086262203]
 current = true
 
@@ -340,3 +150,16 @@ position = Vector2(1897, 1166)
 texture = ExtResource("3_glbon")
 region_enabled = true
 region_rect = Rect2(2, 0, 1400, 1400)
+
+[node name="BoilOverlay" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 100
+
+[node name="ColorRect" type="ColorRect" parent="BoilOverlay"]
+material = SubResource("ShaderMaterial_menu_boil")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

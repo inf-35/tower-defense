@@ -3,15 +3,18 @@
 [ext_resource type="Script" uid="uid://ujr43k3ftswk" path="res://UI/unit_hp_bar/unit_hp_bar.gd" id="2_as0g5"]
 [ext_resource type="Texture2D" uid="uid://dsry0dmswi8wd" path="res://Assets/empty_hp_bar.png" id="3_66oym"]
 [ext_resource type="Texture2D" uid="uid://bfdqgc8m48ldd" path="res://Assets/full_hp_bar.png" id="4_j6gpv"]
+[ext_resource type="Material" path="res://Content/CommonVisuals/combat_light_mix_material.tres" id="5_light_mix"]
 
 [node name="UnitHpBar" type="Control" unique_id=1030602814]
 z_index = 500
 z_as_relative = false
+material = ExtResource("5_light_mix")
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("2_as0g5")
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="." unique_id=486852645]
+use_parent_material = true
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0

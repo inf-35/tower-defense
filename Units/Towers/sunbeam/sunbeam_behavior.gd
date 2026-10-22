@@ -25,6 +25,7 @@ func update(delta: float) -> void:
 func _initialize_laser_pool() -> void:
 	for i in range(max_targets):
 		var line = Line2D.new()
+		line.material = preload("res://Content/CommonVisuals/combat_light_mix_material.tres")
 		line.width = laser_width
 		line.default_color = laser_color
 		line.visible = false

@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://cwnx7qgab7ppj"]
+[gd_scene load_steps=4 format=3 uid="uid://cwnx7qgab7ppj"]
 
 [ext_resource type="Script" uid="uid://ck72bv1wva51a" path="res://UI/settings_menu/settings_menu.gd" id="1_1syaf"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_gdbu8"]
+[ext_resource type="PackedScene" uid="uid://7lbbh8ua0yys" path="res://UI/index/index.tscn" id="3_index"]
 
-[node name="SettingsMenu" type="CanvasLayer" node_paths=PackedStringArray("master_slider", "sfx_slider", "music_slider", "fullscreen_toggle", "show_all_health_bars_toggle", "show_attached_effect_icons_toggle", "back_button", "resume_button", "settings_button", "save_and_quit_button", "settings_root", "pause_root")]
+[node name="SettingsMenu" type="CanvasLayer" node_paths=PackedStringArray("master_slider", "sfx_slider", "music_slider", "fullscreen_toggle", "show_all_health_bars_toggle", "show_attached_effect_icons_toggle", "back_button", "resume_button", "settings_button", "save_and_quit_button", "settings_root", "pause_root", "index_root")]
 layer = 5
 script = ExtResource("1_1syaf")
 master_slider = NodePath("Settings/Control/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HBoxContainer/master_slider")
@@ -18,6 +19,7 @@ settings_button = NodePath("Pause/VBoxContainer/settings")
 save_and_quit_button = NodePath("Pause/VBoxContainer/save_and_quit")
 settings_root = NodePath("Settings")
 pause_root = NodePath("Pause")
+index_root = NodePath("Index")
 
 [node name="Background" type="Panel" parent="."]
 z_index = -1
@@ -185,6 +187,11 @@ grow_vertical = 2
 theme_type_variation = &"hbox_20"
 alignment = 2
 
+[node name="Index" type="Button" parent="Settings/Button"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Index"
+
 [node name="Button" type="Button" parent="Settings/Button"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -226,7 +233,34 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 50
 text = "Settings"
 
+[node name="index" type="Button" parent="Pause/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Index"
+
 [node name="save_and_quit" type="Button" parent="Pause/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 50
 text = "Save and Quit"
+
+[node name="Index" parent="." instance=ExtResource("3_index")]
+visible = false
+
+[node name="Back" type="Button" parent="Index"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -360.0
+offset_top = -140.0
+offset_right = -60.0
+offset_bottom = -60.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Back"
+
+[connection signal="pressed" from="Settings/Button/Index" to="." method="_on_index_pressed"]
+[connection signal="pressed" from="Pause/VBoxContainer/index" to="." method="_on_index_pressed"]
+[connection signal="pressed" from="Index/Back" to="." method="back"]

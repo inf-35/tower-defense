@@ -1,5 +1,7 @@
 shader_type canvas_item;
 
+#include "res://Shaders/combat_light_mix.gdshaderinc"
+
 uniform vec4 shadow_color : source_color = vec4(0.0, 0.0, 0.0, 0.5);
 uniform vec2 frame_size = vec2(1.0);
 uniform vec4 frame_region = vec4(0.0, 0.0, 1.0, 1.0);

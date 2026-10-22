@@ -264,6 +264,7 @@ func update_decoration(cell: Vector2i, type: Terrain.Base) -> void:
 	#3. create the stamp
 	var sprite := Sprite2D.new()
 	sprite.texture = icon
+	sprite.use_parent_material = true
 
 	#calculate position: center of the cell + random offset
 	var center_pos = (Vector2(cell) * cell_size) + (Vector2.ONE * cell_size * 0.5)
@@ -311,6 +312,7 @@ func set_preview_feature(cell: Vector2i, tower_type: int) -> void:
 	var sprite := Sprite2D.new()
 	sprite.scale = Vector2.ONE * 0.06
 	sprite.texture = icon
+	sprite.use_parent_material = true
 
 	#position: strictly centered on the tile (unlike organic terrain which jitters)
 	var center_pos = (Vector2(cell) * cell_size) + (Towers.get_tower_size(tower_type) * cell_size * 0.5)

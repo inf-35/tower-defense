@@ -9,13 +9,14 @@
 
 [resource]
 script = ExtResource("6_pl7ym")
+indexable = false
 id = 16
 size = Vector2i(2, 2)
 cost = 36.0
 required_capacity = 2.0
 element = 4
 tower_name = "Arc (chain)"
-tower_description = "fires a bolt that chains farther and retains more damage and status duration across jumps."
+tower_description = "Fires a bolt that chains through up to 8 other enemies. Jumps retain 85% of the triggering shot's {UNIT_DAMAGE} and timed status duration. Damaging split shots and overkill bolts can each chain once from their own payload; chain hits cannot start new chains."
 icon = ExtResource("1_yjsgc")
 inspector_actions = Array[ExtResource("2_sjacr")]([ExtResource("3_udji3")])
 tower_scene = ExtResource("7_a64ra")

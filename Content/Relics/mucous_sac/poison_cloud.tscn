@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://b7ikev455648n"]
+[gd_scene load_steps=12 format=3 uid="uid://b7ikev455648n"]
 
 [ext_resource type="Script" uid="uid://c5mfnkyxvbtun" path="res://Units/Entities/hurtbox.gd" id="1_dka0b"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="2_3615q"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="3_ldfs7"]
 [ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="4_lfs5o"]
 [ext_resource type="Texture2D" uid="uid://crps220emdfox" path="res://Assets/poison_cloud_particle.png" id="5_3615q"]
+[ext_resource type="Material" path="res://Content/CommonVisuals/combat_light_mix_material.tres" id="6_light_mix"]
 
 [sub_resource type="Resource" id="Resource_wt7ho"]
 script = ExtResource("4_lfs5o")
@@ -53,6 +54,7 @@ metadata/_custom_type_script = "uid://c5mfnkyxvbtun"
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 z_index = 90
 z_as_relative = false
+material = ExtResource("6_light_mix")
 scale = Vector2(0.05, 0.05)
 amount = 1
 texture = ExtResource("5_3615q")

@@ -26,7 +26,9 @@ func detach() -> void: ##stops adjacency refreshes while this farm is ruined or 
 	_disconnect_island_changed()
 
 func _connect_island_changed() -> void: ##subscribes to the island-wide structural invalidation signal used by nearby farm income
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+	if not is_instance_valid(Run.references):
+		return
+	var island: Island = Run.references.island
 	if not is_instance_valid(island):
 		return
 	if island.island_changed.is_connected(_register_income_stats):
@@ -34,7 +36,9 @@ func _connect_island_changed() -> void: ##subscribes to the island-wide structur
 	island.island_changed.connect(_register_income_stats)
 
 func _disconnect_island_changed() -> void: ##disconnects the live adjacency refresh hook without assuming the island still exists
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+	if not is_instance_valid(Run.references):
+		return
+	var island: Island = Run.references.island
 	if not is_instance_valid(island):
 		return
 	if not island.island_changed.is_connected(_register_income_stats):
@@ -50,7 +54,10 @@ func _get_adjacent_farm_count() -> int: ##counts unique adjacent active farms so
 	var tower: Tower = unit as Tower
 	if not is_instance_valid(tower):
 		return 0
-	if not is_instance_valid(Run.references.island):
+	if not is_instance_valid(Run.references):
+		return 0
+	var island: Island = Run.references.island
+	if not is_instance_valid(island):
 		return 0
 
 	var seen_farms: Dictionary[int, bool] = {}

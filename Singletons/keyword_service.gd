@@ -345,7 +345,12 @@ func resolve_tower_description_from_type(type: Towers.Type) -> String:
 	var desc: String = ""
 	if prototype and not prototype.stat_displays.is_empty():
 		for stat_display: StatDisplayInfo in prototype.stat_displays:
-			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_instance(prototype, stat_display), stat_display)
+			if stat_display.special_modifier in [Inspector.DisplayStatModifier.WAVES_LEFT_IN_PHASE, Inspector.DisplayStatModifier.ANOMALY_REWARD_PREVIEW, Inspector.DisplayStatModifier.BREACH_WAVE_PREVIEW]:
+				continue #catalogue definitions have noF wave schedule or rolled reward
+			var raw_value: Variant = Inspector.get_stat_value_from_instance(prototype, stat_display)
+			if raw_value == null:
+				continue
+			var value: Variant = Inspector.apply_display_modifiers(raw_value, stat_display)
 			desc += stat_display.label + " " + str(value) + stat_display.suffix
 			desc += " "
 
@@ -375,7 +380,10 @@ func resolve_unit_description_from_type(type: Units.Type) -> String:
 	var desc: String = ""
 	if prototype and not Units.get_stat_displays(type).is_empty():
 		for stat_display: StatDisplayInfo in Units.get_stat_displays(type):
-			var value: Variant = Inspector.apply_display_modifiers(Inspector.get_stat_value_from_unit(prototype, stat_display), stat_display)
+			var raw_value: Variant = Inspector.get_stat_value_from_unit(prototype, stat_display)
+			if raw_value == null:
+				continue
+			var value: Variant = Inspector.apply_display_modifiers(raw_value, stat_display)
 			desc += stat_display.label + " " + str(value) + stat_display.suffix
 			desc += "\n"
 
@@ -384,8 +392,11 @@ func resolve_unit_description_from_type(type: Units.Type) -> String:
 
 #helper to fetch relic info
 func _resolve_relic_data(relic_id_str: String) -> Dictionary:
+	Relics.ensure_loaded()
+	if not relic_id_str.is_valid_int():
+		return {}
 	var type: RelicData.Type = int(relic_id_str)
-	var relic: RelicData = Relics.relics[type]
+	var relic: RelicData = Relics.relics.get(type)
 
 	if not relic:
 		return {}

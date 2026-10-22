@@ -30,11 +30,12 @@ void fragment() {
 }
 
 void light() {
+	//combat lights pack steady brightness into rgb; energy fades influence, not the target appearance.
 	float source_luminance = dot(COLOR.rgb, vec3(0.2126, 0.7152, 0.0722));
 	float light_peak = max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b));
-	float light_intensity = clamp(light_peak * LIGHT_ENERGY, 0.0, 1.0);
+	float light_intensity = clamp(light_peak, 0.0, 1.0);
 	float local_chroma_scale = mix(1.0, light_chroma_scale, light_intensity);
 	vec3 lit_surface = clamp(vec3(source_luminance) + (COLOR.rgb - vec3(source_luminance)) * local_chroma_scale, vec3(0.0), vec3(1.0));
 	float surface_response = mix(dark_pixel_light_floor, 1.0, source_luminance);
-	LIGHT = vec4(lit_surface * LIGHT_COLOR.rgb * LIGHT_ENERGY * surface_response, LIGHT_COLOR.a);
+	LIGHT = vec4(lit_surface * LIGHT_COLOR.rgb * surface_response, LIGHT_COLOR.a * clamp(LIGHT_ENERGY, 0.0, 1.0));
 }

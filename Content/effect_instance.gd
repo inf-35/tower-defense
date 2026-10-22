@@ -27,6 +27,7 @@ var host: Unit ##to which unit does this effect apply onto
 var source: Unit ##to which unit does this effect come from (may be null)
 var global: bool = false ##whether this effect is a local(unit-wise) or global (game-wise) effect
 var _is_removing: bool = false
+var _runtime_attached: bool = false #authored scope does not imply that gameplay setup has run
 
 func _init() -> void:
 	pass
@@ -37,30 +38,38 @@ func mark_removing() -> void: ##disables this instance before structural removal
 	if is_instance_valid(timer):
 		timer.is_active = false
 
-func detach() -> void:
+func detach() -> void: ##runs gameplay cleanup at most once, and only after a gameplay attachment
 	mark_removing()
+	if not _runtime_attached:
+		return
+	_runtime_attached = false
 	if global or is_instance_valid(host):
 		effect_prototype.detach_handler.call(self)
 
-func attach_to(_host: Unit) -> void:
+func attach_to(_host: Unit) -> void: ##replaces an attachment while keeping prototype display setup outside the gameplay lifecycle
 	detach()
 	host = _host
+	if not is_instance_valid(host):
+		return
 	_is_removing = false
 	enabled = true
 
-	if is_instance_valid(host):
-		if host.abstractive:
-			effect_prototype._handle_display_attach(self)
-		else:
-			effect_prototype.attach_handler.call(self)
+	if host.abstractive:
+		effect_prototype._handle_display_attach(self)
+		return
+	_runtime_attached = true
+	effect_prototype.attach_handler.call(self)
 
 func attach_global() -> void: ##for attaching as a global effect
+	detach()
+	host = null
 	_is_removing = false
 	enabled = true
+	_runtime_attached = true
 	effect_prototype.attach_handler.call(self)
 
 func handle_event_unfiltered(event: GameEvent = null) -> void: ##runs this already-indexed effect without repeating its event-type check
-	if not enabled:
+	if not enabled or not _runtime_attached:
 		return
 	if not global:
 		if not is_instance_valid(host):

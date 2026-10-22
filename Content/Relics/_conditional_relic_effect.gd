@@ -53,6 +53,7 @@ class ConditionalRelicState extends RefCounted:
 	var tower_refs: Dictionary[int, WeakRef] = {}
 	#the island signal outlives individual effect instances, so the callable must be stored for exact disconnect
 	var island_changed_callback: Callable
+	var island_ref: WeakRef
 
 func _init() -> void: ##initialises a passive spatial effect for either global registration or intrinsic host attachment
 	global = true
@@ -67,21 +68,23 @@ func create_instance() -> EffectInstance: ##creates isolated runtime bookkeeping
 func _handle_attach(instance: EffectInstance) -> void: ##subscribes to island topology/content changes and immediately evaluates current towers
 	var state: ConditionalRelicState = instance.state as ConditionalRelicState
 	state.attached_host_only = is_instance_valid(instance.host)
-	#bind a weak ref rather than the live instance so the signal graph never owns a freed runtime object
-	state.island_changed_callback = _on_island_changed.bind(weakref(instance))
 	var island: Island = _get_live_island()
 	if not is_instance_valid(island):
 		return
+	#remember the actual signal owner without extending its lifetime across runs.
+	state.island_ref = weakref(island)
+	state.island_changed_callback = _on_island_changed.bind(weakref(instance))
 	if not island.island_changed.is_connected(state.island_changed_callback):
 		island.island_changed.connect(state.island_changed_callback)
 	_recalculate_all(instance)
 
 func _handle_detach(instance: EffectInstance) -> void: ##disconnects the recalc hook and removes every modifier/effect this relic copy had granted
 	var state: ConditionalRelicState = instance.state as ConditionalRelicState
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+	var island: Island = state.island_ref.get_ref() as Island if state.island_ref != null else null
 	if state.island_changed_callback.is_valid() and is_instance_valid(island) and island.island_changed.is_connected(state.island_changed_callback):
 		island.island_changed.disconnect(state.island_changed_callback)
 	state.island_changed_callback = Callable()
+	state.island_ref = null
 
 	#remove relic-owned modifiers first, then remove any locally granted effects
 	for tower_id: int in state.active_modifiers:
@@ -126,8 +129,10 @@ func _recalculate_all(instance: EffectInstance) -> void: ##re-evaluates the atta
 	for tower: Tower in island.get_all_towers():
 		_evaluate_tower(instance, tower)
 
-func _get_live_island(): ##returns the current island only while it is still live and inside the tree
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+func _get_live_island() -> Island: ##returns the current island only while it is still live and inside the tree
+	if not is_instance_valid(Run.references):
+		return null
+	var island: Island = Run.references.island
 	if not is_instance_valid(island) or not island.is_inside_tree():
 		return null
 	return island

@@ -10,6 +10,7 @@
 
 [resource]
 script = ExtResource("3_81j8p")
+indexable = false
 id = 26
 cost = 0.0
 required_capacity = 0.5

@@ -19,6 +19,7 @@ func submit_tower_type() -> void:
 		id = Towers.Type.VOID
 		target_type_name = "VOID"
 @export var id: Towers.Type
+@export var indexable: bool = true ##lists this definition in the index; disable for content not currently featured in playable runs
 
 #meta-properties
 @export var size: Vector2i = Vector2i.ONE

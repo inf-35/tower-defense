@@ -12,7 +12,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.BASIC, 2],
 	],
 	4: [
-		[Units.Type.DRIFTER, 6],
+		[Units.Type.DRIFTER, 8],
 		[Units.Type.BASIC, 2],
 	],
 	5: [
@@ -124,14 +124,14 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.WARRIOR_PLUS, 8],
 	],
 	24: [
-		[Units.Type.HULK_PLUS, 1],
-		[Units.Type.GIANT_PLUS, 1],
+		[Units.Type.HULK_PLUS, 1*3],
+		[Units.Type.GIANT_PLUS, 1*3],
 		[Units.Type.TROLL_PLUS, 2],
-		[Units.Type.SUMMONER, 2],
-		[Units.Type.HEALER_PLUS, 3],
-		[Units.Type.CLERIC, 2],
-		[Units.Type.SPRINTER_PLUS, 20],
-		[Units.Type.WARRIOR_PLUS, 20],
+		[Units.Type.SUMMONER, 2*3],
+		[Units.Type.HEALER_PLUS, 3*3],
+		[Units.Type.CLERIC, 2*3],
+		[Units.Type.SPRINTER_PLUS, 20*2],
+		[Units.Type.WARRIOR_PLUS, 20*3],
 		
 	],
 }

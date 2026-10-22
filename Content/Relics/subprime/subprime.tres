@@ -12,6 +12,7 @@ metadata/_custom_type_script = "uid://blhhsrfq8l8fj"
 
 [resource]
 script = ExtResource("2_07pg8")
+indexable = false
 type = 13
 global_effect = SubResource("Resource_gv3lq")
 title = "Subprime"

@@ -4,13 +4,16 @@ class_name TowerCombatLight
 const GROUP_NAME: StringName = &"combat_tower_lights"
 const DEFAULT_TEXTURE_SCALE: float = 2.0
 const DEFAULT_ENERGY: float = 0.4
-const DEFAULT_LIGHT_COLOR: Color = Color(1.0, 0.63, 0.2, 1.0)
+const DEFAULT_LIGHT_COLOR: Color = Color(1.754, 1.114, 0.382, 1.0)
 const DEFAULT_ENVIRONMENT_ENERGY_MULTIPLIER: float = 1.0
 const FADE_SECONDS: float = 0.6
 
 @export var light_texture: Texture2D = preload("res://Content/CommonVisuals/combat_tower_light_texture.tres") ##native point-light texture used for the tower's local combat glow
 @export_range(0.05, 4.0, 0.05) var texture_scale: float = DEFAULT_TEXTURE_SCALE ##radius multiplier for this marker's authored light texture
-@export_range(0.0, 4.0, 0.01) var combat_energy: float = DEFAULT_ENERGY ##target light strength once combat-night has faded in
+@export_range(0.0, 4.0, 0.01) var combat_energy: float = DEFAULT_ENERGY: ##steady illuminated-target brightness; transition influence is controlled independently
+	set(value):
+		combat_energy = maxf(value, 0.0)
+		_apply_native_light_state()
 
 var _light_tween: Tween
 var _combat_requested: bool = false
@@ -21,9 +24,9 @@ var available: bool = true:
 	set(value):
 		available = value
 		set_combat_lit(_combat_requested, true)
-var current_energy: float = 0.0:
+var _light_influence: float = 0.0:
 	set(value):
-		current_energy = maxf(value, 0.0)
+		_light_influence = clampf(value, 0.0, 1.0)
 		_apply_native_light_state()
 
 func _ready() -> void:
@@ -50,15 +53,15 @@ func set_combat_lit(active: bool, immediate: bool = false) -> void: ##fades this
 	var should_light: bool = active and available
 	if is_instance_valid(_light_tween):
 		_light_tween.kill()
-	_fade_energy(combat_energy if should_light else 0.0, immediate)
+	_fade_influence(1.0 if should_light else 0.0, immediate)
 
-func _fade_energy(target_energy: float, immediate: bool) -> void:
+func _fade_influence(target_influence: float, immediate: bool) -> void: ##fades the native mix weight without moving the illuminated target toward black
 	if immediate:
-		current_energy = target_energy
+		_light_influence = target_influence
 		return
 
 	_light_tween = create_tween()
-	_light_tween.tween_property(self, "current_energy", target_energy, FADE_SECONDS)
+	_light_tween.tween_property(self, "_light_influence", target_influence, FADE_SECONDS)
 
 func _ensure_native_light() -> void: ##creates the godot 2d light node used by the native canvas lighting path
 	if is_instance_valid(_native_light):
@@ -66,6 +69,7 @@ func _ensure_native_light() -> void: ##creates the godot 2d light node used by t
 
 	_native_light = PointLight2D.new()
 	_native_light.name = "NativeCombatLight"
+	_native_light.blend_mode = Light2D.BLEND_MODE_MIX
 	_native_light.enabled = false
 	_native_light.shadow_enabled = false
 	add_child(_native_light)
@@ -80,6 +84,8 @@ func _apply_native_light_state() -> void: ##mirrors authored marker state onto t
 
 	_native_light.texture = light_texture
 	_native_light.texture_scale = texture_scale
-	_native_light.color = _light_color
-	_native_light.energy = current_energy * _energy_multiplier
-	_native_light.enabled = available and light_texture != null and _native_light.energy > 0.001
+	#receivers keep this rgb target fixed and use native energy only as the mix weight.
+	var target_energy: float = combat_energy * _energy_multiplier
+	_native_light.color = Color(_light_color.r * target_energy, _light_color.g * target_energy, _light_color.b * target_energy, 1.0)
+	_native_light.energy = _light_influence
+	_native_light.enabled = available and light_texture != null and target_energy > 0.001 and _light_influence > 0.001

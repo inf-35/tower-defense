@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("6_xwdom")
+indexable = false
 id = 42
 tags = Array[int]([0, 3])
 cost = 15.0

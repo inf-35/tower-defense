@@ -13,6 +13,7 @@ script = ExtResource("1_data")
 title = "Oliphant"
 icon = ExtResource("2_icon")
 description = "A huge siege beast. Its speed rises during each boss subwave, then resets during prep."
+indexable = false
 stat_displays = Array[ExtResource("3_display")]([ExtResource("4_health"), ExtResource("5_6cncs"), ExtResource("5_speed")])
 important = true
 unit_scene = ExtResource("6_scene")

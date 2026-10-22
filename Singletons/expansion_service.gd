@@ -11,7 +11,6 @@ const WATER_EXTRA_RATIO: float = 1.8
 const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline seeds closer to the origin
 const FRONTIER_EVENING_BIAS: float = 1.125
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
-const DEFAULT_RUINS_DATA: RuinsData = preload("res://Content/Environmental/ruins/default_ruins_data.tres")
 const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.002
 const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.75
 
@@ -397,7 +396,6 @@ func _reserve_forced_ruins(island: Island, block_data: Dictionary[Vector2i, Terr
 			continue
 		block_data[cell].terrain = Terrain.Base.EARTH
 		block_data[cell].feature = Towers.Type.RUINS
-		block_data[cell].initial_state = {&"_ruins_data": DEFAULT_RUINS_DATA}
 		available_cells.erase(cell)
 
 func _generate_expansion_coords(island: Island, land_target: int) -> Dictionary: ##wrapper for _grow_expansion_from_start, quality control (number of tiles of each type, size)

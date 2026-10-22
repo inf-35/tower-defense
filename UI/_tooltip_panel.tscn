@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://ms2w6jihumk"]
+[gd_scene format=3 uid="uid://ms2w6jihumk"]
 
 [ext_resource type="Script" uid="uid://c2xp1qmu85wad" path="res://UI/_tooltip_panel.gd" id="1_c5s8d"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_t0qdu"]
 [ext_resource type="Script" uid="uid://bf2quvi78ybbq" path="res://UI/_interactive_rich_text_label.gd" id="3_fg2ep"]
 
-[node name="TooltipPanel" type="PanelContainer" node_paths=PackedStringArray("title_label", "description_label")]
+[node name="TooltipPanel" type="PanelContainer" unique_id=1955560130 node_paths=PackedStringArray("title_label", "description_label")]
 offset_right = 500.0
 offset_bottom = 160.0
 theme = ExtResource("2_t0qdu")
@@ -14,16 +14,16 @@ title_label = NodePath("MarginContainer/VBoxContainer/title")
 description_label = NodePath("MarginContainer/VBoxContainer/description")
 metadata/_custom_type_script = "uid://c2xp1qmu85wad"
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=932437098]
 layout_mode = 2
 theme = ExtResource("2_t0qdu")
 theme_type_variation = &"MarginMinor"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=294057026]
 layout_mode = 2
 theme_type_variation = &"vbox_5"
 
-[node name="title" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+[node name="title" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=744301636]
 clip_contents = false
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
@@ -36,12 +36,12 @@ autowrap_mode = 0
 script = ExtResource("3_fg2ep")
 metadata/_custom_type_script = "uid://bf2quvi78ybbq"
 
-[node name="description" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+[node name="description" type="RichTextLabel" parent="MarginContainer/VBoxContainer" unique_id=2100372225]
 clip_contents = false
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 mouse_filter = 1
-theme_type_variation = &"rt_s20_descriptive"
+theme_type_variation = &"rt_s15_descriptive"
 text = "etteaeaea"
 fit_content = true
 scroll_active = false

@@ -36,6 +36,7 @@
 [ext_resource type="Script" uid="uid://ccjlpbls3vyv1" path="res://Scene Elements/path_wash_layer.gd" id="33_path_wash"]
 [ext_resource type="Shader" uid="uid://mieee0e0cjm6" path="res://Shaders/path_wash_posterization.gdshader" id="34_path_posterization"]
 [ext_resource type="Shader" uid="uid://dc8bswvlyokra" path="res://Shaders/simple_mix_mask.gdshader" id="35_stain"]
+[ext_resource type="Material" path="res://Content/CommonVisuals/combat_light_mix_material.tres" id="36_light_mix"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q2og1"]
 
@@ -195,6 +196,7 @@ script = ExtResource("3_fgmf3")
 [node name="PathRenderer" type="Node2D" parent="." unique_id=1267335686 node_paths=PackedStringArray("obstruction_warning_renderer", "path_wash_layer")]
 z_index = 200
 z_as_relative = false
+material = ExtResource("36_light_mix")
 script = ExtResource("6_gljqa")
 stroke_texture = ExtResource("7_l23qb")
 corner_texture = ExtResource("8_aibdv")
@@ -206,6 +208,7 @@ metadata/_custom_type_script = "uid://bngvtmcvgq4vj"
 [node name="ObstructionWarnings" type="Node2D" parent="." unique_id=68995237]
 z_index = 500
 z_as_relative = false
+material = ExtResource("36_light_mix")
 script = ExtResource("25_obstruction_warning_renderer")
 warning_texture = ExtResource("26_obstruction_warning")
 intermediate_warning_texture = ExtResource("27_obstruction_warning_intermediate")
@@ -228,6 +231,7 @@ material = SubResource("ShaderMaterial_preview_terrain")
 mouse_filter = 2
 
 [node name="DecorationContainer" type="Node2D" parent="PreviewRenderer" unique_id=102098407]
+material = ExtResource("36_light_mix")
 
 [node name="LakePreviewRenderer" type="Node2D" parent="." unique_id=322664427 node_paths=PackedStringArray("terrain_rect", "background_stain_rect", "decoration_container")]
 z_index = 9
@@ -247,6 +251,7 @@ material = SubResource("ShaderMaterial_lake_preview_terrain")
 mouse_filter = 2
 
 [node name="DecorationContainer" type="Node2D" parent="LakePreviewRenderer" unique_id=77274802]
+material = ExtResource("36_light_mix")
 
 [node name="TerrainRenderer" type="Node2D" parent="." unique_id=409744846 node_paths=PackedStringArray("terrain_rect", "background_stain_rect", "decoration_container", "paper_rect", "paper_grain_rect", "color_rect")]
 z_index = -100
@@ -297,6 +302,7 @@ stretch_mode = 1
 
 [node name="paper_rect" type="TextureRect" parent="TerrainRenderer" unique_id=9571044]
 modulate = Color(1, 1, 1, 0.30588236)
+material = ExtResource("36_light_mix")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -313,6 +319,7 @@ stretch_mode = 1
 
 [node name="color_rect" type="ColorRect" parent="TerrainRenderer" unique_id=385445106]
 z_index = -1
+material = ExtResource("36_light_mix")
 offset_left = -2829.0
 offset_top = -1417.0
 offset_right = 67746.0
@@ -331,6 +338,7 @@ material = SubResource("ShaderMaterial_watercolor_terrain")
 mouse_filter = 2
 
 [node name="DecorationContainer" type="Node2D" parent="TerrainRenderer" unique_id=2119788114]
+material = ExtResource("36_light_mix")
 
 [node name="PathWashRoot" type="Node2D" parent="." unique_id=1954066317]
 z_index = 5
@@ -344,6 +352,7 @@ wash_color = Color(0.98, 0.9408, 0.82320005, 0.8117647)
 [node name="NavigationDebugger" type="Node2D" parent="." unique_id=1062625785]
 visible = false
 z_index = 100
+material = ExtResource("36_light_mix")
 script = ExtResource("15_ad6l7")
 draw_flow_arrows = true
 metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
@@ -351,6 +360,7 @@ metadata/_custom_type_script = "uid://b3n6ehcpq3nug"
 [node name="RangeIndicator" type="Node2D" parent="." unique_id=1018228916]
 z_index = 500
 z_as_relative = false
+material = ExtResource("36_light_mix")
 script = ExtResource("18_aibdv")
 cell_outline_texture = ExtResource("28_blank_grid")
 influence_cell_textures = Dictionary[int, Texture2D]({
@@ -364,6 +374,7 @@ metadata/_custom_type_script = "uid://ibj2mt03m5av"
 [node name="InworldUI" type="Node2D" parent="." unique_id=2111889340]
 z_index = 400
 z_as_relative = false
+material = ExtResource("36_light_mix")
 script = ExtResource("23_world_ui")
 health_bar_scene = ExtResource("24_hp_bar")
 

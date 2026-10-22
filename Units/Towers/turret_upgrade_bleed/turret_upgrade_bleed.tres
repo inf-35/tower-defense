@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("6_b4srf")
+indexable = false
 id = 34
 cost = 10.0
 is_upgrade = true

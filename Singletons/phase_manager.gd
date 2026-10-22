@@ -215,10 +215,14 @@ func _start_choice_phase(type: ChoiceType) -> void:
 			Run.references.island.expansion_service.start_expansion_phase()
 		ChoiceType.REWARD_TOWER:
 			_connect_choice_selected_listener()
-			RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER], false, "Choose a tower")
+			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
+			if not RewardService.generate_and_present_choices(3, [Reward.Type.UNLOCK_TOWER], false, "Choose a tower"):
+				_on_choice_applied()
 		ChoiceType.REWARD_RELIC:
 			_connect_choice_selected_listener()
-			RewardService.generate_and_present_choices(3, [Reward.Type.ADD_RELIC, Reward.Type.ADD_RITE])
+			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
+			if not RewardService.generate_and_present_choices(3, [Reward.Type.ADD_RELIC, Reward.Type.ADD_RITE]):
+				_on_choice_applied()
 
 func _on_player_made_choice(choice_id: int) -> void:
 	if current_phase != GamePhase.CHOICE:
@@ -227,7 +231,6 @@ func _on_player_made_choice(choice_id: int) -> void:
 
 	match current_choice_type:
 		ChoiceType.REWARD_TOWER, ChoiceType.REWARD_RELIC:
-			RewardService.reward_process_complete.connect(_on_choice_applied, CONNECT_ONE_SHOT)
 			RewardService.select_reward(choice_id)
 
 func _on_choice_applied() -> void:
@@ -339,13 +342,15 @@ func start_game_over(is_victory: bool) -> void:
 	UI.display_game_over.emit(is_victory)
 	_report("Game over!")
 
-func _connect_choice_selected_listener() -> void: ##arms the phase-owned choice listener exactly once for the current choice phase
+func _connect_choice_selected_listener() -> void: ##keeps failed claims retryable until the reward service completes the phase
 	_disconnect_choice_selected_listener()
-	UI.choice_selected.connect(_on_player_made_choice, CONNECT_ONE_SHOT)
+	UI.choice_selected.connect(_on_player_made_choice)
 
-func _disconnect_choice_selected_listener() -> void: ##clears stale phase-owned choice listeners left by service-completed choices such as expansion finish
+func _disconnect_choice_selected_listener() -> void: ##releases phase-owned selection and completion listeners on resolution or interruption
 	if UI.choice_selected.is_connected(_on_player_made_choice):
 		UI.choice_selected.disconnect(_on_player_made_choice)
+	if RewardService.reward_process_complete.is_connected(_on_choice_applied):
+		RewardService.reward_process_complete.disconnect(_on_choice_applied)
 
 func _connect_boss_encounter_listeners() -> void: ##arms phase-owned boss listeners exactly once across repeated boss subwaves
 	if not Run.boss_encounters.subwave_cleared.is_connected(_on_boss_subwave_cleared):

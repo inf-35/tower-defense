@@ -1,5 +1,7 @@
 shader_type canvas_item;
 
+#include "res://Shaders/combat_light_mix.gdshaderinc"
+
 uniform sampler2D mask_texture : filter_linear;
 uniform vec4 tint_color : source_color;
 

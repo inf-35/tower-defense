@@ -129,24 +129,30 @@ func get_tower_stat(tower_type: Type, attr: Attributes.id) -> Variant: #gets a t
 		return 0.0
 	return prototype.get_stat(attr)
 
-func get_tower_prototype(tower_type: Type) -> Tower:
-	if not tower_prototypes.has(tower_type): #if no prototype
-		tower_prototypes[tower_type] = create_tower(tower_type) #create prototypical tower
-		tower_prototypes[tower_type].abstractive = true #disable all effects and events
-		tower_prototypes[tower_type].visible = false
-		add_child.call_deferred(tower_prototypes[tower_type]) #trigger _ready() calls
-
-		tower_prototypes[tower_type].tower_position = Vector2i(1915 * tower_type * tower_prototypes[tower_type].unit_id, 5823 * tower_type * tower_prototypes[tower_type].unit_id) #somewhere extremely far away
-		tower_prototypes[tower_type].facing = Tower.Facing.UP
-		tower_prototypes[tower_type].size = Towers.get_tower_size(tower_type)
-		#these prototype towers provide a "default" baseline to lookup from.
+func get_tower_prototype(tower_type: Type) -> Tower: ##returns a fully initialised non-simulating definition, using run modifiers only when a run exists
+	if not tower_prototypes.has(tower_type) or not is_instance_valid(tower_prototypes[tower_type]):
+		var prototype: Tower = create_tower(tower_type, true)
+		tower_prototypes[tower_type] = prototype
+		prototype.size = get_tower_size(tower_type)
+		prototype.facing = Tower.Facing.UP
+		prototype.tower_position = Vector2i(1915, 5823) * (int(tower_type) + 1)
+		add_child(prototype)
+		prototype.tower_position = prototype.tower_position
 	return tower_prototypes[tower_type]
 
 func reset_tower_prototype(tower_type: Type) -> void: ##resets a tower prototype (by type). use after manipulation of prototype
-	var prototype: Tower = tower_prototypes[tower_type] as Tower
-	if prototype: #1915 and 5823 are arbitrary, large, noncongruent values
-		prototype.tower_position = Vector2i(1915 * tower_type * prototype.unit_id, 5823 * tower_type * prototype.unit_id)
+	var prototype: Tower = tower_prototypes.get(tower_type) as Tower
+	if is_instance_valid(prototype):
 		prototype.facing = Tower.Facing.UP
+		prototype.size = get_tower_size(tower_type)
+		prototype.tower_position = Vector2i(1915, 5823) * (int(tower_type) + 1)
+
+func clear_prototypes() -> void: ##frees cached nodes before run-owned dependencies change; definitions remain loaded
+	var prototypes: Array[Tower] = tower_prototypes.values()
+	tower_prototypes.clear()
+	for prototype: Tower in prototypes:
+		if is_instance_valid(prototype):
+			prototype.free()
 
 func get_tower_size(tower_type: Type) -> Vector2i:
 	return tower_stats[tower_type].size
@@ -186,7 +192,7 @@ func get_tower_cost(tower_type: Type) -> float: ##returns the cost of the NEXT t
 		return base_cost
 
 	var current_count: int = 0
-	if is_instance_valid(Run.references.island):
+	if is_instance_valid(Run.references) and is_instance_valid(Run.references.island):
 		current_count = Run.references.island.get_towers_by_type(tower_type).size()
 
 	var final_cost: float = base_cost * pow(1.0 + get_cost_scaling(tower_type), current_count)
@@ -311,10 +317,14 @@ func get_tower_upgrade_cost(tower_type: Type, upgrade_type: Type) -> float: ##re
 		return -1
 	return tower_stats[tower_type].upgrades_into[upgrade_type]
 
-func create_tower(tower_type: Type) -> Tower:
+func create_tower(tower_type: Type, as_prototype: bool = false) -> Tower: ##configures prototypes before tree entry without asking for live placement costs
 	var tower: Tower = get_tower_scene(tower_type).instantiate()
 	tower.type = tower_type
-	tower.flux_value = get_tower_cost(tower_type)
+	if as_prototype:
+		tower.abstractive = true
+		tower.visible = false
+		tower.process_mode = Node.PROCESS_MODE_DISABLED
+	tower.flux_value = get_tower_base_cost(tower_type) if as_prototype else get_tower_cost(tower_type)
 	tower.set_meta(ID.UnitMeta.IS_IMPORTANT, true) #towers are always important
 	return tower
 

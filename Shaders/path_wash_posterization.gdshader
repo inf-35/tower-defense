@@ -1,5 +1,7 @@
 shader_type canvas_item;
 
+#include "res://Shaders/combat_light_mix.gdshaderinc"
+
 uniform float posterization_strength : hint_range(0.0, 1.0, 0.01) = 0.5;
 uniform int alpha_levels : hint_range(2, 32, 1) = 6;
 

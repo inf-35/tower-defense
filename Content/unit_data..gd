@@ -1,6 +1,7 @@
 extends Resource
 class_name UnitData
 
+@export var indexable: bool = true ##lists this enemy in the index; disable when no playable wave or summon can feature it
 @export var title: String
 @export var icon: Texture2D
 @export_multiline var description: String

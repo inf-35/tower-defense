@@ -165,7 +165,9 @@ func _disconnect_network_events() -> void: ##removes the global invalidation lis
 	_is_listening_for_network_events = false
 
 func _connect_island_events() -> void: ##subscribes to structural island changes so blank tower death reports still rebuild the wall network
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+	if not is_instance_valid(Run.references):
+		return
+	var island: Island = Run.references.island
 	if not is_instance_valid(island):
 		return
 	if not island.tower_changed.is_connected(_on_island_tower_changed):
@@ -173,7 +175,12 @@ func _connect_island_events() -> void: ##subscribes to structural island changes
 	_is_listening_for_island_events = true
 
 func _disconnect_island_events() -> void: ##removes the island structural listener without assuming the island survives teardown
-	var island: Island = Run.references.island if is_instance_valid(Run.references.island) else null
+	if not _is_listening_for_island_events:
+		return
+	if not is_instance_valid(Run.references):
+		_is_listening_for_island_events = false
+		return
+	var island: Island = Run.references.island
 	if is_instance_valid(island) and island.tower_changed.is_connected(_on_island_tower_changed):
 		island.tower_changed.disconnect(_on_island_tower_changed)
 	_is_listening_for_island_events = false

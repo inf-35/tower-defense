@@ -1,5 +1,7 @@
 class_name Relics
 #NOTE: this phrasing "static var" instead of "const ... preload()" is needed due to strange parser error bugs
+const RELIC_DIRECTORY: String = "res://Content/Relics"
+
 static var MONEY_MARKET: RelicData = load("res://Content/Relics/money_market/money_market.tres")
 static var SUBPRIME: RelicData = load("res://Content/Relics/subprime/subprime.tres")
 static var STUMBLING_BLOCKS: RelicData = load("res://Content/Relics/stumbling_blocks/stumbling_blocks.tres")
@@ -42,4 +44,52 @@ static var EDELWEISS: RelicData = load("res://Content/Relics/edelweiss/edelweiss
 static var SPRINKLERHEAD: RelicData = load("res://Content/Relics/sprinklerhead/sprinklerhead.tres")
 static var SPARE_SUPPLIES: RelicData = load("res://Content/Relics/spare_supplies/spare_supplies.tres")
 
-static var relics: Dictionary[RelicData.Type, RelicData] = {RelicData.Type.SPARE_SUPPLIES: SPARE_SUPPLIES} ##guild-only relics are registered here; reward_service adds reward relics
+static var relics: Dictionary[RelicData.Type, RelicData] = {}
+static var _is_loaded: bool = false
+
+static func ensure_loaded() -> void: ##loads each canonical relic resource once, independently of reward prototypes
+	if _is_loaded:
+		return
+
+	var dir: DirAccess = DirAccess.open(RELIC_DIRECTORY)
+	if not dir:
+		push_error("Relics: Failed to open directory: " + RELIC_DIRECTORY)
+		return
+	#collect all folders first
+	var folder_names: Array[String] = []
+	dir.list_dir_begin()
+	var iterative_folder_name: String = dir.get_next()
+	while iterative_folder_name != "":
+		if dir.current_is_dir() and not iterative_folder_name.begins_with("."):
+			folder_names.append(iterative_folder_name)
+		iterative_folder_name = dir.get_next()
+	dir.list_dir_end()
+	folder_names.sort()
+	#go through them and register the relics
+	var paths_by_type: Dictionary[RelicData.Type, String] = {}
+	for folder_name: String in folder_names:
+		var resource_path: String = RELIC_DIRECTORY + "/" + folder_name + "/" + folder_name + ".tres"
+		if not FileAccess.file_exists(resource_path) and not FileAccess.file_exists(resource_path + ".remap"):
+			push_warning("Relics: No canonical .tres found in " + RELIC_DIRECTORY + "/" + folder_name)
+			continue
+
+		var resource: Resource = load(resource_path)
+		if not resource is RelicData:
+			push_error("Relics: Failed to load valid RelicData at " + resource_path)
+			continue
+
+		var relic: RelicData = resource as RelicData
+		if not RelicData.Type.values().has(relic.type):
+			push_error("Relics: Invalid type ID " + str(relic.type) + " at " + resource_path)
+			continue
+
+		if relics.has(relic.type):
+			var existing_path: String = paths_by_type.get(relic.type, "an existing registry entry")
+			push_error("Relics: Duplicate type ID " + str(relic.type) + " at " + resource_path + " (already registered from " + existing_path + ")")
+			continue
+
+		relics[relic.type] = relic
+		paths_by_type[relic.type] = resource_path
+
+	_is_loaded = true
+	print("Relics: Loaded ", relics.size(), " definitions.")

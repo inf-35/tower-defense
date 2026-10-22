@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("6_u8u8f")
+indexable = false
 id = 43
 tags = Array[int]([0, 3])
 cost = 15.0

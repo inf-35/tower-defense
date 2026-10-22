@@ -67,7 +67,7 @@ func show_damage_number(damage: float) -> void: ##displays the standard damage m
 func _ready() -> void:
 	max_health = get_stat(_modifiers_component, health_data, Attributes.id.MAX_HEALTH)
 	health = max_health
-	process_mode = Node.PROCESS_MODE_PAUSABLE
+	process_mode = Node.PROCESS_MODE_DISABLED if unit.abstractive else Node.PROCESS_MODE_PAUSABLE
 	_next_tick_interval = _get_initial_tick_interval()
 
 const _TICK_INTERVAL: float = 0.25

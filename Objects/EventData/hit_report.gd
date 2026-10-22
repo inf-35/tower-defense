@@ -6,6 +6,9 @@ var source: Unit ##source of the hit's damage
 var target: Unit ##eventual target of the hit
 var attack_id: int = 0 ##positive when this report belongs to one proc-countable hit group
 var primary: bool = true ##mirrors the hit payload's primary flag so post-hit systems can distinguish root attacks from sibling or follow-up hits
+var incoming_damage: float = 0.0 ##outgoing payload damage before this victim's defenses and hit-received reactions
+var incoming_status_effects: Dictionary[Attributes.Status, Vector2] = {} ##status payload before target-side conversions or duration bonuses
+var incoming_hit: HitData ##resolved payload reference; continuations must copy it and restore incoming damage and statuses before reuse
 var damage_caused: float = 0.0 ##how much damage did the target receive
 var overkill: float = 0.0 ##how much more damage did the target receive than was necessary
 var death_caused: bool = false ##did the target die?

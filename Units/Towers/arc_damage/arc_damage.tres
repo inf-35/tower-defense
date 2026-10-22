@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("6_flo7j")
+indexable = false
 id = 45
 size = Vector2i(2, 2)
 cost = 33.0
@@ -16,7 +17,7 @@ required_capacity = 2.0
 element = 4
 is_upgrade = true
 tower_name = "Arc (damage)"
-tower_description = "fires heavier bolts that hit harder before arcing onward, retaining more damage and status duration across jumps."
+tower_description = "Fires a heavy bolt that chains through up to 4 other enemies. Jumps retain 85% of the triggering shot's {UNIT_DAMAGE} and timed status duration. Damaging split shots and overkill bolts can each chain once from their own payload; chain hits cannot start new chains."
 icon = ExtResource("1_6kgph")
 inspector_actions = Array[ExtResource("2_8xucl")]([ExtResource("3_fgq8q")])
 tower_scene = ExtResource("6_kd242")

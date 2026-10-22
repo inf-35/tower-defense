@@ -443,7 +443,7 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 	var value: Variant = null
 	#handle overrides
 	match info.special_modifier:
-		DisplayStatModifier.CORE_FLUX: return Run.player.flux
+		DisplayStatModifier.CORE_FLUX: return Run.player.flux if is_instance_valid(Run.player) else null
 		DisplayStatModifier.CAPACITY: return Towers.get_tower_capacity(tower.type)
 		DisplayStatModifier.LINE_BREAK: return null
 		DisplayStatModifier.CAPACITY_GENERATION:
@@ -452,8 +452,10 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 		DisplayStatModifier.WAVES_LEFT_IN_PHASE:
 			return tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 		DisplayStatModifier.ANOMALY_REWARD_PREVIEW:
-			var waves_left_to_reward: int = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 			var reward: Reward = tower.get_behavior_attribute(ID.UnitState.REWARD_PREVIEW)
+			if not is_instance_valid(reward):
+				return null
+			var waves_left_to_reward: int = tower.get_behavior_attribute(ID.UnitState.WAVES_LEFT_IN_PHASE)
 
 			if reward.type == Reward.Type.ADD_RELIC:
 				value = reward.relic.title + " in " + str(waves_left_to_reward) + " waves."

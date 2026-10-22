@@ -56,6 +56,8 @@ func is_run_ready() -> bool:
 
 func begin_run(island: Island) -> void:
 	end_run()
+	Towers.clear_prototypes()
+	Units.clear_prototypes()
 	_run_generation += 1
 	_run_owner = island
 	_is_run_ready = false
@@ -104,6 +106,8 @@ func end_run() -> void:
 	_is_run_ready = false
 	if has_active_run():
 		run_ending.emit()
+		Towers.clear_prototypes()
+		Units.clear_prototypes()
 		_clear_run_handles()
 	
 	current_game_scaling = 1.0

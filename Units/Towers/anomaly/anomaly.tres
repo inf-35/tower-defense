@@ -8,10 +8,12 @@
 
 [resource]
 script = ExtResource("1_lwx4q")
+indexable = false
 id = 10
 cost = 0.0
 required_capacity = 0.0
 element = 4
+is_environmental = true
 tower_name = "Shrine"
 tower_description = "Ancient ruins containing hidden artefacts. Can be activated with the spirits of fallen enemies."
 preview = ExtResource("3_b1ehy")

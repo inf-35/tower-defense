@@ -60,7 +60,6 @@ metadata/_custom_type_script = "uid://cv4ytdq1187pu"
 
 [node name="AcceleratingBehavior" type="Node" parent="." unique_id=34063386]
 script = ExtResource("2_yap6c")
-speed_increase_percent = 0.15
 interval = 0.3
 metadata/_custom_type_script = "uid://hhphtfxndfib"
 

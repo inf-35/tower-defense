@@ -26,6 +26,12 @@ turn_speed = 100.0
 shader = ExtResource("7")
 shader_parameter/overlay_color = Color(0, 0, 1, 0)
 shader_parameter/overlay_intensity = 0.0
+shader_parameter/correction_tint = Color(1, 1, 1, 1)
+shader_parameter/correction_tint_strength = 0.0
+shader_parameter/brightness_lift = 0.0
+shader_parameter/chroma_scale = 1.0
+shader_parameter/light_chroma_scale = 2.5
+shader_parameter/dark_pixel_light_floor = 0.08
 
 [sub_resource type="RectangleShape2D" id="3"]
 size = Vector2(70, 70.00002)
