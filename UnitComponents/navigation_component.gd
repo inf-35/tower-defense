@@ -36,7 +36,7 @@ var _current_deviation: Vector2 = Vector2.ZERO
 #--- configuration ---
 const TARGET_DEVIATION_FROM_WAYPOINT: float = Island.CELL_SIZE * 0.5
 const TARGET_DEVIATION_SQUARED = TARGET_DEVIATION_FROM_WAYPOINT ** 2
-const NAVIGATION_UPDATE_INTERVAL: float = 5.0 / 60.0 ##matches the old 5-frame cadence at 60 fps while staying stable across frame rates and game speeds
+const NAVIGATION_UPDATE_INTERVAL: float = 1.0 / 60.0 ##matches the old 5-frame cadence at 60 fps while staying stable across frame rates and game speeds
 
 var _navigation_update_accumulator: float = 0.0
 var _path_dirty: bool = false

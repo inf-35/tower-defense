@@ -205,7 +205,7 @@ func _play_jump_feedback(start_position: Vector2, end_position: Vector2) -> void
 			swirl_info.graphical_layer
 		)
 		if is_instance_valid(swirl_line) and is_instance_valid(swirl_info.swirl_particle_texture):
-			swirl_line.set_texture(swirl_info.swirl_particle_texture)
+			swirl_line.set_swirl_texture(swirl_info.swirl_particle_texture)
 
 	var line := Line2D.new()
 	line.width = jump_feedback_width

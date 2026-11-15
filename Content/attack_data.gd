@@ -8,6 +8,10 @@ class_name AttackData
 	set(new_value):
 		range = new_value
 		value_changed.emit(Attributes.id.RANGE)
+@export_range(0.0, 1.0, 0.01) var minimum_range: float = 0.0: ##closest target distance as a fraction of effective range
+	set(new_value):
+		minimum_range = clampf(new_value, 0.0, 1.0)
+		value_changed.emit(Attributes.id.MINIMUM_RANGE)
 @export var cooldown: float = 1.0: ##cooldown between attacks
 	set(new_value):
 		cooldown = new_value

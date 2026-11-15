@@ -16,7 +16,7 @@
 
 [sub_resource type="Resource" id="Resource_drdql"]
 script = ExtResource("3_e03kd")
-base_capacity = 2.0
+base_capacity = 1.2
 effect_type = 2
 schedule = 1
 metadata/_custom_type_script = "uid://bigp8gkrdqok7"

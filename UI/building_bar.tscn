@@ -87,13 +87,12 @@ theme_type_variation = &"vbox_5"
 theme_override_constants/separation = 12
 
 [node name="tower selection" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar" unique_id=132609132 instance=ExtResource("3_uep1a")]
-use_parent_material = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
 [node name="TowerSlotsPanel" type="PanelContainer" parent="HBoxContainer" unique_id=1509594030]
-use_parent_material = true
 visible = false
+use_parent_material = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2

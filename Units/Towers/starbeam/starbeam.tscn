@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://b0xmn5t7j4lcb"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_display"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="3_damage"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_hitrate"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_range_display"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_health"]
+[ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_range"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_attack"]
+[ext_resource type="Resource" uid="uid://by277rx8cd2sw" path="res://Units/Towers/starbeam/starbeam_attack.tres" id="9_attack_data"]
+[ext_resource type="Texture2D" uid="uid://dmhl37d247h2" path="res://Assets/starbeam_base.png" id="10_a8ijr"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="11_shadow"]
+[ext_resource type="Texture2D" uid="uid://beluvuy4ojv0a" path="res://Assets/starbeam_sunring.png" id="12_o6ttl"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="12_vml51"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="13_cidu5"]
+[ext_resource type="Texture2D" uid="uid://8m8r58tp87yc" path="res://Assets/starbeam_starring.png" id="13_o4jp6"]
+[ext_resource type="Script" uid="uid://g6lcnlgnm1ve" path="res://Units/Towers/starbeam/starbeam_behavior.gd" id="14_behavior"]
+
+[node name="Starbeam" type="Node2D" unique_id=724342648 node_paths=PackedStringArray("turret", "behavior", "graphics", "health_component", "movement_component", "range_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_tower")
+type = 85
+turret = NodePath("Graphics/starring")
+stat_displays = Array[ExtResource("2_display")]([ExtResource("3_damage"), ExtResource("4_hitrate"), ExtResource("5_range_display")])
+behavior = NodePath("StarbeamBehavior")
+graphics = NodePath("Graphics")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+range_component = NodePath("RangeComponent")
+attack_component = NodePath("AttackComponent")
+
+[node name="StarbeamBehavior" type="Node" parent="." unique_id=1245807856 node_paths=PackedStringArray("sunring")]
+script = ExtResource("14_behavior")
+sunring = NodePath("../Graphics/sunring")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1208127386]
+script = ExtResource("6_health")
+
+[node name="RangeComponent" type="Node" parent="." unique_id=1571180023]
+script = ExtResource("7_range")
+targeting_mode = 1
+
+[node name="AttackComponent" type="Node" parent="." unique_id=836669648]
+script = ExtResource("8_attack")
+attack_data = ExtResource("9_attack_data")
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=145765653]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("10_a8ijr")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1056818714]
+script = ExtResource("11_shadow")
+height_multiplier = 2.0
+
+[node name="sunring" type="Sprite2D" parent="Graphics" unique_id=780601919]
+texture = ExtResource("12_o6ttl")
+
+[node name="starring" type="Sprite2D" parent="Graphics" unique_id=17484965]
+rotation = 1.0471976
+scale = Vector2(1.164199, 1)
+texture = ExtResource("13_o4jp6")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1739462691]
+script = ExtResource("12_vml51")
+movement_data = ExtResource("13_cidu5")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"

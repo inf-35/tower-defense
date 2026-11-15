@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://cwlteu3keyq2k"]
+
+[ext_resource type="Script" uid="uid://c5u5coggwig6l" path="res://Units/Towers/caldera/lava_ground.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://dfyyh45tqf8i" path="res://Units/Towers/caldera/lava_ground.gdshader" id="2_shader"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_lava"]
+frequency = 0.034
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lava"]
+width = 128
+height = 128
+noise = SubResource("FastNoiseLite_lava")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lava"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/lava_noise = SubResource("NoiseTexture2D_lava")
+shader_parameter/brush_uv_origin = Vector2(0, 0)
+shader_parameter/brush_uv_span = Vector2(0, 0)
+shader_parameter/brush_strength = 1.0
+shader_parameter/lavaness = 1.0
+shader_parameter/crust_color = Color(0.67, 0.15633334, 0, 0.8509804)
+shader_parameter/molten_color = Color(1, 0.6053333, 0.26, 1)
+shader_parameter/pencil_color = Color(0.14, 0.11725, 0.0854, 0.7411765)
+
+[node name="LavaGround" type="ColorRect" unique_id=1826069141]
+z_index = 50
+material = SubResource("ShaderMaterial_lava")
+offset_right = 10.0
+offset_bottom = 10.0
+mouse_filter = 2
+script = ExtResource("1_script")

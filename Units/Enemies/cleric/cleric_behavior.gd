@@ -28,7 +28,7 @@ func _perform_heal_pulse() -> bool:
 		for status: StatusEffect in statuses:
 			if not is_instance_valid(status):
 				continue
-			if status.stack <= 0.0:
+			if status.stack <= 0.0 or status.type == Attributes.Status.GUSTED:
 				continue
 
 			status.stack = 0.0

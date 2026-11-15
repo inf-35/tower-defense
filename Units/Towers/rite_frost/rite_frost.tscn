@@ -27,6 +27,7 @@ show_as_status_icon = true
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("12_status")
+max_contributing_stacks = 3
 icon = ExtResource("9_v7esy")
 show_as_status_icon = true
 

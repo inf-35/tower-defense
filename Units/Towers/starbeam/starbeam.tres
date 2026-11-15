@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cxnr4q5n0ikq5"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_data"]
+[ext_resource type="Texture2D" uid="uid://dgcfkx0cwhtb8" path="res://Assets/starbeam.png" id="1_ppyp6"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_ogp5x"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_a2t1x"]
+[ext_resource type="PackedScene" uid="uid://b0xmn5t7j4lcb" path="res://Units/Towers/starbeam/starbeam.tscn" id="3_scene"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_0g1v8"]
+
+[resource]
+script = ExtResource("1_data")
+id = 85
+required_capacity = 1.5
+element = 4
+tower_name = "Starbeam"
+tower_description = "Targets the enemy with the most health in range and inflicts {STARSTRUCK|label=Starstruck}, stripping its {UNIT_ARMOR|label=Armor}."
+icon = ExtResource("1_ppyp6")
+preview = ExtResource("1_ppyp6")
+tower_scene = ExtResource("3_scene")

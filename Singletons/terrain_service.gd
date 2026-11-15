@@ -98,6 +98,8 @@ func is_area_constructable(island: Island, tower_facing: Tower.Facing, tower_pos
 	var validity: Dictionary = Towers.get_tower_prototype(tower_type).check_placement_validity(island, tower_position, tower_facing)
 	if not (validity.has("valid") and validity.valid):
 		return false
+	if not _get_relic_placement_error(island, tower_position, tower_type, tower_facing, exclude_tower).is_empty():
+		return false
 
 	var allowed_terrains: Array[Terrain.Base] = Towers.get_tower_allowed_terrains(tower_type)
 	for x: int in size.x:
@@ -164,6 +166,9 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 	var validity: Dictionary = Towers.get_tower_prototype(tower_type).check_placement_validity(island, cell, tower.facing)
 	if validity.has("valid") and not validity.valid:
 		return validity.error
+	var relic_error: String = _get_relic_placement_error(island, cell, tower_type, tower.facing)
+	if not relic_error.is_empty():
+		return relic_error
 
 	for x in range(size.x):
 		for y in range(size.y):
@@ -196,3 +201,17 @@ func get_construction_error_message(island: Island, cell: Vector2i, tower: Tower
 				return "Invalid Terrain: %s" % Terrain.Base.keys()[terrain].capitalize()
 
 	return "" #no error
+
+func _get_relic_placement_error(island: Island, cell: Vector2i, tower_type: Towers.Type, facing: Tower.Facing, exclude_tower: Tower = null) -> String: ##uses the same owned-effect rules for preview feedback and authoritative placement
+	if not is_instance_valid(Run.player):
+		return ""
+	for relic: RelicData in Run.player.active_relics:
+		if relic.global_effect == null:
+			continue
+		var instance: EffectInstance = Run.player.get_relic_effect_instance(relic)
+		if not is_instance_valid(instance) or not instance.enabled:
+			continue
+		var error: String = relic.global_effect.get_placement_error(instance, island, cell, tower_type, facing, exclude_tower)
+		if not error.is_empty():
+			return error
+	return ""

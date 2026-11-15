@@ -5,8 +5,8 @@ signal cancelled
 signal embark_requested(guild: GuildData, environment: Run.GameEnvironment, difficulty: Run.GameDifficulty)
 
 @export var guild_options: Array[EmbarkGuildCard] = [] ##authored guild cards, each binding its own starting-package resource
-@export var woods_option: EmbarkChoice ##placeholder woods environment option
-@export var winter_option: EmbarkChoice ##placeholder winter environment option; unavailable environments are not enumerated
+@export var woods_option: EmbarkChoice ##woods map icon using the shared choice interaction
+@export var winter_option: EmbarkChoice ##winter map icon; unavailable environments are not enumerated
 @export var medium_option: EmbarkChoice ##medium maps to the existing normal difficulty without changing saved enum values
 @export var hard_option: EmbarkChoice ##hard difficulty option
 @export var title_label: Label ##selection-only summary in guild, environment, difficulty order

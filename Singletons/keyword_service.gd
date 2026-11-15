@@ -4,7 +4,7 @@ const BAD_COLOR: Color = Color("b53643ff")
 const HIGHLIGHT_ACTION_COLOR: Color = Color("1a6fc9ff")
 const HIGHLIGHT_COLOR: Color = Color(0.85, 0.669, 0.17, 1.0)
 const INPUT_COLOR: Color = Color(0.17, 0.28, 0.53, 1.0)
-const POSITIVE_HIGHLIGHT_COLOR: Color = Color(0.35, 1.0, 0.45, 0.48)
+const POSITIVE_HIGHLIGHT_COLOR: Color = Color(0.18, 0.5, 0.26, 0.48)
 const NEGATIVE_HIGHLIGHT_COLOR: Color = Color(1.0, 0.2, 0.2, 0.48)
 const TEXT_STYLES: Dictionary[String, Color] = {
 	"bad": BAD_COLOR,
@@ -86,6 +86,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"description": "A flat reduction on damage taken by this unit (does not affect {STATUS|label=Status Effects}).",
 		"icon": preload("res://Assets/armor_icon.png"),
 	},
+	"GUSTED": {
+		"title": "Gusted",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}. This unit is inside a Gust tower's wind field.",
+		"icon": preload("res://Assets/particle_whirl.png")
+	},
 	"FROST": {
 		"title": "Frost",
 		"display": "",
@@ -115,6 +121,12 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"display": "",
 		"description": "{STATUS_EFFECT_LABEL}: Cursed units take 33% more damage per stack of curse.",
 		"icon": preload("res://Assets/cursed_icon.png")
+	},
+	"STARSTRUCK": {
+		"title": "Starstruck",
+		"display": "",
+		"description": "{STATUS_EFFECT_LABEL}. Starstruck units lose all {UNIT_ARMOR} while the effect lasts.",
+		"icon": preload("res://Assets/spark.png")
 	},
 	"POISON": {
 		"title": "Poison",

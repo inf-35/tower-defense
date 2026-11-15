@@ -3,6 +3,7 @@ class_name StatusInfusionEffect
 
 @export var status: Attributes.Status = Attributes.Status.FROST
 @export var bonus_stacks: float = 1.0
+@export_range(0, 16, 1, "or_greater") var max_contributing_stacks: int = 0 ##caps contributing copies when calculating infusion; zero is unlimited and source bookkeeping stays uncapped
 @export var bonus_time: float = 2.0
 @export var projectile_tint: Color = Color(0.5803922, 0.8980392, 1.0, 1.0) ##tint appended to the projectile palette so multi-rite attacks can cycle between distinct colors instead of blending them
 
@@ -33,7 +34,8 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	var status_vector: Vector2 = hit_data.status_effects.get(status, Vector2.ZERO)
 
-	status_vector.x += bonus_stacks * instance.stacks
+	var contributing_stacks: int = mini(instance.stacks, max_contributing_stacks) if max_contributing_stacks > 0 else instance.stacks
+	status_vector.x += bonus_stacks * contributing_stacks
 	status_vector.y = maxf(status_vector.y, bonus_time)
 
 	hit_data.status_effects[status] = status_vector

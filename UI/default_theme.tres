@@ -9,8 +9,9 @@
 [ext_resource type="FontVariation" uid="uid://du0bv3ti1a6il" path="res://Fonts/skranji_italic_variation.tres" id="5_oj63r"]
 [ext_resource type="Texture2D" uid="uid://bjgdunmp1dvg" path="res://Assets/simple_banner.png" id="6_xew0t"]
 [ext_resource type="Texture2D" uid="uid://jsvqbu28lwi1" path="res://Assets/shop_frame.png" id="7_aqj6o"]
+[ext_resource type="Texture2D" uid="uid://bq6akrybyrfsp" path="res://Assets/shop_frame_paper.png" id="8_au85v"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_iilnk"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5vdr8"]
 content_margin_left = 10.0
 content_margin_top = 10.0
 content_margin_right = 10.0
@@ -2630,6 +2631,15 @@ axis_stretch_horizontal = 2
 axis_stretch_vertical = 2
 region_rect = Rect2(0, 0, 600, 600)
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_xldbc"]
+texture = ExtResource("8_au85v")
+texture_margin_left = 200.0
+texture_margin_top = 200.0
+texture_margin_right = 200.0
+texture_margin_bottom = 200.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_xew0t"]
 content_margin_left = 10.0
 content_margin_top = 10.0
@@ -2658,7 +2668,7 @@ Button/colors/font_color = Color(0.4117647, 0.37254903, 0.29411766, 1)
 Button/colors/font_focus_color = Color(0.48, 0.4336, 0.34080002, 1)
 Button/colors/font_pressed_color = Color(0.54, 0.5022, 0.42660004, 1)
 Button/font_sizes/font_size = 40
-Button/styles/normal = SubResource("StyleBoxTexture_iilnk")
+Button/styles/normal = SubResource("StyleBoxTexture_5vdr8")
 Button/styles/pressed = SubResource("StyleBoxTexture_au85v")
 GridContainer/constants/h_separation = 8
 GridContainer/constants/v_separation = 8
@@ -2780,6 +2790,8 @@ rt_s40/font_sizes/mono_font_size = 80
 rt_s40/font_sizes/normal_font_size = 80
 shopcontainer/base_type = &"PanelContainer"
 shopcontainer/styles/panel = SubResource("StyleBoxTexture_u5het")
+shopcontainerpaper/base_type = &"PanelContainer"
+shopcontainerpaper/styles/panel = SubResource("StyleBoxTexture_xldbc")
 simple_banner/base_type = &"PanelContainer"
 simple_banner/styles/panel = SubResource("StyleBoxTexture_xew0t")
 simple_panel/base_type = &"PanelContainer"

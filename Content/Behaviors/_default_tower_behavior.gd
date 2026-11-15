@@ -62,7 +62,9 @@ func update(_delta: float) -> void: ##tracks one target through wind-up and rele
 				return
 
 			#turn towards target
-			if not prediction_valid:
+			if attack_component.attack_data.delivery_method == DeliveryData.DeliveryMethod.HITSCAN:
+				predicted_target_pos = _locked_target.global_position
+			elif not prediction_valid:
 				predicted_target_pos = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_cooldown)
 				prediction_valid = true
 			var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
@@ -96,13 +98,14 @@ func _enter_state(new_state: State, target: Unit = null) -> void:
 			await Clock.create_game_timer(attack_component.current_cooldown - animation_length).timeout
 			_play_animation(&"attack_windup") #TODO: implement animation compress/stretching
 
-func _attack(_target: Unit) -> void:
-	#snap towards target
-	var predicted_target_pos: Vector2 = AttackComponent.predict_intercept_position(unit, _locked_target, attack_component.attack_data.projectile_speed, false, attack_component.current_cooldown)
-	var direction_to_target: Vector2 = (predicted_target_pos - turret.global_position)
+func _attack(target: Unit) -> void: ##snaps to the release aim point before firing at the selected target
+	var aim_position: Vector2 = target.global_position
+	if attack_component.attack_data.delivery_method != DeliveryData.DeliveryMethod.HITSCAN:
+		aim_position = AttackComponent.predict_intercept_position(unit, target, attack_component.attack_data.projectile_speed, false, attack_component.current_cooldown)
+	var direction_to_target: Vector2 = aim_position - turret.global_position
 	turret.rotation = direction_to_target.angle() - graphics.global_rotation
 	_play_animation(&"attack")
-	attack_component.attack(_locked_target)
+	attack_component.attack(target)
 
 #helper for rotation logic
 func _rotate_turret(target_angle: float, turn_step: float) -> void:

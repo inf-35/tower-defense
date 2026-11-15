@@ -10,7 +10,6 @@ enum ConditionKind {
 	AFFECTING_RITES,
 	HOST_TERRAIN,
 	ADJACENT_EMPTY_CELLS,
-	CONTIGUOUS_TYPES,
 }
 
 ##which spatial/counting rule this relic uses when evaluating each host tower
@@ -19,16 +18,16 @@ enum ConditionKind {
 @export var host_tower_types: Array[Towers.Type] = []
 ##reference tower types counted by the condition; some modes instead reuse the host tower type
 @export var reference_tower_types: Array[Towers.Type] = []
-##tower types allowed to bridge a contiguous network; contributors are still filtered by reference_tower_types
-@export var contiguous_bridge_tower_types: Array[Towers.Type] = []
 ##reference terrain types counted by terrain-based neighborhood conditions
 @export var reference_terrain_types: Array[Terrain.Base] = []
 ##maximum search distance for range-based conditions
 @export var max_range: int = 1
 ##minimum count needed before the relic grants anything to a host
 @export var min_count: int = 1
-##whether one qualifying relic source should scale internally with the counted amount
+##whether modifiers and granted effect stacks scale with the counted amount
 @export var scale_with_count: bool = false
+@export_range(0, 64, 1, "or_greater") var scaling_count_offset: int = 0 ##qualifying sources ignored before calculating a scaling benefit
+@export_range(0, 64, 1, "or_greater") var max_scaling_count: int = 0 ##maximum contributing sources for scaling benefits; zero is unlimited
 ##for global left-right / up-down checks, reuse the host tower type instead of reference_tower_types
 @export var match_host_type_on_both_sides: bool = false
 ##terrain types the host itself may stand on for terrain-based conditions
@@ -177,10 +176,10 @@ func _evaluate_tower(instance: EffectInstance, tower: Tower) -> void: ##applies,
 		return
 
 	_apply_modifiers(state, tower, count)
-	_apply_granted_effect(state, tower)
+	_apply_granted_effect(state, tower, count)
 
 	#feedback only fires on first qualification or when a scaling relic gained more sources
-	if previous_count < min_count or (scale_with_count and count > previous_count):
+	if previous_count < min_count or (scale_with_count and _get_scaling_count(count) > _get_scaling_count(previous_count)):
 		_play_condition_link_wisps(tower)
 		trigger_target_bonus_feedback(tower)
 
@@ -209,8 +208,6 @@ func get_condition_source_towers(tower: Tower) -> Array[Tower]: ##returns live t
 			var report: TowerTopologyService.Report = Run.references.island.topology_service.query(tower, query)
 			for candidate: Tower in report.unique_towers:
 				_append_condition_source(source_towers, seen_ids, candidate, tower)
-		ConditionKind.CONTIGUOUS_TYPES:
-			return _get_contiguous_type_sources(tower)
 	return source_towers
 
 func _append_condition_source(sources: Array[Tower], seen_ids: Dictionary[int, bool], candidate: Tower, host_tower: Tower) -> void: ##dedupes multi-tile contributors while applying the same filter used by condition evaluation
@@ -274,8 +271,6 @@ func _count_matches(tower: Tower) -> int: ##normalizes the authored condition ki
 			return int(_matches_host_terrain(tower))
 		ConditionKind.ADJACENT_EMPTY_CELLS:
 			return _count_adjacent_empty_cells(tower)
-		ConditionKind.CONTIGUOUS_TYPES:
-			return _get_contiguous_type_sources(tower).size()
 	return 0
 
 func _count_adjacent_types(tower: Tower) -> int: ##dedupes by tower reference so multi-tile neighbors only contribute once
@@ -326,40 +321,6 @@ func _count_within_range_of_types(tower: Tower) -> int: ##uses topology queries 
 		if _matches_reference_tower(other_tower, tower):
 			count += 1
 	return count
-
-func _get_contiguous_type_sources(tower: Tower) -> Array[Tower]: ##flood-fills cardinally through active authored bridge types and returns matching contributors once each
-	var sources: Array[Tower] = []
-	var island: Island = _get_live_island()
-	if not is_instance_valid(island) or contiguous_bridge_tower_types.is_empty():
-		return sources
-
-	var visited_tower_ids: Dictionary[int, bool] = {tower.unit_id: true}
-	var visited_cells: Dictionary[Vector2i, bool] = {}
-	var queued_cells: Array[Vector2i] = tower.get_adjacent_cells()
-	var queue_index: int = 0
-	while queue_index < queued_cells.size():
-		var cell: Vector2i = queued_cells[queue_index]
-		queue_index += 1
-		if visited_cells.has(cell):
-			continue
-		visited_cells[cell] = true
-
-		var candidate: Tower = island.get_tower_on_tile(cell)
-		if not _is_valid_host_candidate(candidate, tower):
-			continue
-		if not contiguous_bridge_tower_types.has(candidate.type):
-			continue
-		if visited_tower_ids.has(candidate.unit_id):
-			continue
-
-		visited_tower_ids[candidate.unit_id] = true
-		if _matches_reference_tower(candidate, tower):
-			sources.append(candidate)
-		for adjacent_cell: Vector2i in candidate.get_adjacent_cells():
-			if not visited_cells.has(adjacent_cell):
-				queued_cells.append(adjacent_cell)
-
-	return sources
 
 func _has_global_types_on_both_sides(tower: Tower, horizontal: bool) -> bool: ##answers the bookends-style "something exists on both sides" condition without constructing a full path/query object
 	var matching_types: Array = []
@@ -483,11 +444,21 @@ func _apply_scaled_values(modifier: Modifier, modifier_prototype: ModifierDataPr
 	if not scale_with_count:
 		return
 
-	modifier_prototype.apply_single_source_stacks(modifier, count)
+	modifier_prototype.apply_single_source_stacks(modifier, _get_scaling_count(count))
 
-func _apply_granted_effect(state: ConditionalRelicState, tower: Tower) -> void: ##grants the optional local effect at most once per tower and tracks that fact separately from stat modifiers
+func _get_scaling_count(count: int) -> int: ##shares the authored offset and cap between modifier values, effect stacks, and gain feedback
+	var contributing_count: int = maxi(count - scaling_count_offset, 0)
+	return mini(contributing_count, max_scaling_count) if max_scaling_count > 0 else contributing_count
+
+func _apply_granted_effect(state: ConditionalRelicState, tower: Tower, count: int) -> void: ##keeps one local effect per host and sets its stacks from the current qualifying source count
 	var tower_id: int = tower.get_instance_id()
 	if not is_instance_valid(granted_effect):
+		return
+	var effect_stacks: int = granted_effect_stacks * (_get_scaling_count(count) if scale_with_count else 1)
+	if effect_stacks <= 0:
+		if state.active_effects.has(tower_id):
+			tower.remove_effect(granted_effect)
+			state.active_effects.erase(tower_id)
 		return
 
 	var existing_instances: Array[EffectInstance] = tower.get_effect_instances_by_prototype(granted_effect)
@@ -497,11 +468,12 @@ func _apply_granted_effect(state: ConditionalRelicState, tower: Tower) -> void: 
 		existing_instances.clear()
 
 	if not existing_instances.is_empty():
-		existing_instances[0].stacks = granted_effect_stacks
+		existing_instances[0].stacks = effect_stacks
+		existing_instances[0].notify_display_changed()
 		state.active_effects[tower_id] = true
 		return
 
-	tower.apply_effect(granted_effect, granted_effect_stacks)
+	tower.apply_effect(granted_effect, effect_stacks)
 	state.active_effects[tower_id] = true
 
 func _remove_from_tower(state: ConditionalRelicState, tower: Tower) -> void: ##central teardown path for one tower, used both when conditions fail and when hosts become invalid

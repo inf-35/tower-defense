@@ -61,6 +61,7 @@ func _update_slot_minimum_size() -> void: ##reserves only the overlay's protrudi
 
 func _on_mouse_entered() -> void:
 	if not keyword.is_empty():
+		Audio.play_sound(ID.Sounds.BUTTON_HOVER_SOUND, -5.0)
 		hover_started.emit(keyword)
 
 func _on_mouse_exited() -> void:

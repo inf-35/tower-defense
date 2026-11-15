@@ -18,6 +18,8 @@ projectile_tint = Color(0.54648, 0.81, 0.3159, 1)
 script = ExtResource("2_effect")
 reference_tower_types = Array[int]([53])
 min_count = 2
+scale_with_count = true
+scaling_count_offset = 1
 granted_effect = SubResource("Resource_status")
 icon = ExtResource("2_8tt7c")
 
@@ -27,5 +29,5 @@ type = 44
 global_effect = SubResource("Resource_effect")
 reward_tags = Array[int]([0])
 title = "Ergot"
-description = "Towers adjacent to 2 or more {T_FARM|label=Farms} inflict 1 stack of {POISON}, lasting 0.6 seconds."
+description = "Towers' attacks inflict 1 stack of {POISON} per adjacent {T_FARM|label=Farm} after the first, lasting 0.6 seconds."
 icon = ExtResource("2_8tt7c")

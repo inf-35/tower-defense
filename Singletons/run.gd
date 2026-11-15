@@ -20,7 +20,7 @@ const POWER_SERVICE_SCRIPT := preload("res://Singletons/power_service.gd")
 const DAMAGE_TRACKER_SERVICE_SCRIPT := preload("res://Singletons/damage_tracker_service.gd")
 const TUTORIAL_DIRECTOR_SCRIPT := preload("res://Singletons/tutorial_director.gd")
 const ENVIRONMENT_DATABASE: EnvironmentDatabase = preload("res://Indexes/default_environments.tres")
-const DEFAULT_GUILD: GuildData = preload("res://Content/Guilds/testers.tres")
+const DEFAULT_GUILD: GuildData = preload("res://Content/Guilds/guards.tres")
 
 var _run_root: Node
 var _run_owner: Island
@@ -137,7 +137,10 @@ func get_save_data() -> Dictionary:
 	}
 
 func load_save_data(data: Dictionary) -> void:
-	current_guild = load(str(data.get("guild_path", DEFAULT_GUILD.resource_path))) as GuildData
+	var guild_path: String = str(data.get("guild_path", DEFAULT_GUILD.resource_path))
+	if guild_path == "res://Content/Guilds/testers.tres":
+		guild_path = DEFAULT_GUILD.resource_path
+	current_guild = load(guild_path) as GuildData
 	if current_guild == null:
 		current_guild = DEFAULT_GUILD
 	pending_game_difficulty = int(data.get("pending_game_difficulty", GameDifficulty.NORMAL))

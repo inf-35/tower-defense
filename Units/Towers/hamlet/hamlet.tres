@@ -10,11 +10,11 @@
 [resource]
 script = ExtResource("5_mulcf")
 id = 52
-cost = 2.0
+cost = 4.0
 required_capacity = 0.0
 element = 5
 tower_name = "Hamlet"
-tower_description = "A small settlement. Produces 2 {POPULATION}, but can only be placed adjacent to {T_GENERATOR|label=Villages}"
+tower_description = "A small settlement. Produces 1.2 {POPULATION} and must be placed adjacent to a {T_GENERATOR|label=Village}."
 icon = ExtResource("1_4d2o5")
 preview = ExtResource("1_4d2o5")
 tower_scene = ExtResource("6_gigfl")

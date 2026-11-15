@@ -8,15 +8,17 @@ var _motion_target: AnimatableUI
 var _last_disabled_state: bool = false
 var _self_hover_tween: Tween
 
-func _init() -> void:
-	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	#connect this button's own built-in signals to its handler functions
-	self.mouse_entered.connect(_clicky_on_mouse_entered)
-	self.mouse_entered.connect(_clicky_forward_mouse_entered)
-	self.mouse_exited.connect(_clicky_forward_mouse_exited)
-	self.pressed.connect(_clicky_on_pressed)
-
 func _enter_tree() -> void:
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	#bind after scene construction so inherited button scripts are fully installed.
+	if not mouse_entered.is_connected(_clicky_on_mouse_entered):
+		mouse_entered.connect(_clicky_on_mouse_entered)
+	if not mouse_entered.is_connected(_clicky_forward_mouse_entered):
+		mouse_entered.connect(_clicky_forward_mouse_entered)
+	if not mouse_exited.is_connected(_clicky_forward_mouse_exited):
+		mouse_exited.connect(_clicky_forward_mouse_exited)
+	if not pressed.is_connected(_clicky_on_pressed):
+		pressed.connect(_clicky_on_pressed)
 	if not resized.is_connected(_update_pivot):
 		resized.connect(_update_pivot)
 	call_deferred("_update_pivot")

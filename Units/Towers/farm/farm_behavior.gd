@@ -82,7 +82,7 @@ func check_placement_validity(island: Island, cell: Vector2i, facing: int) -> Di
 	return { "valid": false, "error": "Must touch a Structure" }
 
 func _on_wave_ended(_wave: int) -> void:
-	if (unit as Tower).current_state != Tower.State.ACTIVE:
+	if unit.disabled or (unit as Tower).current_state != Tower.State.ACTIVE:
 		return
 
 	var total: float = unit.modifiers_component.pull_dynamic_stat(FARM_INCOME_KEY)

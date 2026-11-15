@@ -133,7 +133,7 @@ func _input(event: InputEvent) -> void:
 
 func start() -> void:
 	for relic: RelicData in active_relics.duplicate():
-		remove_relic(relic)
+		remove_relic(relic, true)
 
 	for unit: Unit in get_tree().get_nodes_in_group(Run.references.TOWER_GROUP):
 		unit.queue_free()
@@ -390,12 +390,14 @@ func add_relic(relic: RelicData) -> void:
 	#announce that the global state has changed
 	relics_changed.emit()
 
-func remove_relic(relic: RelicData) -> bool:
+func remove_relic(relic: RelicData, force: bool = false) -> bool: ##removes an owned relic; force is reserved for consumption and run cleanup
 	if not is_instance_valid(relic):
 		return false
 
 	var matched_relic: RelicData = _find_active_relic_resource(relic)
 	if not is_instance_valid(matched_relic):
+		return false
+	if matched_relic.binding and not force:
 		return false
 
 	if _active_relic_effects.has(matched_relic):
@@ -406,10 +408,10 @@ func remove_relic(relic: RelicData) -> bool:
 	relics_changed.emit()
 	return true
 
-func remove_relic_by_type(relic_type: RelicData.Type) -> bool:
+func remove_relic_by_type(relic_type: RelicData.Type, force: bool = false) -> bool: ##removes an owned type with the same binding protection as direct removal
 	for relic: RelicData in active_relics:
 		if is_instance_valid(relic) and relic.type == relic_type:
-			return remove_relic(relic)
+			return remove_relic(relic, force)
 	return false
 
 func has_free_relic_slot() -> bool: ##returns whether the player currently has at least one unoccupied relic slot

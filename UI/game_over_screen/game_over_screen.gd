@@ -96,9 +96,17 @@ func _populate_towers() -> void:
 	tower_container.show_towers(sorted_types)
 	_debug_log("populated %d tower icons" % sorted_types.size())
 
-func _on_restart_pressed() -> void:
-	#delete the current save (which just died)
+func _on_restart_pressed() -> void: ##starts a fresh island with the settings of the run that just ended
 	SaveLoad.delete_save()
+	if SaveLoad.has_save_file():
+		push_error("GameOverScreen: could not remove the previous save; restart cancelled")
+		return
+
+	#resumed saves can have different settings from the pending new run.
+	Run.pending_game_difficulty = Run.current_game_difficulty
+	Run.pending_guild = Run.current_guild
+	Run.pending_game_environment = Run.current_game_environment
+
 	#unpause before changing scenes or the new scene will start paused
 	get_tree().paused = false
 	#reload the main game scene

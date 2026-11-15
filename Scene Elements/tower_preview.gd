@@ -30,7 +30,6 @@ func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i) -> vo
 
 	tower_sprite.modulate = VALID_TINT if is_valid else INVALID_TINT
 	tower_sprite.rotation = facing * PI * 0.5
-	tower_sprite.scale = _get_preview_scale()
 	var base_size: Vector2i = Towers.get_tower_size(tower_type)
 	var center_offset: Vector2 = (base_size) * Island.CELL_SIZE * 0.5
 	if int(facing) % 2 != 0:
@@ -39,9 +38,14 @@ func update_visuals(is_valid: bool, facing: int, tower_position: Vector2i) -> vo
 	#trigger the _draw() function to update any custom overlays
 	queue_redraw()
 
-func _get_preview_scale() -> Vector2: ##scales preview art by the authored tower footprint so oversized towers no longer render like 1x1 placements
+func _get_preview_scale() -> Vector2: ##fits separate preview artwork to the live base sprite's drawn bounds without stretching its aspect ratio
 	var prototype: Tower = Towers.get_tower_prototype(tower_type)
-	if is_instance_valid(prototype) and is_instance_valid(prototype.graphics):
-		return prototype.graphics.scale
-
-	return Vector2.ONE * BASE_PREVIEW_SCALE
+	if not is_instance_valid(prototype) or not is_instance_valid(prototype.graphics) or tower_sprite.texture == null:
+		return Vector2.ONE * BASE_PREVIEW_SCALE
+	var preview_size: Vector2 = tower_sprite.texture.get_size()
+	if preview_size.x <= 0.0 or preview_size.y <= 0.0:
+		return Vector2.ONE * BASE_PREVIEW_SCALE
+	#preview textures can already be twice the resolution of the scene's base artwork.
+	var drawn_size: Vector2 = prototype.graphics.get_rect().size.abs() * prototype.graphics.scale.abs()
+	var fit_scale: float = minf(drawn_size.x / preview_size.x, drawn_size.y / preview_size.y)
+	return Vector2.ONE * fit_scale

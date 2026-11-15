@@ -150,6 +150,7 @@ script = ExtResource("1_0iamf")
 terrain_renderer = NodePath("TerrainRenderer")
 preview_renderer = NodePath("PreviewRenderer")
 lake_preview_renderer = NodePath("LakePreviewRenderer")
+ruin_average_spacing = 6.0
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1723399969]
 zoom = Vector2(12, 12)

@@ -63,10 +63,12 @@ enum Type {
 	EDELWEISS,
 	SPRINKLERHEAD,
 	SPARE_SUPPLIES,
+	GUARDSHELM,
 }
 
 @export var type: Type
 @export var indexable: bool = true ##lists this relic in the index; disable when no current reward or starting loadout can grant it
+@export var binding: bool = false ##prevents manual removal; consumption and run cleanup may still remove this relic
 #--- effect data ---
 #each relic contains a modifier prototype that defines its stat changes
 @export var modifier_prototypes: Array[GlobalModifierPrototype] ##modifiers that are applied to all satisfying towers (see specific_tower_type)

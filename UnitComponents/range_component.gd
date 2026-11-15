@@ -14,6 +14,8 @@ var modifiers_component: ModifiersComponent
 var _status_targeting_preferences: Dictionary[Attributes.Status, int] = {}
 var _cached_enemies_in_range: Array[Unit] = []
 var _range_query_cache_expires_at_msec: int = 0
+var _minimum_range_squared: float = -1.0 ##negative means this attacker uses the ordinary radius query
+var _maximum_range_squared: float = 0.0
 
 enum TargetingMode {
 	CLOSEST,
@@ -32,6 +34,7 @@ func inject_components(_attack_component: AttackComponent, _modifiers_component:
 
 	if is_instance_valid(modifiers_component) and not modifiers_component.stat_changed.is_connected(_on_stat_changed):
 		modifiers_component.stat_changed.connect(_on_stat_changed)
+	_on_stat_changed(Attributes.id.RANGE)
 
 func _query_enemies_in_range() -> Array[Unit]: ##returns a briefly reusable combat-manager snapshot using this unit's live modified range
 	if not is_instance_valid(unit) or not is_instance_valid(attack_component) or not is_instance_valid(modifiers_component):
@@ -52,12 +55,28 @@ func _query_enemies_in_range() -> Array[Unit]: ##returns a briefly reusable comb
 	_range_query_cache_expires_at_msec = current_ticks_msec + RANGE_QUERY_CACHE_DURATION_MSEC
 	return _cached_enemies_in_range
 
-func _on_stat_changed(attribute: Attributes.id) -> void: ##invalidates cached overlaps immediately when the tower's range changes
-	if attribute != Attributes.id.RANGE:
+func _on_stat_changed(attribute: Attributes.id) -> void: ##updates the firing band and invalidates overlaps when the outer range changes
+	if attribute != Attributes.id.RANGE and attribute != Attributes.id.MINIMUM_RANGE:
 		return
 
-	_range_query_cache_expires_at_msec = 0
-	_cached_enemies_in_range.clear()
+	if attribute == Attributes.id.RANGE:
+		_range_query_cache_expires_at_msec = 0
+		_cached_enemies_in_range.clear()
+
+	var minimum_fraction: Variant = attack_component.get_stat(modifiers_component, attack_component.attack_data, Attributes.id.MINIMUM_RANGE)
+	if minimum_fraction == null or minimum_fraction <= 0.0:
+		_minimum_range_squared = -1.0
+		return
+	var outer_range: float = maxf(attack_component.range, 0.0)
+	var inner_range: float = outer_range * float(minimum_fraction)
+	_minimum_range_squared = inner_range * inner_range
+	_maximum_range_squared = outer_range * outer_range
+
+func is_target_in_range_band(target_unit: Unit) -> bool: ##tests current center distance for attacks with an inner range limit
+	if _minimum_range_squared < 0.0:
+		return true
+	var distance_squared: float = unit.global_position.distance_squared_to(target_unit.global_position)
+	return distance_squared >= _minimum_range_squared and distance_squared <= _maximum_range_squared
 
 #checks hard constraints only (death, despawned, incorporeal).
 #soft constraints (like overkill) are handled in the selection logic.
@@ -77,13 +96,13 @@ func is_target_valid(target_unit) -> bool:
 	if target_unit.abstractive:
 		return false
 
-	return true
+	return is_target_in_range_band(target_unit)
 
 #checks if priority (ie priority and non overkilled targets) are available
 func are_priority_targets_available() -> bool: ##checks one current range snapshot for a preferred non-overkilled target
 	var enemies_in_range: Array[Unit] = _query_enemies_in_range()
 	if is_instance_valid(priority_target_override):
-		if enemies_in_range.has(priority_target_override):
+		if enemies_in_range.has(priority_target_override) and is_target_in_range_band(priority_target_override):
 			return true
 
 	var global_priority_target: Unit = Targeting.get_priority_target()
@@ -119,7 +138,7 @@ func get_target() -> Unit: ##selects one target from the current range snapshot 
 		return null
 
 	if is_instance_valid(priority_target_override):
-		if enemies_in_range.has(priority_target_override):
+		if enemies_in_range.has(priority_target_override) and is_target_in_range_band(priority_target_override):
 			return priority_target_override
 
 	if unit.attack_only_when_blocked:

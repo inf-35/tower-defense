@@ -9,14 +9,15 @@
 [sub_resource type="Resource" id="Resource_armour_ignore"]
 script = ExtResource("1_modifier")
 attribute = 15
-additive = 0.5
+additive = 0.25
 override = null
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
 [sub_resource type="Resource" id="Resource_5ble4"]
 script = ExtResource("2_effect")
 reference_tower_types = Array[int]([6, 26])
-min_count = 2
+scale_with_count = true
+max_scaling_count = 3
 modifier_prototypes = Array[ExtResource("1_modifier")]([SubResource("Resource_armour_ignore")])
 schedule = 0
 icon = ExtResource("3_mkcmd")
@@ -27,6 +28,6 @@ script = ExtResource("3_jj0c7")
 type = 4
 global_effect = SubResource("Resource_5ble4")
 title = "Enfilade"
-description = "Towers adjacent to 2 or more {T_PALISADE|label=Walls} ignore 50% of enemy {UNIT_ARMOR}."
+description = "Towers ignore 25% of enemy {UNIT_ARMOR} for each adjacent {T_PALISADE|label=Wall}, up to 75%."
 icon = ExtResource("3_mkcmd")
 metadata/_custom_type_script = "uid://bdmptskvnyn3g"

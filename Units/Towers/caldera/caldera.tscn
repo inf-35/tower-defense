@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://cm1qkun75pa0d"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://d2akqvxj7p8dj" path="res://Units/Towers/caldera/caldera_behavior.gd" id="2_behavior"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="4_attack"]
+[ext_resource type="Resource" uid="uid://bkw1ekwucicxl" path="res://Units/Towers/caldera/caldera_attack.tres" id="5_attack_data"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_health"]
+[ext_resource type="Script" uid="uid://tg7juyavf2t2" path="res://Content/CommonVisuals/tower_combat_light.gd" id="7_8onow"]
+[ext_resource type="Texture2D" uid="uid://d2k8h8inggxli" path="res://Assets/caldera_lower.png" id="7_fsco3"]
+[ext_resource type="Script" uid="uid://bxb1t1jy3gjrq" path="res://Content/health_data.gd" id="7_health_data"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="8_display"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="9_damage"]
+[ext_resource type="Texture2D" uid="uid://cf4hmnjgi328m" path="res://Assets/caldera_upper.png" id="9_tle6b"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="10_hitrate"]
+[ext_resource type="Texture2D" uid="uid://bdk3wxi1vuuud" path="res://Assets/caldera_glow.png" id="10_tle6b"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="11_status"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="12_max_health"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="13_shadow"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="14_movement"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="15_immobile"]
+
+[sub_resource type="Resource" id="Resource_health"]
+script = ExtResource("7_health_data")
+max_health = 20.0
+
+[node name="Caldera" type="Node2D" unique_id=252851242 node_paths=PackedStringArray("behavior", "graphics", "health_component", "movement_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_tower")
+type = 83
+stat_displays = Array[ExtResource("8_display")]([ExtResource("9_damage"), ExtResource("10_hitrate"), ExtResource("11_status"), ExtResource("12_max_health")])
+behavior = NodePath("CalderaBehavior")
+graphics = NodePath("Graphics")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+attack_component = NodePath("AttackComponent")
+
+[node name="TowerCombatLight" type="Node2D" parent="." unique_id=484446868]
+script = ExtResource("7_8onow")
+texture_scale = 0.5
+metadata/_custom_type_script = "uid://tg7juyavf2t2"
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=153607386]
+scale = Vector2(0.06126645, 0.06126645)
+texture = ExtResource("7_fsco3")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1684663279]
+script = ExtResource("13_shadow")
+height_multiplier = 0.2
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=264509482]
+z_index = 3
+scale = Vector2(1.01, 1.01)
+texture = ExtResource("9_tle6b")
+offset = Vector2(-9, 8)
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D" unique_id=1293624320]
+script = ExtResource("13_shadow")
+height_multiplier = 1.5
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="glow" type="Sprite2D" parent="Graphics/Sprite2D" unique_id=910609998]
+texture = ExtResource("10_tle6b")
+offset = Vector2(22, 4)
+
+[node name="CalderaBehavior" type="Node" parent="." unique_id=171155965 node_paths=PackedStringArray("lava_area", "glow")]
+script = ExtResource("2_behavior")
+lava_area = NodePath("../LavaArea")
+glow = NodePath("../Graphics/Sprite2D/glow")
+glow_lifetime = 5.0
+glow_spin_degrees_per_second = 8.0
+
+[node name="LavaArea" type="Area2D" parent="." unique_id=65853375]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="AttackComponent" type="Node" parent="." unique_id=525461251]
+script = ExtResource("4_attack")
+attack_data = ExtResource("5_attack_data")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=694028454]
+script = ExtResource("6_health")
+health_data = SubResource("Resource_health")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=2035230193]
+script = ExtResource("14_movement")
+movement_data = ExtResource("15_immobile")

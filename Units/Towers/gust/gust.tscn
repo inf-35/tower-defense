@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://djetam1g8x383"]
+
+[ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_tower"]
+[ext_resource type="Script" uid="uid://cript5orq4iq5" path="res://Units/Towers/gust/gust_behavior.gd" id="2_gust"]
+[ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="4_display"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="5_6jlve"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="5_max_health"]
+[ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="7_shadow"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="8_vfx"]
+[ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="10_21le5"]
+[ext_resource type="Texture2D" uid="uid://c58wy0o41beeo" path="res://Assets/gust_lower.png" id="11_4gtfs"]
+[ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="11_naxdc"]
+[ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="12_attack"]
+[ext_resource type="Texture2D" uid="uid://dkcpgw7c2gygt" path="res://Assets/gust_fanhub.png" id="13_70bko"]
+[ext_resource type="Resource" path="res://Units/Towers/gust/gust_attack.tres" id="13_attack_data"]
+[ext_resource type="Texture2D" uid="uid://dk2jg5rkwa2ig" path="res://Assets/gust_fanblades.png" id="14_1i8lc"]
+[ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="14_range"]
+
+[sub_resource type="Resource" id="Resource_wind"]
+resource_local_to_scene = true
+script = ExtResource("8_vfx")
+swirl_width = 4.0
+swirl_particles_per_tile = 2.5
+swirl_scale_min = 0.55
+swirl_scale_max = 0.95
+swirl_drift_speed_min = 12.0
+swirl_drift_speed_max = 24.0
+lifetime = 0.35
+
+[node name="Gust" type="Node2D" unique_id=1309449919 node_paths=PackedStringArray("behavior", "graphics", "health_component", "movement_component", "attack_component")]
+z_index = 100
+script = ExtResource("1_tower")
+type = 84
+stat_displays = Array[ExtResource("4_display")]([ExtResource("5_max_health"), ExtResource("14_range")])
+behavior = NodePath("GustBehavior")
+graphics = NodePath("Graphics")
+health_component = NodePath("HealthComponent")
+movement_component = NodePath("MovementComponent")
+attack_component = NodePath("AttackComponent")
+
+[node name="GustBehavior" type="Node" parent="." unique_id=129879170 node_paths=PackedStringArray("gust_area", "fan_blades")]
+script = ExtResource("2_gust")
+speed_change = 0.6
+gust_area = NodePath("../GustArea")
+wind_vfx = SubResource("Resource_wind")
+fan_blades = NodePath("../Graphics/Sprite2D/fanblades")
+fan_spin_degrees_per_second = 540.0
+
+[node name="GustArea" type="Area2D" parent="." unique_id=626691944]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1064288951]
+script = ExtResource("3_health")
+
+[node name="AttackComponent" type="Node" parent="." unique_id=411612373]
+script = ExtResource("12_attack")
+attack_data = ExtResource("13_attack_data")
+range_only = true
+
+[node name="Graphics" type="Sprite2D" parent="." unique_id=1658414547]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("11_4gtfs")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=2089525430]
+script = ExtResource("7_shadow")
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=1299966525]
+z_index = 5
+scale = Vector2(0.99999994, 0.99999994)
+texture = ExtResource("13_70bko")
+
+[node name="fanblades" type="Sprite2D" parent="Graphics/Sprite2D" unique_id=1413353216]
+z_index = -1
+texture = ExtResource("14_1i8lc")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D" unique_id=1359964529]
+script = ExtResource("7_shadow")
+height_multiplier = 0.2
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="MovementComponent" type="Node" parent="." unique_id=127012107]
+script = ExtResource("10_21le5")
+face_towards_movement = false
+movement_data = ExtResource("11_naxdc")
+metadata/_custom_type_script = "uid://bj2kqlul6w1an"

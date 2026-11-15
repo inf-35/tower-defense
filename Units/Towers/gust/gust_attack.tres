@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://Content/attack_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+range = 30.0
+cooldown = 1000000.0

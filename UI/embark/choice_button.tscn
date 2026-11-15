@@ -1,23 +1,32 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b8pbv5kxhh4kg"]
 
-[ext_resource type="Script" path="res://UI/embark/embark_choice.gd" id="1_choice"]
-[ext_resource type="Script" path="res://UI/_animatable_ui.gd" id="2_motion"]
+[ext_resource type="Script" uid="uid://cfhbfsqw8vtfd" path="res://UI/embark/embark_choice.gd" id="1_choice"]
+[ext_resource type="Script" uid="uid://2p1hsv7rivsk" path="res://UI/_animatable_ui.gd" id="2_motion"]
+[ext_resource type="Texture2D" uid="uid://c16dkdojpq3vp" path="res://Assets/simple_button.png" id="3_rkrgr"]
+[ext_resource type="Script" path="res://UI/paper_selection_outline.gd" id="4_outline"]
+[ext_resource type="Shader" path="res://Shaders/ui_paper_outline.gdshader" id="5_outline_shader"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_input"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
+shader = ExtResource("5_outline_shader")
 
-[node name="Choice" type="Button" node_paths=PackedStringArray("motion", "caption")]
-custom_minimum_size = Vector2(160, 80)
-layout_mode = 3
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6k7r4"]
+texture = ExtResource("3_rkrgr")
+texture_margin_left = 30.0
+texture_margin_top = 30.0
+texture_margin_right = 30.0
+texture_margin_bottom = 30.0
+modulate_color = Color(0.9607843, 0.9843137, 1, 1)
+
+[node name="Choice" type="Button" unique_id=1485380743 node_paths=PackedStringArray("motion", "caption", "paper_outline")]
+custom_minimum_size = Vector2(160, 110)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("StyleBoxEmpty_input")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_input")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_input")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_input")
+theme_type_variation = &"button_empty"
 script = ExtResource("1_choice")
 motion = NodePath("Motion")
-caption = NodePath("Motion/Paper/Padding/Caption")
+caption = NodePath("Motion/Paper/Caption")
+paper_outline = NodePath("Motion/Paper/Outline")
 
-[node name="Motion" type="Control" parent="." node_paths=PackedStringArray("content")]
+[node name="Motion" type="Control" parent="." unique_id=1482952519 node_paths=PackedStringArray("content")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,8 +37,9 @@ mouse_filter = 2
 script = ExtResource("2_motion")
 content = NodePath("Paper")
 hover_enabled = false
+hover_scale = Vector2(1.1, 1.1)
 
-[node name="Paper" type="PanelContainer" parent="Motion"]
+[node name="Paper" type="PanelContainer" parent="Motion" unique_id=74760285]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,15 +47,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_6k7r4")
 
-[node name="Padding" type="MarginContainer" parent="Motion/Paper"]
+[node name="Outline" type="Control" parent="Motion/Paper" node_paths=PackedStringArray("panel")]
+visible = false
+show_behind_parent = true
+material = SubResource("ShaderMaterial_outline")
 layout_mode = 2
 mouse_filter = 2
-theme_type_variation = &"MarginMinor"
+script = ExtResource("4_outline")
+panel = NodePath("..")
 
-[node name="Caption" type="Label" parent="Motion/Paper/Padding"]
+[node name="Caption" type="Label" parent="Motion/Paper" unique_id=1683207505]
 layout_mode = 2
-mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2

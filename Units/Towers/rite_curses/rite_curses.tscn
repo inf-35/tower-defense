@@ -20,6 +20,7 @@ max_range = 2
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_yftrj")
+max_contributing_stacks = 3
 status = 4
 projectile_tint = Color(0.6954933, 0.5808, 0.88, 1)
 metadata/_custom_type_script = "uid://c0tqsk2lv2qho"

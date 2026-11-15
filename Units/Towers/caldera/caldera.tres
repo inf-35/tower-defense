@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cy5enswj5rqwb"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_data"]
+[ext_resource type="Texture2D" uid="uid://fy7cqvw0brie" path="res://Assets/caldera_icon.png" id="1_ge8eq"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_ge8eq"]
+[ext_resource type="PackedScene" uid="uid://cm1qkun75pa0d" path="res://Units/Towers/caldera/caldera.tscn" id="2_scene"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_aw2wi"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_f0w8h"]
+
+[resource]
+script = ExtResource("1_data")
+id = 83
+size = Vector2i(2, 2)
+cost = 18.0
+required_capacity = 3.0
+element = 2
+tags = Array[int]([2])
+tower_name = "Caldera"
+tower_description = "Covers adjacent land tiles with lava. Enemies on produced lava are {UNIT_SPEED|label=Slowed} by 50% (not stacking), and are attacked by this Caldera tower."
+icon = ExtResource("1_ge8eq")
+preview = ExtResource("1_ge8eq")
+tower_scene = ExtResource("2_scene")

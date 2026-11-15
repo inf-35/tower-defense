@@ -3,6 +3,7 @@
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="1_theme"]
 [ext_resource type="PackedScene" uid="uid://dhnu4jl86txm" path="res://UI/index/index_slot.tscn" id="2_slot"]
 [ext_resource type="Script" uid="uid://epiqpu6uok5r" path="res://UI/index/index_page.gd" id="3_page"]
+[ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_button"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_sections"]
 
@@ -70,6 +71,7 @@ toggle_mode = true
 button_pressed = true
 button_group = SubResource("ButtonGroup_sections")
 text = "Structures"
+script = ExtResource("4_button")
 
 [node name="Relics" type="Button" parent="MainFrame/MainPanel/Content/Sections/Tabs" unique_id=906832485]
 custom_minimum_size = Vector2(180, 68)
@@ -79,6 +81,7 @@ theme_override_font_sizes/font_size = 28
 toggle_mode = true
 button_group = SubResource("ButtonGroup_sections")
 text = "Relics"
+script = ExtResource("4_button")
 
 [node name="Enemies" type="Button" parent="MainFrame/MainPanel/Content/Sections/Tabs" unique_id=1006272489]
 custom_minimum_size = Vector2(180, 68)
@@ -88,6 +91,7 @@ theme_override_font_sizes/font_size = 28
 toggle_mode = true
 button_group = SubResource("ButtonGroup_sections")
 text = "Enemies"
+script = ExtResource("4_button")
 
 [node name="Scroll" type="ScrollContainer" parent="MainFrame/MainPanel/Content/Sections" unique_id=1094681314]
 layout_mode = 2

@@ -5,9 +5,16 @@ const SILHOUETTE_SHADER := preload("res://Shaders/silhouette.gdshader")
 const SWEPT_SHADOW_SHADER: Shader = preload("res://Shaders/swept_shadow.gdshader")
 const HEIGHT_SHADOW_COLOR: Color = Color(0.316, 0.265, 0.193, 1.0)
 
-#defines "height": multiplies the global offset.
-#1.0 = standard, 0.5 = short box, 3.0 = tall tower
-@export var height_multiplier: float = 1.0
+@export var height_multiplier: float = 1.0: ##scales the pseudoheight and the projected shadow length
+	set(value):
+		height_multiplier = value
+		_refresh_projections()
+@export var lift_sprite_by_height: bool = true: ##lifts the source sprite and its children while keeping the height silhouette and ground shadow at the base
+	set(value):
+		lift_sprite_by_height = value
+		if is_instance_valid(shadow_material):
+			set_notify_transform(value)
+			_refresh_projections()
 @export_range(2, 32, 1) var shadow_samples: int = 8 ##alpha samples between the building footprint and shadow tip; higher counts smooth long thin shadows
 
 @export_group("Night Projection")
@@ -35,6 +42,11 @@ var _day_sweep_offset: Vector2 = Vector2.ZERO
 var _sweep_offset: Vector2 = Vector2.ZERO
 var _secondary_sweep_offset: Vector2 = Vector2.ZERO
 var _height_offset: Vector2 = Vector2.ZERO
+var _applied_sprite_lift: Vector2 = Vector2.ZERO
+var _last_lifted_sprite_position: Vector2 = Vector2.INF
+var _shadow_anchor_compensation: Vector2 = Vector2.ZERO
+var _lift_basis: Transform2D = Transform2D.IDENTITY
+var _night_light_positions: Array[Vector2] = []
 var _last_source_rect: Rect2
 var _last_frame_region: Rect2
 var _last_texture_size: Vector2 = Vector2.ZERO
@@ -106,6 +118,7 @@ func _ready() -> void: ##builds the shadow sprites once, then only keeps process
 	#5. initial update
 	_update_appearance()
 	_sync_texture_data()
+	set_notify_transform(lift_sprite_by_height)
 	var island_owner: Node = parent
 	while island_owner != null and not (island_owner is Island):
 		island_owner = island_owner.get_parent()
@@ -115,13 +128,31 @@ func _ready() -> void: ##builds the shadow sprites once, then only keeps process
 		_lighting_service.register_shadow(self)
 
 func _exit_tree() -> void:
+	if is_instance_valid(parent_sprite) and parent_sprite.position == _last_lifted_sprite_position:
+		parent_sprite.position += _applied_sprite_lift
+	_applied_sprite_lift = Vector2.ZERO
+	position -= _shadow_anchor_compensation
+	_shadow_anchor_compensation = Vector2.ZERO
 	if is_instance_valid(_lighting_service):
 		_lighting_service.unregister_shadow(self)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSFORM_CHANGED and lift_sprite_by_height:
+		_refresh_lift_if_transformed()
 
 func _process(_delta: float) -> void: ##keeps dynamic shadows matched to animated parent sprites
 	#only run every frame if the object animates (moves, walks, changes frame)
 	if is_dynamic and parent_sprite:
+		if lift_sprite_by_height and parent_sprite != get_parent():
+			_refresh_lift_if_transformed()
 		_sync_texture_data()
+
+func _refresh_lift_if_transformed() -> void: ##refreshes orientation without rebuilding a projection for translation alone
+	if not is_instance_valid(parent_sprite) or not is_instance_valid(shadow_material):
+		return
+	var sprite_transform: Transform2D = parent_sprite.global_transform
+	if sprite_transform.x != _lift_basis.x or sprite_transform.y != _lift_basis.y or parent_sprite.position != _last_lifted_sprite_position:
+		_refresh_projections()
 
 static func _get_shared_height_material() -> ShaderMaterial: ##returns the shared height material for the constant faux-height silhouette layer
 	if not is_instance_valid(_shared_height_material):
@@ -151,6 +182,20 @@ func _sync_texture_data() -> void: ##copies source frames while the ground shado
 	height_sprite.region_rect = parent_sprite.region_rect
 	height_sprite.offset = parent_sprite.offset
 	_sync_sweep_geometry()
+
+func _sync_sprite_lift(local_lift: Vector2) -> void: ##moves the sprite subtree and cancels the lift on this component's shadow layers
+	if lift_sprite_by_height or not _applied_sprite_lift.is_zero_approx():
+		var base_position: Vector2 = parent_sprite.position
+		if base_position == _last_lifted_sprite_position:
+			base_position += _applied_sprite_lift
+		_applied_sprite_lift = parent_sprite.transform.basis_xform(local_lift)
+		_last_lifted_sprite_position = base_position - _applied_sprite_lift
+		if parent_sprite.position != _last_lifted_sprite_position:
+			parent_sprite.position = _last_lifted_sprite_position
+	var compensation: Vector2 = local_lift if get_parent() == parent_sprite else Vector2.ZERO
+	if compensation != _shadow_anchor_compensation:
+		position += compensation - _shadow_anchor_compensation
+		_shadow_anchor_compensation = compensation
 
 func _sync_sweep_geometry() -> void: ##expands real sprite bounds to include the whole sweep so culling agrees with the shader
 	if parent_sprite.texture == null:
@@ -208,10 +253,21 @@ func _sync_sweep_geometry() -> void: ##expands real sprite bounds to include the
 	shadow_material.set_shader_parameter(&"secondary_night_enabled", _night_secondary_enabled)
 
 func set_night_projections(light_positions: Array[Vector2]) -> void: ##stores up to two service-selected local-light projections without owning phase state
-	var caster_position: Vector2 = parent_sprite.global_position
+	_night_light_positions = light_positions
+	var height: float = Sun.global_offset.y * 0.4 * height_multiplier
+	var local_height: Vector2 = Vector2(0, height).rotated(-parent_sprite.global_rotation)
+	var local_lift: Vector2 = Vector2.ZERO
+	if lift_sprite_by_height:
+		_lift_basis = parent_sprite.global_transform
+		if not is_zero_approx(_lift_basis.determinant()):
+			var local_down: Vector2 = _lift_basis.affine_inverse().basis_xform(Vector2.DOWN).normalized()
+			local_height = local_down * absf(height)
+		local_lift = local_height
+	_sync_sprite_lift(local_lift)
+	_height_offset = Vector2.ZERO if lift_sprite_by_height else local_height
+	var caster_position: Vector2 = parent_sprite.to_global(local_lift)
 	var minimum_length: float = minf(night_min_shadow_length, night_max_shadow_length)
 	var maximum_length: float = maxf(night_min_shadow_length, night_max_shadow_length)
-	_height_offset = (Vector2(0, Sun.global_offset.y) * 0.4 * height_multiplier).rotated(-parent_sprite.global_rotation)
 	var projection_count: int = mini(light_positions.size(), 2)
 	_night_secondary_enabled = projection_count > 1
 	_sweep_offset = Vector2.ZERO
@@ -253,11 +309,11 @@ func set_night_mix(night_mix: float) -> void: ##applies the service-owned day/ni
 func _update_appearance() -> void: ##updates shared shadow colors and reapplies the sun projection when daytime owns direction
 	shadow_material.set_shader_parameter("shadow_color", Sun.shadow_color)
 	height_material.set_shader_parameter("shadow_color", HEIGHT_SHADOW_COLOR)
-	_update_day_projection_geometry()
+	_refresh_projections()
 
-func _update_day_projection_geometry() -> void: ##keeps the dedicated sun projection ready without disturbing current day/night visibility
+func _refresh_projections() -> void: ##reprojects both shadow directions from the current sprite orientation and height
+	if not is_instance_valid(parent_sprite) or not is_instance_valid(shadow_material):
+		return
 	#the shadow is a child of the parent, so world-space sun direction must become parent-local
 	_day_sweep_offset = (Sun.global_offset * height_multiplier).rotated(-parent_sprite.global_rotation)
-	_height_offset = (Vector2(0, Sun.global_offset.y) * 0.4 * height_multiplier).rotated(-parent_sprite.global_rotation)
-	height_sprite.position = _height_offset
-	_sync_sweep_geometry()
+	set_night_projections(_night_light_positions)

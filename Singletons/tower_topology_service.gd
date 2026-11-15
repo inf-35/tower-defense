@@ -85,6 +85,35 @@ func query(pivot: Tower, query_data: Query) -> Report: ##core function
 		report.unique_towers.append(tower)
 	return report
 
+func get_connected_towers(pivot: Tower, accepts: Callable, exclude_tower: Tower = null) -> Array[Tower]: ##flood-fills shared footprint edges through accepted towers; excludes the pivot and uses runtime identities, including for previews
+	var connected: Array[Tower] = []
+	if not is_instance_valid(pivot) or not is_instance_valid(island) or not accepts.is_valid():
+		return connected
+	var visited_ids: Dictionary[int, bool] = {pivot.get_instance_id(): true}
+	var visited_cells: Dictionary[Vector2i, bool] = {}
+	for cell: Vector2i in pivot.get_occupied_cells():
+		visited_cells[cell] = true
+	var queued_cells: Array[Vector2i] = pivot.get_adjacent_cells()
+	var index: int = 0
+	while index < queued_cells.size():
+		var cell: Vector2i = queued_cells[index]
+		index += 1
+		if visited_cells.has(cell):
+			continue
+		visited_cells[cell] = true
+		var candidate: Tower = island.get_tower_on_tile(cell)
+		if not is_instance_valid(candidate) or candidate.is_queued_for_deletion() or candidate == exclude_tower:
+			continue
+		var candidate_id: int = candidate.get_instance_id()
+		if visited_ids.has(candidate_id):
+			continue
+		visited_ids[candidate_id] = true
+		if not accepts.call(candidate):
+			continue
+		connected.append(candidate)
+		queued_cells.append_array(candidate.get_adjacent_cells())
+	return connected
+
 func get_adjacency_report(pivot: Tower) -> AdjacencyReportData: ##builds the compatibility adjacency payload from the canonical topology query
 	var topology_report: Report = query(pivot, _legacy_query)
 	var adjacency_data := AdjacencyReportData.new()

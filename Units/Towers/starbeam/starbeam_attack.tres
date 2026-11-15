@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://by277rx8cd2sw"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_attack"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_tbuve"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="2_status"]
+
+[sub_resource type="Resource" id="Resource_starstruck"]
+script = ExtResource("2_status")
+type = 9
+cooldown = 6.0
+
+[resource]
+script = ExtResource("1_attack")
+range = 60.0
+cooldown = 3.0
+damage = 8.0
+status_effects = Array[ExtResource("2_status")]([SubResource("Resource_starstruck")])

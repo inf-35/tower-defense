@@ -35,9 +35,10 @@ func refresh(new_stack: float, new_cooldown: float) -> void:
 func on_timeout() -> void:
 	self.stack = 0
 	#the modifierscomponent will see stack=0 and handle the removal
-#called when the status is being removed to ensure cleanup
-func cleanup() -> void:
-	pass
+func cleanup() -> void: ##cancels the expiry so an old status cannot clear a later application
+	if is_instance_valid(timer):
+		timer.is_active = false
+		timer = null
 
 func can_stack() -> bool:
 	return Attributes.status_effects[type].can_stack

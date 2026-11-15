@@ -15,6 +15,7 @@ class AttackLineageContext extends RefCounted:
 	var status_cooldown_multiplier: float = 1.0
 
 @export var attack_data: Data ##must resolve to attackdata and stay registered with modifiers
+@export var range_only: bool = false ##registers stats for passive coverage without ticking cooldowns or firing attacks
 @export var muzzle: Marker2D ##optional origin marker for projectile and hitscan attacks
 var _modifiers_component: ModifiersComponent
 var _queued_attack_parent_data: EventData
@@ -52,6 +53,9 @@ static func get_next_attack_id() -> int:
 	return attack_id
 
 func _ready() -> void: ##starts cooldown ticking and desyncs identical towers a little
+	if range_only:
+		set_process(false)
+		return
 	set_process(true)
 	current_cooldown += randf_range(0.0, 1.0)
 
@@ -63,6 +67,8 @@ func inject_components(modifiers_component: ModifiersComponent) -> void: ##regis
 	_modifiers_component.register_data(attack_data)
 	create_stat_cache(_modifiers_component, [Attributes.id.DAMAGE, Attributes.id.RADIUS, Attributes.id.COOLDOWN, Attributes.id.ARMOUR_IGNORE])
 	_modifiers_component.stat_changed.connect(_on_stat_changed)
+	if range_only:
+		refresh_cooldown()
 
 func refresh_cooldown() -> void: ##resets the local cooldown using the current modified attack rate
 	current_cooldown = get_stat(_modifiers_component, attack_data, Attributes.id.COOLDOWN)
@@ -199,9 +205,11 @@ func attack_with_context(target: Unit, attack_context: AttackLineageContext, int
 	_attack_with_context(target, attack_context, intercept_override, spend_cooldown, primary)
 
 func fire_sibling_attack(target: Unit, parent_hit_data: HitData, damage_multiplier: float) -> void: ##fires a non-primary sibling payload as its own proc group while preserving source and lineage
-	if attack_data == null or not is_instance_valid(target):
+	if range_only or attack_data == null or not is_instance_valid(target):
 		return
 	if not is_instance_valid(parent_hit_data):
+		return
+	if is_instance_valid(unit.range_component) and not unit.range_component.is_target_in_range_band(target):
 		return
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"sibling_attacks_started")
@@ -226,7 +234,9 @@ func fire_sibling_attack(target: Unit, parent_hit_data: HitData, damage_multipli
 	unit.deal_hit(hit_data, delivery_data)
 
 func _attack_with_context(target: Unit, attack_context: AttackLineageContext, intercept_override: Vector2 = Vector2.ZERO, spend_cooldown: bool = true, primary: bool = true) -> void: ##shared execution path for both normal attacks and immediate explicit follow-up attacks
-	if attack_data == null or not is_instance_valid(target):
+	if range_only or unit.disabled or attack_data == null or not is_instance_valid(target):
+		return
+	if is_instance_valid(unit.range_component) and not unit.range_component.is_target_in_range_band(target):
 		return
 	if DebugAssistant.perf_instrumentation_active:
 		DebugAssistant.record_perf_event(&"attacks_started")

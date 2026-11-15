@@ -11,6 +11,7 @@ class_name EmbarkLoadout
 @export var loadout_hbox: HBoxContainer ##authored row receiving relic cards first, then structure cards in package order
 @export var loadout_scroll: ScrollContainer ##horizontal viewport whose movement dismisses the active tooltip
 @export var loadout_card_scene: PackedScene ##shared index-slot scene, including its title and attribute papers
+@export var card_hover_scale: Vector2 = Vector2(1.1, 1.1) ##local expansion target without changing the cards' resting size or index-page settings
 @export var tooltip_host: Control ##unclipped ancestor that owns keyword tooltips outside the loadout viewport
 
 var _active_tooltip: TooltipPanel
@@ -66,6 +67,7 @@ func _add_slot(keyword: String, icon: Texture2D, title: String, attributes: Arra
 	var motion: AnimatableUI = AnimatableUI.new()
 	motion.content = slot
 	motion.hover_enabled = false
+	motion.hover_scale = card_hover_scale
 	motion.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	motion.custom_minimum_size = slot.get_combined_minimum_size()
 	slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

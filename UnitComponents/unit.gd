@@ -761,7 +761,7 @@ func get_stat(attr: Attributes.id) -> Variant: #generic get stat function
 			return movement_component.get_stat(modifiers_component, movement_component.movement_data, attr)
 
 	if attack_component != null:
-		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.COOLDOWN or attr == Attributes.id.ATTACK_RATE or attr == Attributes.id.ARMOUR_IGNORE:
+		if attr == Attributes.id.DAMAGE or attr == Attributes.id.RADIUS or attr == Attributes.id.RANGE or attr == Attributes.id.MINIMUM_RANGE or attr == Attributes.id.COOLDOWN or attr == Attributes.id.ATTACK_RATE or attr == Attributes.id.ARMOUR_IGNORE:
 			return attack_component.get_stat(modifiers_component, attack_component.attack_data, attr)
 
 	return null

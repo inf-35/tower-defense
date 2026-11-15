@@ -10,7 +10,7 @@ const FADE_SECONDS: float = 0.6
 
 @export var light_texture: Texture2D = preload("res://Content/CommonVisuals/combat_tower_light_texture.tres") ##native point-light texture used for the tower's local combat glow
 @export_range(0.05, 4.0, 0.05) var texture_scale: float = DEFAULT_TEXTURE_SCALE ##radius multiplier for this marker's authored light texture
-@export_range(0.0, 4.0, 0.01) var combat_energy: float = DEFAULT_ENERGY: ##steady illuminated-target brightness; transition influence is controlled independently
+@export_range(0.0, 4.0, 0.01) var combat_energy: float = DEFAULT_ENERGY: ##light strength; weak sources reduce mix influence instead of blending toward a dark target
 	set(value):
 		combat_energy = maxf(value, 0.0)
 		_apply_native_light_state()
@@ -84,8 +84,12 @@ func _apply_native_light_state() -> void: ##mirrors authored marker state onto t
 
 	_native_light.texture = light_texture
 	_native_light.texture_scale = texture_scale
-	#receivers keep this rgb target fixed and use native energy only as the mix weight.
+	#keep weak mix targets bright enough to restore the surface; carry their strength in opacity.
 	var target_energy: float = combat_energy * _energy_multiplier
-	_native_light.color = Color(_light_color.r * target_energy, _light_color.g * target_energy, _light_color.b * target_energy, 1.0)
-	_native_light.energy = _light_influence
+	var target_color: Color = Color(_light_color.r * target_energy, _light_color.g * target_energy, _light_color.b * target_energy, 1.0)
+	var target_peak: float = maxf(target_color.r, maxf(target_color.g, target_color.b))
+	var mix_strength: float = minf(target_peak, 1.0)
+	var target_normalization: float = maxf(mix_strength, 0.0001)
+	_native_light.color = Color(target_color.r / target_normalization, target_color.g / target_normalization, target_color.b / target_normalization, 1.0)
+	_native_light.energy = _light_influence * mix_strength
 	_native_light.enabled = available and light_texture != null and target_energy > 0.001 and _light_influence > 0.001

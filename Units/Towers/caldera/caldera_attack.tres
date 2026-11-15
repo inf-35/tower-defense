@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://bkw1ekwucicxl"]
+
+[ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="1_attack"]
+[ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="1_h47qj"]
+[ext_resource type="Script" uid="uid://c1jdwykpk8uvi" path="res://Content/status_effect_prototype.gd" id="2_status"]
+[ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="3_vfx"]
+[ext_resource type="Texture2D" uid="uid://by60e76i8gyi3" path="res://Assets/particle_whirl.png" id="4_qgk0b"]
+
+[sub_resource type="Resource" id="Resource_burn"]
+script = ExtResource("2_status")
+type = 1
+stack = 2.0
+cooldown = 2.0
+
+[sub_resource type="Resource" id="Resource_impact"]
+script = ExtResource("3_vfx")
+radius = 5.0
+aoe_particles_enabled = true
+aoe_particle_color = Color(1, 0.48, 0.13, 0.64)
+
+[resource]
+script = ExtResource("1_attack")
+cooldown = 2.0
+status_effects = Array[ExtResource("2_status")]([SubResource("Resource_burn")])
+vfx_on_impact = SubResource("Resource_impact")

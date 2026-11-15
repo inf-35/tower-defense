@@ -9,6 +9,7 @@ enum DisplayMode {
 const RELIC_SLOT_SCENE: PackedScene = preload("res://UI/relic_display/relic_slot.tscn")
 const RELIC_PURCHASE_BUTTON_SCENE: PackedScene = preload("res://UI/relic_display/relic_purchase_button.tscn")
 const DELETE_TOOLTIP_HINT: String = "RMB: destroy relic"
+const BINDING_TOOLTIP_HINT: String = "This relic cannot be removed."
 
 #--- configuration ---
 @export var icon_size: Vector2 = Vector2(70, 70)
@@ -94,7 +95,7 @@ func _create_player_relic_slots() -> void: ##rebuilds the live relic bar as fram
 		var entry: Dictionary = _build_relic_entry(relic)
 		var tooltip_data: Dictionary = entry.get("tooltip_data", {}).duplicate(true)
 		var description: String = String(tooltip_data.get("description", ""))
-		var delete_hint: String = KeywordService.wrap_text(DELETE_TOOLTIP_HINT, "bad")
+		var delete_hint: String = KeywordService.wrap_text(BINDING_TOOLTIP_HINT if relic.binding else DELETE_TOOLTIP_HINT, "bad")
 		if description.is_empty():
 			tooltip_data["description"] = delete_hint
 		else:
@@ -230,8 +231,7 @@ func _on_icon_gui_input(event: InputEvent, icon_node: Control, entry: Dictionary
 	if display_mode == DisplayMode.PLAYER_RELICS and event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			var relic: RelicData = entry.get("relic", null) as RelicData
-			if is_instance_valid(relic):
-				Run.player.remove_relic(relic)
+			if is_instance_valid(relic) and Run.player.remove_relic(relic):
 				if icon_node.has_meta("active_tooltip"):
 					var tooltip_instance: TooltipPanel = icon_node.get_meta("active_tooltip")
 					if is_instance_valid(tooltip_instance):

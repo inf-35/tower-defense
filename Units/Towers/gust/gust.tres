@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://cix4ddlc0nsxi"]
+
+[ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="1_data"]
+[ext_resource type="Texture2D" uid="uid://jrdrvtl22txr" path="res://Assets/gust.png" id="1_tu1rq"]
+[ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_tu1rq"]
+[ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_kkk8c"]
+[ext_resource type="PackedScene" uid="uid://djetam1g8x383" path="res://Units/Towers/gust/gust.tscn" id="3_scene"]
+[ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_y4us1"]
+
+[resource]
+script = ExtResource("1_data")
+target_type_name = "GUST"
+id = 84
+cost = 7.0
+required_capacity = 0.8
+element = 4
+tower_name = "Gust"
+tower_description = "Blows towards enemies in the four cardinal lanes within its {UNIT_RANGE|label=Range}. Enemies in its gust are {UNIT_SPEED|label=Slowed} by 60% if moving towards this tower, and sped up by 60% if moving away (non-stacking)."
+icon = ExtResource("1_tu1rq")
+preview = ExtResource("1_tu1rq")
+tower_scene = ExtResource("3_scene")

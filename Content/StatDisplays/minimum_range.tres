@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatDisplayInfo" format=3]
+
+[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="1_display"]
+
+[resource]
+script = ExtResource("1_display")
+attribute = 16
+label = "Minimum {UNIT_RANGE|label=Range}"
+suffix = "%"
+special_modifier = 12

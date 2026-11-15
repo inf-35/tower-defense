@@ -22,6 +22,7 @@ enum id { #trackable value
 	REGEN_REMAINDER_PERCENT, ##regen taken as a percentage of remainder health
 	ATTACK_RATE, ##flat attacks-per-second bonus used when resolving cooldown
 	ARMOUR_IGNORE, ##fraction of negative flat damage taken ignored by outgoing hits
+	MINIMUM_RANGE, ##minimum targeting distance as a fraction of effective range
 }
 
 enum Status { #diegetic statuses
@@ -32,7 +33,9 @@ enum Status { #diegetic statuses
 	CURSED,
 	BLEED,
 	STUN,
-	CLEANSE
+	CLEANSE,
+	GUSTED,
+	STARSTRUCK,
 }
 
 class StatusAttributeData:
@@ -121,7 +124,13 @@ var status_effects: Dictionary[Status, StatusEffectData] = {
 		[],
 		false,
 		Color(0.35, 0.65, 1.0, 0.233)
-	)
+	),
+	Status.GUSTED: StatusEffectData.new([], false, Color(0.52, 0.80, 1.0, 0.55)),
+	Status.STARSTRUCK: StatusEffectData.new(
+		[StatusAttributeData.new(id.FLAT_DAMAGE_TAKEN, 0.0, 0.0)],
+		false,
+		Color(0.701, 1.17, 1.242, 0.722),
+	),
 }
 
 const status_effect_icons: Dictionary[Status, Texture2D] = {
@@ -131,7 +140,9 @@ const status_effect_icons: Dictionary[Status, Texture2D] = {
 	Status.BLEED: preload("res://Assets/bleed_icon.png"),
 	Status.POISON: preload("res://Assets/poison_icon.png"),
 	Status.STUN: preload("res://Assets/stun_icon.png"),
-	Status.CLEANSE: preload("res://Assets/healer.png")
+	Status.CLEANSE: preload("res://Assets/healer.png"),
+	Status.GUSTED: preload("res://Assets/particle_whirl.png"),
+	Status.STARSTRUCK: preload("res://Assets/spark.png"),
 }
 
 var reactions: Array[ReactionData] = [

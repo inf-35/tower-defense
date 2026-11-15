@@ -90,9 +90,13 @@ func on_inspector_action(_action_key: StringName) -> void: ##optional hook for a
 func draw_visuals(canvas: RangeIndicator) -> void: #see RangeIndicator
 	var tower: Tower = unit as Tower
 	_draw_allowed_terrain_visuals(canvas, tower)
-	if not tower.get_stat(Attributes.id.RANGE):
+	var attack_range: Variant = tower.get_stat(Attributes.id.RANGE)
+	if attack_range == null or attack_range <= 0.0:
 		return
-	canvas.preview_circle(tower.global_position, tower.get_stat(Attributes.id.RANGE), canvas.range_color, false, 1.0)
+	canvas.preview_circle(tower.global_position, attack_range, canvas.range_color, false, 1.0)
+	var minimum_fraction: Variant = tower.get_stat(Attributes.id.MINIMUM_RANGE)
+	if minimum_fraction != null and minimum_fraction > 0.0 and minimum_fraction < 1.0:
+		canvas.preview_circle(tower.global_position, attack_range * minimum_fraction, canvas.range_color, false, 1.0)
 
 func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##virtual introspection surface shared by spatial indexing and selection rendering
 	return []

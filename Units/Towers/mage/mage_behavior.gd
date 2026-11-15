@@ -13,32 +13,41 @@ const NETWORK_UPDATE_VISUAL_STEP_SECONDS: float = 0.05
 
 var _connected_palisades: Array[Tower] = [] ##the list of palisades this specific Mage is currently powering
 var _network_rebuild_queued: bool = false
-var _is_listening_for_network_events: bool = false
-var _is_listening_for_island_events: bool = false
+var _network_attached: bool = false
+var _network_island_ref: WeakRef
 var _network_damage_modifier: Modifier
 var _network_cooldown_modifier: Modifier
 var _pulse_cast_id: int = 0
 var _network_visual_id: int = 0
 
-const NETWORK_EVENT_TYPES: Array[GameEvent.EventType] = [
-	GameEvent.EventType.TOWER_BUILT,
-	GameEvent.EventType.DIED,
-	GameEvent.EventType.REPLACED,
-]
-
 func start() -> void: ##attaches the live mage network cache when this behavior first enters play
 	attach()
 
-func attach() -> void: ##subscribes to relevant tower-change events and builds the initial palisade cache
-	_connect_network_events()
-	_recalculate_network()
+func attach() -> void: ##rebuilds after board changes settle and retries once the loaded run is ready
+	if _network_attached or not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return
+	_network_attached = true
+	var island: Island = Run.references.island
+	_network_island_ref = weakref(island)
+	island.island_changed.connect(_queue_network_rebuild)
+	if not Run.is_run_ready() and not Run.references_ready.is_connected(_queue_network_rebuild):
+		Run.references_ready.connect(_queue_network_rebuild, CONNECT_ONE_SHOT)
+	_queue_network_rebuild()
 
 func detach() -> void: ##disconnects cache invalidation and clears the palisade visuals when the mage leaves play
 	_pulse_cast_id += 1
-	_disconnect_network_events()
-	_disconnect_island_events()
+	_network_attached = false
+	var island: Island = _network_island_ref.get_ref() as Island if _network_island_ref != null else null
+	if is_instance_valid(island) and island.island_changed.is_connected(_queue_network_rebuild):
+		island.island_changed.disconnect(_queue_network_rebuild)
+	_network_island_ref = null
+	if Run.references_ready.is_connected(_queue_network_rebuild):
+		Run.references_ready.disconnect(_queue_network_rebuild)
 	_network_rebuild_queued = false
 	_clear_connected_palisades()
+
+func _exit_tree() -> void: ##releases subscriptions and wall visuals even when the mage is freed directly
+	detach()
 
 func update(_delta: float) -> void: ##pulses every connected palisade as one logical attack whenever the mage can fire
 	if _is_attack_possible(false):
@@ -151,81 +160,11 @@ func _pulse_network() -> void: ##reuses one attack context across every emitted 
 			if hit_data.vfx_on_spawn:
 				VFXManager.play_vfx(hit_data.vfx_on_spawn, palisade.global_position, Vector2.UP)
 
-#network management
-func _connect_network_events() -> void: ##connects once to the global and island event buses used to invalidate palisade network caches
-	if not Run.has_active_run() or not is_instance_valid(Run.player):
-		return
-	Run.player.subscribe_events(NETWORK_EVENT_TYPES, _on_global_event)
-	_is_listening_for_network_events = true
-	_connect_island_events()
-
-func _disconnect_network_events() -> void: ##removes the global invalidation listener so ruined mages stop receiving topology events
-	if Run.has_active_run() and is_instance_valid(Run.player):
-		Run.player.unsubscribe_events(NETWORK_EVENT_TYPES, _on_global_event)
-	_is_listening_for_network_events = false
-
-func _connect_island_events() -> void: ##subscribes to structural island changes so blank tower death reports still rebuild the wall network
-	if not is_instance_valid(Run.references):
-		return
-	var island: Island = Run.references.island
-	if not is_instance_valid(island):
-		return
-	if not island.tower_changed.is_connected(_on_island_tower_changed):
-		island.tower_changed.connect(_on_island_tower_changed)
-	_is_listening_for_island_events = true
-
-func _disconnect_island_events() -> void: ##removes the island structural listener without assuming the island survives teardown
-	if not _is_listening_for_island_events:
-		return
-	if not is_instance_valid(Run.references):
-		_is_listening_for_island_events = false
-		return
-	var island: Island = Run.references.island
-	if is_instance_valid(island) and island.tower_changed.is_connected(_on_island_tower_changed):
-		island.tower_changed.disconnect(_on_island_tower_changed)
-	_is_listening_for_island_events = false
-
-func _on_island_tower_changed(_tower_position: Vector2i) -> void: ##queues a rebuild after any tower build, ruin, resurrection, or removal changes grid connectivity
-	if not _is_listening_for_island_events:
-		return
-	_queue_network_rebuild()
-
-func _on_global_event(_unit: Unit, event: GameEvent) -> void: ##queues one cache rebuild after relevant palisade build/death/replacement events
-	if not _is_listening_for_network_events:
-		return
-	if not _is_network_relevant_event(event):
-		return
-	_queue_network_rebuild()
-
-func _is_network_relevant_event(event: GameEvent) -> bool: ##filters global events down to changes that can alter the contiguous palisade network
-	if not is_instance_valid(event):
-		return false
-
-	match event.event_type:
-		GameEvent.EventType.TOWER_BUILT:
-			var build_data: BuildTowerData = event.data as BuildTowerData
-			return is_instance_valid(build_data) and _is_network_wall(build_data.tower)
-		GameEvent.EventType.DIED:
-			var hit_report_data: HitReportData = event.data as HitReportData
-			if not is_instance_valid(hit_report_data) or not hit_report_data.target is Tower:
-				return false
-			return _is_network_wall(hit_report_data.target as Tower)
-		GameEvent.EventType.REPLACED:
-			var replaced_data: UnitReplacedData = event.data as UnitReplacedData
-			if not is_instance_valid(replaced_data):
-				return false
-			return _is_network_wall(replaced_data.old_unit as Tower) or _is_network_wall(replaced_data.new_unit as Tower)
-
-	return false
-
-func _is_network_wall(tower: Tower) -> bool: ##treats palisades as the only cache-relevant wall nodes for the mage network
-	return is_instance_valid(tower) and tower.type == Towers.Type.PALISADE
-
 func _is_active_network_wall(tower: Tower) -> bool: ##requires palisades to still be active before they can bridge or emit mage pulses
-	return _is_network_wall(tower) and not tower.disabled and tower.current_state == Tower.State.ACTIVE
+	return is_instance_valid(tower) and tower.type == Towers.Type.PALISADE and not tower.disabled and tower.current_state == Tower.State.ACTIVE
 
 func _queue_network_rebuild() -> void: ##coalesces repeated same-frame wall events into one palisade flood-fill
-	if _network_rebuild_queued:
+	if not _network_attached or _network_rebuild_queued:
 		return
 	_network_rebuild_queued = true
 	call_deferred("_flush_network_rebuild")
@@ -237,11 +176,12 @@ func _flush_network_rebuild() -> void: ##runs the deferred cache rebuild only wh
 	_recalculate_network()
 
 func _can_rebuild_network() -> bool: ##guards deferred rebuilds that may arrive after the mage was ruined or freed
-	if not is_instance_valid(unit):
+	if not _network_attached or not is_instance_valid(unit) or unit.is_queued_for_deletion():
 		return false
 	if unit.abstractive or unit.disabled:
 		return false
-	if not Run.is_run_ready() or not is_instance_valid(Run.references.island):
+	var island: Island = _network_island_ref.get_ref() as Island if _network_island_ref != null else null
+	if not Run.is_run_ready() or not is_instance_valid(island) or island != Run.references.island or island.game_ending:
 		return false
 	return true
 
@@ -249,7 +189,7 @@ func _recalculate_network() -> void: ##diffs the new contiguous palisade set aga
 	if not _can_rebuild_network():
 		_clear_connected_palisades()
 		return
-	var new_network: Array[Tower] = _calculate_contiguous_palisades((unit as Tower).tower_position)
+	var new_network: Array[Tower] = _calculate_contiguous_palisades()
 	var network_changed: bool = new_network.size() != _connected_palisades.size()
 	if not network_changed:
 		for palisade: Tower in new_network:
@@ -279,7 +219,8 @@ func _recalculate_network() -> void: ##diffs the new contiguous palisade set aga
 func _clear_connected_palisades() -> void: ##removes this mage's contribution from every currently cached palisade
 	_network_visual_id += 1
 	for palisade: Tower in _connected_palisades:
-		_set_palisade_tint(palisade, false)
+		if is_instance_valid(palisade):
+			_set_palisade_tint(palisade, false)
 	_connected_palisades.clear()
 	_clear_network_stat_modifiers()
 
@@ -348,8 +289,9 @@ func _upsert_network_modifier(existing_modifier: Modifier, attribute: Attributes
 		modifiers_component.add_modifier(modifier)
 		return modifier
 
-	existing_modifier.multiplicative = multiplicative
-	modifiers_component.change_modifier(existing_modifier)
+	if not is_equal_approx(existing_modifier.multiplicative, multiplicative):
+		existing_modifier.multiplicative = multiplicative
+		modifiers_component.change_modifier(existing_modifier)
 	return existing_modifier
 
 func _clear_network_stat_modifiers() -> void: ##removes mage network self-buffs when the network disappears or the behavior detaches
@@ -365,42 +307,12 @@ func _clear_network_stat_modifiers() -> void: ##removes mage network self-buffs 
 	_network_damage_modifier = null
 	_network_cooldown_modifier = null
 
-func _calculate_contiguous_palisades(start_cell: Vector2i) -> Array[Tower]: ##flood-fills outward through linked palisades so the mage can pulse the full contiguous network
-	var island = Run.references.island
-	if not is_instance_valid(island): return []
-	if not is_instance_valid(unit): return []
-	if unit.disabled and not unit.abstractive: return []
-
-	var network: Array[Tower] = []
-	var visited_cells: Dictionary = {}
-	var queue: Array[Vector2i] = [start_cell]
-
-	while queue.size() > 0:
-		var curr_cell = queue.pop_front()
-		if visited_cells.has(curr_cell): continue
-		visited_cells[curr_cell] = true
-
-		var t = island.get_tower_on_tile(curr_cell)
-
-		if curr_cell == start_cell and not is_instance_valid(t):
-			for dir in island.DIRS:
-				queue.append(curr_cell + dir)
-		if not is_instance_valid(t):
-			continue
-
-		#valid nodes: the starting cell (which might be empty ground in preview), or palisades
-		if curr_cell == start_cell or _is_active_network_wall(t):
-			if _is_active_network_wall(t):
-				#prevent duplicate adds for multi-tile palisades
-				if not network.has(t):
-					network.append(t)
-
-			#queue neighbors
-			for adj_cell in t.get_adjacent_cells():
-				if not visited_cells.has(adj_cell):
-					queue.append(adj_cell)
-
-	return network
+func _calculate_contiguous_palisades() -> Array[Tower]: ##uses the shared full-network search for both the live cache and positioned previews
+	if not is_instance_valid(unit) or not is_instance_valid(Run.references) or not is_instance_valid(Run.references.island):
+		return []
+	if unit.disabled and not unit.abstractive:
+		return []
+	return Run.references.island.topology_service.get_connected_towers(unit as Tower, _is_active_network_wall)
 
 func _set_palisade_tint(palisade: Tower, is_connected: bool) -> void: ##increments or decrements the shared mage tint count on one palisade
 	if not is_instance_valid(palisade) or not is_instance_valid(palisade.graphics): return
@@ -438,7 +350,7 @@ func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##
 		return []
 	var highlighted_palisades: Array[Tower] = _connected_palisades
 	if (unit as Tower).abstractive:
-		highlighted_palisades = _calculate_contiguous_palisades((unit as Tower).tower_position)
+		highlighted_palisades = _calculate_contiguous_palisades()
 	var cells: Array[Vector2i] = []
 	for palisade: Tower in highlighted_palisades:
 		if not is_instance_valid(palisade):

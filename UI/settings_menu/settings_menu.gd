@@ -65,9 +65,6 @@ func _ready() -> void:
 	settings_button.pressed.connect(func(): enter_state(State.SETTINGS))
 	save_and_quit_button.pressed.connect(func(): _on_save_and_quit())
 
-	if is_instance_valid(Run.phases) and not Run.phases.phase_advanced.is_connected(_evaluate_save_validity):
-		Run.phases.phase_advanced.connect(_evaluate_save_validity)
-
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	#start hidden
 	visible = false
@@ -109,24 +106,19 @@ func enter_state(input_state: State) -> void:
 	index_root.visible = input_state == State.INDEX
 
 	state = input_state
+	if state == State.PAUSE:
+		#the shared menu survives scene changes, but each run has its own phase manager.
+		if is_instance_valid(Run.phases) and not Run.phases.phase_advanced.is_connected(_evaluate_save_validity):
+			Run.phases.phase_advanced.connect(_evaluate_save_validity)
+		_evaluate_save_validity()
 
 func _on_index_pressed() -> void: ##opens the authored index while preserving the menu's existing pause ownership
 	enter_state(State.INDEX)
 
 #--- internal logic ---
 
-func _evaluate_save_validity() -> void:
-	if not is_instance_valid(Run.phases):
-		save_and_quit_button.disabled = true
-		return
-
-	#if not state == State.PAUSE:
-		#return
-
-	if Run.phases.current_phase == Run.phases.GamePhase.BUILDING:
-		save_and_quit_button.disabled = false
-	else:
-		save_and_quit_button.disabled = true
+func _evaluate_save_validity() -> void: ##keeps the button in sync with the active run's building phase
+	save_and_quit_button.disabled = not is_instance_valid(Run.phases) or Run.phases.current_phase != Phases.GamePhase.BUILDING
 
 func _load_current_settings() -> void:
 	#volume (convert db to 0-1 linear if your sliders are 0-1, or 0-100)

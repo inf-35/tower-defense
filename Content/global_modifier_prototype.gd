@@ -7,6 +7,7 @@ enum TargetFilter {
 	TOWERS_BY_ELEMENT, ##towers are filtered by required_element also
 	TOWERS_BY_TYPE,
 	ENEMIES_ONLY,
+	ALLIED_TOWERS,
 }
 
 @export var target_filter: TargetFilter = TargetFilter.ALL
@@ -16,6 +17,8 @@ enum TargetFilter {
 func matches_unit(unit: Unit) -> bool:
 	#1. filter by type
 	match target_filter:
+		TargetFilter.ALLIED_TOWERS:
+			return unit is Tower and not unit.hostile and not (unit as Tower).environmental
 		TargetFilter.ALL:
 			return true
 		TargetFilter.ALL_TOWERS:

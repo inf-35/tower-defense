@@ -140,7 +140,7 @@ func _pick_echo_target(source_tower: Tower) -> Tower: ##chooses one other active
 			continue
 		if not is_instance_valid(tower) or tower.disabled or tower.current_state != Tower.State.ACTIVE:
 			continue
-		if not is_instance_valid(tower.attack_component):
+		if not is_instance_valid(tower.attack_component) or tower.attack_component.range_only:
 			continue
 		candidates.append(tower)
 

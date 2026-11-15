@@ -43,6 +43,7 @@ static var BASTION: RelicData = load("res://Content/Relics/bastion/bastion.tres"
 static var EDELWEISS: RelicData = load("res://Content/Relics/edelweiss/edelweiss.tres")
 static var SPRINKLERHEAD: RelicData = load("res://Content/Relics/sprinklerhead/sprinklerhead.tres")
 static var SPARE_SUPPLIES: RelicData = load("res://Content/Relics/spare_supplies/spare_supplies.tres")
+static var GUARDSHELM: RelicData = load("res://Content/Relics/guardshelm/guardshelm.tres")
 
 static var relics: Dictionary[RelicData.Type, RelicData] = {}
 static var _is_loaded: bool = false

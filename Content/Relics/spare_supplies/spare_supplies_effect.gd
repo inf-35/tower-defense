@@ -69,7 +69,7 @@ func _activate(player: Player, waves: Waves, state: SuppliesState) -> void: ##co
 	state.activation = null
 	var ended_wave: int = waves.stop_combat_wave()
 	player.hp = restored_health
-	player.remove_relic_by_type(RelicData.Type.SPARE_SUPPLIES)
+	player.remove_relic_by_type(RelicData.Type.SPARE_SUPPLIES, true)
 	_clear_non_boss_enemies(waves)
 	waves.enemy_spawned.disconnect(_register_enemy_death_tracking.bind(state))
 	if is_instance_valid(Run.boss_encounters) and Run.boss_encounters.has_active_encounter():

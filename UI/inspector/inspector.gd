@@ -330,6 +330,7 @@ enum DisplayStatModifier {
 	ANOMALY_REWARD_PREVIEW,
 	DISPLAY_ATTACK_STATUSES,
 	BREACH_WAVE_PREVIEW,
+	PERCENTAGE,
 }
 
 func _update_status_display(unit: Unit) -> void:
@@ -534,6 +535,8 @@ static func apply_display_modifiers(value: Variant, info: StatDisplayInfo) -> Va
 		value = 1.0 / float(value)
 	if info.special_modifier == DisplayStatModifier.INVERT:
 		value *= -1
+	if info.special_modifier == DisplayStatModifier.PERCENTAGE:
+		value = float(value) * 100.0
 
 	if typeof(value) == TYPE_FLOAT:
 		return snappedf(value, 0.01)

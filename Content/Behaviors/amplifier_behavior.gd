@@ -9,10 +9,15 @@ const INFLUENCE_KEY: StringName = &"adjacent_modifiers"
 @export var modifier_prototypes: Array[ModifierDataPrototype] ##modifier that will be applied to adjacent towers (per adjacent amplifier)
 @export var topology: TowerTopologyConfig = TowerTopologyConfig.new() ##authored topology receiving the modifiers; defaults to one-cell cardinal adjacency
 
-#--- private state ---
-#this dictionary tracks the modifiers this specific amplifier has applied to other towers.
-#format: { tower -> array[modifier] }
-var _applied_modifiers: Dictionary[Tower, Array] = {}
+class AppliedModifiersState extends RefCounted:
+	var tower_ref: WeakRef
+	var modifiers: Array[Modifier] = []
+
+	func _init(tower: Tower) -> void:
+		tower_ref = weakref(tower)
+
+#target nodes may be freed before their amplifier during scene teardown.
+var _applied_modifiers: Dictionary[int, AppliedModifiersState] = {}
 var _subscription_id: int = -1
 var _last_report: TowerTopologyService.Report = null
 var attached: bool = false
@@ -74,20 +79,24 @@ func _on_topology_updated(report: TowerTopologyService.Report) -> void: ##reconc
 		current_adjacent_towers.assign(report.unique_towers)
 	current_adjacent_towers.erase(unit as Tower)
 
-	#--- 1. remove modifiers from towers that are no longer adjacent ---
-	var towers_to_unmodify: Array[Tower]
-	for affected_tower: Tower in _applied_modifiers:
-		if not current_adjacent_towers.has(affected_tower):
-			towers_to_unmodify.append(affected_tower)
-
-	for tower: Tower in towers_to_unmodify:
-		_remove_modifiers_from_tower(tower)
-
-	#--- 2. apply modifiers to newly adjacent towers ---
+	var current_tower_ids: Dictionary[int, bool] = {}
 	for tower: Tower in current_adjacent_towers:
-		if (not _applied_modifiers.has(tower)) or _applied_modifiers[tower].is_empty():
+		if is_instance_valid(tower):
+			current_tower_ids[tower.get_instance_id()] = true
+
+	for tower_id: int in _applied_modifiers.keys():
+		if not current_tower_ids.has(tower_id):
+			_remove_modifiers_from_tower(tower_id)
+
+	for tower: Tower in current_adjacent_towers:
+		if not attached:
+			return
+		if not is_instance_valid(tower):
+			continue
+		var tower_id: int = tower.get_instance_id()
+		if not _applied_modifiers.has(tower_id) or _applied_modifiers[tower_id].modifiers.is_empty():
 			_apply_modifier_to_tower(tower)
-			if is_instance_valid(unit.buff_component):
+			if attached and is_instance_valid(tower) and is_instance_valid(unit.buff_component):
 				unit.buff_component.activate_new_link(tower)
 
 #this is the canonical cleanup function, called automatically when the tower is destroyed.
@@ -115,35 +124,44 @@ func get_tower_influences(_candidate: Tower = null) -> Array[TowerInfluence]: ##
 	))
 	return influences
 
-func _apply_modifier_to_tower(target_tower: Tower) -> void:
-	if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
+func _apply_modifier_to_tower(target_tower: Tower) -> void: ##owns only the generated modifiers, with a weak reference to their recipient
+	if not attached or not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
 		return
+	var tower_id: int = target_tower.get_instance_id()
+	var state := AppliedModifiersState.new(target_tower)
+	_applied_modifiers[tower_id] = state
 	for modifier_prototype: ModifierDataPrototype in modifier_prototypes:
+		if not attached or _applied_modifiers.get(tower_id) != state:
+			break
+		if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
+			break
 		var new_modifier := modifier_prototype.generate_modifier()
 		#brand the modifier with our host unit's id for clear source tracking.
 		new_modifier.source_id = unit.unit_id
 
+		#stat notifications can detach the source synchronously, so record ownership first.
+		state.modifiers.append(new_modifier)
 		target_tower.modifiers_component.add_modifier(new_modifier)
-		if not _applied_modifiers.has(target_tower):
-			_applied_modifiers[target_tower] = []
-		_applied_modifiers[target_tower].append(new_modifier) #track the applied modifier
 
-func _remove_modifiers_from_tower(target_tower: Tower) -> void:
-	if not _applied_modifiers.has(target_tower):
+func _remove_modifiers_from_tower(tower_id: int) -> void: ##releases the record even if the target has already been freed
+	var state: AppliedModifiersState = _applied_modifiers.get(tower_id)
+	if state == null:
 		return
 
-	if is_instance_valid(target_tower) and is_instance_valid(target_tower.modifiers_component):
-		var modifiers_to_remove: Array = _applied_modifiers[target_tower]
-		for modifier_to_remove: Modifier in modifiers_to_remove:
-			target_tower.modifiers_component.remove_modifier(modifier_to_remove)
+	#forget ownership before removal notifications can re-enter cleanup.
+	_applied_modifiers.erase(tower_id)
+	var target_tower: Tower = state.tower_ref.get_ref() as Tower
+	if not is_instance_valid(target_tower) or not is_instance_valid(target_tower.modifiers_component):
+		return
+	var target_modifiers: ModifiersComponent = target_tower.modifiers_component
+	for modifier: Modifier in state.modifiers:
+		if not is_instance_valid(target_modifiers):
+			break
+		target_modifiers.remove_modifier(modifier)
 
-	_applied_modifiers.erase(target_tower)
-
-func _clear_all_modifiers() -> void:
-	#create a copy of the keys because we will be modifying the dictionary while iterating
-	var towers_to_clear: Array[Tower] = _applied_modifiers.keys()
-	for tower: Tower in towers_to_clear:
-		_remove_modifiers_from_tower(tower)
+func _clear_all_modifiers() -> void: ##cleans by scalar ids, independent of target destruction order
+	for tower_id: int in _applied_modifiers.keys():
+		_remove_modifiers_from_tower(tower_id)
 	_applied_modifiers.clear()
 
 func _get_topology_service() -> TowerTopologyService: ##resolves the island topology service used by runtime and preview queries

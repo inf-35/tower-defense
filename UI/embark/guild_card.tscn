@@ -3,14 +3,19 @@
 [ext_resource type="Theme" path="res://UI/default_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://UI/embark/embark_guild_card.gd" id="2_card"]
 [ext_resource type="Script" path="res://UI/_animatable_ui.gd" id="3_motion"]
+[ext_resource type="Script" path="res://UI/paper_selection_outline.gd" id="4_outline"]
+[ext_resource type="Shader" path="res://Shaders/ui_paper_outline.gdshader" id="5_outline_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
+shader = ExtResource("5_outline_shader")
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_input"]
 
-[node name="GuildCard" type="Button" node_paths=PackedStringArray("motion", "caption")]
+[node name="GuildCard" type="Button" node_paths=PackedStringArray("motion", "caption", "paper_outline")]
 custom_minimum_size = Vector2(280, 340)
 layout_mode = 3
 anchors_preset = 0
-size_flags_vertical = 3
+size_flags_vertical = 4
 theme = ExtResource("1_theme")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_input")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_input")
@@ -19,6 +24,7 @@ toggle_mode = true
 script = ExtResource("2_card")
 motion = NodePath("Motion")
 caption = NodePath("Motion/Paper/Padding/Content/Title")
+paper_outline = NodePath("Motion/Paper/Outline")
 
 [node name="Motion" type="Control" parent="." node_paths=PackedStringArray("content")]
 layout_mode = 1
@@ -31,6 +37,7 @@ mouse_filter = 2
 script = ExtResource("3_motion")
 content = NodePath("Paper")
 hover_enabled = false
+hover_scale = Vector2(1.1, 1.1)
 
 [node name="Paper" type="PanelContainer" parent="Motion"]
 layout_mode = 1
@@ -40,6 +47,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="Outline" type="Control" parent="Motion/Paper" node_paths=PackedStringArray("panel")]
+visible = false
+show_behind_parent = true
+material = SubResource("ShaderMaterial_outline")
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_outline")
+panel = NodePath("..")
 
 [node name="Padding" type="MarginContainer" parent="Motion/Paper"]
 layout_mode = 2

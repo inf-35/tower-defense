@@ -940,7 +940,7 @@ func play_swirl_line_info(info: VFXInfo, start_position: Vector2, end_position: 
 		info.graphical_layer
 	)
 	if is_instance_valid(line):
-		line.set_texture(info.swirl_particle_texture)
+		line.set_swirl_texture(info.swirl_particle_texture)
 	return line
 
 func create_swirl_beam(
@@ -955,7 +955,8 @@ func create_swirl_beam(
 	drift_speed_min: float = 4.0,
 	drift_speed_max: float = 12.0,
 	drift_angle_noise_deg: float = 35.0,
-	graphical_layer: int = Layers.ALLIED_PROJECTILES
+	graphical_layer: int = Layers.ALLIED_PROJECTILES,
+	forward_only: bool = false
 ) -> SwirlLineVFX: ##spawns a persistent diffuse swirl beam that the caller can keep repositioning while a link stays active
 	if DebugAssistant.disable_vfx_visuals:
 		return null
@@ -981,11 +982,12 @@ func create_swirl_beam(
 		scale_max,
 		drift_speed_min,
 		drift_speed_max,
-		drift_angle_noise_deg
+		drift_angle_noise_deg,
+		forward_only
 	)
 	return beam
 
-func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position: Vector2, strength: float = 1.0) -> SwirlLineVFX: ##spawns a persistent swirl beam from one authored resource so linked supports stay data-driven
+func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position: Vector2, strength: float = 1.0, forward_only: bool = false) -> SwirlLineVFX: ##spawns a persistent swirl beam with optional one-way drift
 	if not is_instance_valid(info):
 		return null
 	if strength <= 0.0:
@@ -1006,10 +1008,11 @@ func create_swirl_beam_info(info: VFXInfo, start_position: Vector2, end_position
 		info.swirl_drift_speed_min,
 		info.swirl_drift_speed_max,
 		info.swirl_drift_angle_noise_deg,
-		info.graphical_layer
+		info.graphical_layer,
+		forward_only
 	)
 	if is_instance_valid(beam):
-		beam.set_texture(info.swirl_particle_texture)
+		beam.set_swirl_texture(info.swirl_particle_texture)
 	return beam
 
 func _play_vfx_scene(info: VFXInfo, pos: Vector2, velocity: Vector2, lifetime: float, scale: Vector2, host: Node2D, projectile_tints: Array[Color], projectile_tint_lifetime: float, is_projectile: bool = false) -> Node2D:

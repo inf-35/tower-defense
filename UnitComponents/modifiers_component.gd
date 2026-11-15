@@ -143,9 +143,16 @@ func set_status_timers_paused(paused: bool) -> void: ##pauses or resumes every a
 			status.timer.paused = paused
 
 func _is_status_blocked_by_cleanse(type: Attributes.Status) -> bool:
-	if type == Attributes.Status.CLEANSE:
+	if type == Attributes.Status.CLEANSE or type == Attributes.Status.GUSTED:
 		return false
 	return _status_effects.has(Attributes.Status.CLEANSE)
+
+func remove_status(type: Attributes.Status) -> void: ##ends an active status and its timer through the normal modifier and tint update
+	var status: StatusEffect = _status_effects.get(type)
+	if status == null:
+		return
+	status.stack = 0.0
+	update_status(status)
 
 #update a status effect
 func update_status(status: StatusEffect) -> void:
@@ -375,6 +382,8 @@ func pull_stat(attr: Attributes.id) -> Variant:
 
 		final_value = (final_value + global_sum_add) * global_product_mult if global_override == null else global_override
 
+	if attr == Attributes.id.MINIMUM_RANGE:
+		return clampf(final_value, 0.0, 1.0)
 	return final_value
 
 func _pull_cooldown_stat() -> Variant: ##resolves cooldown in cooldown-space first, then applies flat attacks-per-second bonuses in rate-space

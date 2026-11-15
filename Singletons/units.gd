@@ -33,10 +33,10 @@ var unit_stats: Dictionary[Type, UnitData] = {}
 var unit_prototypes: Dictionary[Type, Unit] = {}
 
 const VERBOSE: bool = false
-const GLOBAL_ENEMY_HP_MULTIPLIER: float = 0.8
-const ENEMY_HP_PER_WAVE_MULTIPLIER: float = 0.01
+const GLOBAL_ENEMY_HP_MULTIPLIER: float = 0.65
+const ENEMY_HP_PER_WAVE_MULTIPLIER: float = 0.02
 const GLOBAL_ENEMY_SPEED_MULTIPLIER: float = 1/1.25
-const GLOBAL_ENEMY_DAMAGE_MULTIPLIER: float = 1.0
+const GLOBAL_ENEMY_DAMAGE_MULTIPLIER: float = 1.8
 const MIN_ENEMY_PRESENTATION_SCALE: float = 0.8
 const MAX_ENEMY_PRESENTATION_SCALE: float = 0.9
 const SMALL_ENEMY_VISUAL_EXTENT: float = 6.0
@@ -132,7 +132,7 @@ func create_unit(unit_type: Type, as_prototype: bool = false) -> Unit:
 			_unit.modifiers_component.add_permanent_modifier(global_speed_mod)
 		if _unit.attack_component:
 			var global_damage_mod := Modifier.new(Attributes.id.DAMAGE, GLOBAL_ENEMY_DAMAGE_MULTIPLIER, 0.0, -1.0)
-			_unit.modifiers_component.add_permanent_modifier(global_damage_mod)
+			_unit.modifiers_component.add_permanent_modifier(global_damage_mod),
 
 		CONNECT_ONE_SHOT
 	)
