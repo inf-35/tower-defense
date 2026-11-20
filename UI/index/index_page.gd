@@ -52,7 +52,7 @@ func _on_category_selected(category: Category) -> void:
 	_refresh_entries()
 	scroll_container.scroll_vertical = 0
 
-func _refresh_entries() -> void: ##rebuilds the selected category from authored registries only when run prototypes are safe to query
+func _refresh_entries() -> void: ##rebuilds the selected category when run prototypes are safe to query
 	if _is_run_ending or (Run.has_active_run() and not Run.is_run_ready()):
 		return
 

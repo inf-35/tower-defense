@@ -5,13 +5,18 @@
 [ext_resource type="Script" path="res://UI/_animatable_ui.gd" id="3_motion"]
 [ext_resource type="Script" path="res://UI/paper_selection_outline.gd" id="4_outline"]
 [ext_resource type="Shader" path="res://Shaders/ui_paper_outline.gdshader" id="5_outline_shader"]
+[ext_resource type="Shader" path="res://Shaders/ui_selection_outline.gdshader" id="6_icon_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
 shader = ExtResource("5_outline_shader")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_icon"]
+resource_local_to_scene = true
+shader = ExtResource("6_icon_shader")
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_input"]
 
-[node name="GuildCard" type="Button" node_paths=PackedStringArray("motion", "caption", "paper_outline")]
+[node name="GuildCard" type="Button" node_paths=PackedStringArray("motion", "caption", "icon_target", "paper_outline")]
 custom_minimum_size = Vector2(280, 340)
 layout_mode = 3
 anchors_preset = 0
@@ -24,6 +29,7 @@ toggle_mode = true
 script = ExtResource("2_card")
 motion = NodePath("Motion")
 caption = NodePath("Motion/Paper/Padding/Content/Title")
+icon_target = NodePath("Motion/Paper/Padding/Content/Icon")
 paper_outline = NodePath("Motion/Paper/Outline")
 
 [node name="Motion" type="Control" parent="." node_paths=PackedStringArray("content")]
@@ -68,6 +74,7 @@ mouse_filter = 2
 theme_override_constants/separation = 12
 
 [node name="Icon" type="TextureRect" parent="Motion/Paper/Padding/Content"]
+material = SubResource("ShaderMaterial_icon")
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_vertical = 3

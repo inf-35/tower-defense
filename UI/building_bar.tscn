@@ -22,7 +22,7 @@ script = ExtResource("1_08diq")
 towers_bar = NodePath("HBoxContainer/Panel/MarginContainer/ScrollContainer/towers_bar")
 trade_button = NodePath("HBoxContainer/trade")
 trade_button_label = NodePath("HBoxContainer/trade/label")
-tower_slot_label = NodePath("HBoxContainer/TowerSlotsPanel/MarginContainer/slot_label")
+tower_slot_label = NodePath("HBoxContainer/Panel/Control/TowerSlotsPanel/MarginContainer/slot_label")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=230116015]
 use_parent_material = true
@@ -33,7 +33,7 @@ anchor_bottom = 1.0
 offset_bottom = 6.60004
 grow_horizontal = 2
 grow_vertical = 2
-theme_type_variation = &"vbox_10"
+theme_type_variation = &"vbox_20"
 
 [node name="trade" type="Button" parent="HBoxContainer" unique_id=674207593]
 use_parent_material = true
@@ -90,26 +90,33 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
-[node name="TowerSlotsPanel" type="PanelContainer" parent="HBoxContainer" unique_id=1509594030]
-visible = false
-use_parent_material = true
+[node name="Control" type="Control" parent="HBoxContainer/Panel" unique_id=456452424]
 layout_mode = 2
+mouse_filter = 2
+
+[node name="TowerSlotsPanel" type="PanelContainer" parent="HBoxContainer/Panel/Control" unique_id=1509594030]
+use_parent_material = true
+layout_mode = 0
+offset_left = -7.0
+offset_top = -41.0
+offset_right = 234.0
+offset_bottom = 30.0
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_type_variation = &"simple_panel"
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/TowerSlotsPanel" unique_id=373565510]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel/Control/TowerSlotsPanel" unique_id=373565510]
 use_parent_material = true
 layout_mode = 2
 theme_type_variation = &"MarginSuperminor"
 
-[node name="slot_label" type="RichTextLabel" parent="HBoxContainer/TowerSlotsPanel/MarginContainer" unique_id=1980623880]
+[node name="slot_label" type="RichTextLabel" parent="HBoxContainer/Panel/Control/TowerSlotsPanel/MarginContainer" unique_id=1980623880]
 use_parent_material = true
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"rt_s20"
 bbcode_enabled = true
-text = "Towers: 0/8"
+text = "Types: 0/8"
 fit_content = true
 scroll_active = false
 horizontal_alignment = 1

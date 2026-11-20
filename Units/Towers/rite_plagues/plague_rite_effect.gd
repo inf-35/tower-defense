@@ -112,15 +112,23 @@ func _find_nearest_uninfected_enemies(instance: EffectInstance, origin: Unit, co
 	var nearest_distances: Array[float] = []
 	var candidates: Array[Unit] = CombatManager.get_units_in_radius(spread_radius, origin_position, true)
 	for candidate: Unit in candidates:
-		if not _is_valid_spread_target(origin, candidate, state):
+		if not is_instance_valid(candidate) or candidate == origin:
+			continue
+		if not candidate.hostile or candidate.disabled or candidate.is_queued_for_deletion():
+			continue
+		var distance_squared: float = origin_position.distance_squared_to(candidate.global_position)
+		if targets.size() == count and distance_squared >= nearest_distances[count - 1]:
+			continue
+		if not is_instance_valid(candidate.modifiers_component):
+			continue
+		if state.pending_targets.has(candidate.get_instance_id()):
+			continue
+		if candidate.modifiers_component.has_status(spread_status):
 			continue
 
-		var distance_squared: float = origin_position.distance_squared_to(candidate.global_position)
 		var insert_index: int = 0
 		while insert_index < nearest_distances.size() and distance_squared >= nearest_distances[insert_index]:
 			insert_index += 1
-		if insert_index >= count:
-			continue
 
 		targets.insert(insert_index, candidate)
 		nearest_distances.insert(insert_index, distance_squared)
@@ -129,19 +137,6 @@ func _find_nearest_uninfected_enemies(instance: EffectInstance, origin: Unit, co
 			nearest_distances.pop_back()
 
 	return targets
-
-func _is_valid_spread_target(origin: Unit, candidate: Unit, state: PlagueRiteState) -> bool: ##rejects invalid, infected, or already-reserved enemies returned by the hostile-unit radius query
-	if not is_instance_valid(candidate) or candidate == origin:
-		return false
-	if not candidate.hostile or candidate.disabled or candidate.is_queued_for_deletion():
-		return false
-	if not is_instance_valid(candidate.modifiers_component):
-		return false
-	if state.pending_targets.has(candidate.get_instance_id()):
-		return false
-	if candidate.modifiers_component.has_status(spread_status):
-		return false
-	return true
 
 func _reserve_pending_target(instance: EffectInstance, target: Unit) -> void: ##marks one enemy as already claimed by a bolt from this effect instance
 	var state: PlagueRiteState = instance.state as PlagueRiteState

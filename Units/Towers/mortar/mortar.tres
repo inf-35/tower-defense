@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=8 format=3 uid="uid://fsas6ethkjl2"]
+[gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://fsas6ethkjl2"]
 
 [ext_resource type="Texture2D" uid="uid://d0g5jqpqajbyi" path="res://Assets/cannon_full.png" id="1_dtqqj"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_a7a3b"]
@@ -11,6 +11,7 @@
 [resource]
 script = ExtResource("3_hsyy1")
 id = 22
+indexable = false
 size = Vector2i(2, 2)
 cost = 12.0
 required_capacity = 2.0

@@ -110,6 +110,7 @@ func _process(delta: float) -> void:
 				_handle_blocked_state()
 			else:
 				movement_component.target_direction = Vector2.ZERO
+				movement_component.target_position = movement_component.position
 			return
 
 	#4. obstruction check
@@ -123,8 +124,8 @@ func _process(delta: float) -> void:
 		_handle_moving_state()
 
 #--- core logic ---
-func _check_for_obstructions() -> void:
-	if unit.incorporeal or unit.phasing:
+func _check_for_obstructions() -> void: ##resolves blockers from tower occupancy independently of navigable terrain membership
+	if unit.incorporeal or unit.phasing or not is_instance_valid(_island):
 		return
 
 	#prioritize the cell we are trying to enter (forward progress)
@@ -133,16 +134,12 @@ func _check_for_obstructions() -> void:
 	#also check the cell we are standing on (anti-stuck / built-on-top)
 	var current_cell: Vector2i = movement_component.cell_position
 
-	if not Navigation.grid.has(next_cell):
-		push_warning("Navigation failed to retrieve at position: ", next_cell)
-		push_warning(_path)
-		return
-	#look up the map note: if the corresponding cell has a base navcost, we immmediately assume it is not a valid blocker
-	var tower_ahead = Run.references.island.get_tower_on_tile(next_cell) if Navigation.grid[next_cell] != Navigation.BASE_COST else null
-	var tower_here = Run.references.island.get_tower_on_tile(current_cell) if Navigation.grid[current_cell] != Navigation.BASE_COST else null
+	#occupancy remains queryable even if a unit briefly leaves the navigable terrain grid.
+	var tower_ahead: Tower = _island.get_tower_on_tile(next_cell)
+	var tower_here: Tower = tower_ahead if current_cell == next_cell else _island.get_tower_on_tile(current_cell)
 
 	#prioritize blocking the tower ahead, fallback to the tower we are inside
-	var candidate = tower_ahead if is_valid_blocker(tower_ahead) else (tower_here if is_valid_blocker(tower_here) else null)
+	var candidate: Tower = tower_ahead if is_valid_blocker(tower_ahead) else (tower_here if is_valid_blocker(tower_here) else null)
 
 	if candidate != blocking_tower:
 		blocking_tower = candidate

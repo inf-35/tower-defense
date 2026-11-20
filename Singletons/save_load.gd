@@ -4,6 +4,23 @@ const SAVE_PATH: String = "user://savegame.json"
 const PROFILE_PATH: String = "user://profile.json"
 const BossEncounters := preload("res://Indexes/boss_encounters.gd")
 
+var profile: PlayerProfile:
+	get:
+		return _profile
+
+var _profile := PlayerProfile.new()
+var _profile_loaded: bool = false
+var _profile_can_save: bool = false
+var _profile_dirty: bool = false
+
+func _ready() -> void: ##loads app-owned progress before the main menu or a run reads it
+	_profile.changed.connect(_on_profile_changed)
+	load_profile()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_flush_profile()
+
 #public api
 func save_game() -> void:
 	print("SaveLoad: Starting Save Process...")
@@ -39,7 +56,6 @@ func save_game() -> void:
 
 func load_game() -> bool:
 	print("SaveLoad: Starting Load Process...")
-	load_profile()
 
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("SaveLoad: No save file found.")
@@ -90,60 +106,64 @@ func load_game() -> bool:
 	print("SaveLoad: Load Complete.")
 	return true
 
-func save_profile() -> void:
-	print("SaveLoad: Saving profile...")
+func save_profile() -> void: ##captures live preferences and retries any pending profile write
+	var settings: Dictionary[String, Variant] = _profile.get_settings()
+	settings.merge(WindowSettings.get_profile_data(), true)
+	settings["show_all_health_bars"] = Pause.show_all_health_bars
+	settings["show_attached_effect_icons"] = Pause.show_attached_effect_icons
+	_profile.set_settings(settings)
+	_flush_profile()
 
-	var profile_dict: Dictionary = {
-		"settings": WindowSettings.get_profile_data()
-	}
-	profile_dict["settings"]["show_all_health_bars"] = Pause.show_all_health_bars
-	profile_dict["settings"]["show_attached_effect_icons"] = Pause.show_attached_effect_icons
-	if is_instance_valid(Run.player):
-		profile_dict["player"] = Run.player.get_profile()
-	var json_string = JSON.stringify(profile_dict)
+func load_profile() -> bool: ##hydrates the shared object once; repeated calls preserve current in-memory progress
+	if _profile_loaded:
+		return _profile_can_save
+	_profile_loaded = true
+	var profile_data: Variant = _read_profile()
+	_profile_can_save = profile_data is Dictionary and _profile.load_profile(profile_data)
+	if _profile_can_save:
+		_profile_dirty = not profile_data.is_empty() and int(profile_data.get("version", 0)) < PlayerProfile.SCHEMA_VERSION
+	var settings: Dictionary[String, Variant] = _profile.get_settings()
+	Pause.show_all_health_bars = bool(settings.get("show_all_health_bars", false))
+	Pause.show_attached_effect_icons = bool(settings.get("show_attached_effect_icons", true))
+	WindowSettings.apply_startup_settings(settings)
+	return _profile_can_save
 
-	#write to file
-	var file = FileAccess.open(PROFILE_PATH, FileAccess.WRITE)
-	if file:
-		file.store_string(json_string)
-		print("SaveLoad: Game saved successfully to " + PROFILE_PATH)
+func get_wave_records() -> Dictionary[String, Dictionary]: ##reads a snapshot from memory for the index
+	return _profile.get_wave_records()
 
-func load_profile() -> bool:
-	print("SaveLoad: Starting Load profile Process...")
+func record_wave_clear(environment: Run.GameEnvironment, difficulty: Run.GameDifficulty, wave_number: int) -> void: ##converts run enums to persisted keys and records the clear in memory
+	var environment_key: String = Run.GameEnvironment.keys()[environment].to_lower()
+	var difficulty_key: String = Run.GameDifficulty.keys()[difficulty].to_lower()
+	_profile.record_wave_clear(environment_key, difficulty_key, wave_number)
+
+func _on_profile_changed() -> void: ##persists infrequent settings, tutorial, and record changes immediately
+	_profile_dirty = true
+	_flush_profile()
+
+func _flush_profile() -> void: ##keeps failed writes pending and preserves an unreadable on-disk profile
+	if not _profile_dirty or not _profile_can_save:
+		return
+	if _write_profile(_profile.get_profile()):
+		_profile_dirty = false
+
+func _read_profile() -> Variant: ##returns a blank profile on first launch and null if an existing profile cannot be read safely
 	if not FileAccess.file_exists(PROFILE_PATH):
-		print("SaveLoad: No save file found.")
-		WindowSettings.apply_startup_settings()
-		return false
-
-	#read file
-	var file = FileAccess.open(PROFILE_PATH, FileAccess.READ)
-	if not file:
-		WindowSettings.apply_startup_settings()
+		return {}
+	var file: FileAccess = FileAccess.open(PROFILE_PATH, FileAccess.READ)
+	if file == null:
 		push_error("SaveLoad: Failed to open profile file.")
+		return null
+	var json := JSON.new()
+	if json.parse(file.get_as_text()) != OK or not json.data is Dictionary:
+		push_error("SaveLoad: Invalid profile data. " + json.get_error_message())
+		return null
+	return json.data
+
+func _write_profile(profile_dict: Dictionary) -> bool: ##writes the cached snapshot without consulting run-owned state
+	var file: FileAccess = FileAccess.open(PROFILE_PATH, FileAccess.WRITE)
+	if file == null or not file.store_string(JSON.stringify(profile_dict)):
+		push_error("SaveLoad: Failed to write profile file.")
 		return false
-
-	var json_string = file.get_as_text()
-
-	#parse json
-	var json = JSON.new()
-	var error: Error = json.parse(json_string)
-	if error != OK:
-		WindowSettings.apply_startup_settings()
-		push_error("SaveLoad: JSON Parse Error: " + json.get_error_message())
-		return false
-
-	var save_dict: Dictionary = json.data
-
-	if save_dict.has("settings"):
-		var settings_data: Dictionary = save_dict["settings"]
-		Pause.show_all_health_bars = bool(settings_data.get("show_all_health_bars", false))
-		Pause.show_attached_effect_icons = bool(settings_data.get("show_attached_effect_icons", true))
-		WindowSettings.apply_startup_settings(settings_data)
-	else:
-		WindowSettings.apply_startup_settings()
-
-	if save_dict.has("player") and is_instance_valid(Run.player):
-		Run.player.load_profile(save_dict["player"])
 	return true
 
 func _should_restore_boss_encounter(data: Dictionary) -> bool: ##keeps stale boss-test saves from restoring encounters no longer scheduled by phases
@@ -168,6 +188,10 @@ func delete_save() -> void:
 func has_profile() -> bool:
 	return FileAccess.file_exists(PROFILE_PATH)
 
-func delete_profile() -> void:
-	if FileAccess.file_exists(PROFILE_PATH):
-		DirAccess.remove_absolute(PROFILE_PATH)
+func delete_profile() -> void: ##clears the same cached object only after its stored profile has been removed
+	if FileAccess.file_exists(PROFILE_PATH) and DirAccess.remove_absolute(PROFILE_PATH) != OK:
+		push_error("SaveLoad: Failed to delete profile file.")
+		return
+	_profile.load_profile({})
+	_profile_dirty = false
+	_profile_can_save = true

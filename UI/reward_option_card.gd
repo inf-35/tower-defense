@@ -94,6 +94,11 @@ func _apply_visuals(reward: Reward) -> void:
 			title_text = reward.title if reward.title != "" else "Gold Cache"
 			desc_text = reward.description if reward.description != "" else "Gain %.0f {GOLD} immediately." % amount
 
+		Reward.Type.ADD_TOWER_TYPE_SLOTS:
+			icon_tex = Towers.get_tower_icon(Towers.Type.TURRET)
+			title_text = reward.title if reward.title != "" else "Expanded Plans"
+			desc_text = reward.description if reward.description != "" else "Increase your maximum number of tower and rite types by %d for this run." % reward.tower_type_slots
+
 	if icon:
 		icon.texture = icon_tex
 
@@ -149,6 +154,8 @@ func _refresh_reward_availability() -> void: ##re-evaluates whether this reward 
 		var parsed_text: String = _base_description_text
 		if not _reward_available:
 			parsed_text += "\n" + KeywordService.wrap_text(_reward_block_reason, "bad")
+		elif _reward_data.type == Reward.Type.UNLOCK_TOWER or _reward_data.type == Reward.Type.ADD_RITE:
+			parsed_text += "\n" + KeywordService.wrap_text("This consumes one tower type slot. Choose carefully!", "bad")
 		description.set_parsed_text(parsed_text)
 
 	_update_card_disabled_state()

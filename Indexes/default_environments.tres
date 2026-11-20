@@ -14,6 +14,7 @@
 [sub_resource type="Resource" id="Resource_woods_profile"]
 script = ExtResource("2_environment_profile")
 display_name = "Woods"
+description = "Lightly wooded frontier-lands"
 clear_color = Color(0.96, 0.91, 0.81, 1)
 ui_canvas_color = Color(0.96, 0.91, 0.81, 1)
 paper_background_color = Color(0.96, 0.91, 0.81, 1)
@@ -88,6 +89,7 @@ modifiers = Array[ExtResource("4_modifier")]([SubResource("Resource_highland_mod
 [sub_resource type="Resource" id="Resource_winter_profile"]
 script = ExtResource("2_environment_profile")
 display_name = "Winter"
+description = "Icy lands of wind and frost"
 open_water_base = 4
 open_water_label = "Ice"
 lake_noise_frequency_multiplier = 1.15

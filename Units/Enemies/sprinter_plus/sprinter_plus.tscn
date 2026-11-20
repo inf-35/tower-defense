@@ -53,7 +53,7 @@ attack_component = NodePath("AttackComponent")
 
 [node name="AcceleratingBehavior" type="Node" parent="." unique_id=2123889792]
 script = ExtResource("3")
-speed_increase_percent = 0.25
+speed_increase_percent = 0.22
 interval = 0.3
 
 [node name="NavigationComponent" type="Node" parent="." unique_id=1288699964]

@@ -8,7 +8,8 @@ enum Type {
 	ADD_RELIC,
 	ADD_RITE,
 
-	EXPORT #workaround, this tells the initialiser that the reward is defined in inspector
+	EXPORT, #workaround, this tells the initialiser that the reward is defined in inspector
+	ADD_TOWER_TYPE_SLOTS,
 }
 
 enum Rarity {
@@ -24,6 +25,7 @@ enum Rarity {
 @export var relic: RelicData
 @export var rite_type: Towers.Type
 @export var flux_amount: float
+@export var tower_type_slots: int = 0 ##additional tower and rite type slots granted for this run
 
 @export var base_rarity: Rarity = Rarity.UNCOMMON
 @export var weight_scale: float = 1.0 ##post-rarity multiplier for authored edge cases such as gold bundles

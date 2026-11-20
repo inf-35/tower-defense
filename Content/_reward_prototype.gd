@@ -11,6 +11,7 @@ class_name RewardPrototype #see Reward
 @export var relic_data: RelicData
 @export var rite_type: Towers.Type = Towers.Type.VOID
 @export var flux_amount: int = 0
+@export var tower_type_slots: int = 0 ##additional shared loadout slots granted by this reward
 
 @export var base_rarity: Reward.Rarity = Reward.Rarity.UNCOMMON
 @export var weight_scale: float = 1.0
@@ -36,5 +37,7 @@ func generate_reward() -> Reward: ##converts this editor-friendly resource into 
 			reward.rite_type = rite_type
 		Reward.Type.ADD_FLUX:
 			reward.flux_amount = flux_amount
+		Reward.Type.ADD_TOWER_TYPE_SLOTS:
+			reward.tower_type_slots = tower_type_slots
 
 	return reward

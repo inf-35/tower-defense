@@ -114,17 +114,17 @@ func _compare_tower_bar_types(a: Towers.Type, b: Towers.Type) -> bool: ##sorts r
 		return a_is_rite
 	return int(a) < int(b)
 
-func _refresh_tower_slot_label() -> void: ##updates the placeholder active-loadout counter beneath the tower bar
+func _refresh_tower_slot_label() -> void: ##shows the shared tower and rite type count beneath the tower bar
 	if not is_instance_valid(tower_slot_label):
 		return
 	if not Run.has_active_run() or not is_instance_valid(Run.player):
-		tower_slot_label.set_parsed_text("Towers: 0/8")
+		tower_slot_label.set_parsed_text("Types: 0/%d" % Player.MAX_ACTIVE_TOWER_TYPES)
 		return
 
 	var current: int = Run.player.get_active_tower_type_count()
 	var maximum: int = Run.player.get_max_active_tower_types()
-	var label_text: String = "Towers: %d/%d" % [current, maximum]
-	if current > maximum:
+	var label_text: String = "Types: %d/%d" % [current, maximum]
+	if current >= maximum:
 		label_text = KeywordService.wrap_text(label_text, "bad")
 	tower_slot_label.set_parsed_text(label_text)
 

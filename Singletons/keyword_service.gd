@@ -126,7 +126,7 @@ const KEYWORDS: Dictionary[String, Dictionary] = {
 		"title": "Starstruck",
 		"display": "",
 		"description": "{STATUS_EFFECT_LABEL}. Starstruck units lose all {UNIT_ARMOR} while the effect lasts.",
-		"icon": preload("res://Assets/spark.png")
+		"icon": preload("res://Assets/starstruck_status_effect_icon.png")
 	},
 	"POISON": {
 		"title": "Poison",

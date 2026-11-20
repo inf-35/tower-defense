@@ -19,7 +19,7 @@ const RITE_EXCAVATION_COST: float = 0.0
 const BASE_RELIC_SLOTS: int = 4
 const RELIC_SLOT_FIRST_COST: float = 8.0
 const RELIC_SLOT_COST_SCALE: float = 1.8
-const MAX_ACTIVE_TOWER_TYPES: int = 999
+const MAX_ACTIVE_TOWER_TYPES: int = 8
 const DEBUG_GRANT_TEST_CONTENT: bool = false
 const DEBUG_TEST_FLUX: float = 200.0
 
@@ -69,6 +69,7 @@ var unlocked_towers: Dictionary[Towers.Type, bool] = {}:
 var _tower_limits: Dictionary[Towers.Type, int] = {} ##stores placement limits of various towers, by default -1, which is infinite
 
 var rite_inventory: Dictionary[Towers.Type, int] = {}
+var _bonus_tower_type_slots: int = 0
 
 var active_relics: Array[RelicData]
 var _active_relic_effects: Dictionary[RelicData, EffectInstance] = {}
@@ -76,25 +77,6 @@ var relic_slot_capacity: int = BASE_RELIC_SLOTS:
 	set(value):
 		relic_slot_capacity = maxi(value, BASE_RELIC_SLOTS)
 		relic_slots_changed.emit()
-
-#tutorial
-enum TutorialFlag {
-	TROLL = 2,
-	TOWER_DESTROYED = 3,
-	RUINS = 4,
-	RITE = 5,
-	ONBOARDING = 6,
-	SHOP = 7,
-}
-
-var completed_tutorials: Dictionary[TutorialFlag, bool] = {
-	TutorialFlag.TROLL: false,
-	TutorialFlag.TOWER_DESTROYED: false,
-	TutorialFlag.RUINS: false,
-	TutorialFlag.RITE: false,
-	TutorialFlag.ONBOARDING: false,
-	TutorialFlag.SHOP: false,
-}
 
 #various services (which are children of this node)
 var ruin_service: RuinService
@@ -142,6 +124,7 @@ func start() -> void:
 		unit.queue_free()
 
 	rite_inventory.clear()
+	_bonus_tower_type_slots = 0
 	_tower_limits.clear()
 	unlocked_towers.clear()
 	active_relics.clear()
@@ -304,12 +287,10 @@ func unlock_tower(tower_type : Towers.Type, unlock : bool = true) -> bool:
 	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 	return true
 
-func get_active_tower_type_count() -> int: ##counts currently placeable non-rite tower types, without caring about towers already on the map
+func get_active_tower_type_count() -> int: ##counts unlocked tower and rite types in the active loadout
 	var count: int = 0
 	for tower_type: Towers.Type in unlocked_towers:
 		if tower_type == Towers.Type.VOID or tower_type == Towers.Type.PLAYER_CORE:
-			continue
-		if Towers.is_tower_rite(tower_type):
 			continue
 		if not unlocked_towers[tower_type]:
 			continue
@@ -317,16 +298,20 @@ func get_active_tower_type_count() -> int: ##counts currently placeable non-rite
 	return count
 
 func get_max_active_tower_types() -> int: ##returns the current active tower-loadout cap for ui and reward gates
-	return MAX_ACTIVE_TOWER_TYPES
+	return MAX_ACTIVE_TOWER_TYPES + _bonus_tower_type_slots
 
-func has_free_tower_type_slot() -> bool: ##returns whether one more new non-rite tower type can enter the active placeable bar
-	return get_active_tower_type_count() < MAX_ACTIVE_TOWER_TYPES
+func add_tower_type_slots(amount: int) -> void: ##adds run-owned loadout slots and refreshes the existing sidebar and reward gates
+	if amount <= 0:
+		return
+	_bonus_tower_type_slots += amount
+	unlocked_towers_changed.emit(unlocked_towers, rite_inventory)
 
-func can_add_tower_type(tower_type: Towers.Type) -> bool: ##allows duplicates and rites, but blocks new non-rite tower entries once the active loadout is full
+func has_free_tower_type_slot() -> bool: ##returns whether one more tower or rite type fits in the shared loadout
+	return get_active_tower_type_count() < get_max_active_tower_types()
+
+func can_add_tower_type(tower_type: Towers.Type) -> bool: ##allows already unlocked types and gates new towers and rites through the shared cap
 	if tower_type == Towers.Type.VOID or tower_type == Towers.Type.PLAYER_CORE:
 		return false
-	if Towers.is_tower_rite(tower_type):
-		return true
 	if unlocked_towers.get(tower_type, false):
 		return true
 	return has_free_tower_type_slot()
@@ -548,6 +533,7 @@ func get_save_data() -> Dictionary:
 		"hp": hp,
 		"unlocked_towers": unlocked_towers,
 		"rite_inventory": rite_inventory,
+		"bonus_tower_type_slots": _bonus_tower_type_slots,
 		"relic_slot_capacity": relic_slot_capacity,
 	}
 
@@ -563,6 +549,7 @@ func load_save_data(save_data: Dictionary) -> void:
 	flux = float(save_data.gold)
 	hp = int(save_data.hp)
 	relic_slot_capacity = int(save_data.get("relic_slot_capacity", BASE_RELIC_SLOTS))
+	_bonus_tower_type_slots = maxi(int(save_data.get("bonus_tower_type_slots", 0)), 0)
 
 	for unlocked_tower_type in save_data.unlocked_towers:
 		unlocked_towers[int(unlocked_tower_type)] = bool(save_data.unlocked_towers[unlocked_tower_type])
@@ -592,16 +579,3 @@ func load_relic(active_relic: Dictionary) -> void: #add_relic, but for loading
 	var effect_instance: EffectInstance = get_relic_effect_instance(relic)
 	if is_instance_valid(effect_instance) and active_relic.has("global_effect"):
 		effect_instance.effect_prototype.load_save_data(effect_instance, active_relic.global_effect)
-
-func get_profile() -> Dictionary:
-	var profile_data: Dictionary = {
-		"completed_tutorials": completed_tutorials,
-	}
-	return profile_data
-
-func load_profile(profile_data: Dictionary) -> void:
-	var saved_tutorials: Dictionary = profile_data.get("completed_tutorials", {})
-	for tutorial_key: String in saved_tutorials:
-		var tutorial_flag: int = int(tutorial_key)
-		if completed_tutorials.has(tutorial_flag):
-			completed_tutorials[tutorial_flag] = saved_tutorials[tutorial_key]

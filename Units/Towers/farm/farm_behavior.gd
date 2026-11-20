@@ -92,6 +92,10 @@ func _on_wave_ended(_wave: int) -> void:
 	if is_instance_valid(UI.floating_text_manager):
 		var popup_lifetime: float = UI.floating_text_manager.default_lifetime * payout_text_lifetime_multiplier
 		UI.floating_text_manager.show_ink_outlined_text("+%.2f" % total, unit.global_position, Color.GOLD, false, popup_lifetime)
+		
+	if total > 0.0:
+		await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
+		Audio.play_sound(ID.Sounds.COIN_PICKUP_SOUND, 5.0, unit.global_position)
 
 func get_display_data() -> Dictionary: ##reports the authored base income value for inspector/tooltip formatting
 	return {

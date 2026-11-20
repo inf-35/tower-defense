@@ -120,7 +120,7 @@ const SCRIPTED_WAVES: Dictionary[int, Array] = {
 		[Units.Type.FLESHBLOB, 6],
 		[Units.Type.HEALER_PLUS, 3],
 		[Units.Type.CLERIC, 2],
-		[Units.Type.SPRINTER_PLUS, 26],
+		[Units.Type.SPRINTER_PLUS, 24],
 		[Units.Type.WARRIOR_PLUS, 8],
 	],
 	24: [

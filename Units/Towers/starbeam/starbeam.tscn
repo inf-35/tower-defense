@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="4_hitrate"]
 [ext_resource type="Resource" uid="uid://c75nwxacopwiv" path="res://Content/StatDisplays/range.tres" id="5_range_display"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_health"]
+[ext_resource type="Resource" uid="uid://c4abdiu1ku5x3" path="res://Content/StatDisplays/status.tres" id="6_o4jp6"]
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="7_range"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="8_attack"]
 [ext_resource type="Resource" uid="uid://by277rx8cd2sw" path="res://Units/Towers/starbeam/starbeam_attack.tres" id="9_attack_data"]
@@ -22,7 +23,7 @@ z_index = 100
 script = ExtResource("1_tower")
 type = 85
 turret = NodePath("Graphics/starring")
-stat_displays = Array[ExtResource("2_display")]([ExtResource("3_damage"), ExtResource("4_hitrate"), ExtResource("5_range_display")])
+stat_displays = Array[ExtResource("2_display")]([ExtResource("3_damage"), ExtResource("4_hitrate"), ExtResource("5_range_display"), ExtResource("6_o4jp6")])
 behavior = NodePath("StarbeamBehavior")
 graphics = NodePath("Graphics")
 health_component = NodePath("HealthComponent")
@@ -51,7 +52,7 @@ texture = ExtResource("10_a8ijr")
 
 [node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=1056818714]
 script = ExtResource("11_shadow")
-height_multiplier = 2.0
+height_multiplier = 1.2
 
 [node name="sunring" type="Sprite2D" parent="Graphics" unique_id=780601919]
 texture = ExtResource("12_o6ttl")

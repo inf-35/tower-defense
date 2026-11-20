@@ -215,7 +215,7 @@ func get_reward_block_reason(reward: Reward) -> String: ##returns the current re
 			if reward.tower_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.tower_type):
 				return "Already unlocked."
 			if reward.tower_type != Towers.Type.VOID and not Run.player.can_add_tower_type(reward.tower_type):
-				return "No tower slots."
+				return "No tower type slots."
 		Reward.Type.ADD_RELIC:
 			if not is_instance_valid(reward.relic):
 				return "Unavailable."
@@ -226,6 +226,11 @@ func get_reward_block_reason(reward: Reward) -> String: ##returns the current re
 		Reward.Type.ADD_RITE:
 			if reward.rite_type != Towers.Type.VOID and Run.player.is_tower_unlocked(reward.rite_type):
 				return "Already unlocked."
+			if reward.rite_type != Towers.Type.VOID and not Run.player.can_add_tower_type(reward.rite_type):
+				return "No tower type slots."
+		Reward.Type.ADD_TOWER_TYPE_SLOTS:
+			if reward.tower_type_slots <= 0:
+				return "Unavailable."
 
 	return ""
 
@@ -284,6 +289,11 @@ func apply_reward(reward: Reward) -> bool:
 		Reward.Type.ADD_FLUX:
 			var amount: float = reward.flux_amount
 			Run.player.flux += amount
+			reward_applied.emit(reward)
+			return true
+
+		Reward.Type.ADD_TOWER_TYPE_SLOTS:
+			Run.player.add_tower_type_slots(reward.tower_type_slots)
 			reward_applied.emit(reward)
 			return true
 

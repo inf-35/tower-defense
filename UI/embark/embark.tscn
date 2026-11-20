@@ -20,15 +20,14 @@
 [sub_resource type="ButtonGroup" id="ButtonGroup_ixus3"]
 resource_local_to_scene = false
 
-[sub_resource type="ButtonGroup" id="ButtonGroup_x5x47"]
-resource_local_to_scene = false
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xg4nm"]
 resource_local_to_scene = true
 shader = ExtResource("10_xg4nm")
 shader_parameter/outline_enabled = false
+shader_parameter/locked = false
+shader_parameter/locked_color = Color(0.45, 0.45, 0.45, 1)
 shader_parameter/outline_color = Color(0.96, 0.68, 0.16, 1)
-shader_parameter/outline_width = 2.0
+shader_parameter/outline_width = 5.0
 shader_parameter/alpha_threshold = 0.1
 shader_parameter/draw_size = Vector2(260, 260)
 
@@ -36,6 +35,33 @@ shader_parameter/draw_size = Vector2(260, 260)
 resource_local_to_scene = true
 shader = ExtResource("10_xg4nm")
 shader_parameter/outline_enabled = false
+shader_parameter/locked = false
+shader_parameter/locked_color = Color(0.45, 0.45, 0.45, 1)
+shader_parameter/outline_color = Color(0.96, 0.68, 0.16, 1)
+shader_parameter/outline_width = 5.0
+shader_parameter/alpha_threshold = 0.1
+shader_parameter/draw_size = Vector2(260, 260)
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_x5x47"]
+resource_local_to_scene = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_61sd2"]
+resource_local_to_scene = true
+shader = ExtResource("10_xg4nm")
+shader_parameter/outline_enabled = false
+shader_parameter/locked = false
+shader_parameter/locked_color = Color(0.45, 0.45, 0.45, 1)
+shader_parameter/outline_color = Color(0.96, 0.68, 0.16, 1)
+shader_parameter/outline_width = 2.0
+shader_parameter/alpha_threshold = 0.1
+shader_parameter/draw_size = Vector2(260, 260)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7i0xg"]
+resource_local_to_scene = true
+shader = ExtResource("10_xg4nm")
+shader_parameter/outline_enabled = false
+shader_parameter/locked = false
+shader_parameter/locked_color = Color(0.45, 0.45, 0.45, 1)
 shader_parameter/outline_color = Color(0.96, 0.68, 0.16, 1)
 shader_parameter/outline_width = 2.0
 shader_parameter/alpha_threshold = 0.1
@@ -53,7 +79,7 @@ texture = ExtResource("14_xg4nm")
 texture_margin_left = 60.0
 texture_margin_right = 150.0
 
-[node name="Embark" type="Control" unique_id=973310809 node_paths=PackedStringArray("guild_options", "woods_option", "winter_option", "medium_option", "hard_option", "title_label", "guild_title", "guild_description", "loadout", "embark_button", "cancel_button")]
+[node name="Embark" type="Control" unique_id=973310809 node_paths=PackedStringArray("guild_options", "woods_option", "winter_option", "medium_option", "hard_option", "title_label", "guild_title", "guild_description", "environment_description", "loadout", "embark_button", "cancel_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -62,7 +88,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_theme")
 script = ExtResource("7_page")
-guild_options = [NodePath("MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards"), NodePath("MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers")]
+guild_options = [NodePath("MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers"), NodePath("MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards")]
 woods_option = NodePath("MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Woods")
 winter_option = NodePath("MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Winter")
 medium_option = NodePath("MainFrame/Content/Columns/Control2/ReservedSpace/DifficultyOptions/Medium")
@@ -70,6 +96,7 @@ hard_option = NodePath("MainFrame/Content/Columns/Control2/ReservedSpace/Difficu
 title_label = NodePath("MainFrame/TitleCenter/TitlePanel/Padding/Title")
 guild_title = NodePath("MainFrame/Content/Columns/Control/Guilds/GuildDescription/Padding/Content/Title")
 guild_description = NodePath("MainFrame/Content/Columns/Control/Guilds/GuildDescription/Padding/Content/Description")
+environment_description = NodePath("MainFrame/Content/Columns/Control2/ReservedSpace/MapDescriptionSpace/MapDescription/Padding/Description")
 loadout = NodePath("MainFrame/Content/LoadoutBarSpace")
 embark_button = NodePath("MainFrame/Actions/EmbarkButton")
 cancel_button = NodePath("MainFrame/Actions/CancelButton")
@@ -156,27 +183,30 @@ size_flags_vertical = 3
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="Guards" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards" unique_id=785975889 instance=ExtResource("2_card")]
-layout_mode = 2
-button_group = SubResource("ButtonGroup_ixus3")
-guild = ExtResource("9_guards")
-
-[node name="Icon" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards/Motion/Paper/Padding/Content" index="0"]
-texture = ExtResource("3_guards_icon")
-
-[node name="Title" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards/Motion/Paper/Padding/Content" index="1"]
-text = "Guards"
-
 [node name="Pioneers" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards" unique_id=384665571 instance=ExtResource("2_card")]
 layout_mode = 2
 button_group = SubResource("ButtonGroup_ixus3")
 guild = ExtResource("10_pioneers")
 
 [node name="Icon" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers/Motion/Paper/Padding/Content" index="0"]
+material = SubResource("ShaderMaterial_xg4nm")
 texture = ExtResource("7_x5x47")
 
 [node name="Title" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers/Motion/Paper/Padding/Content" index="1"]
 text = "Pioneers"
+
+[node name="Guards" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards" unique_id=785975889 instance=ExtResource("2_card")]
+layout_mode = 2
+button_group = SubResource("ButtonGroup_ixus3")
+guild = ExtResource("9_guards")
+required_wave_clear = 24
+
+[node name="Icon" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards/Motion/Paper/Padding/Content" index="0"]
+material = SubResource("ShaderMaterial_ee4pe")
+texture = ExtResource("3_guards_icon")
+
+[node name="Title" parent="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards/Motion/Paper/Padding/Content" index="1"]
+text = "???"
 
 [node name="GuildDescription" type="PanelContainer" parent="MainFrame/Content/Columns/Control/Guilds" unique_id=1199626274]
 custom_minimum_size = Vector2(0, 160)
@@ -202,6 +232,7 @@ autowrap_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
 autowrap_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MainFrame/Content/Columns/Control" unique_id=1063357821]
@@ -281,9 +312,13 @@ button_group = SubResource("ButtonGroup_x5x47")
 title = "Woods"
 
 [node name="Icon" parent="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Woods/Motion/Content" parent_id_path=PackedInt32Array(671541134, 208701585) index="0" unique_id=479170868]
-material = SubResource("ShaderMaterial_xg4nm")
+material = SubResource("ShaderMaterial_61sd2")
 texture = ExtResource("12_woods_icon")
 expand_mode = 5
+
+[node name="Caption" parent="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Woods/Motion/Content" parent_id_path=PackedInt32Array(671541134, 208701585) index="1" unique_id=270875631]
+theme_type_variation = &"text_s15"
+text = "aeaea"
 
 [node name="Winter" parent="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices" unique_id=1550973430 instance=ExtResource("11_map_choice")]
 layout_mode = 1
@@ -300,11 +335,46 @@ grow_horizontal = 2
 grow_vertical = 2
 button_group = SubResource("ButtonGroup_x5x47")
 title = "Winter"
+required_wave_clear = 16
 
 [node name="Icon" parent="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Winter/Motion/Content" parent_id_path=PackedInt32Array(1550973430, 208701585) index="0" unique_id=479170868]
-material = SubResource("ShaderMaterial_ee4pe")
+material = SubResource("ShaderMaterial_7i0xg")
 texture = ExtResource("13_winter_icon")
 expand_mode = 5
+
+[node name="Caption" parent="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Winter/Motion/Content" parent_id_path=PackedInt32Array(1550973430, 208701585) index="1" unique_id=270875631]
+theme_type_variation = &"text_s15"
+
+[node name="MapDescriptionSpace" type="Control" parent="MainFrame/Content/Columns/Control2/ReservedSpace" unique_id=427190051]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MapDescription" type="PanelContainer" parent="MainFrame/Content/Columns/Control2/ReservedSpace/MapDescriptionSpace" unique_id=1187780841]
+z_index = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.6
+offset_left = -20.199951
+offset_top = -111.80005
+offset_right = -5.0
+offset_bottom = 25.199951
+mouse_filter = 2
+
+[node name="Padding" type="MarginContainer" parent="MainFrame/Content/Columns/Control2/ReservedSpace/MapDescriptionSpace/MapDescription" unique_id=312864743]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"MarginMajor"
+
+[node name="Description" type="RichTextLabel" parent="MainFrame/Content/Columns/Control2/ReservedSpace/MapDescriptionSpace/MapDescription/Padding" unique_id=1343444731]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 2
+vertical_alignment = 1
 
 [node name="DifficultyOptions" type="HBoxContainer" parent="MainFrame/Content/Columns/Control2/ReservedSpace" unique_id=1964396519]
 layout_mode = 2
@@ -330,7 +400,7 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -242.19995
+offset_left = -185.19995
 offset_top = -72.79999
 offset_right = 30.800049
 offset_bottom = 100.20001
@@ -340,7 +410,7 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_xg4nm")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="MainFrame/Content/Columns/Control2/PanelContainer" unique_id=1413568297]
 layout_mode = 2
-text = "Embark"
+text = "Maps"
 scroll_active = false
 horizontal_alignment = 2
 
@@ -418,7 +488,7 @@ size_flags_vertical = 4
 disabled = true
 title = "Embark"
 
-[editable path="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards"]
 [editable path="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Pioneers"]
+[editable path="MainFrame/Content/Columns/Control/Guilds/GuildScroll/GuildPadding/GuildCards/Guards"]
 [editable path="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Woods"]
 [editable path="MainFrame/Content/Columns/Control2/ReservedSpace/EnvironmentPanel/Padding/EnvironmentOptions/MapChoices/Winter"]

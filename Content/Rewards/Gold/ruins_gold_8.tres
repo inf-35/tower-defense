@@ -1,14 +1,15 @@
-[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://di6yhce7kn360"]
+[gd_resource type="Resource" script_class="RewardPrototype" format=3 uid="uid://djj0nqy252uvb"]
 
 [ext_resource type="Script" uid="uid://dvfm5ntqw5j3e" path="res://Content/_reward_prototype.gd" id="1_reward"]
 
 [resource]
 script = ExtResource("1_reward")
-id_name = "ruins_gold_15"
+id_name = "ruins_gold_8"
 title = "Gold Cache"
-description = "Gain 15 {GOLD} immediately."
+description = "Gain 8 {GOLD} immediately."
 type = 0
-flux_amount = 15.0
+flux_amount = 8.0
 base_rarity = 0
+weight_scale = 4.0
 
 

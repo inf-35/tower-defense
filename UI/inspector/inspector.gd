@@ -276,6 +276,9 @@ func _create_action_button(tower: Tower, action: InspectorAction) -> void:
 				btn.text = "Excavate (%.2f)" % Run.player.RITE_EXCAVATION_COST
 				if Run.player.flux < Run.player.RITE_EXCAVATION_COST or tower.current_state != Tower.State.ACTIVE:
 					is_disabled = true
+				if not Run.player.can_add_tower_type(tower.type):
+					is_disabled = true
+					btn.tooltip_text = "No tower type slots."
 				btn.pressed.connect(UI.excavate_rite_requested.emit.bind(tower))
 			else:
 				var sell_value: float = snappedf(Towers.get_tower_refund_value(tower.type) * Tower.REFUND_PROPORTION, Towers.TOWER_COST_INCREMENT)
@@ -331,6 +334,7 @@ enum DisplayStatModifier {
 	DISPLAY_ATTACK_STATUSES,
 	BREACH_WAVE_PREVIEW,
 	PERCENTAGE,
+	RANGE_BAND,
 }
 
 func _update_status_display(unit: Unit) -> void:
@@ -468,6 +472,14 @@ static func get_stat_value_from_instance(tower: Tower, info: StatDisplayInfo) ->
 			return value
 		DisplayStatModifier.BREACH_WAVE_PREVIEW:
 			return tower.get_behavior_attribute(ID.UnitState.BREACH_WAVE_PREVIEW)
+		DisplayStatModifier.RANGE_BAND:
+			var attack_range: Variant = tower.get_stat(Attributes.id.RANGE)
+			if attack_range == null:
+				return null
+			var maximum_range: float = maxf(float(attack_range), 0.0)
+			var minimum_fraction: Variant = tower.get_stat(Attributes.id.MINIMUM_RANGE)
+			var minimum_range: float = maximum_range * float(minimum_fraction) if minimum_fraction != null else 0.0
+			return "%s ~ %s" % [snappedf(minimum_range, 0.01), snappedf(maximum_range, 0.01)]
 		DisplayStatModifier.DISPLAY_ATTACK_STATUSES:
 			if not is_instance_valid(tower.attack_component):
 				return null

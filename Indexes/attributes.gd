@@ -141,8 +141,8 @@ const status_effect_icons: Dictionary[Status, Texture2D] = {
 	Status.POISON: preload("res://Assets/poison_icon.png"),
 	Status.STUN: preload("res://Assets/stun_icon.png"),
 	Status.CLEANSE: preload("res://Assets/healer.png"),
-	Status.GUSTED: preload("res://Assets/particle_whirl.png"),
-	Status.STARSTRUCK: preload("res://Assets/spark.png"),
+	Status.GUSTED: preload("res://Assets/gusted_status_effect_icon.png"),
+	Status.STARSTRUCK: preload("res://Assets/starstruck_status_effect_icon.png"),
 }
 
 var reactions: Array[ReactionData] = [

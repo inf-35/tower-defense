@@ -23,8 +23,7 @@ var position: Vector2:
 		position = new_position
 		unit.global_position = position
 
-		if _stagger % 8 == 0:
-			cell_position = Island.position_to_cell(position)
+		cell_position = Island.position_to_cell(position)
 
 var direction: Vector2
 var cell_position: Vector2i:
@@ -32,8 +31,9 @@ var cell_position: Vector2i:
 		if cell_position == new_cell_position:
 			return
 
-		movement_to_cell.emit(cell_position, new_cell_position)
+		var previous_cell: Vector2i = cell_position
 		cell_position = new_cell_position
+		movement_to_cell.emit(previous_cell, new_cell_position)
 
 var target_position: Vector2
 var target_direction: Vector2:
@@ -54,8 +54,6 @@ func inject_components(n_graphics: Node2D, modifiers_component = null) -> void:
 	create_stat_cache(_modifiers_component, [Attributes.id.MAX_SPEED, Attributes.id.ACCELERATION, Attributes.id.TURN_SPEED])
 
 func _ready() -> void: ##initialises movement state and removes immutable movement components from the physics loop
-	_STAGGER_CYCLE = 3
-	_stagger = randi_range(0, _STAGGER_CYCLE)
 	position = position #trigger setter functions, esp. cell
 	cell_position = Island.position_to_cell(position)
 	unit.position = position
@@ -64,8 +62,6 @@ func _ready() -> void: ##initialises movement state and removes immutable moveme
 		set_physics_process(false)
 
 func _physics_process(_delta: float) -> void:
-	_stagger += 1
-
 	if paused:
 		velocity = Vector2.ZERO
 		return
@@ -81,13 +77,12 @@ func _physics_process(_delta: float) -> void:
 	if not movement_data.mobile:
 		return
 
-	if _accumulated_delta > 0.08:
-		if target_position:
-			if (target_position - position).length_squared() > _ERROR_SQUARED:
-				target_direction = (target_position - position) #recalculate target direction
-			else:
-				target_direction = Vector2.ZERO
+	#steering follows the physics step so fast units cannot keep moving along a stale heading.
+	var to_target: Vector2 = target_position - position
+	if target_position:
+		target_direction = to_target if to_target.length_squared() > _ERROR_SQUARED else Vector2.ZERO
 
+	if _accumulated_delta > 0.08:
 		_update_walk_cycle(_accumulated_delta)
 		_accumulated_delta = 0.0 #reset accumulated delta
 
@@ -96,7 +91,10 @@ func _physics_process(_delta: float) -> void:
 	if face_towards_movement and velocity.length_squared() > 0.01:
 		unit.rotation = velocity.angle()
 
-	position += velocity * Clock.physics_game_delta
+	var displacement: Vector2 = velocity * Clock.physics_game_delta
+	if target_position and displacement.length_squared() > to_target.length_squared():
+		displacement = to_target
+	position += displacement
 
 func _update_walk_cycle(delta: float) -> void:
 	if not jiggle_enabled or not is_instance_valid(graphics):

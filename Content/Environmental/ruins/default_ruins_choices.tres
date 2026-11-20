@@ -6,4 +6,4 @@
 [resource]
 script = ExtResource("1_1")
 title = "Search the ruins"
-type_filter = Array[int]([0, 1, 2, 3])
+type_filter = Array[int]([0, 1, 2, 3, 5])

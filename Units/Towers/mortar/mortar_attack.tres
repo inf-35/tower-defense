@@ -39,5 +39,6 @@ armour_ignore = 1.0
 breaking = true
 vfx_on_spawn = SubResource("Resource_e3651")
 vfx_on_impact = SubResource("Resource_m0o9m")
+fire_sound = &"cannon_fire_sound"
 projectile_speed = 40.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

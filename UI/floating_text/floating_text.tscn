@@ -6,11 +6,6 @@
 
 [node name="FloatingText" type="Label"]
 material = ExtResource("3_light_mix")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 theme = ExtResource("1_nso1a")
 theme_override_colors/font_outline_color = Color(0.99215686, 0.9372549, 0.84705883, 1)
 theme_override_constants/outline_size = 8

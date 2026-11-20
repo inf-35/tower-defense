@@ -91,9 +91,8 @@ func start_game(progress_callback: Callable = Callable()) -> void:
 	await begin_new_game(progress_callback)
 
 func begin_new_game(progress_callback: Callable = Callable()) -> void:
-	_report_loading(progress_callback, "Loading profile...", 0.62)
+	_report_loading(progress_callback, "Preparing island...", 0.62)
 	await get_tree().process_frame
-	SaveLoad.load_profile()
 	await Run.references.island.generate_new_island()
 	current_wave_number = 0
 	current_phase = GamePhase.IDLE
@@ -298,9 +297,10 @@ func _start_boss_combat_wave(boss_encounter_type: BossEncounters.Type) -> void: 
 	_connect_boss_encounter_listeners()
 	Run.boss_encounters.start_or_resume_subwave(current_wave_number, boss_encounter_type)
 
-func _on_combat_wave_ended(_wave_number: int) -> void:
+func _on_combat_wave_ended(wave_number: int) -> void:
 	if current_phase != GamePhase.COMBAT_WAVE:
 		return
+	SaveLoad.record_wave_clear(Run.current_game_environment, Run.current_game_difficulty, wave_number)
 	_report("combat wave " + str(current_wave_number) + " reported as ended by Run.waves.gd.")
 	wave_ended.emit(current_wave_number)
 
@@ -320,9 +320,10 @@ func _on_boss_subwave_cleared(_wave_number: int, _subwave_index: int) -> void: #
 	_start_building_phase()
 	phase_advanced.emit()
 
-func _on_boss_encounter_ended(_wave_number: int, _encounter_type: int) -> void: ##finishes the real boss wave once the persistent boss dies
+func _on_boss_encounter_ended(wave_number: int, _encounter_type: int) -> void: ##finishes the real boss wave once the persistent boss dies
 	if current_phase != GamePhase.COMBAT_WAVE:
 		return
+	SaveLoad.record_wave_clear(Run.current_game_environment, Run.current_game_difficulty, wave_number)
 	_report("boss encounter ended for wave " + str(current_wave_number) + ".")
 	_disconnect_boss_encounter_listeners()
 	Run.waves.wave_ended.emit(current_wave_number)

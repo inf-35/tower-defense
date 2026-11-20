@@ -15,7 +15,6 @@ var show_attached_effect_icons: bool = true:
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	SaveLoad.load_profile()
 
 func _input(event: InputEvent) -> void:
 	if not event.is_action_pressed("menu"):

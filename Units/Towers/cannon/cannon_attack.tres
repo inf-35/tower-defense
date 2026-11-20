@@ -41,5 +41,6 @@ damage = 12.0
 breaking = true
 vfx_on_spawn = SubResource("Resource_e3651")
 vfx_on_impact = SubResource("Resource_4fgl6")
+fire_sound = &"cannon_fire_sound"
 projectile_speed = 210.0
 metadata/_custom_type_script = "uid://bxee20ha7a0bv"

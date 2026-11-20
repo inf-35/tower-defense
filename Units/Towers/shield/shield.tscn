@@ -1,14 +1,17 @@
-[gd_scene load_steps=11 format=3 uid="uid://dv6kdb6a6pltb"]
+[gd_scene format=3 uid="uid://dv6kdb6a6pltb"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_vyvgg"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="2_6bos2"]
 [ext_resource type="Script" uid="uid://bdhsnunw7upow" path="res://Content/Behaviors/amplifier_behavior.gd" id="2_wgsl0"]
 [ext_resource type="Script" uid="uid://fg7kwlp4e1tp" path="res://Content/modifier_data_prototype.gd" id="3_6sgcr"]
+[ext_resource type="Resource" uid="uid://c8sulmlfvi5s7" path="res://Content/StatDisplays/max_health.tres" id="3_v5c40"]
 [ext_resource type="Script" uid="uid://bj2kqlul6w1an" path="res://UnitComponents/movement_component.gd" id="4_humpw"]
 [ext_resource type="Resource" uid="uid://ce3mgj1gxv4wo" path="res://Content/Movement/immobile_mvmt.tres" id="5_2d7id"]
 [ext_resource type="Script" uid="uid://b016qjmysn53e" path="res://UnitComponents/health_component.gd" id="6_nhso7"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="7_b2noi"]
-[ext_resource type="Texture2D" uid="uid://sv2v7deixlsu" path="res://Assets/green_tower_base.png" id="7_jmo6j"]
+[ext_resource type="Texture2D" uid="uid://bn2lr3hdn81iu" path="res://Assets/shield_stepstones.png" id="7_kqw3n"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="8_ffryd"]
+[ext_resource type="Texture2D" uid="uid://oukges6ugihj" path="res://Assets/shield_obelisk.png" id="9_chgh3"]
 
 [sub_resource type="Resource" id="Resource_b2noi"]
 script = ExtResource("3_6sgcr")
@@ -16,10 +19,11 @@ attribute = 11
 multiplicative = 0.25
 metadata/_custom_type_script = "uid://fg7kwlp4e1tp"
 
-[node name="Shield" type="Node2D" node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
+[node name="Shield" type="Node2D" unique_id=1119738892 node_paths=PackedStringArray("behavior", "graphics", "modifiers_component", "health_component", "movement_component")]
 z_index = 100
 script = ExtResource("1_vyvgg")
 type = 12
+stat_displays = Array[ExtResource("2_6bos2")]([ExtResource("3_v5c40")])
 behavior = NodePath("AmplifierBehavior")
 graphics = NodePath("Graphics")
 modifiers_component = NodePath("ModifiersComponent")
@@ -27,28 +31,38 @@ health_component = NodePath("HealthComponent")
 movement_component = NodePath("MovementComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="AmplifierBehavior" type="Node" parent="."]
+[node name="AmplifierBehavior" type="Node" parent="." unique_id=1698143083]
 script = ExtResource("2_wgsl0")
 modifier_prototypes = Array[ExtResource("3_6sgcr")]([SubResource("Resource_b2noi")])
 metadata/_custom_type_script = "uid://bdhsnunw7upow"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=460293297]
 script = ExtResource("4_humpw")
 movement_data = ExtResource("5_2d7id")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1397747396]
 script = ExtResource("6_nhso7")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="Graphics" type="Sprite2D" parent="."]
+[node name="Graphics" type="Sprite2D" parent="." unique_id=585380474]
 scale = Vector2(0.065, 0.065)
-texture = ExtResource("7_jmo6j")
+texture = ExtResource("7_kqw3n")
 
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=603601130]
 script = ExtResource("7_b2noi")
+height_multiplier = 0.25
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=1171085994]
+texture = ExtResource("9_chgh3")
+
+[node name="ShadowComponent" type="Node2D" parent="Graphics/Sprite2D" unique_id=1325300521]
+script = ExtResource("7_b2noi")
+height_multiplier = 1.2
+shadow_samples = 16
+metadata/_custom_type_script = "uid://cgkca68adlq8y"
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=2128125309]
 script = ExtResource("8_ffryd")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"

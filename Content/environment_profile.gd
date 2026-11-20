@@ -2,6 +2,7 @@ class_name EnvironmentProfile
 extends Resource
 
 @export var display_name: String = "" ##editor-facing label for the environment profile
+@export_multiline var description: String = "" ##concise player-facing description shown when hovering or selecting this map in embark
 @export var open_water_base: int = Terrain.Base.WATER ##revealed lake terrain for this environment
 @export var open_water_label: String = "Water" ##player-facing label for the revealed open-water terrain in this environment
 @export_range(0.0, 1.0, 0.001) var lake_threshold: float = 0.68 ##lower values create larger lake fields for this environment

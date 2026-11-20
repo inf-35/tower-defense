@@ -21,12 +21,12 @@ func _handle_attach(_instance: EffectInstance) -> void:
 func _handle_detach(_instance: EffectInstance) -> void:
 	pass
 
-func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
+func _handle_event(instance: EffectInstance, event: GameEvent) -> void: ##rejects exhausted lineage before searching for another infection target
 	if event.event_type != GameEvent.EventType.HIT_RECEIVED:
 		return
 
 	var hit_data: HitData = event.data as HitData
-	if not hit_data:
+	if not hit_data or hit_data.has_lineage_producer(instance):
 		return
 
 	var victim: Unit = event.unit
@@ -46,7 +46,7 @@ func _handle_event(instance: EffectInstance, event: GameEvent) -> void:
 
 	_fire_projectile(instance, victim, target, hit_data, poison_stacks * _get_effect_stacks(instance))
 
-func _find_target(origin_unit: Unit) -> Unit:
+func _find_target(origin_unit: Unit) -> Unit: ##samples candidates without replacement until one eligible target is found
 	var candidates: Array[Unit] = CombatManager.get_units_in_radius(
 		search_radius,
 		origin_unit.global_position,
@@ -54,8 +54,11 @@ func _find_target(origin_unit: Unit) -> Unit:
 		[origin_unit]
 	)
 
-	candidates.shuffle()
-	for candidate: Unit in candidates:
+	for index: int in range(candidates.size()):
+		var random_index: int = randi_range(index, candidates.size() - 1)
+		var candidate: Unit = candidates[random_index]
+		candidates[random_index] = candidates[index]
+		candidates[index] = candidate
 		if _is_valid_target(candidate):
 			return candidate
 

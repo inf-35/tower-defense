@@ -4,7 +4,5 @@
 
 [resource]
 script = ExtResource("1_display")
-attribute = 16
-label = "Minimum {UNIT_RANGE|label=Range}"
-suffix = "%"
-special_modifier = 12
+label = "{UNIT_RANGE|label=Range}"
+special_modifier = 13

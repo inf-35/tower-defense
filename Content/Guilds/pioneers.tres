@@ -8,6 +8,6 @@
 script = ExtResource("1_2dmvw")
 title = "Pioneers"
 description = "A hardy guild well-suited for expeditions."
-starting_buildings = Array[int]([2, 6, 53, 5, 84, 85])
+starting_buildings = Array[int]([2, 6, 53, 5])
 starting_relics = Array[ExtResource("2_brlti")]([ExtResource("3_brlti")])
 metadata/_custom_type_script = "uid://ceq64w4b51rhw"

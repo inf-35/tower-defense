@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhviujwgfvasj"
-path="res://.godot/imported/index.png-1fa76f5e0e893f01f18fdc47b06d8f29.ctex"
+uid="uid://oukges6ugihj"
+path="res://.godot/imported/shield_obelisk.png-ac54391ebc7b9499ebda10d689f705b6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web-export/index.png"
-dest_files=["res://.godot/imported/index.png-1fa76f5e0e893f01f18fdc47b06d8f29.ctex"]
+source_file="res://Assets/shield_obelisk.png"
+dest_files=["res://.godot/imported/shield_obelisk.png-ac54391ebc7b9499ebda10d689f705b6.ctex"]
 
 [params]
 

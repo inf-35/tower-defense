@@ -13,6 +13,11 @@ const DEFAULT_PROJECTILE_CHROMA_BOOST: float = 0.75
 const DEFAULT_PROJECTILE_NIGHT_SHADING_FRACTION: float = 0.9
 const PROJECTILE_TEXTURE_BATCH_INITIAL_CAPACITY: int = 32
 const PROJECTILE_TEXTURE_BATCH_AABB: AABB = AABB(Vector3(-100000.0, -100000.0, -1.0), Vector3(200000.0, 200000.0, 2.0))
+const GPU_TRAIL_SHADER: Shader = preload("res://Shaders/projectile_trail_strip.gdshader")
+const GPU_TRAIL_CHROMA_SHADER: Shader = preload("res://Shaders/projectile_trail_strip_chroma.gdshader")
+const GPU_TRAIL_INSTANCE_FLOATS: int = 16
+
+@export var gpu_projectile_trails_enabled: bool = true ##renders all projectile trails with shared gpu strips, disable to compare against cpu ribbons
 
 
 class SceneTintState extends RefCounted:
@@ -37,15 +42,34 @@ class ProjectileTextureBatch extends RefCounted:
 	var base_count: int = 0
 	var chroma_count: int = 0
 
+class ProjectileTrailBatch extends RefCounted:
+	var mesh: ArrayMesh
+	var base_instance: MultiMeshInstance2D
+	var chroma_instance: MultiMeshInstance2D
+	var base_buffer := PackedFloat32Array()
+	var chroma_buffer := PackedFloat32Array()
+	var points_buffer := PackedFloat32Array()
+	var points_image: Image
+	var points_texture: ImageTexture
+	var point_capacity: int = 0
+	var capacity: int = 0
+	var count: int = 0
+
 var _active_vfx: Array[VFXInstance] = []
 var _active_scene_tints: Array[SceneTintState] = []
 var _active_exempt_nodes: Array[Node2D] = []
 var _projectile_texture_batches: Dictionary[String, ProjectileTextureBatch] = {}
+var _projectile_trail_batches: Dictionary[String, ProjectileTrailBatch] = {}
 var _projectile_canvas_layer: CanvasLayer
 var _projectile_canvas_root: Node2D
 var _projectile_trail_canvas_item: RID
 var _projectile_chroma_canvas_item: RID
 var _projectile_chroma_material: CanvasItemMaterial
+var _trail_indices_by_point_count: Dictionary[int, PackedInt32Array] = {}
+var _trail_half_width_offsets := PackedVector2Array()
+var _trail_alpha_weights := PackedFloat32Array()
+var _trail_vertices := PackedVector2Array()
+var _trail_colors := PackedColorArray()
 #a flat array allows for optimal memory access
 
 func _ready() -> void: ##registers the render-server draw hook while leaving per-frame simulation asleep until effects exist
@@ -72,6 +96,10 @@ func _exit_tree() -> void: ##releases render-server resources owned by the exemp
 		if is_instance_valid(batch.chroma_instance):
 			batch.chroma_instance.queue_free()
 	_projectile_texture_batches.clear()
+	for batch: ProjectileTrailBatch in _projectile_trail_batches.values():
+		batch.base_instance.queue_free()
+		batch.chroma_instance.queue_free()
+	_projectile_trail_batches.clear()
 	if _projectile_trail_canvas_item.is_valid():
 		RenderingServer.free_rid(_projectile_trail_canvas_item)
 	if _projectile_chroma_canvas_item.is_valid():
@@ -410,27 +438,209 @@ func _draw_projectile_chroma(vfx: VFXInstance, info: VFXInfo, current_scale_val:
 	var scale_multiplier: float = _get_projectile_chroma_scale(strength)
 	_draw_vfx_shape(_projectile_chroma_canvas_item, vfx, info, current_scale_val, chroma_color, scale_multiplier)
 
-func _draw_projectile_trails() -> void: ##draws projectile trails as centralized smoothed ribbon geometry on the exempt projectile pass
+func _draw_projectile_trails() -> void: ##submits shared gpu batches or prepares indexed cpu ribbons for comparison
 	RenderingServer.canvas_item_clear(_projectile_trail_canvas_item)
+	for batch: ProjectileTrailBatch in _projectile_trail_batches.values():
+		batch.count = 0
 	if DebugAssistant.disable_projectile_trails or DebugAssistant.disable_projectile_visuals:
+		_clear_gpu_projectile_trails()
 		return
+
+	RenderingServer.canvas_item_add_set_transform(_projectile_trail_canvas_item, Transform2D.IDENTITY)
+	if _projectile_chroma_canvas_item.is_valid():
+		RenderingServer.canvas_item_add_set_transform(_projectile_chroma_canvas_item, Transform2D.IDENTITY)
 
 	for vfx: VFXInstance in _active_vfx:
 		if not _is_projectile_trail_enabled(vfx):
 			continue
 		if vfx.trail_points.size() < 2:
 			continue
+		if gpu_projectile_trails_enabled:
+			_submit_gpu_projectile_trail(vfx)
+			continue
 
 		var centerline: PackedVector2Array = _build_smoothed_trail_centerline(vfx)
 		var head_index: int = centerline.size() - 1
 		centerline = _extend_projectile_trail_head(vfx, centerline)
+		var point_count: int = centerline.size()
+		if not _trail_indices_by_point_count.has(point_count):
+			var indices := PackedInt32Array()
+			indices.resize((point_count - 1) * 6)
+			for segment: int in range(point_count - 1):
+				var vertex: int = segment * 2
+				var index: int = segment * 6
+				indices[index] = vertex
+				indices[index + 1] = vertex + 1
+				indices[index + 2] = vertex + 2
+				indices[index + 3] = vertex + 1
+				indices[index + 4] = vertex + 3
+				indices[index + 5] = vertex + 2
+			_trail_indices_by_point_count[point_count] = indices
+		var triangle_indices: PackedInt32Array = _trail_indices_by_point_count[point_count]
+
+		_trail_half_width_offsets.resize(point_count)
+		_trail_alpha_weights.resize(point_count)
+		_trail_vertices.resize(point_count * 2)
+		_trail_colors.resize(point_count * 2)
+		var fade_start_index: int = clampi(head_index, 1, point_count - 1)
+		var fade_length: int = maxi(point_count - 1 - fade_start_index, 1)
+		for i: int in range(point_count):
+			var trail_progress: float = minf(float(i) / float(fade_start_index), 1.0)
+			var head_fade: float = 1.0
+			if i > fade_start_index:
+				var fade_progress: float = float(i - fade_start_index) / float(fade_length)
+				head_fade = 1.0 - smoothstep(0.0, 1.0, fade_progress)
+			_trail_half_width_offsets[i] = _get_trail_normal(centerline, i) * (0.5 * smoothstep(0.0, 1.0, trail_progress) * head_fade)
+			_trail_alpha_weights[i] = pow(trail_progress, 1.35) * head_fade
+
 		var outer_color: Color = _apply_vfx_color_override(vfx.vfx_info.projectile_trail_outer_color, vfx.color_override)
 		var inner_color: Color = _apply_vfx_color_override(vfx.vfx_info.projectile_trail_inner_color, vfx.color_override)
 		outer_color = _apply_projectile_night_shading(outer_color)
 		inner_color = _apply_projectile_night_shading(inner_color)
-		_draw_projectile_trail_chroma(vfx, centerline, head_index, outer_color, inner_color)
-		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, head_index, vfx.vfx_info.projectile_trail_outer_width, outer_color)
-		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, head_index, vfx.vfx_info.projectile_trail_inner_width, inner_color)
+		_draw_projectile_trail_chroma(vfx, centerline, triangle_indices, outer_color, inner_color)
+		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, triangle_indices, vfx.vfx_info.projectile_trail_outer_width, outer_color)
+		_draw_projectile_trail_ribbon(_projectile_trail_canvas_item, centerline, triangle_indices, vfx.vfx_info.projectile_trail_inner_width, inner_color)
+
+	for batch: ProjectileTrailBatch in _projectile_trail_batches.values():
+		if batch.count > 0:
+			batch.points_image.set_data(batch.point_capacity, batch.capacity, false, Image.FORMAT_RGBAF, batch.points_buffer.to_byte_array())
+			batch.points_texture.update(batch.points_image)
+			batch.base_instance.multimesh.buffer = batch.base_buffer
+			batch.chroma_instance.multimesh.buffer = batch.chroma_buffer
+		batch.base_instance.multimesh.visible_instance_count = batch.count * 2
+		batch.chroma_instance.multimesh.visible_instance_count = batch.count
+		batch.base_instance.visible = batch.count > 0
+		batch.chroma_instance.visible = batch.count > 0
+
+func _get_gpu_projectile_trail_batch(info: VFXInfo) -> ProjectileTrailBatch: ##shares one strip and sampled-path texture across trails with matching sampling settings
+	var point_capacity: int = maxi(info.projectile_trail_max_points, 2)
+	var smooth_steps: int = maxi(info.projectile_trail_smooth_steps, 1)
+	var head_steps: int = maxi(info.projectile_trail_head_extension_steps, 1)
+	var key: String = "%d:%d:%d" % [point_capacity, smooth_steps, head_steps]
+	if _projectile_trail_batches.has(key):
+		return _projectile_trail_batches[key]
+
+	var batch := ProjectileTrailBatch.new()
+	batch.point_capacity = point_capacity
+	batch.points_image = Image.create(point_capacity, 1, false, Image.FORMAT_RGBAF)
+	batch.points_texture = ImageTexture.create_from_image(batch.points_image)
+	var body_steps: int = (point_capacity - 1) * smooth_steps
+	var point_count: int = body_steps + head_steps + 1
+	var vertices := PackedVector3Array()
+	var indices := PackedInt32Array()
+	vertices.resize(point_count * 2)
+	indices.resize((point_count - 1) * 6)
+	for i: int in range(point_count):
+		vertices[i * 2] = Vector3(float(i), -0.5, 0.0)
+		vertices[i * 2 + 1] = Vector3(float(i), 0.5, 0.0)
+		if i == point_count - 1:
+			continue
+		var vertex: int = i * 2
+		var index: int = i * 6
+		indices[index] = vertex
+		indices[index + 1] = vertex + 1
+		indices[index + 2] = vertex + 2
+		indices[index + 3] = vertex + 1
+		indices[index + 4] = vertex + 3
+		indices[index + 5] = vertex + 2
+	var arrays: Array[Variant] = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_INDEX] = indices
+	batch.mesh = ArrayMesh.new()
+	batch.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+
+	for additive: bool in [false, true]:
+		var multimesh := MultiMesh.new()
+		multimesh.transform_format = MultiMesh.TRANSFORM_2D
+		multimesh.use_colors = true
+		multimesh.use_custom_data = true
+		multimesh.mesh = batch.mesh
+		multimesh.custom_aabb = PROJECTILE_TEXTURE_BATCH_AABB
+		multimesh.visible_instance_count = 0
+		var material := ShaderMaterial.new()
+		material.shader = GPU_TRAIL_CHROMA_SHADER if additive else GPU_TRAIL_SHADER
+		material.set_shader_parameter("trail_points_texture", batch.points_texture)
+		material.set_shader_parameter("trail_smooth_steps", smooth_steps)
+		material.set_shader_parameter("trail_head_steps", head_steps)
+		var instance := MultiMeshInstance2D.new()
+		instance.name = "ProjectileTrailChromaBatch" if additive else "ProjectileTrailStripBatch"
+		instance.multimesh = multimesh
+		instance.material = material
+		instance.z_index = Layers.ALLIED_PROJECTILES if additive else Layers.ALLIED_PROJECTILES + 1
+		instance.z_as_relative = false
+		instance.visible = false
+		_projectile_canvas_root.add_child(instance)
+		if additive:
+			batch.chroma_instance = instance
+		else:
+			batch.base_instance = instance
+	_projectile_trail_batches[key] = batch
+	return batch
+
+func _submit_gpu_projectile_trail(vfx: VFXInstance) -> void: ##uploads raw trajectory samples and layer data for shader-side smoothing and ribbon construction
+	var info: VFXInfo = vfx.vfx_info
+	var batch: ProjectileTrailBatch = _get_gpu_projectile_trail_batch(info)
+	if batch.count >= batch.capacity:
+		batch.capacity = maxi(batch.capacity * 2, PROJECTILE_TEXTURE_BATCH_INITIAL_CAPACITY)
+		batch.base_instance.multimesh.instance_count = batch.capacity * 2
+		batch.chroma_instance.multimesh.instance_count = batch.capacity
+		batch.base_buffer.resize(batch.capacity * 2 * GPU_TRAIL_INSTANCE_FLOATS)
+		batch.chroma_buffer.resize(batch.capacity * GPU_TRAIL_INSTANCE_FLOATS)
+		batch.points_buffer.resize(batch.capacity * batch.point_capacity * 4)
+		batch.points_image = Image.create(batch.point_capacity, batch.capacity, false, Image.FORMAT_RGBAF)
+		batch.points_texture.set_image(batch.points_image)
+	var point_count: int = mini(vfx.trail_points.size(), batch.point_capacity)
+	var first_point: int = vfx.trail_points.size() - point_count
+	var tail: Vector2 = vfx.trail_points[first_point]
+	var row_offset: int = batch.count * batch.point_capacity * 4
+	for i: int in range(point_count):
+		var point: Vector2 = vfx.position if i == point_count - 1 else vfx.trail_points[first_point + i]
+		var relative: Vector2 = point - tail
+		var offset: int = row_offset + i * 4
+		batch.points_buffer[offset] = relative.x
+		batch.points_buffer[offset + 1] = relative.y
+	var fallback_heading: Vector2 = vfx.visual_velocity if not vfx.visual_velocity.is_zero_approx() else vfx.velocity
+	batch.points_buffer[row_offset + 2] = fallback_heading.x
+	batch.points_buffer[row_offset + 3] = fallback_heading.y
+	var outer_color: Color = _apply_projectile_night_shading(_apply_vfx_color_override(info.projectile_trail_outer_color, vfx.color_override))
+	var inner_color: Color = _apply_projectile_night_shading(_apply_vfx_color_override(info.projectile_trail_inner_color, vfx.color_override))
+	var strength: float = vfx.projectile_trail_chroma_strength * _get_projectile_chroma_multiplier()
+	var chroma_color: Color = _get_projectile_chroma_color(outer_color.lerp(inner_color, 0.35), strength)
+	var chroma_width: float = maxf(info.projectile_trail_outer_width, info.projectile_trail_inner_width) * _get_projectile_chroma_scale(strength)
+	var transform := Transform2D(0.0, tail)
+	var extension: float = maxf(info.projectile_trail_head_extension, 0.0)
+	_write_gpu_trail_instance(batch.base_buffer, batch.count * 2, transform, outer_color, point_count, extension, maxf(info.projectile_trail_outer_width, 0.0))
+	_write_gpu_trail_instance(batch.base_buffer, batch.count * 2 + 1, transform, inner_color, point_count, extension, maxf(info.projectile_trail_inner_width, 0.0))
+	_write_gpu_trail_instance(batch.chroma_buffer, batch.count, transform, chroma_color, point_count, extension, chroma_width)
+	batch.count += 1
+
+func _write_gpu_trail_instance(buffer: PackedFloat32Array, instance_index: int, transform: Transform2D, color: Color, point_count: int, extension: float, width: float) -> void: ##packs one two-dimensional transform, color, and shader payload into the shared upload buffer
+	var offset: int = instance_index * GPU_TRAIL_INSTANCE_FLOATS
+	buffer[offset] = transform.x.x
+	buffer[offset + 1] = transform.y.x
+	buffer[offset + 2] = 0.0
+	buffer[offset + 3] = transform.origin.x
+	buffer[offset + 4] = transform.x.y
+	buffer[offset + 5] = transform.y.y
+	buffer[offset + 6] = 0.0
+	buffer[offset + 7] = transform.origin.y
+	buffer[offset + 8] = color.r
+	buffer[offset + 9] = color.g
+	buffer[offset + 10] = color.b
+	buffer[offset + 11] = maxf(color.a, 0.0)
+	buffer[offset + 12] = float(point_count)
+	buffer[offset + 13] = extension
+	buffer[offset + 14] = width
+	buffer[offset + 15] = 0.0
+
+func _clear_gpu_projectile_trails() -> void: ##hides retained trail batches when debug controls suppress their visuals
+	for batch: ProjectileTrailBatch in _projectile_trail_batches.values():
+		batch.count = 0
+		batch.base_instance.visible = false
+		batch.chroma_instance.visible = false
+		batch.base_instance.multimesh.visible_instance_count = 0
+		batch.chroma_instance.multimesh.visible_instance_count = 0
 
 func _record_projectile_trail_point(vfx: VFXInstance) -> void: ##adds a sparse trajectory sample only after enough movement to keep ribbon geometry compact
 	if not _is_projectile_trail_enabled(vfx):
@@ -516,7 +726,7 @@ func _sample_catmull_rom(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: 
 		+ (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3
 	)
 
-func _draw_projectile_trail_chroma(vfx: VFXInstance, centerline: PackedVector2Array, head_index: int, outer_color: Color, inner_color: Color) -> void: ##draws one wide additive ribbon behind exempt projectile trails
+func _draw_projectile_trail_chroma(vfx: VFXInstance, centerline: PackedVector2Array, triangle_indices: PackedInt32Array, outer_color: Color, inner_color: Color) -> void: ##draws the additive layer using the current trail's shared geometry
 	if not _projectile_chroma_canvas_item.is_valid():
 		return
 
@@ -528,9 +738,9 @@ func _draw_projectile_trail_chroma(vfx: VFXInstance, centerline: PackedVector2Ar
 	var chroma_color: Color = _get_projectile_chroma_color(base_color, strength)
 	var head_width: float = maxf(vfx.vfx_info.projectile_trail_outer_width, vfx.vfx_info.projectile_trail_inner_width)
 	head_width *= _get_projectile_chroma_scale(strength)
-	_draw_projectile_trail_ribbon(_projectile_chroma_canvas_item, centerline, head_index, head_width, chroma_color)
+	_draw_projectile_trail_ribbon(_projectile_chroma_canvas_item, centerline, triangle_indices, head_width, chroma_color)
 
-func _draw_projectile_trail_ribbon(canvas_item_rid: RID, centerline: PackedVector2Array, head_index: int, head_width: float, base_color: Color) -> void: ##draws one tapered polygon strip from a smoothed projectile path
+func _draw_projectile_trail_ribbon(canvas_item_rid: RID, centerline: PackedVector2Array, triangle_indices: PackedInt32Array, head_width: float, base_color: Color) -> void: ##fills one layer from shared trail scratch data and submits its precomputed triangle connections
 	if not canvas_item_rid.is_valid():
 		return
 	if centerline.size() < 2:
@@ -538,42 +748,17 @@ func _draw_projectile_trail_ribbon(canvas_item_rid: RID, centerline: PackedVecto
 	if head_width <= 0.0 or base_color.a <= 0.0:
 		return
 
-	RenderingServer.canvas_item_add_set_transform(canvas_item_rid, Transform2D.IDENTITY)
-
-	var left_edge := PackedVector2Array()
-	var right_edge := PackedVector2Array()
-	var left_colors := PackedColorArray()
-	var right_colors := PackedColorArray()
-	var point_count: int = centerline.size()
-	var fade_start_index: int = clampi(head_index, 1, point_count - 1)
-	var fade_length: int = maxi(point_count - 1 - fade_start_index, 1)
-
-	for i: int in range(point_count):
-		var trail_progress: float = minf(float(i) / float(fade_start_index), 1.0)
-		var head_fade: float = 1.0
-		if i > fade_start_index:
-			var fade_progress: float = float(i - fade_start_index) / float(fade_length)
-			head_fade = 1.0 - smoothstep(0.0, 1.0, fade_progress)
-		var width: float = head_width * smoothstep(0.0, 1.0, trail_progress) * head_fade
-		var alpha: float = base_color.a * pow(trail_progress, 1.35) * head_fade
+	for i: int in range(centerline.size()):
+		var offset: Vector2 = _trail_half_width_offsets[i] * head_width
+		var alpha: float = base_color.a * _trail_alpha_weights[i]
 		var point_color: Color = Color(base_color.r, base_color.g, base_color.b, alpha)
-		var normal: Vector2 = _get_trail_normal(centerline, i)
+		var vertex: int = i * 2
+		_trail_vertices[vertex] = centerline[i] + offset
+		_trail_vertices[vertex + 1] = centerline[i] - offset
+		_trail_colors[vertex] = point_color
+		_trail_colors[vertex + 1] = point_color
 
-		left_edge.append(centerline[i] + normal * width * 0.5)
-		left_colors.append(point_color)
-		right_edge.append(centerline[i] - normal * width * 0.5)
-		right_colors.append(point_color)
-
-	var polygon_points := PackedVector2Array()
-	var polygon_colors := PackedColorArray()
-	for i: int in range(left_edge.size()):
-		polygon_points.append(left_edge[i])
-		polygon_colors.append(left_colors[i])
-	for i: int in range(right_edge.size() - 1, -1, -1):
-		polygon_points.append(right_edge[i])
-		polygon_colors.append(right_colors[i])
-
-	RenderingServer.canvas_item_add_polygon(canvas_item_rid, polygon_points, polygon_colors)
+	RenderingServer.canvas_item_add_triangle_array(canvas_item_rid, triangle_indices, _trail_vertices, _trail_colors)
 
 func _get_trail_normal(centerline: PackedVector2Array, index: int) -> Vector2: ##uses neighbouring samples to orient ribbon width around bends
 	var previous_point: Vector2 = centerline[maxi(index - 1, 0)]
@@ -687,16 +872,19 @@ func apply_debug_visual_flags() -> void: ##clears currently drawn diagnostic-dis
 	if DebugAssistant.disable_projectile_visuals:
 		RenderingServer.canvas_item_clear(_projectile_trail_canvas_item)
 		RenderingServer.canvas_item_clear(_projectile_chroma_canvas_item)
+		_clear_gpu_projectile_trails()
 		_clear_projectile_texture_batches()
 		for vfx: VFXInstance in _active_vfx:
 			if vfx.is_projectile:
 				_clear_vfx_draw(vfx)
 	elif DebugAssistant.disable_projectile_trails:
 		RenderingServer.canvas_item_clear(_projectile_trail_canvas_item)
+		_clear_gpu_projectile_trails()
 
 func _clear_active_vfx_draws() -> void:
 	RenderingServer.canvas_item_clear(_projectile_trail_canvas_item)
 	RenderingServer.canvas_item_clear(_projectile_chroma_canvas_item)
+	_clear_gpu_projectile_trails()
 	_clear_projectile_texture_batches()
 	for vfx: VFXInstance in _active_vfx:
 		_clear_vfx_draw(vfx)

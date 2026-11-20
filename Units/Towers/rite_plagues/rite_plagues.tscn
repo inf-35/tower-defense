@@ -22,6 +22,7 @@
 script = ExtResource("12_vfx")
 texture = ExtResource("13_poison_icon")
 radius = 1.5
+projectile_trail_inner_color = Color(0.738, 0.9, 0.41399997, 1)
 scale = 0.12
 rotation_mode = 1
 
@@ -29,7 +30,7 @@ rotation_mode = 1
 script = ExtResource("11_attack")
 delivery_method = 1
 vfx_on_spawn = SubResource("Resource_plague_projectile_vfx")
-projectile_speed = 120.0
+projectile_speed = 60.0
 
 [sub_resource type="Resource" id="Resource_owejg"]
 script = ExtResource("4_4swbb")

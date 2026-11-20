@@ -8,19 +8,21 @@
 resource_local_to_scene = true
 shader = ExtResource("3_outline")
 shader_parameter/outline_enabled = false
+shader_parameter/locked = false
+shader_parameter/locked_color = Color(0.45, 0.45, 0.45, 1)
 shader_parameter/outline_color = Color(0.96, 0.68, 0.16, 1)
 shader_parameter/outline_width = 2.0
 shader_parameter/alpha_threshold = 0.1
 shader_parameter/draw_size = Vector2(260, 260)
 
-[node name="MapChoice" type="Button" unique_id=1827949417 node_paths=PackedStringArray("motion", "caption", "outline_target")]
+[node name="MapChoice" type="Button" unique_id=1827949417 node_paths=PackedStringArray("motion", "caption", "icon_target")]
 custom_minimum_size = Vector2(260, 260)
 theme_type_variation = &"button_empty"
 toggle_mode = true
 script = ExtResource("1_choice")
 motion = NodePath("Motion")
 caption = NodePath("Motion/Content/Caption")
-outline_target = NodePath("Motion/Content/Icon")
+icon_target = NodePath("Motion/Content/Icon")
 
 [node name="Motion" type="Control" parent="." unique_id=1373091039 node_paths=PackedStringArray("content")]
 layout_mode = 1

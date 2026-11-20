@@ -12,7 +12,6 @@ const EXPANSION_ORIGIN_BIAS_EXPONENT: float = 1.4 #higher = prefers shoreline se
 const FRONTIER_EVENING_BIAS: float = 1.125
 const FRONTIER_EVENING_MAX_MULTIPLIER: float = 1.8
 const DEFAULT_SETTLEMENT_PROBABILITY: float = 0.002
-const HARD_SETTLEMENT_PROBABILITY_MULTIPLIER: float = 0.75
 
 #--- procedural configuration ---
 #a helper class to define how a specific terrain type (bonus tile) spawns
@@ -135,7 +134,6 @@ func generate_and_present_choices(island: Island, block_size: int, choice_count:
 	for i: int in range(choice_count):
 		#generate the block data, which may now include a breach seed
 		var expansion_params: GenerationParameters = STANDARD_EXPANSION_PARAMS.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
-		_apply_difficulty_to_generation_params(expansion_params)
 		var rite_rule: PlacementRule = expansion_params.placement_rules[1]
 		rite_rule.tower_type = _pick_random_rite_type()
 		#var second_rite_rule: PlacementRule = rite_rule.duplicate_deep(Resource.DeepDuplicateMode.DEEP_DUPLICATE_INTERNAL)
@@ -251,18 +249,6 @@ func _on_exit() -> void:
 	UI.hide_expansion_confirmation.emit()
 	UI.hide_expansion_exit.emit()
 
-func _apply_difficulty_to_generation_params(params: GenerationParameters) -> void: ##applies run-difficulty tuning to authored generation params without hardcoding individual call sites
-	for rule: TerrainGenRule in params.terrain_gen_rules:
-		rule.probability *= _get_terrain_probability_multiplier(rule.terrain_type)
-
-func _get_terrain_probability_multiplier(terrain_type: Terrain.Base) -> float: ##returns the current difficulty multiplier for one terrain family
-	match terrain_type:
-		Terrain.Base.SETTLEMENT:
-			if Run.current_game_difficulty == Run.GameDifficulty.HARD:
-				return HARD_SETTLEMENT_PROBABILITY_MULTIPLIER
-
-	return 1.0
-
 func _clear_expansion_state(island: Island) -> void: ##resets the expansion preview state without rewinding the player's camera once manual control is restored
 	_current_state = State.IDLE
 	_choices_by_id.clear()
@@ -298,6 +284,9 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	for check_cell: Vector2i in coords_pool_for_terrain:
 		var current_base = block_data[check_cell].terrain
 		for rule: TerrainGenRule in params.terrain_gen_rules:
+			#ruin sites can already be visible before the player charts them.
+			if rule.terrain_type == Terrain.Base.SETTLEMENT and island.has_ruin_site(check_cell):
+				continue
 			if not rule.allowed_on.is_empty():
 				if not current_base in rule.allowed_on:
 					continue
@@ -351,6 +340,9 @@ func _generate_block(island: Island, block_size: int, params: GenerationParamete
 	for rule: PlacementRule in params.placement_rules:
 		#"rule.count" here is interpreted as "number of instances" or "number of clusters" depending on logic
 		var candidate_cells: Array[Vector2i] = _get_candidate_cells(available_cells, island, rule.seed_placement)
+		candidate_cells = candidate_cells.filter(func(cell: Vector2i) -> bool:
+			return block_data[cell].terrain != Terrain.Base.SETTLEMENT
+		)
 
 		var features_to_place: int = _roll_environment_adjusted_feature_count(rule)
 		var placed_features: int = 0
@@ -520,7 +512,7 @@ func _get_candidate_cells(pool: Array[Vector2i], island: Island, placement_logic
 #center: start tile
 #size: how many tiles
 #block_data: context to check bounds
-#check_feature_empty: if true, only grows into tiles with no existing tower/feature
+#check_feature_empty: if true, skips settlements and tiles already occupied by a feature
 func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, check_feature_empty: bool = false) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
 	var open_list: Array[Vector2i] = [center]
@@ -532,7 +524,8 @@ func _grow_blob_in_block(center: Vector2i, size: int, block_data: Dictionary, ch
 		#validation check
 		if not block_data.has(current): continue
 		if Terrain.is_waterlike(block_data[current].terrain): continue
-		if check_feature_empty and block_data[current].feature != Towers.Type.VOID: continue
+		if check_feature_empty and (block_data[current].terrain == Terrain.Base.SETTLEMENT or block_data[current].feature != Towers.Type.VOID):
+			continue
 
 		result.append(current)
 

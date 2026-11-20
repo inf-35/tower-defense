@@ -3,6 +3,9 @@ render_mode unshaded;
 
 //a crisp selection border following the icon's opaque silhouette, including internal gaps.
 uniform bool outline_enabled = false;
+//locked icons retain only their original transparency, hiding all authored colour and linework.
+uniform bool locked = false;
+uniform vec3 locked_color : source_color = vec3(0.45);
 uniform vec4 outline_color : source_color = vec4(0.96, 0.68, 0.16, 1.0);
 //source-texture pixels; the border scales with the artwork during hover expansion.
 uniform float outline_width : hint_range(0.0, 8.0, 0.25) = 5.0;
@@ -22,14 +25,17 @@ float sample_alpha(sampler2D source_texture, vec2 uv) {
 
 void vertex() {
 	item_modulate = COLOR;
-	if (outline_enabled && outline_width > 0.0) {
+	if (!locked && outline_enabled && outline_width > 0.0) {
 		float texture_scale = min(draw_size.x * TEXTURE_PIXEL_SIZE.x, draw_size.y * TEXTURE_PIXEL_SIZE.y);
 		VERTEX += (UV * 2.0 - 1.0) * outline_width * texture_scale;
 	}
 }
 
 void fragment() {
-	if (outline_enabled && outline_width > 0.0) {
+	if (locked) {
+		//fragment color already contains the sampled texture alpha and canvas modulation.
+		COLOR.rgb = locked_color * item_modulate.rgb;
+	} else if (outline_enabled && outline_width > 0.0) {
 		//remap the expanded quad back to the original image without stretching its artwork.
 		vec2 margin = TEXTURE_PIXEL_SIZE * outline_width;
 		vec2 uv = UV * (vec2(1.0) + margin * 2.0) - margin;
