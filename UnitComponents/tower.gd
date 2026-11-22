@@ -109,6 +109,9 @@ func enter_ruin_state(reason: RuinService.RuinReason) -> void:
 	if current_state == State.RUINED:
 		return
 
+	if not abstractive and Run.is_run_ready():
+		ParticleManager.play_particles(ID.Particles.BUILDING_DUST_BURST, global_position)
+
 	current_state = State.RUINED
 	if is_instance_valid(combat_light):
 		combat_light.available = false
@@ -261,6 +264,10 @@ func _ready() -> void:
 	behavior.initialise(self)
 	if abstractive:
 		return
+
+	#reconstruction and generated terrain features should not play player construction feedback.
+	if Run.is_run_ready() and not environmental and not hostile:
+		ParticleManager.play_particles(ID.Particles.BUILDING_DUST_BURST, global_position)
 
 	adjacency_updated.connect(func(adjacency_data: AdjacencyReportData): #receive data from Island
 		var event := GameEvent.new()

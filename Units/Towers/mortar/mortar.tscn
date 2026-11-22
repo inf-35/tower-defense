@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://clq5akjbo7s7q"]
+[gd_scene format=3 uid="uid://clq5akjbo7s7q"]
 
 [ext_resource type="Script" uid="uid://glk50fqtygyn" path="res://UnitComponents/tower.gd" id="1_7vk8b"]
 [ext_resource type="Script" uid="uid://cs61b35p7jme8" path="res://Content/Behaviors/_default_tower_behavior.gd" id="2_hnf8u"]
@@ -8,22 +8,23 @@
 [ext_resource type="Script" uid="uid://c7bx77xcy58x8" path="res://UnitComponents/range_component.gd" id="6_xvi8q"]
 [ext_resource type="Script" uid="uid://detgar3t50qgi" path="res://UnitComponents/attack_component.gd" id="7_orbrr"]
 [ext_resource type="Resource" uid="uid://bi7clc5rwhhg5" path="res://Units/Towers/mortar/mortar_attack.tres" id="8_5p5fl"]
-[ext_resource type="Texture2D" uid="uid://v6uy4q8ahnbn" path="res://Assets/blue_tower_base.png" id="9_goxye"]
-[ext_resource type="Texture2D" uid="uid://d3pulwmy5uqta" path="res://Assets/cannon_turret.png" id="10_d02bj"]
 [ext_resource type="Script" uid="uid://bpd0vj57rmxpn" path="res://UnitComponents/modifiers_component.gd" id="11_wg8jx"]
-[ext_resource type="Script" path="res://Content/stat_display_info.gd" id="12_display"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/damage.tres" id="13_damage"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/hitrate.tres" id="14_hitrate"]
+[ext_resource type="Script" uid="uid://ytjls7y0k8wv" path="res://Content/stat_display_info.gd" id="12_display"]
+[ext_resource type="Resource" uid="uid://chohow8sxqky1" path="res://Content/StatDisplays/damage.tres" id="13_damage"]
+[ext_resource type="Texture2D" uid="uid://q21lnqsn4air" path="res://Assets/mortar_base.png" id="14_5p5fl"]
+[ext_resource type="Resource" uid="uid://b6anrk53urna4" path="res://Content/StatDisplays/hitrate.tres" id="14_hitrate"]
+[ext_resource type="Texture2D" uid="uid://iuxxchf1fi06" path="res://Assets/mortar_rigging.png" id="15_goxye"]
 [ext_resource type="Resource" path="res://Content/StatDisplays/range_band.tres" id="15_range_band"]
-[ext_resource type="Resource" path="res://Content/StatDisplays/radius.tres" id="17_radius"]
+[ext_resource type="Texture2D" uid="uid://cwm042jik0f5h" path="res://Assets/mortar_cannon.png" id="16_d02bj"]
+[ext_resource type="Resource" uid="uid://cybuicau0bb6i" path="res://Content/StatDisplays/radius.tres" id="17_radius"]
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="18_shadow"]
 
-[sub_resource type="Animation" id="Animation_placeholder_reset"]
+[sub_resource type="Animation" id="Animation_mortar_reset"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/path = NodePath("Graphics/TurretFrame/base/Sprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -35,7 +36,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/path = NodePath("Graphics/TurretFrame/base/Sprite2D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -45,47 +46,77 @@ tracks/1/keys = {
 "values": [Vector2(0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_placeholder_attack"]
+[sub_resource type="Animation" id="Animation_mortar_attack"]
 resource_name = "attack"
-length = 0.5
+length = 0.75
 step = 0.016666668
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/TurretFrame/Turret:scale")
+tracks/0/path = NodePath("Graphics/TurretFrame/base/Sprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.13, 0.3, 0.5),
+"times": PackedFloat32Array(0, 0.05, 0.16, 0.45, 0.75),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(0.65, 1.25), Vector2(1.18, 0.86), Vector2(0.96, 1.03), Vector2(1, 1)]
+"values": [Vector2(1, 1), Vector2(0.62, 1.28), Vector2(1.13, 0.9), Vector2(0.98, 1.02), Vector2(1, 1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Graphics/TurretFrame/Turret:position")
+tracks/1/path = NodePath("Graphics/TurretFrame/base/Sprite2D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.09, 0.22, 0.38, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.045, 0.1, 0.28, 0.52, 0.65, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 0), Vector2(-36, 0), Vector2(-8, 0), Vector2(2, 0), Vector2(0, 0)]
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(-90, 0), Vector2(-38, 0), Vector2(-6, 0), Vector2(2, 0), Vector2(0, 0)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_placeholder"]
+[sub_resource type="Animation" id="Animation_mortar_windup"]
+resource_name = "attack_windup"
+length = 0.9
+step = 0.025
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/TurretFrame/base/Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.028125, 0.05625, 0.084375, 0.1125, 0.140625, 0.16875, 0.196875, 0.225, 0.253125, 0.28125, 0.309375, 0.3375, 0.365625, 0.39375, 0.421875, 0.45, 0.478125, 0.50625, 0.534375, 0.5625, 0.590625, 0.61875, 0.646875, 0.675, 0.703125, 0.73125, 0.759375, 0.7875, 0.815625, 0.84375, 0.871875, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0.0023, -0.0035), Vector2(-0.0047, 0.0133), Vector2(0.0334, -0.007), Vector2(-0.0437, -0.0406), Vector2(0.0391, 0.0879), Vector2(-0.1336, 0.0141), Vector2(0.1244, -0.0957), Vector2(-0.2, 0.1), Vector2(0.1898, -0.2848), Vector2(-0.1172, 0.332), Vector2(0.449, -0.0945), Vector2(-0.3937, -0.3656), Vector2(0.2641, 0.5941), Vector2(-0.7273, 0.0766), Vector2(0.5713, -0.4395), Vector2(-0.8, 0.4), Vector2(0.6773, -1.016), Vector2(-0.3797, 1.0758), Vector2(1.3396, -0.282), Vector2(-1.0938, -1.0156), Vector2(0.6891, 1.5504), Vector2(-1.7961, 0.1891), Vector2(1.3432, -1.0332), Vector2(-1.8, 0.9), Vector2(1.4648, -2.1973), Vector2(-0.7922, 2.2445), Vector2(2.7053, -0.5695), Vector2(-2.1437, -1.9906), Vector2(1.3141, 2.9566), Vector2(-3.3398, 0.3516), Vector2(2.44, -1.877), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/TurretFrame/base/Sprite2D:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = false
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mortar"]
 _data = {
-&"RESET": SubResource("Animation_placeholder_reset"),
-&"attack": SubResource("Animation_placeholder_attack")
+&"RESET": SubResource("Animation_mortar_reset"),
+&"attack": SubResource("Animation_mortar_attack"),
+&"attack_windup": SubResource("Animation_mortar_windup")
 }
 
-[node name="Mortar" type="Node2D" node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
+[node name="Mortar" type="Node2D" unique_id=928740087 node_paths=PackedStringArray("turret", "behavior", "graphics", "animation_player", "modifiers_component", "health_component", "movement_component", "range_component", "attack_component")]
 z_index = 100
 script = ExtResource("1_7vk8b")
 type = 22
-stat_displays = Array[ExtResource("12_display")]([ExtResource("13_damage"), ExtResource("14_hitrate"), ExtResource("15_range_band"), ExtResource("17_radius")])
 turret = NodePath("Graphics/TurretFrame")
+stat_displays = Array[ExtResource("12_display")]([ExtResource("13_damage"), ExtResource("14_hitrate"), ExtResource("15_range_band"), ExtResource("17_radius")])
 behavior = NodePath("DefaultTowerBehavior")
 graphics = NodePath("Graphics")
 animation_player = NodePath("AnimationPlayer")
@@ -96,51 +127,56 @@ range_component = NodePath("RangeComponent")
 attack_component = NodePath("AttackComponent")
 metadata/_custom_type_script = "uid://glk50fqtygyn"
 
-[node name="DefaultTowerBehavior" type="Node" parent="."]
+[node name="DefaultTowerBehavior" type="Node" parent="." unique_id=313133068]
 script = ExtResource("2_hnf8u")
 metadata/_custom_type_script = "uid://cs61b35p7jme8"
 
-[node name="MovementComponent" type="Node" parent="."]
+[node name="MovementComponent" type="Node" parent="." unique_id=2082374092]
 script = ExtResource("3_d40xg")
 movement_data = ExtResource("4_8nmin")
 metadata/_custom_type_script = "uid://bj2kqlul6w1an"
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1506650568]
 script = ExtResource("5_cuvit")
 metadata/_custom_type_script = "uid://b016qjmysn53e"
 
-[node name="RangeComponent" type="Node" parent="."]
+[node name="RangeComponent" type="Node" parent="." unique_id=1548140701]
 script = ExtResource("6_xvi8q")
 metadata/_custom_type_script = "uid://c7bx77xcy58x8"
 
-[node name="AttackComponent" type="Node" parent="." node_paths=PackedStringArray("muzzle")]
+[node name="AttackComponent" type="Node" parent="." unique_id=1172822422 node_paths=PackedStringArray("muzzle")]
 script = ExtResource("7_orbrr")
 attack_data = ExtResource("8_5p5fl")
 muzzle = NodePath("../Graphics/TurretFrame/Muzzle")
 metadata/_custom_type_script = "uid://detgar3t50qgi"
 
-[node name="Graphics" type="Sprite2D" parent="."]
-scale = Vector2(0.121, 0.121)
-texture = ExtResource("9_goxye")
+[node name="Graphics" type="Sprite2D" parent="." unique_id=2117778453]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("14_5p5fl")
 
-[node name="TurretFrame" type="Node2D" parent="Graphics"]
-z_index = 1
-
-[node name="Turret" type="Sprite2D" parent="Graphics/TurretFrame"]
-texture = ExtResource("10_d02bj")
-
-[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame"]
-position = Vector2(56.60377, 0)
-
-[node name="ShadowComponent" type="Node2D" parent="Graphics"]
+[node name="ShadowComponent" type="Node2D" parent="Graphics" unique_id=872752756]
+scale = Vector2(0.99999994, 0.99999994)
 script = ExtResource("18_shadow")
-height_multiplier = 0.8
 metadata/_custom_type_script = "uid://cgkca68adlq8y"
 
-[node name="ModifiersComponent" type="Node" parent="."]
+[node name="TurretFrame" type="Node2D" parent="Graphics" unique_id=396048101]
+z_index = 1
+
+[node name="base" type="Sprite2D" parent="Graphics/TurretFrame" unique_id=1015718385]
+texture = ExtResource("15_goxye")
+offset = Vector2(-15, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics/TurretFrame/base" unique_id=693385548]
+texture = ExtResource("16_d02bj")
+offset = Vector2(10, 0)
+
+[node name="Muzzle" type="Marker2D" parent="Graphics/TurretFrame" unique_id=1534551826]
+position = Vector2(122, 0)
+
+[node name="ModifiersComponent" type="Node" parent="." unique_id=1245686436]
 script = ExtResource("11_wg8jx")
 metadata/_custom_type_script = "uid://bpd0vj57rmxpn"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1648363373]
 root_motion_local = true
-libraries/ = SubResource("AnimationLibrary_placeholder")
+libraries/ = SubResource("AnimationLibrary_mortar")

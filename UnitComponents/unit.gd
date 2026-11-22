@@ -670,11 +670,17 @@ func take_hit(hit: HitData) -> void:
 	if unit_dead and not is_zero_approx(direct_health_damage):
 		hit_report.death_caused = true
 
-		ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
+		if not self is Tower:
+			ParticleManager.play_particles(ID.Particles.ENEMY_DEATH_SPARKS, self.global_position, hit_report.velocity.angle())
 
 		died.emit(hit_report) #NOTE: this is when the unit dies
 	elif graphics:
-		var hit_feedback_admitted: bool = ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
+		var hit_feedback_admitted: bool = false
+		if self is Tower:
+			if direct_health_damage > 0.0:
+				hit_feedback_admitted = ParticleManager.play_particles(ID.Particles.BUILDING_HIT_DUST, global_position)
+		else:
+			hit_feedback_admitted = ParticleManager.play_particles(ID.Particles.ENEMY_HIT_SPARKS, self.global_position, hit_report.velocity.angle())
 		if hit_feedback_admitted:
 			play_hit_flash()
 

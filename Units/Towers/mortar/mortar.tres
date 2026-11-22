@@ -1,8 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" format=3 uid="uid://fsas6ethkjl2"]
 
-[ext_resource type="Texture2D" uid="uid://d0g5jqpqajbyi" path="res://Assets/cannon_full.png" id="1_dtqqj"]
+[ext_resource type="Texture2D" uid="uid://caqisag6t02ux" path="res://Assets/mortar_icon.png" id="1_1emyw"]
 [ext_resource type="Script" uid="uid://do6qrosup8u56" path="res://Content/inspector_action_info.gd" id="2_a7a3b"]
-[ext_resource type="Texture2D" uid="uid://dumjwd7geyjbj" path="res://Assets/cannon_icon.png" id="2_n1ccw"]
 [ext_resource type="Script" uid="uid://dplrswcru72f4" path="res://Content/tower_data.gd" id="3_hsyy1"]
 [ext_resource type="Resource" uid="uid://b3b6naynouf2j" path="res://Content/InspectorActions/default_sell.tres" id="3_yivyx"]
 [ext_resource type="Resource" uid="uid://dr31usbi57f7i" path="res://Content/InspectorActions/default_upgrade.tres" id="4_5wuvk"]
@@ -16,8 +15,8 @@ size = Vector2i(2, 2)
 cost = 12.0
 required_capacity = 2.0
 tower_name = "Mortar"
-tower_description = "Lobs a long-range shell that ignores Armor and damages enemies in a two-tile-wide blast. Can only target enemies between its minimum and maximum {UNIT_RANGE}."
-icon = ExtResource("1_dtqqj")
-preview = ExtResource("2_n1ccw")
+tower_description = "Lobs a long-range shell that damages enemies in a two-tile-wide blast. Can only target enemies between its minimum and maximum {UNIT_RANGE}."
+icon = ExtResource("1_1emyw")
+preview = ExtResource("1_1emyw")
 tower_scene = ExtResource("4_flo2w")
 metadata/_custom_type_script = "uid://dplrswcru72f4"

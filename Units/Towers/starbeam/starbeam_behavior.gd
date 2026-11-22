@@ -13,14 +13,40 @@ func start() -> void: ##binds the animation to game speed before the first coold
 	Clock.speed_changed.connect(_on_speed_changed)
 	attach()
 
-func attach() -> void: ##resumes tracking and starts a turn over the remaining cooldown
+func attach() -> void: ##restores the authored pose and starts a turn over the remaining cooldown
+	_play_animation(&"RESET")
+	animation_player.advance(0.0)
 	_turn_sunring(0.0)
 
 func detach() -> void: ##stops both rings when the tower deactivates
 	_enter_state(State.READY)
+	_play_animation(&"RESET")
+	animation_player.advance(0.0)
 	if _sunring_tween != null:
 		_sunring_tween.kill()
 		_sunring_tween = null
+
+func _enter_state(new_state: State, target: Unit = null) -> void: ##cancels an abandoned windup while allowing a fired shot's fade to finish
+	if new_state == State.READY and animation_player.assigned_animation == &"attack_windup":
+		_play_animation(&"RESET")
+		animation_player.advance(0.0)
+		_in_anticipation = false
+	super._enter_state(new_state, target)
+
+func _play_animation(anim_name: StringName, custom_speed: float = 1.0) -> void: ##aligns authored windup playback to cooldown and ignores stale target timers
+	if not is_instance_valid(animation_player) or not animation_player.has_animation(anim_name):
+		return
+	if anim_name == &"attack_windup" and (unit.disabled or _current_state != State.WIND_UP):
+		return
+	if anim_name == &"attack_windup" and custom_speed > 0.0 and attack_component.current_cooldown > animation_player.get_animation(anim_name).length:
+		return
+	animation_player.speed_scale = Clock.speed_multiplier
+	animation_player.play(anim_name, -1, custom_speed, custom_speed < 0.0)
+	if anim_name == &"attack_windup" and custom_speed > 0.0:
+		var windup_length: float = animation_player.get_animation(anim_name).length
+		animation_player.seek(clampf(windup_length - attack_component.current_cooldown, 0.0, windup_length), true)
+	elif anim_name == &"attack":
+		animation_player.seek(0.0, true)
 
 func _attack(_target: Unit) -> void: ##fires at the current priority target with a matching starstruck particle trail
 	var target: Unit = range_component.get_target()
@@ -51,6 +77,8 @@ func _turn_sunring(pause_seconds: float) -> void: ##holds at firing, then eases 
 	_sunring_tween.tween_property(sunring, ^"rotation_degrees", target_degrees, cooldown - pause_duration) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT).set_delay(pause_duration)
 
-func _on_speed_changed(multiplier: float) -> void: ##keeps the current turn in sync with the game's clock
+func _on_speed_changed(multiplier: float) -> void: ##keeps authored animations and the current turn in sync with the game's clock
+	if is_instance_valid(animation_player):
+		animation_player.speed_scale = multiplier
 	if _sunring_tween != null and _sunring_tween.is_valid():
 		_sunring_tween.set_speed_scale(multiplier)

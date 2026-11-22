@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bqewtpqhtt2s1"]
+
+[ext_resource type="Texture2D" uid="uid://cr1f4b58qewrn" path="res://Assets/dust_particles.png" id="1_dust"]
+
+[sub_resource type="Gradient" id="Gradient_fade"]
+offsets = PackedFloat32Array(0, 0.08, 0.55, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.9, 1, 1, 1, 0.55, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_fade"]
+gradient = SubResource("Gradient_fade")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dust"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 6.0
+angle_max = 360.0
+spread = 180.0
+initial_velocity_min = 8.0
+initial_velocity_max = 26.0
+angular_velocity_min = -60.000015
+angular_velocity_max = 59.99998
+gravity = Vector3(0, 60, 0)
+damping_min = 12.0
+damping_max = 20.0
+scale_min = 0.049999997
+scale_max = 0.08
+color_ramp = SubResource("GradientTexture_fade")
+
+[node name="BuildingDustBurst" type="GPUParticles2D" unique_id=687920249]
+z_index = 101
+z_as_relative = false
+emitting = false
+amount = 6
+texture = ExtResource("1_dust")
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+visibility_rect = Rect2(-48, -48, 96, 96)
+process_material = SubResource("ParticleProcessMaterial_dust")

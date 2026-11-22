@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://cc0cpxad1o1nw" path="res://UI/main_menu.gd" id="1_06t4h"]
 [ext_resource type="Theme" uid="uid://d1gcsqycnxqwm" path="res://UI/default_theme.tres" id="2_7vrkn"]
-[ext_resource type="Texture2D" uid="uid://pvyutr4ju2ce" path="res://Assets/Marketing/itch_background.png" id="3_glbon"]
-[ext_resource type="Texture2D" uid="uid://dum52yseqso5v" path="res://Assets/Marketing/wordmark.png" id="4_glbon"]
 [ext_resource type="Script" uid="uid://dmty142sb38lp" path="res://UI/clicky_button.gd" id="4_jix8l"]
+[ext_resource type="Texture2D" uid="uid://dsrluoycetwgf" path="res://Assets/wordmark.png" id="4_qe12f"]
+[ext_resource type="Texture2D" uid="uid://btnkc8mx6wt4w" path="res://Assets/itch_background.png" id="6_8qtwp"]
 [ext_resource type="Shader" uid="uid://c470efx242vnm" path="res://Shaders/screen_boil.gdshader" id="8_screen_boil"]
-[ext_resource type="PackedScene" path="res://UI/embark/embark.tscn" id="9_embark"]
+[ext_resource type="PackedScene" uid="uid://cis162bjkk48y" path="res://UI/embark/embark.tscn" id="9_embark"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_menu_boil"]
 
@@ -114,7 +114,7 @@ offset_top = 200.0
 offset_right = 673.5176
 offset_bottom = 466.0
 grow_horizontal = 2
-texture = ExtResource("4_glbon")
+texture = ExtResource("4_qe12f")
 
 [node name="AnalyticsNotice" type="Label" parent="UI/MarginContainer/Control" unique_id=1943911136]
 layout_mode = 1
@@ -132,7 +132,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="EmbarkPage" parent="UI" instance=ExtResource("9_embark")]
+[node name="EmbarkPage" parent="UI" unique_id=1720221698 instance=ExtResource("9_embark")]
 visible = false
 
 [node name="AudioListener2D" type="AudioListener2D" parent="." unique_id=1086262203]
@@ -147,15 +147,15 @@ repeat_times = 200
 [node name="Sprite2D" type="Sprite2D" parent="Parallax2D" unique_id=551256432]
 texture_repeat = 2
 position = Vector2(1897, 1166)
-texture = ExtResource("3_glbon")
+texture = ExtResource("6_8qtwp")
 region_enabled = true
 region_rect = Rect2(2, 0, 1400, 1400)
 
-[node name="BoilOverlay" type="CanvasLayer" parent="."]
+[node name="BoilOverlay" type="CanvasLayer" parent="." unique_id=1079377202]
 process_mode = 3
 layer = 100
 
-[node name="ColorRect" type="ColorRect" parent="BoilOverlay"]
+[node name="ColorRect" type="ColorRect" parent="BoilOverlay" unique_id=846761086]
 material = SubResource("ShaderMaterial_menu_boil")
 anchors_preset = 15
 anchor_right = 1.0

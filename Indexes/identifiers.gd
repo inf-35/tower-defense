@@ -28,6 +28,8 @@ class Rewards:
 class Particles:
 	const ENEMY_HIT_SPARKS: StringName = &"enemy_hit_sparks"
 	const ENEMY_DEATH_SPARKS: StringName = &"enemy_death_sparks"
+	const BUILDING_HIT_DUST: StringName = &"building_hit_dust"
+	const BUILDING_DUST_BURST: StringName = &"building_dust_burst"
 
 class Sounds:
 	const ENEMY_HIT_SOUND: StringName = &"enemy_hit_sound"

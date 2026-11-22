@@ -29,7 +29,13 @@ func _ready() -> void: ##registers the inherited debug hitbox group before wirin
 		var resolve_keep_damage: Callable = func() -> void:
 			if not Run.has_active_run() or not is_instance_valid(enemy) or enemy.is_queued_for_deletion():
 				return
-			Run.player.hp -= 1
+			var player: Player = Run.player
+			var health_before: float = player.hp
+			var impact_position: Vector2 = global_position
+			player.hp -= 1
+			if is_instance_valid(player) and player.hp < health_before:
+				var dust_effect: StringName = ID.Particles.BUILDING_DUST_BURST if player.hp <= 0.0 else ID.Particles.BUILDING_HIT_DUST
+				ParticleManager.play_particles(dust_effect, impact_position)
 			if Run.has_active_run() and is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
 				enemy.died.emit(HitReportData.new())
 		resolve_keep_damage.call_deferred()

@@ -4,7 +4,9 @@ extends Node
 #--- configuration ---
 @export var particle_library: Dictionary[StringName, PackedScene] = {
 	ID.Particles.ENEMY_HIT_SPARKS : preload("res://Assets/Particles/enemy_hit_sparks.tscn"),
-	ID.Particles.ENEMY_DEATH_SPARKS: preload("res://Assets/Particles/enemy_death_sparks.tscn")
+	ID.Particles.ENEMY_DEATH_SPARKS: preload("res://Assets/Particles/enemy_death_sparks.tscn"),
+	ID.Particles.BUILDING_HIT_DUST: preload("res://Assets/Particles/building_hit_dust.tscn"),
+	ID.Particles.BUILDING_DUST_BURST: preload("res://Assets/Particles/building_dust_burst.tscn"),
 }
 
 #--- object pooling ---
@@ -12,6 +14,7 @@ const INITIAL_POOL_SIZE: int = 5
 const MAX_POOL_SIZE_PER_EFFECT: int = 32 ##bounds synchronous emitter creation when one attack hits a large crowd
 #dictionary[stringname, array[gpuparticles2d]]
 var _emitter_pool: Dictionary = {}
+var _busy_emitters: Dictionary[GPUParticles2D, bool] = {}
 
 func _ready() -> void:
 	#initial shader compilation
@@ -44,15 +47,15 @@ func play_particles(effect_name: StringName, position: Vector2, rotation: float 
 	#3. configure and play
 	emitter.global_position = position
 	emitter.rotation = rotation
+	_busy_emitters[emitter] = true
+	emitter.restart()
 	emitter.emitting = true
-	#note: no need to manually manage return. the emitter stays in the pool array.
-	#we just check 'emitting' property next time we need one.
 	return true
 
 func _find_free_emitter(effect_name: StringName) -> GPUParticles2D:
 	var pool: Array = _emitter_pool[effect_name]
 	for emitter: GPUParticles2D in pool:
-		if not emitter.emitting:
+		if not _busy_emitters.has(emitter):
 			return emitter
 	return null
 
@@ -75,6 +78,7 @@ func _expand_pool(effect_name: StringName, count: int) -> Array[GPUParticles2D]:
 		var emitter: GPUParticles2D = scene.instantiate()
 		emitter.one_shot = true #crucial for pooling logic
 		emitter.emitting = false
+		emitter.finished.connect(func() -> void: _busy_emitters.erase(emitter))
 		add_child(emitter)
 
 		_emitter_pool[effect_name].append(emitter)

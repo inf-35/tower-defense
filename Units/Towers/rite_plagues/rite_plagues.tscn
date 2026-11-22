@@ -15,7 +15,7 @@
 [ext_resource type="Script" uid="uid://cgkca68adlq8y" path="res://UnitComponents/shadow_component.gd" id="10_msd7q"]
 [ext_resource type="Script" uid="uid://bxee20ha7a0bv" path="res://Content/attack_data.gd" id="11_attack"]
 [ext_resource type="Script" uid="uid://bflbkh7hshl8l" path="res://Content/vfx_info.gd" id="12_vfx"]
-[ext_resource type="Texture2D" uid="uid://534q8fh0sw7t" path="res://Assets/poison_icon.png" id="13_poison_icon"]
+[ext_resource type="Texture2D" uid="uid://cfbw5q2grc5o8" path="res://Assets/poisonball.png" id="13_poison_icon"]
 [ext_resource type="Texture2D" uid="uid://3kc7rmumtsjp" path="res://Assets/rite_plagues.png" id="15_j8r1l"]
 
 [sub_resource type="Resource" id="Resource_plague_projectile_vfx"]
